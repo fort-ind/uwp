@@ -131,12 +131,6 @@
                         <SymbolIcon Symbol="People"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="About" Tag="About"
-                                     ToolTipService.ToolTip="About">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Help"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <!-- Content Area -->
@@ -254,18 +248,6 @@
                                        Margin="0,0,0,10"/>
 
                             <TextBlock Text="Social features coming soon"
-                                       FontSize="18"
-                                       TextWrapping="Wrap"/>
-                        </StackPanel>
-
-                        <!-- About Content -->
-                        <StackPanel x:Name="AboutPanel" Visibility="Collapsed">
-                            <TextBlock Text="About Fort.ind Desktop"
-                                       FontSize="32"
-                                       FontWeight="Bold"
-                                       Margin="0,0,0,10"/>
-
-                            <TextBlock Text="Version 0.5 Beta"
                                        FontSize="18"
                                        TextWrapping="Wrap"/>
                         </StackPanel>
@@ -620,20 +602,63 @@
                                             <Rectangle Height="1" Margin="0,0,0,12"
                                                        Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
                                                        Opacity="0.08"/>
-                                            <StackPanel Spacing="8">
-                                                <TextBlock Text="Fort.ind Desktop for UWP"
-                                                           FontSize="14" FontWeight="SemiBold"/>
-                                                <TextBlock Text="Version 0.5 Beta"
-                                                           FontSize="12" Opacity="0.6"/>
-                                                <Button x:Name="AboutButton"
-                                                        Click="AboutButton_Click"
-                                                        Margin="0,4,0,0"
-                                                        Style="{StaticResource ButtonRevealStyle}">
-                                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                                        <FontIcon Glyph="&#xE946;" FontSize="14"/>
-                                                        <TextBlock Text="View Details"/>
+                                            <StackPanel Spacing="12">
+
+                                                <!-- App identity -->
+                                                <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                                    <Border Width="44" Height="44" CornerRadius="10"
+                                                            Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                                        <FontIcon Glyph="&#xE774;" FontSize="22"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <StackPanel VerticalAlignment="Center" Spacing="4">
+                                                        <TextBlock Text="Fort.ind" FontSize="16" FontWeight="Bold"/>
+                                                        <TextBlock Text="Version 0.5 Beta"
+                                                                   FontSize="12"
+                                                                   Opacity="0.5"/>
                                                     </StackPanel>
-                                                </Button>
+                                                </StackPanel>
+
+                                                <Rectangle Height="1"
+                                                           Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                                           Opacity="0.08"/>
+
+                                                <!-- Links row -->
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <HyperlinkButton NavigateUri="https://fort1nd.com"
+                                                                     Padding="8,4" Margin="0">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <FontIcon Glyph="&#xE774;" FontSize="12"/>
+                                                            <TextBlock Text="Website" FontSize="12"/>
+                                                        </StackPanel>
+                                                    </HyperlinkButton>
+                                                    <HyperlinkButton x:Name="GitHubLink"
+                                                                     NavigateUri="https://github.com/fort-ind/Fort.ind-UWP"
+                                                                     Padding="8,4" Margin="0">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <FontIcon Glyph="&#xE943;" FontSize="12"/>
+                                                            <TextBlock Text="Source Code" FontSize="12"/>
+                                                        </StackPanel>
+                                                    </HyperlinkButton>
+                                                    <HyperlinkButton x:Name="IssuesLink"
+                                                                     NavigateUri="https://github.com/fort-ind/Fort.ind-UWP/issues"
+                                                                     Padding="8,4" Margin="0">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <FontIcon Glyph="&#xE946;" FontSize="12"/>
+                                                            <TextBlock Text="Report a Bug" FontSize="12"/>
+                                                        </StackPanel>
+                                                    </HyperlinkButton>
+                                                </StackPanel>
+
+                                                <!-- Footer -->
+                                                <StackPanel Orientation="Horizontal" Spacing="6" Opacity="0.4">
+                                                    <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="made with love for windows by fort.ind"
+                                                               FontSize="11" VerticalAlignment="Center"/>
+                                                    <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"/>
+                                                </StackPanel>
+
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>

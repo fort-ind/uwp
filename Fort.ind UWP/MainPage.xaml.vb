@@ -19,7 +19,6 @@ Public NotInheritable Class MainPage
         New SearchItem("Beta Programs", "Menu", "Betas"),
         New SearchItem("Your Profile", "Menu", "Profile"),
         New SearchItem("Social", "Menu", "Social"),
-        New SearchItem("About", "Menu", "About"),
         New SearchItem("Settings", "Menu", "Settings"),
         New SearchItem("Data Storage", "Settings", "Settings"),
         New SearchItem("Local JSON Storage", "Settings", "Settings"),
@@ -215,7 +214,6 @@ Public NotInheritable Class MainPage
         GamesPanel.Visibility = Visibility.Collapsed
         BetasPanel.Visibility = Visibility.Collapsed
         SocialPanel.Visibility = Visibility.Collapsed
-        AboutPanel.Visibility = Visibility.Collapsed
         SettingsPanel.Visibility = Visibility.Collapsed
         ContentFrame.Visibility = Visibility.Collapsed
         ContentScrollViewer.Visibility = Visibility.Visible
@@ -245,8 +243,6 @@ Public NotInheritable Class MainPage
                 End Try
             Case "Social"
                 SocialPanel.Visibility = Visibility.Visible
-            Case "About"
-                AboutPanel.Visibility = Visibility.Visible
             Case "Settings"
                 SettingsPanel.Visibility = Visibility.Visible
                 UpdateStorageInfo()
@@ -263,26 +259,6 @@ Public NotInheritable Class MainPage
         Catch ex As Exception
             StoragePathText.Text = ""
             UserCountText.Text = ""
-        End Try
-    End Sub
-
-    Private Async Sub AboutButton_Click(sender As Object, e As RoutedEventArgs)
-        Try
-            If _isDialogOpen Then Return
-            _isDialogOpen = True
-
-            Dim aboutDialog As New ContentDialog()
-            aboutDialog.Title = "About"
-            aboutDialog.Content = $"Fort.ind desktop for UWP{vbCrLf}Version 0.5 Beta{vbCrLf}{vbCrLf}Storage: Local JSON Files"
-            aboutDialog.PrimaryButtonText = "OK"
-            aboutDialog.DefaultButton = ContentDialogButton.Primary
-            aboutDialog.XamlRoot = Me.XamlRoot
-
-            Await aboutDialog.ShowAsync()
-        Catch ex As Exception
-            Debug.WriteLine($"MainPage: About dialog failed – {ex.Message}")
-        Finally
-            _isDialogOpen = False
         End Try
     End Sub
 
