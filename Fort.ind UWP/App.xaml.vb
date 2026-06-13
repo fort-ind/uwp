@@ -11,7 +11,9 @@ NotInheritable Class App
     ''' </summary>
     ''' <param name="e">Details about the launch request and process.</param>
     Protected Overrides Async Sub OnLaunched(e As Windows.ApplicationModel.Activation.LaunchActivatedEventArgs)
-        Dim rootFrame As Frame = TryCast(Window.Current.Content, Frame)
+        Dim showStartupErrorDialog As Boolean = False
+        Try
+            Dim rootFrame As Frame = TryCast(Window.Current.Content, Frame)
 
         ' Do not repeat app initialization when the Window already has content,
         ' just ensure that the window is active
@@ -27,7 +29,7 @@ NotInheritable Class App
             End If
 
             ' Apply saved theme before rendering to prevent a flash of the default theme
-            Dim savedTheme = Windows.Storage.ApplicationData.Current.LocalSettings.Values("AppTheme")?.ToString()
+            Dim savedTheme = Windows.Storage.ApplicationData.Current.LocalSettings.Values(AppConstants.SettingAppTheme)?.ToString()
             Select Case savedTheme
                 Case "Light" : rootFrame.RequestedTheme = ElementTheme.Light
                 Case "Dark"  : rootFrame.RequestedTheme = ElementTheme.Dark
@@ -53,6 +55,24 @@ NotInheritable Class App
             ' Ensure the current window is active
             Window.Current.Activate()
         End If
+        Catch ex As Exception
+            ' Log critical startup error
+            Debug.WriteLine($"Critical: OnLaunched failed - {ex.Message}")
+            showStartupErrorDialog = True
+        End Try
+
+        If showStartupErrorDialog AndAlso Window.Current.Content IsNot Nothing Then
+            Try
+                Dim errorDialog As New ContentDialog()
+                errorDialog.Title = "Startup Error"
+                errorDialog.Content = "The application failed to start properly. Please try restarting."
+                errorDialog.PrimaryButtonText = "OK"
+                errorDialog.XamlRoot = Window.Current.Content.XamlRoot
+                Await errorDialog.ShowAsync()
+            Catch
+                ' Nothing more we can do
+            End Try
+        End If
     End Sub
 
     ''' <summary>
@@ -60,8 +80,23 @@ NotInheritable Class App
     ''' </summary>
     ''' <param name="sender">The Frame which failed navigation</param>
     ''' <param name="e">Details about the navigation failure</param>
-    Private Sub OnNavigationFailed(sender As Object, e As NavigationFailedEventArgs)
-        Throw New Exception("Failed to load Page " + e.SourcePageType.FullName)
+    Private Async Sub OnNavigationFailed(sender As Object, e As NavigationFailedEventArgs)
+        ' Log the error instead of crashing the app
+        Debug.WriteLine($"Navigation failed: {e.SourcePageType.FullName} - {If(e.Exception IsNot Nothing, e.Exception.Message, "Unknown error")}")
+        
+        ' Show user-friendly error dialog
+        Try
+            Dim errorDialog As New ContentDialog()
+            errorDialog.Title = "Navigation Error"
+            errorDialog.Content = $"Failed to load page. The application will return to the home screen."
+            errorDialog.PrimaryButtonText = "OK"
+            errorDialog.DefaultButton = ContentDialogButton.Primary
+            errorDialog.XamlRoot = Window.Current.Content.XamlRoot
+            Await errorDialog.ShowAsync()
+        Catch ex As Exception
+            ' If dialog fails, just log it
+            Debug.WriteLine($"Error dialog failed: {ex.Message}")
+        End Try
     End Sub
 
     ''' <summary>

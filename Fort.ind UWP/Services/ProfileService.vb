@@ -21,10 +21,14 @@ Public Class ProfileService
     ''' <summary>
     ''' Attempts to register a new user
     ''' </summary>
-    Public Shared Async Function RegisterAsync(username As String, password As String, displayName As String, email As String) As Task(Of RegistrationResult)
+    Public Shared Async Function RegisterAsync(username As String, password As String, displayName As String, email As String, Optional cancellationToken As Threading.CancellationToken = Nothing) As Task(Of RegistrationResult)
         ' Validate inputs
         If String.IsNullOrWhiteSpace(username) OrElse username.Length < 3 Then
             Return New RegistrationResult(False, "Username must be at least 3 characters")
+        End If
+
+        If username.Length > 50 Then
+            Return New RegistrationResult(False, "Username must be 50 characters or fewer")
         End If
 
         If Not username.All(Function(c) Char.IsLetterOrDigit(c) OrElse c = "-"c OrElse c = "_"c) Then
@@ -35,19 +39,38 @@ Public Class ProfileService
             Return New RegistrationResult(False, "Password must be at least 8 characters")
         End If
 
+        ' Cap password length to prevent excessive PBKDF2 hashing time
+        If password.Length > 128 Then
+            Return New RegistrationResult(False, "Password must be 128 characters or fewer")
+        End If
+
+        If Not String.IsNullOrWhiteSpace(displayName) AndAlso displayName.Length > 100 Then
+            Return New RegistrationResult(False, "Display name must be 100 characters or fewer")
+        End If
+
         If String.IsNullOrWhiteSpace(displayName) Then
             displayName = username
         End If
+
+        ' Check for cancellation
+        cancellationToken.ThrowIfCancellationRequested()
 
         ' Check if username is taken
         If Await LocalStorageService.IsUsernameTakenAsync(username) Then
             Return New RegistrationResult(False, "Username is already taken")
         End If
 
+        ' Check for cancellation before expensive operation
+        cancellationToken.ThrowIfCancellationRequested()
+
         ' Create new profile
         Dim profile As New UserProfile(username, displayName, email)
-        profile.PasswordHash = HashPassword(password)
+        ' Move password hashing off UI thread to prevent UI freeze
+        profile.PasswordHash = Await Task.Run(Function() HashPassword(password), cancellationToken)
         profile.LastLoginDate = DateTime.Now
+
+        ' Check for cancellation
+        cancellationToken.ThrowIfCancellationRequested()
 
         ' Save profile
         Dim saved = Await LocalStorageService.SaveProfileAsync(profile)
@@ -66,10 +89,13 @@ Public Class ProfileService
     ''' <summary>
     ''' Attempts to log in with username and password
     ''' </summary>
-    Public Shared Async Function LoginAsync(username As String, password As String) As Task(Of LoginResult)
+    Public Shared Async Function LoginAsync(username As String, password As String, Optional cancellationToken As Threading.CancellationToken = Nothing) As Task(Of LoginResult)
         If String.IsNullOrWhiteSpace(username) OrElse String.IsNullOrWhiteSpace(password) Then
             Return New LoginResult(False, "Username and password are required")
         End If
+
+        ' Check for cancellation
+        cancellationToken.ThrowIfCancellationRequested()
 
         ' Find user by username
         Dim profile = Await LocalStorageService.LoadProfileByUsernameAsync(username)
@@ -77,8 +103,12 @@ Public Class ProfileService
             Return New LoginResult(False, "Invalid username or password")
         End If
 
-        ' Verify password
-        If Not VerifyPassword(password, profile.PasswordHash) Then
+        ' Check for cancellation before expensive operation
+        cancellationToken.ThrowIfCancellationRequested()
+
+        ' Verify password off UI thread to prevent UI freeze
+        Dim isValid = Await Task.Run(Function() VerifyPassword(password, profile.PasswordHash), cancellationToken)
+        If Not isValid Then
             Return New LoginResult(False, "Invalid username or password")
         End If
 
@@ -144,7 +174,7 @@ Public Class ProfileService
     ''' <summary>
     ''' Updates the current user's profile
     ''' </summary>
-    Public Shared Async Function UpdateProfileAsync(displayName As String, email As String, bio As String) As Task(Of Boolean)
+    Public Shared Async Function UpdateProfileAsync(displayName As String, email As String, bio As String, Optional profilePicturePath As String = Nothing, Optional updateProfilePicture As Boolean = False) As Task(Of Boolean)
         If CurrentUser Is Nothing Then
             Return False
         End If
@@ -152,16 +182,21 @@ Public Class ProfileService
         Dim oldDisplayName = CurrentUser.DisplayName
         Dim oldEmail = CurrentUser.Email
         Dim oldBio = CurrentUser.Bio
+        Dim oldProfilePicturePath = CurrentUser.ProfilePicturePath
 
         CurrentUser.DisplayName = displayName
         CurrentUser.Email = email
         CurrentUser.Bio = bio
+        If updateProfilePicture Then
+            CurrentUser.ProfilePicturePath = profilePicturePath
+        End If
 
         Dim saved = Await LocalStorageService.SaveProfileAsync(CurrentUser)
         If Not saved Then
             CurrentUser.DisplayName = oldDisplayName
             CurrentUser.Email = oldEmail
             CurrentUser.Bio = oldBio
+            CurrentUser.ProfilePicturePath = oldProfilePicturePath
         End If
         Return saved
     End Function
@@ -171,6 +206,10 @@ Public Class ProfileService
     ''' </summary>
     Public Shared Async Function UpdatePreferencesAsync(preferences As UserPreferences) As Task(Of Boolean)
         If CurrentUser Is Nothing Then
+            Return False
+        End If
+
+        If preferences Is Nothing Then
             Return False
         End If
 
@@ -186,13 +225,17 @@ Public Class ProfileService
     ''' <summary>
     ''' Changes the user's password
     ''' </summary>
-    Public Shared Async Function ChangePasswordAsync(currentPassword As String, newPassword As String) As Task(Of Boolean)
+    Public Shared Async Function ChangePasswordAsync(currentPassword As String, newPassword As String, Optional cancellationToken As Threading.CancellationToken = Nothing) As Task(Of Boolean)
         If CurrentUser Is Nothing Then
             Return False
         End If
 
-        ' Verify current password
-        If Not VerifyPassword(currentPassword, CurrentUser.PasswordHash) Then
+        ' Check for cancellation
+        cancellationToken.ThrowIfCancellationRequested()
+
+        ' Verify current password off UI thread
+        Dim isValid = Await Task.Run(Function() VerifyPassword(currentPassword, CurrentUser.PasswordHash), cancellationToken)
+        If Not isValid Then
             Return False
         End If
 
@@ -201,8 +244,12 @@ Public Class ProfileService
             Return False
         End If
 
+        ' Check for cancellation before expensive operation
+        cancellationToken.ThrowIfCancellationRequested()
+
         Dim oldHash = CurrentUser.PasswordHash
-        CurrentUser.PasswordHash = HashPassword(newPassword)
+        ' Hash new password off UI thread
+        CurrentUser.PasswordHash = Await Task.Run(Function() HashPassword(newPassword), cancellationToken)
         Dim saved = Await LocalStorageService.SaveProfileAsync(CurrentUser)
         If Not saved Then
             CurrentUser.PasswordHash = oldHash
@@ -255,7 +302,7 @@ Public Class ProfileService
     ''' Verifies a password against a stored hash created by <see cref="HashPassword"/>.
     ''' </summary>
     Private Shared Function VerifyPassword(password As String, storedHash As String) As Boolean
-        If String.IsNullOrEmpty(password) OrElse String.IsNullOrWhiteSpace(storedHash) Then
+        If String.IsNullOrWhiteSpace(password) OrElse String.IsNullOrWhiteSpace(storedHash) Then
             Return False
         End If
 

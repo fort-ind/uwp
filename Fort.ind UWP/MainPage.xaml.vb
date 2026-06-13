@@ -13,39 +13,43 @@ Public NotInheritable Class MainPage
 
     ' Static menu/settings items (never changes)
     Private Shared ReadOnly s_staticSearchItems As SearchItem() = {
-        New SearchItem("Home", "Menu", "LatestNews"),
-        New SearchItem("Latest News", "Menu", "LatestNews"),
-        New SearchItem("Games", "Menu", "Games"),
-        New SearchItem("Beta Programs", "Menu", "Betas"),
-        New SearchItem("Your Profile", "Menu", "Profile"),
-        New SearchItem("Social", "Menu", "Social"),
-        New SearchItem("Settings", "Menu", "Settings"),
-        New SearchItem("Data Storage", "Settings", "Settings"),
-        New SearchItem("Local JSON Storage", "Settings", "Settings"),
-        New SearchItem("Live Tile", "Settings", "Settings"),
-        New SearchItem("Refresh Live Tile", "Settings", "Settings"),
-        New SearchItem("Clear Live Tile", "Settings", "Settings"),
-        New SearchItem("Welcome Dialog", "Settings", "Settings"),
-        New SearchItem("Show Welcome Dialog Again", "Settings", "Settings"),
-        New SearchItem("Appearance", "Settings", "Settings"),
-        New SearchItem("Theme", "Settings", "Settings"),
-        New SearchItem("Dark Mode", "Settings", "Settings"),
-        New SearchItem("Light Mode", "Settings", "Settings"),
-        New SearchItem("Background Color", "Settings", "Settings"),
-        New SearchItem("Background Tint", "Settings", "Settings"),
-        New SearchItem("Account", "Profile", "Profile"),
-        New SearchItem("Login", "Profile", "Profile"),
-        New SearchItem("Register", "Profile", "Profile")
+        New SearchItem("Home", AppConstants.CategoryMenu, AppConstants.NavigationLatestNews),
+        New SearchItem("Latest News", AppConstants.CategoryMenu, AppConstants.NavigationLatestNews),
+        New SearchItem("Games", AppConstants.CategoryMenu, AppConstants.NavigationGames),
+        New SearchItem("Beta Programs", AppConstants.CategoryMenu, AppConstants.NavigationBetas),
+        New SearchItem("Your Profile", AppConstants.CategoryMenu, AppConstants.NavigationProfile),
+        New SearchItem("Social", AppConstants.CategoryMenu, AppConstants.NavigationSocial),
+        New SearchItem("About", AppConstants.CategoryMenu, AppConstants.NavigationAbout),
+        New SearchItem("Settings", AppConstants.CategoryMenu, AppConstants.NavigationSettings),
+        New SearchItem("Data Storage", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Local JSON Storage", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Live Tile", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Refresh Live Tile", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Clear Live Tile", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Welcome Dialog", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Show Welcome Dialog Again", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Appearance", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Theme", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Dark Mode", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Light Mode", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Background Color", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Background Tint", AppConstants.CategorySettings, AppConstants.NavigationSettings),
+        New SearchItem("Account", AppConstants.CategoryProfile, AppConstants.NavigationProfile),
+        New SearchItem("Login", AppConstants.CategoryProfile, AppConstants.NavigationProfile),
+        New SearchItem("Register", AppConstants.CategoryProfile, AppConstants.NavigationProfile)
     }
 
     ' All searchable items – volatile reference swapped once when sitemap loads (no lock needed for reads)
     Private _allSearchItems As IReadOnlyList(Of SearchItem) = s_staticSearchItems
 
     ' Guard to prevent multiple ContentDialogs from opening simultaneously
-    Private _isDialogOpen As Boolean = False
+    Private _dialogSemaphore As New Threading.SemaphoreSlim(1, 1)
 
     ' Guard to suppress appearance control event handlers during settings load
     Private _loadingSettings As Boolean = False
+
+    ' Cancels stale search work while the user is still typing.
+    Private _searchDebounceCts As Threading.CancellationTokenSource
 
     ' Light-mode equivalents for each dark tint color
     Private Shared ReadOnly s_lightTintMap As New Dictionary(Of String, String) From {
@@ -67,11 +71,26 @@ Public NotInheritable Class MainPage
         ' Listen for auth state changes
         AddHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
         AddHandler Unloaded, AddressOf MainPage_Unloaded
+        AddHandler Loaded, AddressOf MainPage_Loaded
+    End Sub
+
+    Private Sub MainPage_Loaded(sender As Object, e As RoutedEventArgs)
+        ' Attach keyboard handler only when loaded to prevent memory leaks
         AddHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
     End Sub
 
     Private Async Sub LoadSitemapItems()
+        Dim shouldHideLoadingIndicator As Boolean = False
         Try
+            ' Show loading indicator
+            Await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                Sub()
+                    If LoadingIndicator IsNot Nothing Then
+                        LoadingIndicator.IsActive = True
+                        LoadingIndicator.Visibility = Visibility.Visible
+                    End If
+                End Sub)
+
             Dim sitemapItems = Await SitemapService.LoadSearchItemsAsync()
             ' Build a new combined list and swap the reference (atomic, no lock needed)
             Dim combined As New List(Of SearchItem)(s_staticSearchItems.Length + sitemapItems.Count)
@@ -80,19 +99,50 @@ Public NotInheritable Class MainPage
             _allSearchItems = combined
         Catch ex As Exception
             Debug.WriteLine($"MainPage: Failed to load sitemap items – {ex.Message}")
+        Finally
+            shouldHideLoadingIndicator = True
         End Try
+
+        If shouldHideLoadingIndicator Then
+            ' VB does not allow Await in Finally blocks.
+            Await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                Sub()
+                    If LoadingIndicator IsNot Nothing Then
+                        LoadingIndicator.IsActive = False
+                        LoadingIndicator.Visibility = Visibility.Collapsed
+                    End If
+                End Sub)
+        End If
     End Sub
 
     Private Sub MainPage_Unloaded(sender As Object, e As RoutedEventArgs)
         RemoveHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
-        RemoveHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
+        ' Remove keyboard handler to prevent memory leaks
+        Try
+            RemoveHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
+        Catch ex As Exception
+            Debug.WriteLine($"MainPage: Failed to remove KeyDown handler - {ex.Message}")
+        End Try
+
+        If _searchDebounceCts IsNot Nothing Then
+            _searchDebounceCts.Cancel()
+            _searchDebounceCts.Dispose()
+            _searchDebounceCts = Nothing
+        End If
     End Sub
 
     Private Async Sub OnAuthStateChanged(sender As Object, isLoggedIn As Boolean)
         Try
             Await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
-                Sub() UpdateProfileNavItem())
+                Sub()
+                    Try
+                        UpdateProfileNavItem()
+                    Catch ex As Exception
+                        Debug.WriteLine($"MainPage: UpdateProfileNavItem failed - {ex.Message}")
+                    End Try
+                End Sub)
         Catch ex As Exception
+            ' Critical: Catch exceptions in async void to prevent app crash
             Debug.WriteLine($"MainPage: Auth state change handler failed – {ex.Message}")
         End Try
     End Sub
@@ -153,7 +203,7 @@ Public NotInheritable Class MainPage
         Try
             ' Update Live Tile with latest news
             Dim newsItems As New List(Of NewsItem) From {
-                New NewsItem("Whats new?", "2026.1 has been released for web go to fort1nd.com to see whats new", "welcome"),
+                New NewsItem("What's new?", "2026.1 has been released for web go to fort1nd.com to see whats new", "welcome"),
                 New NewsItem("Get Started", "Hello! fort.uwp is now ready to use. :3", "features")
             }
 
@@ -182,8 +232,8 @@ Public NotInheritable Class MainPage
             ' Show welcome dialog on first launch
             Dim localSettings = ApplicationData.Current.LocalSettings
             Dim hideWelcome As Boolean = False
-            If localSettings.Values.ContainsKey("HideWelcomeDialog") Then
-                hideWelcome = CBool(localSettings.Values("HideWelcomeDialog"))
+            If localSettings.Values.ContainsKey(AppConstants.SettingHideWelcomeDialog) Then
+                hideWelcome = CBool(localSettings.Values(AppConstants.SettingHideWelcomeDialog))
             End If
             If Not hideWelcome Then
                 Await ShowWelcomeDialogAsync()
@@ -199,7 +249,7 @@ Public NotInheritable Class MainPage
         Else
             Dim invokedItem = TryCast(args.InvokedItemContainer, NavigationViewItem)
             If invokedItem IsNot Nothing Then
-                Dim tag = If(invokedItem.Tag?.ToString(), "LatestNews")
+                Dim tag = If(invokedItem.Tag?.ToString(), AppConstants.NavigationLatestNews)
                 ShowPanel(tag)
             End If
         End If
@@ -220,30 +270,40 @@ Public NotInheritable Class MainPage
 
         ' Show the selected panel
         Select Case panelName
-            Case "LatestNews"
+            Case AppConstants.NavigationLatestNews
                 LatestNewsPanel.Visibility = Visibility.Visible
-            Case "Games"
+            Case AppConstants.NavigationGames
                 GamesPanel.Visibility = Visibility.Visible
-            Case "Betas"
+            Case AppConstants.NavigationBetas
                 BetasPanel.Visibility = Visibility.Visible
-            Case "Profile"
+            Case AppConstants.NavigationProfile
                 ' Navigate to ProfilePage in the frame (skip if already there)
                 ContentScrollViewer.Visibility = Visibility.Collapsed
                 ContentFrame.Visibility = Visibility.Visible
                 Try
-                    If Not TypeOf ContentFrame.Content Is ProfilePage Then
-                        ContentFrame.Navigate(GetType(ProfilePage))
+                    ' Null check for ContentFrame
+                    If ContentFrame IsNot Nothing Then
+                        If TypeOf ContentFrame.Content Is ProfilePage Then
+                            ' Already on profile page – refresh the UI instead of re-navigating
+                            DirectCast(ContentFrame.Content, ProfilePage).RefreshUI()
+                        Else
+                            ContentFrame.Navigate(GetType(ProfilePage))
+                        End If
                     End If
                 Catch ex As Exception
                     ' Navigation failed – fall back to home
                     Debug.WriteLine($"MainPage: Profile navigation failed – {ex.Message}")
-                    ContentFrame.Visibility = Visibility.Collapsed
+                    If ContentFrame IsNot Nothing Then
+                        ContentFrame.Visibility = Visibility.Collapsed
+                    End If
                     ContentScrollViewer.Visibility = Visibility.Visible
                     LatestNewsPanel.Visibility = Visibility.Visible
                 End Try
-            Case "Social"
+            Case AppConstants.NavigationSocial
                 SocialPanel.Visibility = Visibility.Visible
-            Case "Settings"
+            Case AppConstants.NavigationAbout
+                AboutPanel.Visibility = Visibility.Visible
+            Case AppConstants.NavigationSettings
                 SettingsPanel.Visibility = Visibility.Visible
                 UpdateStorageInfo()
             Case Else
@@ -259,6 +319,28 @@ Public NotInheritable Class MainPage
         Catch ex As Exception
             StoragePathText.Text = ""
             UserCountText.Text = ""
+        End Try
+    End Sub
+
+    Private Async Sub AboutButton_Click(sender As Object, e As RoutedEventArgs)
+        ' Use semaphore to prevent concurrent dialog opening
+        If Not Await _dialogSemaphore.WaitAsync(0) Then
+            Return ' Another dialog is already open
+        End If
+
+        Try
+            Dim aboutDialog As New ContentDialog()
+            aboutDialog.Title = "About"
+            aboutDialog.Content = $"Fort.ind desktop for UWP{vbCrLf}Version 0.5 Beta{vbCrLf}{vbCrLf}Storage: Local JSON Files"
+            aboutDialog.PrimaryButtonText = "OK"
+            aboutDialog.DefaultButton = ContentDialogButton.Primary
+            aboutDialog.XamlRoot = Me.XamlRoot
+
+            Await aboutDialog.ShowAsync()
+        Catch ex As Exception
+            Debug.WriteLine($"MainPage: About dialog failed – {ex.Message}")
+        Finally
+            _dialogSemaphore.Release()
         End Try
     End Sub
 
@@ -279,24 +361,27 @@ Public NotInheritable Class MainPage
             Dim localSettings = ApplicationData.Current.LocalSettings
 
             ' Restore theme selection
-            Dim theme As String = "Default"
-            If localSettings.Values.ContainsKey("AppTheme") Then
-                theme = localSettings.Values("AppTheme").ToString()
+            Dim theme As String = AppConstants.ThemeDefault
+            If localSettings.Values.ContainsKey(AppConstants.SettingAppTheme) Then
+                theme = localSettings.Values(AppConstants.SettingAppTheme).ToString()
             End If
             Select Case theme
-                Case "Light" : ThemeLightRadio.IsChecked = True
-                Case "Dark"  : ThemeDarkRadio.IsChecked = True
-                Case Else    : ThemeSystemRadio.IsChecked = True
+                Case AppConstants.ThemeLight : ThemeLightRadio.IsChecked = True
+                Case AppConstants.ThemeDark : ThemeDarkRadio.IsChecked = True
+                Case Else : ThemeSystemRadio.IsChecked = True
             End Select
             ApplyTheme(theme)
 
             ' Restore tint color selection
-            Dim tintTag As String = "Default"
-            If localSettings.Values.ContainsKey("AppTintColor") Then
-                tintTag = localSettings.Values("AppTintColor").ToString()
+            Dim tintTag As String = AppConstants.ThemeDefault
+            If localSettings.Values.ContainsKey(AppConstants.SettingAppTintColor) Then
+                tintTag = localSettings.Values(AppConstants.SettingAppTintColor).ToString()
             End If
             ApplyTintColor(tintTag)
             UpdateTintSelection(tintTag)
+
+            ' Restore settings panel states
+            RestoreSettingsPanelStates()
         Finally
             _loadingSettings = False
         End Try
@@ -306,25 +391,25 @@ Public NotInheritable Class MainPage
         Dim rootFrame = TryCast(Window.Current.Content, Frame)
         If rootFrame Is Nothing Then Return
         Select Case theme
-            Case "Light" : rootFrame.RequestedTheme = ElementTheme.Light
-            Case "Dark"  : rootFrame.RequestedTheme = ElementTheme.Dark
-            Case Else    : rootFrame.RequestedTheme = ElementTheme.Default
+            Case AppConstants.ThemeLight : rootFrame.RequestedTheme = ElementTheme.Light
+            Case AppConstants.ThemeDark : rootFrame.RequestedTheme = ElementTheme.Dark
+            Case Else : rootFrame.RequestedTheme = ElementTheme.Default
         End Select
         If Not _loadingSettings Then
-            ApplicationData.Current.LocalSettings.Values("AppTheme") = theme
+            ApplicationData.Current.LocalSettings.Values(AppConstants.SettingAppTheme) = theme
         End If
         UpdateTitleBarColors()
         ' Re-apply tint so the correct light/dark shade is used for the new theme
         If Not _loadingSettings Then
-            Dim savedTint = ApplicationData.Current.LocalSettings.Values("AppTintColor")?.ToString()
-            If Not String.IsNullOrEmpty(savedTint) AndAlso savedTint <> "Default" Then
+            Dim savedTint = ApplicationData.Current.LocalSettings.Values(AppConstants.SettingAppTintColor)?.ToString()
+            If Not String.IsNullOrEmpty(savedTint) AndAlso savedTint <> AppConstants.ThemeDefault Then
                 ApplyTintColor(savedTint)
             End If
         End If
     End Sub
 
     Private Sub ApplyTintColor(colorTag As String)
-        If String.IsNullOrEmpty(colorTag) OrElse colorTag = "Default" Then
+        If String.IsNullOrEmpty(colorTag) OrElse colorTag = AppConstants.ThemeDefault Then
             Dim original = TryCast(Me.Resources("AppAcrylicBrush"), Brush)
             If original IsNot Nothing Then RootGrid.Background = original
         Else
@@ -350,7 +435,7 @@ Public NotInheritable Class MainPage
                 RootGrid.Background = New AcrylicBrush() With {
                     .BackgroundSource = AcrylicBackgroundSource.HostBackdrop,
                     .TintColor = c,
-                    .TintOpacity = tintOpacity,
+                    .tintOpacity = tintOpacity,
                     .TintLuminosityOpacity = 0.85,
                     .FallbackColor = c
                 }
@@ -359,7 +444,7 @@ Public NotInheritable Class MainPage
             End Try
         End If
         If Not _loadingSettings Then
-            ApplicationData.Current.LocalSettings.Values("AppTintColor") = colorTag
+            ApplicationData.Current.LocalSettings.Values(AppConstants.SettingAppTintColor) = colorTag
         End If
     End Sub
 
@@ -370,8 +455,8 @@ Public NotInheritable Class MainPage
             btn.BorderBrush = New SolidColorBrush(Colors.Transparent)
         Next
         Dim sel As Button = Nothing
-        Select Case If(selectedTag, "Default")
-            Case "Default" : sel = TintDefaultButton
+        Select Case If(selectedTag, AppConstants.ThemeDefault)
+            Case AppConstants.ThemeDefault : sel = TintDefaultButton
             Case "#1E3A5F" : sel = TintBlueButton
             Case "#2D1B69" : sel = TintPurpleButton
             Case "#0F3D2E" : sel = TintGreenButton
@@ -397,7 +482,7 @@ Public NotInheritable Class MainPage
     End Function
 
     Private Sub AppearanceHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
-        ToggleSettingsRow(AppearanceContent, AppearanceChevronRotation)
+        ToggleSettingsRow(AppearanceContent, AppearanceChevronRotation, AppConstants.SettingSettingsAppearanceExpanded)
     End Sub
 
     Private Sub ThemeRadio_Checked(sender As Object, e As RoutedEventArgs)
@@ -420,29 +505,82 @@ Public NotInheritable Class MainPage
     ' ── Settings row expand/collapse ──
 
     Private Sub StorageHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
-        ToggleSettingsRow(StorageContent, StorageChevronRotation)
+        ToggleSettingsRow(StorageContent, StorageChevronRotation, AppConstants.SettingSettingsStorageExpanded)
     End Sub
 
     Private Sub TileHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
-        ToggleSettingsRow(TileContent, TileChevronRotation)
+        ToggleSettingsRow(TileContent, TileChevronRotation, AppConstants.SettingSettingsTileExpanded)
     End Sub
 
     Private Sub WelcomeHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
-        ToggleSettingsRow(WelcomeContent, WelcomeChevronRotation)
+        ToggleSettingsRow(WelcomeContent, WelcomeChevronRotation, AppConstants.SettingSettingsWelcomeExpanded)
     End Sub
 
     Private Sub AboutHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
-        ToggleSettingsRow(AboutContent, AboutChevronRotation)
+        ToggleSettingsRow(AboutContent, AboutChevronRotation, AppConstants.SettingSettingsAboutExpanded)
     End Sub
 
-    Private Sub ToggleSettingsRow(content As StackPanel, chevronTransform As RotateTransform)
-        If content.Visibility = Visibility.Collapsed Then
+    ''' <summary>
+    ''' Toggle settings row with state persistence
+    ''' </summary>
+    Private Sub ToggleSettingsRow(content As StackPanel, chevronTransform As RotateTransform, Optional settingKey As String = Nothing)
+        Dim isExpanded = content.Visibility = Visibility.Collapsed
+
+        If isExpanded Then
             content.Visibility = Visibility.Visible
             chevronTransform.Angle = 90
         Else
             content.Visibility = Visibility.Collapsed
             chevronTransform.Angle = 0
         End If
+
+        ' Save state if key is provided
+        If Not String.IsNullOrEmpty(settingKey) Then
+            Try
+                ApplicationData.Current.LocalSettings.Values(settingKey) = isExpanded
+            Catch ex As Exception
+                Debug.WriteLine($"MainPage: Failed to save panel state - {ex.Message}")
+            End Try
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Restore settings panel expanded/collapsed states
+    ''' </summary>
+    Private Sub RestoreSettingsPanelStates()
+        Try
+            Dim localSettings = ApplicationData.Current.LocalSettings
+
+            ' Restore each panel state
+            RestorePanelState(AppConstants.SettingSettingsAppearanceExpanded, AppearanceContent, AppearanceChevronRotation)
+            RestorePanelState(AppConstants.SettingSettingsStorageExpanded, StorageContent, StorageChevronRotation)
+            RestorePanelState(AppConstants.SettingSettingsTileExpanded, TileContent, TileChevronRotation)
+            RestorePanelState(AppConstants.SettingSettingsWelcomeExpanded, WelcomeContent, WelcomeChevronRotation)
+            RestorePanelState(AppConstants.SettingSettingsAboutExpanded, AboutContent, AboutChevronRotation)
+        Catch ex As Exception
+            Debug.WriteLine($"MainPage: Failed to restore panel states - {ex.Message}")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Restore individual panel state
+    ''' </summary>
+    Private Sub RestorePanelState(settingKey As String, content As StackPanel, chevronTransform As RotateTransform)
+        Try
+            Dim localSettings = ApplicationData.Current.LocalSettings
+            If localSettings.Values.ContainsKey(settingKey) Then
+                Dim isExpanded = CBool(localSettings.Values(settingKey))
+                If isExpanded Then
+                    content.Visibility = Visibility.Visible
+                    chevronTransform.Angle = 90
+                Else
+                    content.Visibility = Visibility.Collapsed
+                    chevronTransform.Angle = 0
+                End If
+            End If
+        Catch ex As Exception
+            Debug.WriteLine($"MainPage: Failed to restore {settingKey} - {ex.Message}")
+        End Try
     End Sub
 
     Private Sub SettingsRow_PointerEntered(sender As Object, e As PointerRoutedEventArgs)
@@ -456,8 +594,10 @@ Public NotInheritable Class MainPage
     End Sub
 
     Private Async Function ShowWelcomeDialogAsync() As Task
-        If _isDialogOpen Then Return
-        _isDialogOpen = True
+        ' Use semaphore to prevent concurrent dialog opening
+        If Not Await _dialogSemaphore.WaitAsync(0) Then
+            Return ' Another dialog is already open
+        End If
 
         Try
             Dim dontShowCheckBox As New CheckBox()
@@ -512,19 +652,19 @@ Public NotInheritable Class MainPage
 
             If dontShowCheckBox.IsChecked.GetValueOrDefault(False) Then
                 Dim localSettings = ApplicationData.Current.LocalSettings
-                localSettings.Values("HideWelcomeDialog") = True
+                localSettings.Values(AppConstants.SettingHideWelcomeDialog) = True
             End If
         Catch ex As Exception
             Debug.WriteLine($"MainPage: Welcome dialog failed – {ex.Message}")
         Finally
-            _isDialogOpen = False
+            _dialogSemaphore.Release()
         End Try
     End Function
 
     Private Async Sub ResetWelcomeButton_Click(sender As Object, e As RoutedEventArgs)
         Try
             Dim localSettings = ApplicationData.Current.LocalSettings
-            localSettings.Values("HideWelcomeDialog") = False
+            localSettings.Values(AppConstants.SettingHideWelcomeDialog) = False
             Await ShowWelcomeDialogAsync()
         Catch ex As Exception
             Debug.WriteLine($"MainPage: Reset welcome failed – {ex.Message}")
@@ -544,6 +684,9 @@ Public NotInheritable Class MainPage
         End If
         ' Escape clears the search box when it has text
         If args.VirtualKey = Windows.System.VirtualKey.Escape AndAlso Not String.IsNullOrEmpty(NavSearchBox.Text) Then
+            If _searchDebounceCts IsNot Nothing Then
+                _searchDebounceCts.Cancel()
+            End If
             NavSearchBox.Text = ""
             NavSearchBox.ItemsSource = Nothing
             args.Handled = True
@@ -553,37 +696,72 @@ Public NotInheritable Class MainPage
     Private Sub NavSearchBox_TextChanged(sender As AutoSuggestBox, args As AutoSuggestBoxTextChangedEventArgs)
         If args.Reason = AutoSuggestionBoxTextChangeReason.UserInput Then
             Dim query = sender.Text.Trim()
+
+            If _searchDebounceCts IsNot Nothing Then
+                _searchDebounceCts.Cancel()
+                _searchDebounceCts.Dispose()
+            End If
+
             If String.IsNullOrEmpty(query) Then
                 sender.ItemsSource = Nothing
                 Return
             End If
 
-            ' Read volatile reference – no lock or copy needed
-            Dim items = _allSearchItems
-
-            Dim filtered As New List(Of SearchItem)()
-            For Each item In items
-                If item.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 OrElse
-                   item.Category.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 Then
-                    filtered.Add(item)
-                End If
-            Next
-
-            ' Add profile-specific item if logged in and matches
-            If ProfileService.CurrentUser IsNot Nothing Then
-                Dim name = If(String.IsNullOrWhiteSpace(ProfileService.CurrentUser.DisplayName),
-                              ProfileService.CurrentUser.Username,
-                              ProfileService.CurrentUser.DisplayName)
-                Dim profileTitle = $"Profile: {name}"
-                If profileTitle.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 OrElse
-                   "Profile".IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 Then
-                    filtered.Add(New SearchItem(profileTitle, "Profile", "Profile"))
-                End If
-            End If
-
-            sender.ItemsSource = filtered
+            _searchDebounceCts = New Threading.CancellationTokenSource()
+            ApplySearchSuggestionsAsync(sender, query, _searchDebounceCts.Token)
         End If
     End Sub
+
+    Private Async Sub ApplySearchSuggestionsAsync(sender As AutoSuggestBox, query As String, cancellationToken As Threading.CancellationToken)
+        Try
+            Await Task.Delay(AppConstants.SearchDebounceMilliseconds, cancellationToken)
+
+            If cancellationToken.IsCancellationRequested Then
+                Return
+            End If
+
+            ' Capture volatile references on the UI thread before going off-thread
+            Dim snapshot = _allSearchItems
+            Dim currentUser = ProfileService.CurrentUser
+
+            Dim results = Await Task.Run(Function() BuildSearchSuggestions(query, snapshot, currentUser), cancellationToken)
+
+            If Not cancellationToken.IsCancellationRequested Then
+                sender.ItemsSource = results
+            End If
+        Catch ex As OperationCanceledException
+            ' Expected while typing quickly.
+        Catch ex As Exception
+            Debug.WriteLine($"MainPage: Debounced search failed – {ex.Message}")
+        End Try
+    End Sub
+
+    Private Shared Function BuildSearchSuggestions(query As String, items As IReadOnlyList(Of SearchItem), currentUser As UserProfile) As List(Of SearchItem)
+        Dim filtered As New List(Of SearchItem)()
+        For Each item In items
+            If item.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 OrElse
+               item.Category.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 Then
+                filtered.Add(item)
+                If filtered.Count >= AppConstants.SearchSuggestionLimit Then
+                    Exit For
+                End If
+            End If
+        Next
+
+        ' Add profile-specific item if logged in and matches, respecting the suggestion limit
+        If filtered.Count < AppConstants.SearchSuggestionLimit AndAlso currentUser IsNot Nothing Then
+            Dim name = If(String.IsNullOrWhiteSpace(currentUser.DisplayName),
+                          currentUser.Username,
+                          currentUser.DisplayName)
+            Dim profileTitle = $"Profile: {name}"
+            If profileTitle.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 OrElse
+               AppConstants.CategoryProfile.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 Then
+                filtered.Add(New SearchItem(profileTitle, AppConstants.CategoryProfile, AppConstants.NavigationProfile))
+            End If
+        End If
+
+        Return filtered
+    End Function
 
     Private Async Sub NavSearchBox_QuerySubmitted(sender As AutoSuggestBox, args As AutoSuggestBoxQuerySubmittedEventArgs)
         Try
@@ -625,10 +803,16 @@ Public NotInheritable Class MainPage
     End Sub
 
     Private Async Function NavigateToSearchItem(item As SearchItem) As Task
+        ' Null check for item
+        If item Is Nothing Then
+            Debug.WriteLine("MainPage: NavigateToSearchItem called with null item")
+            Return
+        End If
+
         If Not String.IsNullOrEmpty(item.Url) Then
             ' Validate URL before launching to avoid UriFormatException
             Dim uri As Uri = Nothing
-            If Uri.TryCreate(item.Url, UriKind.Absolute, uri) Then
+            If uri.TryCreate(item.Url, UriKind.Absolute, uri) Then
                 Await Windows.System.Launcher.LaunchUriAsync(uri)
             Else
                 Debug.WriteLine($"MainPage: Invalid URL in search item – {item.Url}")
