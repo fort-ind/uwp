@@ -302,7 +302,7 @@ Public NotInheritable Class MainPage
             Case AppConstants.NavigationSocial
                 SocialPanel.Visibility = Visibility.Visible
             Case AppConstants.NavigationAbout
-                AboutPanel.Visibility = Visibility.Visible
+                AboutButton_Click(Nothing, Nothing)
             Case AppConstants.NavigationSettings
                 SettingsPanel.Visibility = Visibility.Visible
                 UpdateStorageInfo()
