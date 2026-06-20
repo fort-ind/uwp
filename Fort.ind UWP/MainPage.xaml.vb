@@ -302,6 +302,9 @@ Public NotInheritable Class MainPage
             Case AppConstants.NavigationSocial
                 SocialPanel.Visibility = Visibility.Visible
             Case AppConstants.NavigationAbout
+                ' About is presented as a dialog overlay. Keep Home visible behind it so
+                ' the content area is not left blank once the dialog is dismissed.
+                LatestNewsPanel.Visibility = Visibility.Visible
                 AboutButton_Click(Nothing, Nothing)
             Case AppConstants.NavigationSettings
                 SettingsPanel.Visibility = Visibility.Visible
@@ -405,6 +408,9 @@ Public NotInheritable Class MainPage
             If Not String.IsNullOrEmpty(savedTint) AndAlso savedTint <> AppConstants.ThemeDefault Then
                 ApplyTintColor(savedTint)
             End If
+            ' Refresh the selected swatch's highlight border so it matches the new theme
+            ' (white outline in dark mode, black outline in light mode).
+            UpdateTintSelection(If(savedTint, AppConstants.ThemeDefault))
         End If
     End Sub
 
@@ -812,7 +818,7 @@ Public NotInheritable Class MainPage
         If Not String.IsNullOrEmpty(item.Url) Then
             ' Validate URL before launching to avoid UriFormatException
             Dim uri As Uri = Nothing
-            If uri.TryCreate(item.Url, UriKind.Absolute, uri) Then
+            If Uri.TryCreate(item.Url, UriKind.Absolute, uri) Then
                 Await Windows.System.Launcher.LaunchUriAsync(uri)
             Else
                 Debug.WriteLine($"MainPage: Invalid URL in search item – {item.Url}")

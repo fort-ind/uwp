@@ -53,10 +53,10 @@
                 <StackPanel Spacing="16">
                     <!-- Logo/Title -->
                     <StackPanel HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <TextBlock Text="??" 
-                                   FontSize="48" 
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="Fort.ind" 
+                        <FontIcon Glyph="&#xE72E;"
+                                  FontSize="48"
+                                  HorizontalAlignment="Center"/>
+                        <TextBlock Text="Fort.ind"
                                    FontSize="28" 
                                    FontWeight="Bold"
                                    HorizontalAlignment="Center"/>

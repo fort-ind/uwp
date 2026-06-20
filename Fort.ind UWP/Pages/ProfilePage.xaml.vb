@@ -185,10 +185,11 @@ Public NotInheritable Class ProfilePage
                 PhotoStatusText.Visibility = Visibility.Collapsed
                 EditSuccessText.Text = "Profile updated successfully!"
                 EditSuccessText.Visibility = Visibility.Visible
-                RefreshUI()
-                ' Auto-hide success message and return to view mode after delay
+                ' Keep the success message visible briefly, then refresh the header and
+                ' return to view mode. RefreshUI() switches to view mode (hiding this
+                ' panel), so calling it before the delay would flash the message away.
                 Await Task.Delay(1500)
-                ShowViewMode()
+                RefreshUI()
             Else
                 EditErrorText.Text = "Failed to save profile"
                 EditErrorText.Visibility = Visibility.Visible
@@ -407,7 +408,7 @@ Public NotInheritable Class ProfilePage
             Return "?"
         End If
 
-        Dim parts = name.Trim().Split(" "c)
+        Dim parts = name.Trim().Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
         If parts.Length >= 2 AndAlso parts(1).Length > 0 Then
             Return (parts(0).Substring(0, 1) & parts(1).Substring(0, 1)).ToUpper()
         End If
@@ -431,7 +432,12 @@ Public NotInheritable Class ProfilePage
                 imageUri = New Uri($"ms-appdata:///local/{profilePicturePath.TrimStart("/"c)}")
             End If
 
-            ProfileImage.Source = New BitmapImage(imageUri)
+            ' IgnoreImageCache: avatars are saved under a fixed file name per user, so the
+            ' URI does not change when the photo is replaced. Without this, the previously
+            ' cached bitmap would keep showing after the user picks a new photo.
+            Dim bitmap As New BitmapImage() With {.CreateOptions = BitmapCreateOptions.IgnoreImageCache}
+            bitmap.UriSource = imageUri
+            ProfileImage.Source = bitmap
             ProfileImage.Visibility = Visibility.Visible
             ProfileInitials.Visibility = Visibility.Collapsed
         Catch ex As Exception
