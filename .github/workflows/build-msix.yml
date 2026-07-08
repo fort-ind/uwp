@@ -74,7 +74,8 @@ jobs:
           while ($parts.Count -lt 4) { $parts += "0" }
           $version = $parts[0..3] -join '.'
         } else {
-          $version = "2.0.${{ github.run_number }}.0"
+          $build = ${{ github.run_number }} - 111
+          $version = "2.0.$build.0"
         }
         Write-Host "Setting version to: $version"
         $manifestPath = "${{ env.Manifest_Path }}"
