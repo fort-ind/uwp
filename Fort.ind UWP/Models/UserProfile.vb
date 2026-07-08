@@ -97,6 +97,33 @@ Public Class UserProfile
         Me.Email = email
     End Sub
 
+    ''' <summary>
+    ''' Returns a deep copy of this profile. Used so edits can be saved on a detached copy
+    ''' and only swapped into the shared CurrentUser after the save succeeds, avoiding
+    ''' readers observing a half-applied mutation.
+    ''' </summary>
+    Public Function Clone() As UserProfile
+        Dim copy As New UserProfile() With {
+            .UserId = Me.UserId,
+            .DisplayName = Me.DisplayName,
+            .Username = Me.Username,
+            .PasswordHash = Me.PasswordHash,
+            .Email = Me.Email,
+            .Bio = Me.Bio,
+            .ProfilePicturePath = Me.ProfilePicturePath,
+            .CreatedDate = Me.CreatedDate,
+            .LastLoginDate = Me.LastLoginDate
+        }
+        Dim prefs = Me.Preferences
+        copy.Preferences = New UserPreferences() With {
+            .EnableLiveTile = prefs.EnableLiveTile,
+            .EnableNotifications = prefs.EnableNotifications,
+            .Theme = prefs.Theme,
+            .RememberLogin = prefs.RememberLogin
+        }
+        Return copy
+    End Function
+
 End Class
 
 ''' <summary>

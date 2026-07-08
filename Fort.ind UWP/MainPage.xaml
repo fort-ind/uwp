@@ -649,7 +649,8 @@
                                                     </Border>
                                                     <StackPanel VerticalAlignment="Center" Spacing="4">
                                                         <TextBlock Text="Fort.ind" FontSize="16" FontWeight="Bold"/>
-                                                        <TextBlock Text="Version 0.5 Beta"
+                                                        <TextBlock x:Name="AboutVersionText"
+                                                                   Text="Version"
                                                                    FontSize="12"
                                                                    Opacity="0.5"/>
                                                     </StackPanel>

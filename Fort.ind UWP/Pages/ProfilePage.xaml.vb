@@ -14,6 +14,10 @@ Public NotInheritable Class ProfilePage
     Private _pendingProfilePicturePath As String = Nothing
     Private _removeProfilePictureRequested As Boolean = False
 
+    ' Cache-busting token appended to the avatar URI. Bumped whenever the photo changes so
+    ' the new bitmap is fetched, while unchanged avatars still hit the image cache.
+    Private _avatarCacheToken As Integer = 0
+
     Public Sub New()
         Me.InitializeComponent()
         AddHandler Loaded, AddressOf ProfilePage_Loaded
@@ -159,9 +163,8 @@ Public NotInheritable Class ProfilePage
             displayName = ProfileService.CurrentUser.Username
         End If
         
-        ' Basic email validation
-        If Not String.IsNullOrWhiteSpace(email) AndAlso
-           (Not email.Contains("@") OrElse Not email.Contains(".")) Then
+        ' Email validation
+        If Not String.IsNullOrWhiteSpace(email) AndAlso Not ValidationHelpers.IsValidEmail(email) Then
             EditErrorText.Text = "Please enter a valid email address"
             EditErrorText.Visibility = Visibility.Visible
             Return
@@ -381,6 +384,8 @@ Public NotInheritable Class ProfilePage
 
             _pendingProfilePicturePath = relativePath
             _removeProfilePictureRequested = False
+            ' New file was written to the fixed per-user path; bust the cache so it shows.
+            _avatarCacheToken += 1
             PhotoStatusText.Text = "New profile photo selected. Save changes to apply."
             PhotoStatusText.Visibility = Visibility.Visible
             UpdateAvatarUI(relativePath)
@@ -425,17 +430,21 @@ Public NotInheritable Class ProfilePage
                 Return
             End If
 
-            Dim imageUri As Uri = Nothing
+            Dim baseUri As String
             If profilePicturePath.StartsWith("ms-appdata:///", StringComparison.OrdinalIgnoreCase) Then
-                imageUri = New Uri(profilePicturePath)
+                baseUri = profilePicturePath
             Else
-                imageUri = New Uri($"ms-appdata:///local/{profilePicturePath.TrimStart("/"c)}")
+                baseUri = $"ms-appdata:///local/{profilePicturePath.TrimStart("/"c)}"
             End If
 
-            ' IgnoreImageCache: avatars are saved under a fixed file name per user, so the
-            ' URI does not change when the photo is replaced. Without this, the previously
-            ' cached bitmap would keep showing after the user picks a new photo.
-            Dim bitmap As New BitmapImage() With {.CreateOptions = BitmapCreateOptions.IgnoreImageCache}
+            ' Avatars are saved under a fixed file name per user, so the URI does not change
+            ' when the photo is replaced. Rather than disabling the image cache entirely
+            ' (which forces a re-decode on every render), append a cache-busting token that
+            ' only changes when the photo changes. _avatarCacheToken is bumped on select/remove.
+            Dim separator = If(baseUri.Contains("?"), "&", "?")
+            Dim imageUri As New Uri($"{baseUri}{separator}v={_avatarCacheToken}")
+
+            Dim bitmap As New BitmapImage()
             bitmap.UriSource = imageUri
             ProfileImage.Source = bitmap
             ProfileImage.Visibility = Visibility.Visible
@@ -450,6 +459,13 @@ Public NotInheritable Class ProfilePage
 
     Private Shared Async Function SaveAvatarToLocalStorageAsync(sourceFile As StorageFile) As Task(Of String)
         Try
+            ' Re-check the user: awaiting the file picker yields control, so the user
+            ' could have logged out (clearing CurrentUser) while it was open.
+            Dim user = ProfileService.CurrentUser
+            If user Is Nothing Then
+                Return Nothing
+            End If
+
             Dim extension = sourceFile.FileType
             If String.IsNullOrWhiteSpace(extension) Then
                 extension = ".png"
@@ -457,7 +473,7 @@ Public NotInheritable Class ProfilePage
 
             Dim localFolder = ApplicationData.Current.LocalFolder
             Dim avatarFolder = Await localFolder.CreateFolderAsync(AppConstants.AvatarFolderName, CreationCollisionOption.OpenIfExists)
-            Dim fileName = $"{ProfileService.CurrentUser.UserId}{extension.ToLowerInvariant()}"
+            Dim fileName = $"{user.UserId}{extension.ToLowerInvariant()}"
 
             Await sourceFile.CopyAsync(avatarFolder, fileName, NameCollisionOption.ReplaceExisting)
             Return $"{AppConstants.AvatarFolderName}/{fileName}"

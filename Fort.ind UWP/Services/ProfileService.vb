@@ -175,28 +175,24 @@ Public Class ProfileService
     ''' Updates the current user's profile
     ''' </summary>
     Public Shared Async Function UpdateProfileAsync(displayName As String, email As String, bio As String, Optional profilePicturePath As String = Nothing, Optional updateProfilePicture As Boolean = False) As Task(Of Boolean)
-        If CurrentUser Is Nothing Then
+        Dim current = CurrentUser
+        If current Is Nothing Then
             Return False
         End If
 
-        Dim oldDisplayName = CurrentUser.DisplayName
-        Dim oldEmail = CurrentUser.Email
-        Dim oldBio = CurrentUser.Bio
-        Dim oldProfilePicturePath = CurrentUser.ProfilePicturePath
-
-        CurrentUser.DisplayName = displayName
-        CurrentUser.Email = email
-        CurrentUser.Bio = bio
+        ' Apply edits to a detached copy so no reader (search snapshot, auth listeners)
+        ' can observe a half-saved CurrentUser. Only swap it in once the save succeeds.
+        Dim updated = current.Clone()
+        updated.DisplayName = displayName
+        updated.Email = email
+        updated.Bio = bio
         If updateProfilePicture Then
-            CurrentUser.ProfilePicturePath = profilePicturePath
+            updated.ProfilePicturePath = profilePicturePath
         End If
 
-        Dim saved = Await LocalStorageService.SaveProfileAsync(CurrentUser)
-        If Not saved Then
-            CurrentUser.DisplayName = oldDisplayName
-            CurrentUser.Email = oldEmail
-            CurrentUser.Bio = oldBio
-            CurrentUser.ProfilePicturePath = oldProfilePicturePath
+        Dim saved = Await LocalStorageService.SaveProfileAsync(updated)
+        If saved Then
+            CurrentUser = updated
         End If
         Return saved
     End Function
@@ -205,7 +201,8 @@ Public Class ProfileService
     ''' Updates user preferences
     ''' </summary>
     Public Shared Async Function UpdatePreferencesAsync(preferences As UserPreferences) As Task(Of Boolean)
-        If CurrentUser Is Nothing Then
+        Dim current = CurrentUser
+        If current Is Nothing Then
             Return False
         End If
 
@@ -213,11 +210,11 @@ Public Class ProfileService
             Return False
         End If
 
-        Dim oldPreferences = CurrentUser.Preferences
-        CurrentUser.Preferences = preferences
-        Dim saved = Await LocalStorageService.SaveProfileAsync(CurrentUser)
-        If Not saved Then
-            CurrentUser.Preferences = oldPreferences
+        Dim updated = current.Clone()
+        updated.Preferences = preferences
+        Dim saved = Await LocalStorageService.SaveProfileAsync(updated)
+        If saved Then
+            CurrentUser = updated
         End If
         Return saved
     End Function
@@ -247,12 +244,13 @@ Public Class ProfileService
         ' Check for cancellation before expensive operation
         cancellationToken.ThrowIfCancellationRequested()
 
-        Dim oldHash = CurrentUser.PasswordHash
-        ' Hash new password off UI thread
-        CurrentUser.PasswordHash = Await Task.Run(Function() HashPassword(newPassword), cancellationToken)
-        Dim saved = Await LocalStorageService.SaveProfileAsync(CurrentUser)
-        If Not saved Then
-            CurrentUser.PasswordHash = oldHash
+        ' Hash new password off UI thread, then save on a detached copy and swap on success.
+        Dim newHash = Await Task.Run(Function() HashPassword(newPassword), cancellationToken)
+        Dim updated = CurrentUser.Clone()
+        updated.PasswordHash = newHash
+        Dim saved = Await LocalStorageService.SaveProfileAsync(updated)
+        If saved Then
+            CurrentUser = updated
         End If
         Return saved
     End Function

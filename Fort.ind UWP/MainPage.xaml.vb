@@ -51,6 +51,10 @@ Public NotInheritable Class MainPage
     ' Cancels stale search work while the user is still typing.
     Private _searchDebounceCts As Threading.CancellationTokenSource
 
+    ' Tracks whether the CoreWindow KeyDown handler is attached, so repeated Loaded/Unloaded
+    ' cycles (which UWP can fire more than once) don't attach it multiple times.
+    Private _keyHandlerAttached As Boolean = False
+
     ' Light-mode equivalents for each dark tint color
     Private Shared ReadOnly s_lightTintMap As New Dictionary(Of String, String) From {
         {"#1E3A5F", "#C8E0F5"},
@@ -62,6 +66,7 @@ Public NotInheritable Class MainPage
 
     Public Sub New()
         Me.InitializeComponent()
+        AboutVersionText.Text = $"Version {AppConstants.AppVersionDisplay}"
         SetupTitleBar()
         UpdateLiveTile()
         UpdateProfileNavItem()
@@ -75,8 +80,12 @@ Public NotInheritable Class MainPage
     End Sub
 
     Private Sub MainPage_Loaded(sender As Object, e As RoutedEventArgs)
-        ' Attach keyboard handler only when loaded to prevent memory leaks
+        ' Attach keyboard handler only when loaded to prevent memory leaks.
+        ' Guard against Loaded firing more than once, which would attach duplicate
+        ' handlers and run the Ctrl+F / Escape logic multiple times per keypress.
+        If _keyHandlerAttached Then Return
         AddHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
+        _keyHandlerAttached = True
     End Sub
 
     Private Async Sub LoadSitemapItems()
@@ -118,11 +127,14 @@ Public NotInheritable Class MainPage
     Private Sub MainPage_Unloaded(sender As Object, e As RoutedEventArgs)
         RemoveHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
         ' Remove keyboard handler to prevent memory leaks
-        Try
-            RemoveHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
-        Catch ex As Exception
-            Debug.WriteLine($"MainPage: Failed to remove KeyDown handler - {ex.Message}")
-        End Try
+        If _keyHandlerAttached Then
+            Try
+                RemoveHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
+            Catch ex As Exception
+                Debug.WriteLine($"MainPage: Failed to remove KeyDown handler - {ex.Message}")
+            End Try
+            _keyHandlerAttached = False
+        End If
 
         If _searchDebounceCts IsNot Nothing Then
             _searchDebounceCts.Cancel()
@@ -334,7 +346,7 @@ Public NotInheritable Class MainPage
         Try
             Dim aboutDialog As New ContentDialog()
             aboutDialog.Title = "About"
-            aboutDialog.Content = $"Fort.ind desktop for UWP{vbCrLf}Version 0.5 Beta{vbCrLf}{vbCrLf}Storage: Local JSON Files"
+            aboutDialog.Content = $"Fort.ind desktop for UWP{vbCrLf}Version {AppConstants.AppVersionDisplay}{vbCrLf}{vbCrLf}Storage: Local JSON Files"
             aboutDialog.PrimaryButtonText = "OK"
             aboutDialog.DefaultButton = ContentDialogButton.Primary
             aboutDialog.XamlRoot = Me.XamlRoot

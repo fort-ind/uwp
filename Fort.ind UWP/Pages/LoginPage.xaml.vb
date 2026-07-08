@@ -111,9 +111,8 @@ Public NotInheritable Class LoginPage
             Return
         End If
 
-        ' Basic email format validation (only if provided)
-        If Not String.IsNullOrWhiteSpace(email) AndAlso
-           (Not email.Contains("@") OrElse Not email.Contains(".")) Then
+        ' Email format validation (only if provided)
+        If Not String.IsNullOrWhiteSpace(email) AndAlso Not ValidationHelpers.IsValidEmail(email) Then
             ShowRegError("Please enter a valid email address")
             Return
         End If
@@ -267,8 +266,8 @@ Public NotInheritable Class LoginPage
             Return
         End If
         
-        ' Basic email validation
-        If Not email.Contains("@") OrElse Not email.Contains(".") OrElse email.Length < 5 Then
+        ' Email validation
+        If Not ValidationHelpers.IsValidEmail(email) Then
             RegEmailHint.Text = "⚠ Please enter a valid email address"
             RegEmailHint.Foreground = New SolidColorBrush(Windows.UI.Colors.Orange)
             RegEmailHint.Visibility = Visibility.Visible

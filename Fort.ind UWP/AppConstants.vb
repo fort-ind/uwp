@@ -54,4 +54,23 @@ Public NotInheritable Class AppConstants
     ' Profile assets
     Public Const AvatarFolderName As String = "Avatars"
 
+    ' Release channel suffix appended after the numeric version (e.g. "0.5.0 Beta")
+    Public Const VersionChannel As String = "Beta"
+
+    ''' <summary>
+    ''' The app version pulled from the package manifest, formatted as "Major.Minor.Build".
+    ''' Falls back to a static string if the package identity is unavailable (e.g. unpackaged).
+    ''' Single source of truth so the About screen never drifts from the manifest.
+    ''' </summary>
+    Public Shared ReadOnly Property AppVersionDisplay As String
+        Get
+            Try
+                Dim v = Windows.ApplicationModel.Package.Current.Id.Version
+                Return $"{v.Major}.{v.Minor}.{v.Build} {VersionChannel}"
+            Catch
+                Return $"0.5.0 {VersionChannel}"
+            End Try
+        End Get
+    End Property
+
 End Class
