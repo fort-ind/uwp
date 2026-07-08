@@ -1,4 +1,4 @@
-# Fort.ind UWP
+# Fort.uwp
 a sort of prototype version of fort.desktop not intended for use only for debugging or adding items, this MAY be rebuilt as plain WinUI
 # requirements
 must at least be on version Windows 10 1809, the dependencies for the app are in the artifacts folder 
