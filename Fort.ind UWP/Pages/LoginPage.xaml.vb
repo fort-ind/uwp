@@ -236,22 +236,19 @@ Public NotInheritable Class LoginPage
         Dim username = RegUsernameBox.Text.Trim()
         
         If String.IsNullOrWhiteSpace(username) Then
-            RegUsernameHint.Visibility = Visibility.Collapsed
+            RegUsernameHintPanel.Visibility = Visibility.Collapsed
             Return
         End If
-        
+
         If username.Length < 3 Then
-            RegUsernameHint.Text = "⚠ Username must be at least 3 characters"
-            RegUsernameHint.Foreground = New SolidColorBrush(Windows.UI.Colors.Orange)
-            RegUsernameHint.Visibility = Visibility.Visible
+            ShowValidationHint(RegUsernameHintPanel, RegUsernameHintIcon, RegUsernameHint,
+                               WarningGlyph, Windows.UI.Colors.Orange, "Username must be at least 3 characters")
         ElseIf Not IsValidUsername(username) Then
-            RegUsernameHint.Text = "⚠ Only letters, numbers, hyphens and underscores allowed"
-            RegUsernameHint.Foreground = New SolidColorBrush(Windows.UI.Colors.Red)
-            RegUsernameHint.Visibility = Visibility.Visible
+            ShowValidationHint(RegUsernameHintPanel, RegUsernameHintIcon, RegUsernameHint,
+                               WarningGlyph, Windows.UI.Colors.Red, "Only letters, numbers, hyphens and underscores allowed")
         Else
-            RegUsernameHint.Text = "✓ Username looks good"
-            RegUsernameHint.Foreground = New SolidColorBrush(Windows.UI.Colors.Green)
-            RegUsernameHint.Visibility = Visibility.Visible
+            ShowValidationHint(RegUsernameHintPanel, RegUsernameHintIcon, RegUsernameHint,
+                               CheckGlyph, Windows.UI.Colors.Green, "Username looks good")
         End If
     End Sub
 
@@ -262,20 +259,38 @@ Public NotInheritable Class LoginPage
         Dim email = RegEmailBox.Text.Trim()
         
         If String.IsNullOrWhiteSpace(email) Then
-            RegEmailHint.Visibility = Visibility.Collapsed
+            RegEmailHintPanel.Visibility = Visibility.Collapsed
             Return
         End If
-        
+
         ' Email validation
         If Not ValidationHelpers.IsValidEmail(email) Then
-            RegEmailHint.Text = "⚠ Please enter a valid email address"
-            RegEmailHint.Foreground = New SolidColorBrush(Windows.UI.Colors.Orange)
-            RegEmailHint.Visibility = Visibility.Visible
+            ShowValidationHint(RegEmailHintPanel, RegEmailHintIcon, RegEmailHint,
+                               WarningGlyph, Windows.UI.Colors.Orange, "Please enter a valid email address")
         Else
-            RegEmailHint.Text = "✓ Email format looks valid"
-            RegEmailHint.Foreground = New SolidColorBrush(Windows.UI.Colors.Green)
-            RegEmailHint.Visibility = Visibility.Visible
+            ShowValidationHint(RegEmailHintPanel, RegEmailHintIcon, RegEmailHint,
+                               CheckGlyph, Windows.UI.Colors.Green, "Email format looks valid")
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Segoe MDL2 Assets glyphs used for inline validation hints
+    ''' </summary>
+    Private Const WarningGlyph As Char = ChrW(&HE7BA)
+    Private Const CheckGlyph As Char = ChrW(&HE73E)
+
+    ''' <summary>
+    ''' Shows an inline validation hint as a Segoe MDL2 icon plus a message,
+    ''' with the icon and text sharing the same status color.
+    ''' </summary>
+    Private Shared Sub ShowValidationHint(panel As StackPanel, icon As FontIcon, label As TextBlock,
+                                          glyph As Char, color As Windows.UI.Color, message As String)
+        Dim brush As New SolidColorBrush(color)
+        icon.Glyph = glyph.ToString()
+        icon.Foreground = brush
+        label.Foreground = brush
+        label.Text = message
+        panel.Visibility = Visibility.Visible
     End Sub
 
     ''' <summary>

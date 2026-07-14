@@ -38,14 +38,14 @@
             <TextBlock Text="Fort.ind"
                        VerticalAlignment="Center"
                        Margin="12,0,0,0"
-                       FontSize="12"
+                       Style="{StaticResource CaptionTextBlockStyle}"
                        Opacity="0.8"/>
         </Grid>
 
         <!-- Main Content -->
         <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid Background="{StaticResource CardAcrylicBrush}"
-                  CornerRadius="12"
+                  CornerRadius="4"
                   Padding="40"
                   MinWidth="380"
                   MaxWidth="420">
@@ -57,11 +57,10 @@
                                   FontSize="48"
                                   HorizontalAlignment="Center"/>
                         <TextBlock Text="Fort.ind"
-                                   FontSize="28" 
-                                   FontWeight="Bold"
+                                   Style="{StaticResource TitleTextBlockStyle}"
                                    HorizontalAlignment="Center"/>
-                        <TextBlock Text="Sign in to your account" 
-                                   FontSize="14"
+                        <TextBlock Text="Sign in to your account"
+                                   Style="{StaticResource BodyTextBlockStyle}"
                                    Opacity="0.7"
                                    HorizontalAlignment="Center"/>
                     </StackPanel>
@@ -129,10 +128,19 @@
                                      TextChanged="RegUsernameBox_TextChanged"
                                      AutomationProperties.Name="Username"
                                      AutomationProperties.HelpText="Enter a username with only letters, numbers, hyphens and underscores"/>
-                            <TextBlock x:Name="RegUsernameHint"
-                                       FontSize="11"
-                                       Margin="0,2,0,0"
-                                       Visibility="Collapsed"/>
+                            <StackPanel x:Name="RegUsernameHintPanel"
+                                        Orientation="Horizontal" Spacing="6"
+                                        Margin="0,2,0,0"
+                                        Visibility="Collapsed">
+                                <FontIcon x:Name="RegUsernameHintIcon"
+                                          FontSize="11"
+                                          VerticalAlignment="Top"
+                                          Margin="0,1,0,0"/>
+                                <TextBlock x:Name="RegUsernameHint"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           AutomationProperties.LiveSetting="Polite"/>
+                            </StackPanel>
                         </StackPanel>
 
                         <TextBox x:Name="RegDisplayNameBox"
@@ -149,10 +157,19 @@
                                      TextChanged="RegEmailBox_TextChanged"
                                      AutomationProperties.Name="Email address"
                                      AutomationProperties.HelpText="Optional email address for your account"/>
-                            <TextBlock x:Name="RegEmailHint"
-                                       FontSize="11"
-                                       Margin="0,2,0,0"
-                                       Visibility="Collapsed"/>
+                            <StackPanel x:Name="RegEmailHintPanel"
+                                        Orientation="Horizontal" Spacing="6"
+                                        Margin="0,2,0,0"
+                                        Visibility="Collapsed">
+                                <FontIcon x:Name="RegEmailHintIcon"
+                                          FontSize="11"
+                                          VerticalAlignment="Top"
+                                          Margin="0,1,0,0"/>
+                                <TextBlock x:Name="RegEmailHint"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           AutomationProperties.LiveSetting="Polite"/>
+                            </StackPanel>
                         </StackPanel>
 
                         <PasswordBox x:Name="RegPasswordBox"

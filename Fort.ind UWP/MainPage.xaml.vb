@@ -499,7 +499,7 @@ Public NotInheritable Class MainPage
                               Convert.ToByte(hex.Substring(4, 2), 16))
     End Function
 
-    Private Sub AppearanceHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
+    Private Sub AppearanceHeader_Tapped(sender As Object, e As RoutedEventArgs)
         ToggleSettingsRow(AppearanceContent, AppearanceChevronRotation, AppConstants.SettingSettingsAppearanceExpanded)
     End Sub
 
@@ -522,19 +522,19 @@ Public NotInheritable Class MainPage
 
     ' ── Settings row expand/collapse ──
 
-    Private Sub StorageHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
+    Private Sub StorageHeader_Tapped(sender As Object, e As RoutedEventArgs)
         ToggleSettingsRow(StorageContent, StorageChevronRotation, AppConstants.SettingSettingsStorageExpanded)
     End Sub
 
-    Private Sub TileHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
+    Private Sub TileHeader_Tapped(sender As Object, e As RoutedEventArgs)
         ToggleSettingsRow(TileContent, TileChevronRotation, AppConstants.SettingSettingsTileExpanded)
     End Sub
 
-    Private Sub WelcomeHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
+    Private Sub WelcomeHeader_Tapped(sender As Object, e As RoutedEventArgs)
         ToggleSettingsRow(WelcomeContent, WelcomeChevronRotation, AppConstants.SettingSettingsWelcomeExpanded)
     End Sub
 
-    Private Sub AboutHeader_Tapped(sender As Object, e As TappedRoutedEventArgs)
+    Private Sub AboutHeader_Tapped(sender As Object, e As RoutedEventArgs)
         ToggleSettingsRow(AboutContent, AboutChevronRotation, AppConstants.SettingSettingsAboutExpanded)
     End Sub
 
@@ -599,16 +599,6 @@ Public NotInheritable Class MainPage
         Catch ex As Exception
             Debug.WriteLine($"MainPage: Failed to restore {settingKey} - {ex.Message}")
         End Try
-    End Sub
-
-    Private Sub SettingsRow_PointerEntered(sender As Object, e As PointerRoutedEventArgs)
-        Dim element = TryCast(sender, FrameworkElement)
-        If element IsNot Nothing Then element.Opacity = 0.85
-    End Sub
-
-    Private Sub SettingsRow_PointerExited(sender As Object, e As PointerRoutedEventArgs)
-        Dim element = TryCast(sender, FrameworkElement)
-        If element IsNot Nothing Then element.Opacity = 1.0
     End Sub
 
     Private Async Function ShowWelcomeDialogAsync() As Task

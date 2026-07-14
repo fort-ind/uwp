@@ -30,7 +30,7 @@
             <!-- Not Logged In State -->
             <StackPanel x:Name="NotLoggedInPanel" Visibility="Collapsed">
                 <Grid Background="{StaticResource CardAcrylicBrush}"
-                      CornerRadius="8"
+                      CornerRadius="4"
                       Padding="24">
                     <StackPanel HorizontalAlignment="Center" Spacing="16">
                         <FontIcon Glyph="&#xE77B;"
@@ -58,7 +58,7 @@
                 
                 <!-- Profile Header -->
                 <Grid Background="{StaticResource CardAcrylicBrush}"
-                      CornerRadius="8"
+                      CornerRadius="4"
                       Padding="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -77,7 +77,7 @@
                         <TextBlock x:Name="ProfileInitials"
                                    Text="?"
                                    FontSize="32"
-                                   FontWeight="Bold"
+                                   FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>
                     </Grid>
@@ -86,8 +86,7 @@
                     <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
                         <TextBlock x:Name="DisplayNameText"
                                    Text="Display Name"
-                                   FontSize="24"
-                                   FontWeight="Bold"/>
+                                   Style="{StaticResource SubtitleTextBlockStyle}"/>
                         <TextBlock x:Name="UsernameText"
                                    Text="@username"
                                    FontSize="14"
@@ -111,7 +110,7 @@
                     
                     <!-- Bio Section -->
                     <Grid Background="{StaticResource CardAcrylicBrush}"
-                          CornerRadius="8"
+                          CornerRadius="4"
                           Padding="20">
                         <StackPanel>
                             <TextBlock Text="About"
@@ -127,7 +126,7 @@
 
                     <!-- Contact Info -->
                     <Grid Background="{StaticResource CardAcrylicBrush}"
-                          CornerRadius="8"
+                          CornerRadius="4"
                           Padding="20">
                         <StackPanel Spacing="12">
                             <TextBlock Text="Contact"
@@ -171,7 +170,7 @@
                 <StackPanel x:Name="EditModePanel" Spacing="16" Visibility="Collapsed">
                     
                     <Grid Background="{StaticResource CardAcrylicBrush}"
-                          CornerRadius="8"
+                          CornerRadius="4"
                           Padding="20">
                         <StackPanel Spacing="16">
                             <TextBlock Text="Edit Profile"
@@ -253,7 +252,7 @@
 
                     <!-- Change Password Section -->
                     <Grid Background="{StaticResource CardAcrylicBrush}"
-                          CornerRadius="8"
+                          CornerRadius="4"
                           Padding="20">
                         <StackPanel Spacing="16">
                             <TextBlock Text="Change Password"
@@ -317,8 +316,8 @@
                     <Grid>
                         <Grid Background="{ThemeResource SystemControlErrorTextForegroundBrush}"
                               Opacity="0.15"
-                              CornerRadius="8"/>
-                        <Grid CornerRadius="8"
+                              CornerRadius="4"/>
+                        <Grid CornerRadius="4"
                               Padding="20">
                             <StackPanel Spacing="12">
                                 <StackPanel Orientation="Horizontal" Spacing="8">

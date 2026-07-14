@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /INSTALL.md
+/docs/windows10-uwp-design-guidance.md
