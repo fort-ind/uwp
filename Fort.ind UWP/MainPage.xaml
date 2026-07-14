@@ -690,7 +690,7 @@
                                                 <!-- Footer -->
                                                 <StackPanel Orientation="Horizontal" Spacing="6" Opacity="0.4">
                                                     <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"/>
-                                                    <TextBlock Text="made with love for windows by fort.ind"
+                                                    <TextBlock Text="made with love by fort.ind"
                                                                FontSize="11" VerticalAlignment="Center"/>
                                                     <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"/>
                                                 </StackPanel>

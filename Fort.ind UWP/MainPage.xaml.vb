@@ -215,7 +215,7 @@ Public NotInheritable Class MainPage
         Try
             ' Update Live Tile with latest news
             Dim newsItems As New List(Of NewsItem) From {
-                New NewsItem("What's new?", "2026.1 has been released for web go to fort1nd.com to see whats new", "welcome"),
+                New NewsItem("What's new?", "2026.7 has been released for web go to fort1nd.com to see whats new", "welcome"),
                 New NewsItem("Get Started", "Hello! fort.uwp is now ready to use. :3", "features")
             }
 
