@@ -136,11 +136,7 @@ Public NotInheritable Class MainPage
             _keyHandlerAttached = False
         End If
 
-        If _searchDebounceCts IsNot Nothing Then
-            _searchDebounceCts.Cancel()
-            _searchDebounceCts.Dispose()
-            _searchDebounceCts = Nothing
-        End If
+        CancelPendingSearch()
     End Sub
 
     Private Async Sub OnAuthStateChanged(sender As Object, isLoggedIn As Boolean)
@@ -510,7 +506,7 @@ Public NotInheritable Class MainPage
                 RootGrid.Background = New AcrylicBrush() With {
                     .BackgroundSource = AcrylicBackgroundSource.HostBackdrop,
                     .TintColor = c,
-                    .tintOpacity = tintOpacity,
+                    .TintOpacity = tintOpacity,
                     .TintLuminosityOpacity = 0.85,
                     .FallbackColor = c
                 }
@@ -749,31 +745,43 @@ Public NotInheritable Class MainPage
         End If
         ' Escape clears the search box when it has text
         If args.VirtualKey = Windows.System.VirtualKey.Escape AndAlso Not String.IsNullOrEmpty(NavSearchBox.Text) Then
-            If _searchDebounceCts IsNot Nothing Then
-                _searchDebounceCts.Cancel()
-            End If
+            CancelPendingSearch()
             NavSearchBox.Text = ""
             NavSearchBox.ItemsSource = Nothing
             args.Handled = True
         End If
     End Sub
 
+    Private Sub CancelPendingSearch()
+        ' Clear the field before disposing so no later caller can reach the dead source.
+        Dim cts = _searchDebounceCts
+        _searchDebounceCts = Nothing
+        If cts Is Nothing Then
+            Return
+        End If
+
+        Try
+            cts.Cancel()
+        Catch ex As ObjectDisposedException
+            ' Already torn down elsewhere – nothing left to cancel.
+        End Try
+        cts.Dispose()
+    End Sub
+
     Private Sub NavSearchBox_TextChanged(sender As AutoSuggestBox, args As AutoSuggestBoxTextChangedEventArgs)
         If args.Reason = AutoSuggestionBoxTextChangeReason.UserInput Then
             Dim query = sender.Text.Trim()
 
-            If _searchDebounceCts IsNot Nothing Then
-                _searchDebounceCts.Cancel()
-                _searchDebounceCts.Dispose()
-            End If
+            CancelPendingSearch()
 
             If String.IsNullOrEmpty(query) Then
                 sender.ItemsSource = Nothing
                 Return
             End If
 
-            _searchDebounceCts = New Threading.CancellationTokenSource()
-            ApplySearchSuggestionsAsync(sender, query, _searchDebounceCts.Token)
+            Dim cts = New Threading.CancellationTokenSource()
+            _searchDebounceCts = cts
+            ApplySearchSuggestionsAsync(sender, query, cts.Token)
         End If
     End Sub
 
