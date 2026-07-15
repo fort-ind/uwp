@@ -235,8 +235,18 @@ Public NotInheritable Class MainPage
             If NavView.MenuItems.Count > 0 Then
                 NavView.SelectedItem = NavView.MenuItems(0)
             End If
+
+            ' Assigning SelectedItem raises SelectionChanged, not ItemInvoked, so the
+            ' initial view has to be set up by hand. Without this the header is never
+            ' given a title, and a null header collapses the header row entirely -
+            ' leaving the floating pane toggle button to overlap the content.
+            ShowPanel(AppConstants.NavigationLatestNews)
+
             ' Ensure pane starts closed
-            NavView.IsPaneOpen = False
+            ClosePaneUnlessExpanded()
+
+            ' DisplayModeChanged does not fire for the mode the control starts in.
+            UpdateContentPadding(NavView.DisplayMode)
 
             ' Clear the badge now that the user has opened the app
             LiveTileService.ClearBadge()
@@ -266,11 +276,57 @@ Public NotInheritable Class MainPage
             End If
         End If
 
-        ' Always close the pane after navigation
-        NavView.IsPaneOpen = False
+        ' Close the pane after navigation
+        ClosePaneUnlessExpanded()
+    End Sub
+
+    ''' <summary>
+    ''' Closes the navigation pane, except in Expanded display mode where the pane is
+    ''' docked beside the content rather than overlaying it, and is meant to stay open.
+    ''' </summary>
+    Private Sub ClosePaneUnlessExpanded()
+        If NavView.DisplayMode <> NavigationViewDisplayMode.Expanded Then
+            NavView.IsPaneOpen = False
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Page title for a panel, shown in the NavigationView header.
+    ''' </summary>
+    Private Shared Function HeaderFor(panelName As String) As String
+        Select Case panelName
+            Case AppConstants.NavigationGames
+                Return "Games"
+            Case AppConstants.NavigationBetas
+                Return "Beta Programs"
+            Case AppConstants.NavigationProfile
+                Return "Your Profile"
+            Case AppConstants.NavigationSocial
+                Return "Social"
+            Case AppConstants.NavigationSettings
+                Return "Settings"
+            Case Else
+                ' Home, About (a dialog over Home) and unknown tags all show the Home panel.
+                Return "Welcome to Fort.ind"
+        End Select
+    End Function
+
+    Private Sub NavView_DisplayModeChanged(sender As NavigationView, args As NavigationViewDisplayModeChangedEventArgs)
+        UpdateContentPadding(args.DisplayMode)
+    End Sub
+
+    ''' <summary>
+    ''' Minimal mode leaves less room for content, so it uses the tighter 12px margin the
+    ''' design guidance recommends; Compact and Expanded get the standard 24px.
+    ''' </summary>
+    Private Sub UpdateContentPadding(mode As NavigationViewDisplayMode)
+        Dim inset As Double = If(mode = NavigationViewDisplayMode.Minimal, 12, 24)
+        ContentPanel.Padding = New Thickness(inset)
     End Sub
 
     Private Sub ShowPanel(panelName As String)
+        NavView.Header = HeaderFor(panelName)
+
         ' Hide all panels and frame
         LatestNewsPanel.Visibility = Visibility.Collapsed
         GamesPanel.Visibility = Visibility.Collapsed
@@ -310,6 +366,7 @@ Public NotInheritable Class MainPage
                     End If
                     ContentScrollViewer.Visibility = Visibility.Visible
                     LatestNewsPanel.Visibility = Visibility.Visible
+                    NavView.Header = HeaderFor(AppConstants.NavigationLatestNews)
                 End Try
             Case AppConstants.NavigationSocial
                 SocialPanel.Visibility = Visibility.Visible

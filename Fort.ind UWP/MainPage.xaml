@@ -66,27 +66,46 @@
         <!-- Main Content -->
         <NavigationView x:Name="NavView"
                          Grid.Row="1"
-                         PaneDisplayMode="LeftCompact"
-                         CompactModeThresholdWidth="640"
-                         ExpandedModeThresholdWidth="1008"
+                         PaneDisplayMode="Auto"
                          CompactPaneLength="48"
                          OpenPaneLength="320"
                          IsBackButtonVisible="Collapsed"
                          IsSettingsVisible="True"
                          IsPaneToggleButtonVisible="True"
-                         IsPaneOpen="False"
                          ItemInvoked="NavView_ItemInvoked"
                          Loaded="NavView_Loaded"
+                         DisplayModeChanged="NavView_DisplayModeChanged"
                          Background="Transparent" Grid.RowSpan="2">
 
             <NavigationView.Resources>
+                <!-- Every pane glyph must centre on 24px (half of the 48px compact pane).
+                     The toggle button is sized by its own resource, not CompactPaneLength,
+                     so it has to be widened to 48 as well or the hamburger sits 4px left. -->
                 <x:Double x:Key="NavigationViewCompactPaneLength">48</x:Double>
-                <Thickness x:Key="NavigationViewItemIconBoxMargin">14,12,14,12</Thickness>
+                <x:Double x:Key="PaneToggleButtonWidth">48</x:Double>
+                <Thickness x:Key="NavigationViewItemIconBoxMargin">16,12,16,12</Thickness>
             </NavigationView.Resources>
+
+            <!-- Page titles live here rather than in the content, so the floating pane
+                 toggle button cannot overlap them in Minimal mode. The header host
+                 already carries a 12px left margin (48px in Minimal, to clear the
+                 toggle button), so 12 more lands the text on the content's 24px
+                 padding, and leaves a 12px gap after the toggle button in Minimal. -->
+            <NavigationView.HeaderTemplate>
+                <DataTemplate>
+                    <!-- Top, not Center: the header box starts 5px below the toggle
+                         button's, so centring here drops the title below the button. -->
+                    <TextBlock Text="{Binding}"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               VerticalAlignment="Top"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="12,0,12,0"/>
+                </DataTemplate>
+            </NavigationView.HeaderTemplate>
 
             <NavigationView.AutoSuggestBox>
                 <AutoSuggestBox x:Name="NavSearchBox"
-                                PlaceholderText="Search..."
+                                PlaceholderText="Search for games pages and more.."
                                 QueryIcon="Find"
                                 MaxSuggestionListHeight="400"
                                 TextChanged="NavSearchBox_TextChanged"
@@ -174,13 +193,10 @@
                 <Frame x:Name="ContentFrame" Visibility="Collapsed"/>
 
                 <ScrollViewer x:Name="ContentScrollViewer">
-                    <StackPanel x:Name="ContentPanel" Padding="24">
+                    <!-- Padding is set from NavView_DisplayModeChanged: 12px in Minimal, 24px otherwise. -->
+                    <StackPanel x:Name="ContentPanel">
                         <!-- Latest News Content (default view) -->
                         <StackPanel x:Name="LatestNewsPanel" Visibility="Visible">
-                            <TextBlock Text="Welcome to Fort.ind"
-                                       Style="{StaticResource TitleTextBlockStyle}"
-                                       Margin="0,0,0,10"/>
-
                             <TextBlock Text="Check back here for the latest updates and announcements."
                                        Style="{StaticResource BodyTextBlockStyle}"
                                        Opacity="0.7"
@@ -256,10 +272,6 @@
 
                         <!-- Games Content -->
                         <StackPanel x:Name="GamesPanel" Visibility="Collapsed">
-                            <TextBlock Text="Games"
-                                       Style="{StaticResource TitleTextBlockStyle}"
-                                       Margin="0,0,0,10"/>
-
                             <TextBlock Text="Visit https://www.fort1nd.com to explore our games"
                                        Style="{StaticResource BodyTextBlockStyle}"
                                        TextWrapping="Wrap"/>
@@ -267,10 +279,6 @@
 
                         <!-- Betas Content -->
                         <StackPanel x:Name="BetasPanel" Visibility="Collapsed">
-                            <TextBlock Text="Beta Programs"
-                                       Style="{StaticResource TitleTextBlockStyle}"
-                                       Margin="0,0,0,10"/>
-
                             <TextBlock Text="Access beta versions and early features (coming soon)"
                                        Style="{StaticResource BodyTextBlockStyle}"
                                        TextWrapping="Wrap"/>
@@ -280,10 +288,6 @@
 
                         <!-- Social Content -->
                         <StackPanel x:Name="SocialPanel" Visibility="Collapsed">
-                            <TextBlock Text="Social"
-                                       Style="{StaticResource TitleTextBlockStyle}"
-                                       Margin="0,0,0,10"/>
-
                             <TextBlock Text="Social features coming soon"
                                        Style="{StaticResource BodyTextBlockStyle}"
                                        TextWrapping="Wrap"/>
@@ -291,10 +295,6 @@
 
                         <!-- Settings Content -->
                         <StackPanel x:Name="SettingsPanel" Visibility="Collapsed">
-                            <TextBlock Text="Settings"
-                                       Style="{StaticResource TitleTextBlockStyle}"
-                                       Margin="0,0,0,4"/>
-
                             <TextBlock Text="Configure your application preferences"
                                        Style="{StaticResource BodyTextBlockStyle}"
                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
