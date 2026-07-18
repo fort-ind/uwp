@@ -15,15 +15,15 @@ function Write-Status($message, $type = "Info") {
 function Write-Banner {
     $cat = @'
                                  /\_/\
-                                ( o.o )
+                                ( -.- )
                                  > ^ <
 '@
     Write-Host ""
     Write-Host "  ╔══════════════════════════════════════════╗" -ForegroundColor DarkMagenta
-    Write-Host "  ║                                            ║" -ForegroundColor DarkMagenta
-    Write-Host "  ║          F O R T . I N D   U W P          ║" -ForegroundColor Magenta
-    Write-Host "  ║               Installer                    ║" -ForegroundColor DarkMagenta
-    Write-Host "  ║                                            ║" -ForegroundColor DarkMagenta
+    Write-Host "  ║                                          ║" -ForegroundColor DarkMagenta
+    Write-Host "  ║                fort.uwp                  ║" -ForegroundColor Magenta
+    Write-Host "  ║                Installer                 ║" -ForegroundColor DarkMagenta
+    Write-Host "  ║                                          ║" -ForegroundColor DarkMagenta
     Write-Host "  ╚══════════════════════════════════════════╝" -ForegroundColor DarkMagenta
     Write-Host $cat -ForegroundColor Magenta
     Write-Host ""
@@ -179,7 +179,7 @@ if ($certFile) {
         }
     } catch {
         Write-Status "Failed to install certificate: $($_.Exception.Message)" "Error"
-        $continue = Read-Host "Continue without certificate? (y/N)"
+        $continue = Read-Host "conntinue without the app cert? (y/N)"
         if ($continue -ne "y" -and $continue -ne "Y") {
             exit 1
         }
@@ -201,7 +201,7 @@ if ($msixFile) {
     # Check if app is already installed and remove old version
     $existingApp = Get-AppxPackage -Name "*Fort.ind*" -ErrorAction SilentlyContinue
     if ($existingApp) {
-        Write-Status "Removing previous version..." "Info"
+        Write-Status "almost done here..." "Info"
         $existingApp | Remove-AppxPackage -ErrorAction SilentlyContinue
     }
 
@@ -210,15 +210,15 @@ if ($msixFile) {
         Write-Status "Fort.ind UWP installed successfully!" "Success"
         Write-Host ""
         Write-Host "  ╔══════════════════════════════════════════╗" -ForegroundColor Magenta
-        Write-Host "  ║        Installation Complete!  =^..^=      ║" -ForegroundColor Magenta
+        Write-Host "  ║        Installation Complete!  =^..^=    ║" -ForegroundColor Magenta
         Write-Host "  ╚══════════════════════════════════════════╝" -ForegroundColor Magenta
         Write-Host ""
-        Write-Host "  Find Fort.ind UWP in your Start menu." -ForegroundColor Magenta
+        Write-Host "  Find Fort.uwp in your Start menu!" -ForegroundColor Magenta
         Write-Host "  If you run into any bugs, please open" -ForegroundColor DarkMagenta
-        Write-Host "  an issue on the GitHub repository." -ForegroundColor DarkMagenta
+        Write-Host "  an issue on the github repo at fort-ind/uwp" -ForegroundColor DarkMagenta
         Write-Host ""
     } catch {
-        Write-Status "That's awkward... the install failed: $($_.Exception.Message)" "Error"
+        Write-Status "That's awkward... :( the install failed: $($_.Exception.Message)" "Error"
         Write-Host ""
         Write-Status "Troubleshooting tips:" "Warning"
         Write-Status "1. Make sure Developer Mode is enabled in Windows Settings" "Info"
@@ -226,7 +226,7 @@ if ($msixFile) {
         Write-Status "3. Check if Windows Update has pending updates" "Info"
     }
 } else {
-    Write-Status "No MSIX or APPX file found in the package directory!" "Error"
+    Write-Status "seems like the APPX/MSIX package is missing, (did you extract the zip right?)" "Error"
 }
 
 Write-Host ""
