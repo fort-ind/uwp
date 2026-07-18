@@ -235,7 +235,7 @@ Public NotInheritable Class MainPage
             ' initial view has to be set up by hand. Without this the header is never
             ' given a title, and a null header collapses the header row entirely -
             ' leaving the floating pane toggle button to overlap the content.
-            ShowPanel(AppConstants.NavigationLatestNews)
+            ShowContent(AppConstants.NavigationLatestNews)
 
             ' Ensure pane starts closed
             ClosePaneUnlessExpanded()
@@ -262,12 +262,12 @@ Public NotInheritable Class MainPage
 
     Private Sub NavView_ItemInvoked(sender As NavigationView, args As NavigationViewItemInvokedEventArgs)
         If args.IsSettingsInvoked Then
-            ShowPanel("Settings")
+            ShowContent(AppConstants.NavigationSettings)
         Else
             Dim invokedItem = TryCast(args.InvokedItemContainer, NavigationViewItem)
             If invokedItem IsNot Nothing Then
                 Dim tag = If(invokedItem.Tag?.ToString(), AppConstants.NavigationLatestNews)
-                ShowPanel(tag)
+                ShowContent(tag)
             End If
         End If
 
@@ -319,63 +319,76 @@ Public NotInheritable Class MainPage
         ContentPanel.Padding = New Thickness(inset)
     End Sub
 
-    Private Sub ShowPanel(panelName As String)
-        NavView.Header = HeaderFor(panelName)
+    ''' <summary>
+    ''' Central content switch. This is the single place that owns the decision between the
+    ''' app's two content hosts: page-backed views (currently only Profile) navigate the
+    ''' ContentFrame, while every other view is a lightweight inline panel shown in the
+    ''' ContentScrollViewer. Adding a new page-backed view is a one-line Case here.
+    ''' </summary>
+    Private Sub ShowContent(tag As String)
+        NavView.Header = HeaderFor(tag)
 
-        ' Hide all panels and frame
-        LatestNewsPanel.Visibility = Visibility.Collapsed
-        GamesPanel.Visibility = Visibility.Collapsed
-        BetasPanel.Visibility = Visibility.Collapsed
-        SocialPanel.Visibility = Visibility.Collapsed
-        SettingsPanel.Visibility = Visibility.Collapsed
-        ContentFrame.Visibility = Visibility.Collapsed
-        ContentScrollViewer.Visibility = Visibility.Visible
-
-        ' Show the selected panel
-        Select Case panelName
-            Case AppConstants.NavigationLatestNews
-                LatestNewsPanel.Visibility = Visibility.Visible
-            Case AppConstants.NavigationGames
-                GamesPanel.Visibility = Visibility.Visible
-            Case AppConstants.NavigationBetas
-                BetasPanel.Visibility = Visibility.Visible
+        Select Case tag
             Case AppConstants.NavigationProfile
-                ' Navigate to ProfilePage in the frame (skip if already there)
-                ContentScrollViewer.Visibility = Visibility.Collapsed
-                ContentFrame.Visibility = Visibility.Visible
-                Try
-                    ' Null check for ContentFrame
-                    If ContentFrame IsNot Nothing Then
-                        If TypeOf ContentFrame.Content Is ProfilePage Then
-                            ' Already on profile page – refresh the UI instead of re-navigating
-                            DirectCast(ContentFrame.Content, ProfilePage).RefreshUI()
-                        Else
-                            ContentFrame.Navigate(GetType(ProfilePage))
-                        End If
-                    End If
-                Catch ex As Exception
-                    ' Navigation failed – fall back to home
-                    Debug.WriteLine($"MainPage: Profile navigation failed – {ex.Message}")
-                    If ContentFrame IsNot Nothing Then
-                        ContentFrame.Visibility = Visibility.Collapsed
-                    End If
-                    ContentScrollViewer.Visibility = Visibility.Visible
-                    LatestNewsPanel.Visibility = Visibility.Visible
-                    NavView.Header = HeaderFor(AppConstants.NavigationLatestNews)
-                End Try
+                ' The one page-backed view: hosted in the Frame, not as an inline panel.
+                ShowProfilePage()
+            Case AppConstants.NavigationGames
+                ShowInlinePanel(GamesPanel)
+            Case AppConstants.NavigationBetas
+                ShowInlinePanel(BetasPanel)
             Case AppConstants.NavigationSocial
-                SocialPanel.Visibility = Visibility.Visible
+                ShowInlinePanel(SocialPanel)
+            Case AppConstants.NavigationSettings
+                ShowInlinePanel(SettingsPanel)
+                UpdateStorageInfo()
             Case AppConstants.NavigationAbout
                 ' About is presented as a dialog overlay. Keep Home visible behind it so
                 ' the content area is not left blank once the dialog is dismissed.
-                LatestNewsPanel.Visibility = Visibility.Visible
+                ShowInlinePanel(LatestNewsPanel)
                 AboutButton_Click(Nothing, Nothing)
-            Case AppConstants.NavigationSettings
-                SettingsPanel.Visibility = Visibility.Visible
-                UpdateStorageInfo()
             Case Else
-                LatestNewsPanel.Visibility = Visibility.Visible
+                ' Home, Latest News, and any unknown tag fall back to the Home panel.
+                ShowInlinePanel(LatestNewsPanel)
         End Select
+    End Sub
+
+    ''' <summary>
+    ''' Shows the inline content host (the ScrollViewer) and makes exactly one panel visible.
+    ''' Collapses the Frame so the two hosts are never on screen at the same time.
+    ''' </summary>
+    Private Sub ShowInlinePanel(panel As UIElement)
+        ContentFrame.Visibility = Visibility.Collapsed
+        ContentScrollViewer.Visibility = Visibility.Visible
+
+        LatestNewsPanel.Visibility = If(panel Is LatestNewsPanel, Visibility.Visible, Visibility.Collapsed)
+        GamesPanel.Visibility = If(panel Is GamesPanel, Visibility.Visible, Visibility.Collapsed)
+        BetasPanel.Visibility = If(panel Is BetasPanel, Visibility.Visible, Visibility.Collapsed)
+        SocialPanel.Visibility = If(panel Is SocialPanel, Visibility.Visible, Visibility.Collapsed)
+        SettingsPanel.Visibility = If(panel Is SettingsPanel, Visibility.Visible, Visibility.Collapsed)
+    End Sub
+
+    ''' <summary>
+    ''' Shows the Frame content host and navigates it to ProfilePage (or refreshes the UI if
+    ''' it is already there). Falls back to the Home panel if navigation fails.
+    ''' </summary>
+    Private Sub ShowProfilePage()
+        ContentScrollViewer.Visibility = Visibility.Collapsed
+        ContentFrame.Visibility = Visibility.Visible
+        Try
+            If ContentFrame IsNot Nothing Then
+                If TypeOf ContentFrame.Content Is ProfilePage Then
+                    ' Already on profile page – refresh the UI instead of re-navigating
+                    DirectCast(ContentFrame.Content, ProfilePage).RefreshUI()
+                Else
+                    ContentFrame.Navigate(GetType(ProfilePage))
+                End If
+            End If
+        Catch ex As Exception
+            ' Navigation failed – fall back to home
+            Debug.WriteLine($"MainPage: Profile navigation failed – {ex.Message}")
+            NavView.Header = HeaderFor(AppConstants.NavigationLatestNews)
+            ShowInlinePanel(LatestNewsPanel)
+        End Try
     End Sub
 
     Private Sub UpdateStorageInfo()
@@ -927,7 +940,7 @@ Public NotInheritable Class MainPage
                 Debug.WriteLine($"MainPage: Invalid URL in search item – {item.Url}")
             End If
         ElseIf Not String.IsNullOrEmpty(item.NavigationTag) Then
-            ShowPanel(item.NavigationTag)
+            ShowContent(item.NavigationTag)
         End If
     End Function
 

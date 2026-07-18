@@ -20,23 +20,13 @@
                           TintOpacity="0.65"
                           FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
-            <!-- Reveal Highlight NavigationViewItem Style Override -->
+            <!-- NavigationViewItem foreground: high-contrast when idle, accent when selected -->
             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{ThemeResource SystemBaseHighColor}"/>
             <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
             <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColor}"/>
             <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColor}"/>
 
-            <!-- Enable Reveal Highlight on Buttons -->
-            <Style TargetType="Button">
-                <Setter Property="Background" Value="{ThemeResource ButtonRevealBackground}"/>
-                <Setter Property="BackgroundSizing" Value="InnerBorderEdge"/>
-                <Setter Property="BorderBrush" Value="{ThemeResource ButtonRevealBorderBrush}"/>
-            </Style>
-
-            <!-- Enable Reveal on AppBarButton -->
-            <Style TargetType="AppBarButton">
-                <Setter Property="Background" Value="{ThemeResource AppBarButtonRevealBackground}"/>
-            </Style>
+            <!-- Reveal is intentionally NOT applied globally -->
 
         </ResourceDictionary>
     </Application.Resources>
