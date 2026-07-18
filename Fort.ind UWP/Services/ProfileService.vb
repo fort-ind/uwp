@@ -1,374 +1,125 @@
-Imports System.Security.Cryptography
-Imports System.Text
-
 ''' <summary>
-''' Service for managing user accounts and authentication
-''' Handles login, registration, and profile management
-''' Ready to be extended with server authentication later
+''' Manages the signed-in fort.social (Misskey) identity: sign-in via MiAuth, session restore,
+''' and sign-out. fort.social is the source of truth for the account; there is no local
+''' registration/password system.
 ''' </summary>
 Public Class ProfileService
 
     ''' <summary>
-    ''' The currently logged-in user profile
+    ''' The currently signed-in user profile
     ''' </summary>
     Public Shared Property CurrentUser As UserProfile
 
     ''' <summary>
-    ''' Event raised when user logs in or out
+    ''' Event raised when the user signs in or out
     ''' </summary>
     Public Shared Event AuthStateChanged As EventHandler(Of Boolean)
 
     ''' <summary>
-    ''' Attempts to register a new user
+    ''' Runs the MiAuth sign-in flow against fort.social (opens the system browser and waits
+    ''' for it to redirect back into the app). On success, caches the returned profile and
+    ''' access token.
     ''' </summary>
-    Public Shared Async Function RegisterAsync(username As String, password As String, displayName As String, email As String, Optional cancellationToken As Threading.CancellationToken = Nothing) As Task(Of RegistrationResult)
-        ' Validate inputs
-        If String.IsNullOrWhiteSpace(username) OrElse username.Length < 3 Then
-            Return New RegistrationResult(False, "Username must be at least 3 characters")
+    Public Shared Async Function LoginWithMisskeyAsync() As Task(Of LoginResult)
+        Dim result = Await MisskeyAuthService.SignInAsync()
+        If Not result.Success Then
+            Return New LoginResult(False, result.ErrorMessage)
         End If
 
-        If username.Length > 50 Then
-            Return New RegistrationResult(False, "Username must be 50 characters or fewer")
-        End If
-
-        If Not username.All(Function(c) Char.IsLetterOrDigit(c) OrElse c = "-"c OrElse c = "_"c) Then
-            Return New RegistrationResult(False, "Username may only contain letters, numbers, hyphens and underscores")
-        End If
-
-        If String.IsNullOrWhiteSpace(password) OrElse password.Length < 8 Then
-            Return New RegistrationResult(False, "Password must be at least 8 characters")
-        End If
-
-        ' Cap password length to prevent excessive PBKDF2 hashing time
-        If password.Length > 128 Then
-            Return New RegistrationResult(False, "Password must be 128 characters or fewer")
-        End If
-
-        If Not String.IsNullOrWhiteSpace(displayName) AndAlso displayName.Length > 100 Then
-            Return New RegistrationResult(False, "Display name must be 100 characters or fewer")
-        End If
-
-        If String.IsNullOrWhiteSpace(displayName) Then
-            displayName = username
-        End If
-
-        ' Check for cancellation
-        cancellationToken.ThrowIfCancellationRequested()
-
-        ' Check if username is taken
-        If Await LocalStorageService.IsUsernameTakenAsync(username) Then
-            Return New RegistrationResult(False, "Username is already taken")
-        End If
-
-        ' Check for cancellation before expensive operation
-        cancellationToken.ThrowIfCancellationRequested()
-
-        ' Create new profile
-        Dim profile As New UserProfile(username, displayName, email)
-        ' Move password hashing off UI thread to prevent UI freeze
-        profile.PasswordHash = Await Task.Run(Function() HashPassword(password), cancellationToken)
-        profile.LastLoginDate = DateTime.Now
-
-        ' Check for cancellation
-        cancellationToken.ThrowIfCancellationRequested()
-
-        ' Save profile
-        Dim saved = Await LocalStorageService.SaveProfileAsync(profile)
-        If Not saved Then
-            Return New RegistrationResult(False, "Failed to save profile")
-        End If
-
-        ' Auto-login after registration
-        CurrentUser = profile
-        Await LocalStorageService.SaveCurrentUserIdAsync(profile.UserId)
-        RaiseEvent AuthStateChanged(Nothing, True)
-
-        Return New RegistrationResult(True, "Account created successfully!", profile)
+        Await ApplySignInResultAsync(result)
+        Return New LoginResult(True, "Signed in!", result.Profile)
     End Function
 
     ''' <summary>
-    ''' Attempts to log in with username and password
+    ''' Applies a completed MiAuth sign-in (profile + token already obtained), caching the
+    ''' profile and notifying listeners. Shared by the normal in-app sign-in flow and the
+    ''' cold-start protocol-activation path (App.OnActivated), where the app process that
+    ''' started SignInAsync may no longer be the one that receives the browser's callback.
     ''' </summary>
-    Public Shared Async Function LoginAsync(username As String, password As String, Optional cancellationToken As Threading.CancellationToken = Nothing) As Task(Of LoginResult)
-        If String.IsNullOrWhiteSpace(username) OrElse String.IsNullOrWhiteSpace(password) Then
-            Return New LoginResult(False, "Username and password are required")
-        End If
+    Public Shared Async Function ApplySignInResultAsync(result As MisskeyAuthResult) As Task(Of Boolean)
+        If result Is Nothing OrElse Not result.Success Then Return False
 
-        ' Check for cancellation
-        cancellationToken.ThrowIfCancellationRequested()
-
-        ' Find user by username
-        Dim profile = Await LocalStorageService.LoadProfileByUsernameAsync(username)
-        If profile Is Nothing Then
-            Return New LoginResult(False, "Invalid username or password")
-        End If
-
-        ' Check for cancellation before expensive operation
-        cancellationToken.ThrowIfCancellationRequested()
-
-        ' Verify password off UI thread to prevent UI freeze
-        Dim isValid = Await Task.Run(Function() VerifyPassword(password, profile.PasswordHash), cancellationToken)
-        If Not isValid Then
-            Return New LoginResult(False, "Invalid username or password")
-        End If
-
-        ' Update last login
-        profile.LastLoginDate = DateTime.Now
-        Await LocalStorageService.SaveProfileAsync(profile)
-
-        ' Set current user
-        CurrentUser = profile
-        Await LocalStorageService.SaveCurrentUserIdAsync(profile.UserId)
+        CurrentUser = result.Profile
+        Await LocalStorageService.SaveProfileAsync(result.Profile)
         RaiseEvent AuthStateChanged(Nothing, True)
-        Dim displayName = If(String.IsNullOrWhiteSpace(profile.DisplayName), profile.Username, profile.DisplayName)
+
+        Dim displayName = If(String.IsNullOrWhiteSpace(result.Profile.DisplayName), result.Profile.Username, result.Profile.DisplayName)
         LiveTileService.SendToast("Welcome back!", $"Signed in as {displayName}")
 
-        Return New LoginResult(True, "Login successful!", profile)
+        Return True
     End Function
 
     ''' <summary>
-    ''' Logs out the current user
+    ''' Signs the current user out and clears the cached profile and access token.
     ''' </summary>
     Public Shared Async Function LogoutAsync() As Task
         Dim name = If(CurrentUser IsNot Nothing, If(String.IsNullOrWhiteSpace(CurrentUser.DisplayName), CurrentUser.Username, CurrentUser.DisplayName), "")
         CurrentUser = Nothing
-        Await LocalStorageService.ClearCurrentUserAsync()
+        MisskeyAuthService.ClearToken()
+        Await LocalStorageService.ClearProfileAsync()
         RaiseEvent AuthStateChanged(Nothing, False)
         If Not String.IsNullOrEmpty(name) Then LiveTileService.SendToast("Signed out", $"Goodbye, {name}!")
     End Function
 
     ''' <summary>
-    ''' Tries to restore session from stored user ID
-    ''' Call this at app startup
+    ''' Restores a session at app startup. Shows the cached profile immediately (so the UI
+    ''' isn't blocked on network access), then refreshes it from fort.social in the background.
+    ''' If there's no cached profile yet (token present but first run after an update), it
+    ''' fetches synchronously instead.
     ''' </summary>
     Public Shared Async Function TryRestoreSessionAsync() As Task(Of Boolean)
         Try
-            Dim userId = Await LocalStorageService.GetCurrentUserIdAsync()
-            If String.IsNullOrEmpty(userId) Then
+            Dim token = MisskeyAuthService.TryGetToken()
+            If String.IsNullOrEmpty(token) Then
                 Return False
             End If
 
-            Dim profile = Await LocalStorageService.LoadProfileAsync(userId)
-            If profile Is Nothing Then
-                ' Profile file is gone — clear the orphaned session
-                Await LocalStorageService.ClearCurrentUserAsync()
-                Return False
+            Dim cached = Await LocalStorageService.LoadProfileAsync()
+            If cached Is Nothing Then
+                Dim fetched = Await MisskeyAuthService.FetchCurrentUserAsync(token)
+                If fetched Is Nothing Then
+                    Await LogoutAsync()
+                    Return False
+                End If
+
+                CurrentUser = fetched
+                Await LocalStorageService.SaveProfileAsync(fetched)
+                RaiseEvent AuthStateChanged(Nothing, True)
+                Return True
             End If
 
-            ' Check if remember login is enabled
-            If Not profile.Preferences.RememberLogin Then
-                Await LocalStorageService.ClearCurrentUserAsync()
-                Return False
-            End If
-
-            CurrentUser = profile
+            CurrentUser = cached
             RaiseEvent AuthStateChanged(Nothing, True)
+
+            ' Refresh from fort.social in the background so a slow/offline network doesn't
+            ' delay startup. A revoked token simply leaves the cached profile in place until
+            ' the user explicitly signs out.
+            RefreshCurrentUserInBackground(token)
+
             Return True
         Catch ex As Exception
-            ' Log unexpected errors during session restore instead of silently swallowing them
-            System.Diagnostics.Debug.WriteLine($"TryRestoreSessionAsync failed: {ex}")
+            Debug.WriteLine($"TryRestoreSessionAsync failed: {ex}")
             Return False
         End Try
     End Function
 
-    ''' <summary>
-    ''' Updates the current user's profile
-    ''' </summary>
-    Public Shared Async Function UpdateProfileAsync(displayName As String, email As String, bio As String, Optional profilePicturePath As String = Nothing, Optional updateProfilePicture As Boolean = False) As Task(Of Boolean)
-        Dim current = CurrentUser
-        If current Is Nothing Then
-            Return False
-        End If
-
-        ' Apply edits to a detached copy so no reader (search snapshot, auth listeners)
-        ' can observe a half-saved CurrentUser. Only swap it in once the save succeeds.
-        Dim updated = current.Clone()
-        updated.DisplayName = displayName
-        updated.Email = email
-        updated.Bio = bio
-        If updateProfilePicture Then
-            updated.ProfilePicturePath = profilePicturePath
-        End If
-
-        Dim saved = Await LocalStorageService.SaveProfileAsync(updated)
-        If saved Then
-            CurrentUser = updated
-        End If
-        Return saved
-    End Function
-
-    ''' <summary>
-    ''' Updates user preferences
-    ''' </summary>
-    Public Shared Async Function UpdatePreferencesAsync(preferences As UserPreferences) As Task(Of Boolean)
-        Dim current = CurrentUser
-        If current Is Nothing Then
-            Return False
-        End If
-
-        If preferences Is Nothing Then
-            Return False
-        End If
-
-        Dim updated = current.Clone()
-        updated.Preferences = preferences
-        Dim saved = Await LocalStorageService.SaveProfileAsync(updated)
-        If saved Then
-            CurrentUser = updated
-        End If
-        Return saved
-    End Function
-
-    ''' <summary>
-    ''' Changes the user's password
-    ''' </summary>
-    Public Shared Async Function ChangePasswordAsync(currentPassword As String, newPassword As String, Optional cancellationToken As Threading.CancellationToken = Nothing) As Task(Of Boolean)
-        If CurrentUser Is Nothing Then
-            Return False
-        End If
-
-        ' Check for cancellation
-        cancellationToken.ThrowIfCancellationRequested()
-
-        ' Verify current password off UI thread
-        Dim isValid = Await Task.Run(Function() VerifyPassword(currentPassword, CurrentUser.PasswordHash), cancellationToken)
-        If Not isValid Then
-            Return False
-        End If
-
-        ' Validate new password
-        If String.IsNullOrWhiteSpace(newPassword) OrElse newPassword.Length < 8 Then
-            Return False
-        End If
-
-        ' Check for cancellation before expensive operation
-        cancellationToken.ThrowIfCancellationRequested()
-
-        ' Hash new password off UI thread, then save on a detached copy and swap on success.
-        Dim newHash = Await Task.Run(Function() HashPassword(newPassword), cancellationToken)
-        Dim updated = CurrentUser.Clone()
-        updated.PasswordHash = newHash
-        Dim saved = Await LocalStorageService.SaveProfileAsync(updated)
-        If saved Then
-            CurrentUser = updated
-        End If
-        Return saved
-    End Function
-
-    ''' <summary>
-    ''' Deletes the current user's account
-    ''' </summary>
-    Public Shared Async Function DeleteAccountAsync() As Task(Of Boolean)
-        If CurrentUser Is Nothing Then
-            Return False
-        End If
-
-        Dim userId = CurrentUser.UserId
-        Await LogoutAsync()
-        Return Await LocalStorageService.DeleteProfileAsync(userId)
-    End Function
-
-#Region "Password Hashing"
-
-    ''' <summary>
-    ''' Creates a secure hash of the password using PBKDF2 with a per-password random salt.
-    ''' The resulting string has the format: iterations:saltBase64:hashBase64
-    ''' </summary>
-    Private Shared Function HashPassword(password As String) As String
-        ' PBKDF2 configuration
-        Const iterations As Integer = 600000
-        Const saltSize As Integer = 16   ' 128-bit salt
-        Const keySize As Integer = 32    ' 256-bit derived key
-
-        Dim salt(saltSize - 1) As Byte
-        Using rng As RandomNumberGenerator = RandomNumberGenerator.Create()
-            rng.GetBytes(salt)
-        End Using
-
-        Dim hashBytes As Byte()
-        Using pbkdf2 As New Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256)
-            hashBytes = pbkdf2.GetBytes(keySize)
-        End Using
-
-        Dim saltBase64 = Convert.ToBase64String(salt)
-        Dim hashBase64 = Convert.ToBase64String(hashBytes)
-
-        Return $"{iterations}:{saltBase64}:{hashBase64}"
-    End Function
-
-    ''' <summary>
-    ''' Verifies a password against a stored hash created by <see cref="HashPassword"/>.
-    ''' </summary>
-    Private Shared Function VerifyPassword(password As String, storedHash As String) As Boolean
-        If String.IsNullOrWhiteSpace(password) OrElse String.IsNullOrWhiteSpace(storedHash) Then
-            Return False
-        End If
-
-        Dim parts = storedHash.Split(":"c)
-        If parts.Length <> 3 Then
-            ' Unknown or legacy format; cannot verify securely
-            Return False
-        End If
-
-        Dim iterations As Integer
-        If Not Integer.TryParse(parts(0), iterations) Then
-            Return False
-        End If
-
-        Dim salt As Byte()
-        Dim storedHashBytes As Byte()
+    Private Shared Async Sub RefreshCurrentUserInBackground(token As String)
         Try
-            salt = Convert.FromBase64String(parts(1))
-            storedHashBytes = Convert.FromBase64String(parts(2))
-        Catch ex As FormatException
-            Return False
+            Dim fetched = Await MisskeyAuthService.FetchCurrentUserAsync(token)
+            If fetched Is Nothing Then Return
+
+            CurrentUser = fetched
+            Await LocalStorageService.SaveProfileAsync(fetched)
+            RaiseEvent AuthStateChanged(Nothing, True)
+        Catch ex As Exception
+            Debug.WriteLine($"RefreshCurrentUserInBackground failed: {ex.Message}")
         End Try
-
-        Dim computedHash As Byte()
-        Using pbkdf2 As New Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256)
-            computedHash = pbkdf2.GetBytes(storedHashBytes.Length)
-        End Using
-
-        Return FixedTimeEquals(storedHashBytes, computedHash)
-    End Function
-
-    ''' <summary>
-    ''' Compares two byte arrays in constant time to avoid timing attacks.
-    ''' </summary>
-    Private Shared Function FixedTimeEquals(a As Byte(), b As Byte()) As Boolean
-        If a Is Nothing OrElse b Is Nothing OrElse a.Length <> b.Length Then
-            Return False
-        End If
-
-        Dim diff As Integer = 0
-        For i As Integer = 0 To a.Length - 1
-            diff = diff Or (a(i) Xor b(i))
-        Next
-
-        Return diff = 0
-    End Function
-
-#End Region
-
-End Class
-
-''' <summary>
-''' Result of a registration attempt
-''' </summary>
-Public Class RegistrationResult
-    Public Property Success As Boolean
-    Public Property Message As String
-    Public Property Profile As UserProfile
-
-    Public Sub New(success As Boolean, message As String, Optional profile As UserProfile = Nothing)
-        Me.Success = success
-        Me.Message = message
-        Me.Profile = profile
     End Sub
+
 End Class
 
 ''' <summary>
-''' Result of a login attempt
+''' Result of a sign-in attempt
 ''' </summary>
 Public Class LoginResult
     Public Property Success As Boolean

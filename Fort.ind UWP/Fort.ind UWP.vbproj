@@ -144,7 +144,6 @@
     </Compile>
     <Compile Include="Models\SearchItem.vb" />
     <Compile Include="Models\UserProfile.vb" />
-    <Compile Include="Models\ValidationHelpers.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="Pages\LoginPage.xaml.vb">
       <DependentUpon>LoginPage.xaml</DependentUpon>
@@ -154,6 +153,7 @@
     </Compile>
     <Compile Include="Services\LiveTileService.vb" />
     <Compile Include="Services\LocalStorageService.vb" />
+    <Compile Include="Services\MisskeyAuthService.vb" />
     <Compile Include="Services\ProfileService.vb" />
     <Compile Include="Services\SitemapService.vb" />
   </ItemGroup>

@@ -51,11 +51,8 @@ Public NotInheritable Class AppConstants
     Public Const SitemapCacheTimestampKey As String = "SitemapCacheUnixSeconds"
     Public Const SitemapCacheTtlHours As Integer = 24
 
-    ' Profile assets
-    Public Const AvatarFolderName As String = "Avatars"
-
     ' Release channel suffix appended after the numeric version (e.g. "0.5.0 Beta")
-    Public Const VersionChannel As String = "Beta"
+    Public Const VersionChannel As String = " "
 
     ''' <summary>
     ''' The app version pulled from the package manifest, formatted as "Major.Minor.Build".
@@ -68,7 +65,7 @@ Public NotInheritable Class AppConstants
                 Dim v = Windows.ApplicationModel.Package.Current.Id.Version
                 Return $"{v.Major}.{v.Minor}.{v.Build} {VersionChannel}"
             Catch
-                Return $"0.5.0 {VersionChannel}"
+                Return $"2.0.10 {VersionChannel}"
             End Try
         End Get
     End Property

@@ -35,8 +35,7 @@ Public NotInheritable Class MainPage
         New SearchItem("Background Color", AppConstants.CategorySettings, AppConstants.NavigationSettings),
         New SearchItem("Background Tint", AppConstants.CategorySettings, AppConstants.NavigationSettings),
         New SearchItem("Account", AppConstants.CategoryProfile, AppConstants.NavigationProfile),
-        New SearchItem("Login", AppConstants.CategoryProfile, AppConstants.NavigationProfile),
-        New SearchItem("Register", AppConstants.CategoryProfile, AppConstants.NavigationProfile)
+        New SearchItem("Sign In", AppConstants.CategoryProfile, AppConstants.NavigationProfile)
     }
 
     ' All searchable items – volatile reference swapped once when sitemap loads (no lock needed for reads)
@@ -379,14 +378,51 @@ Public NotInheritable Class MainPage
         End Select
     End Sub
 
-    Private Async Sub UpdateStorageInfo()
+    Private Sub UpdateStorageInfo()
         Try
             StoragePathText.Text = $"Location: {LocalStorageService.DataPath}"
-            Dim userCount = Await LocalStorageService.GetUserCountAsync()
-            UserCountText.Text = $"Registered users: {userCount}"
+
+            Dim user = ProfileService.CurrentUser
+            If user IsNot Nothing Then
+                CacheDescriptionText.Text = "You are logged in using fort.social. We cached your login details so we can quickly log you in :p"
+                UserCountText.Text = $"Signed in as @{user.Username}@{If(String.IsNullOrWhiteSpace(user.Host), MisskeyAuthService.InstanceHost, user.Host)}"
+                ClearLoginInfoButton.Visibility = Visibility.Visible
+            Else
+                CacheDescriptionText.Text = "Not signed in... why dont you go do that?"
+                UserCountText.Text = ""
+                ClearLoginInfoButton.Visibility = Visibility.Collapsed
+            End If
         Catch ex As Exception
             StoragePathText.Text = ""
             UserCountText.Text = ""
+        End Try
+    End Sub
+
+    Private Async Sub ClearLoginInfoButton_Click(sender As Object, e As RoutedEventArgs)
+        ' Use semaphore to prevent concurrent dialog opening
+        If Not Await _dialogSemaphore.WaitAsync(0) Then
+            Return ' Another dialog is already open
+        End If
+
+        Try
+            Dim dialog As New ContentDialog()
+            dialog.Title = "remove your account"
+            dialog.Content = "this will remove the login data for your fort.social account, beware! this does not deauthorize your account from fort.social go to your profile > service integration and unlink your account from there if you dont want to use this account in fort.desktop"
+            dialog.PrimaryButtonText = "Clear"
+            dialog.CloseButtonText = "Cancel"
+            dialog.DefaultButton = ContentDialogButton.Close
+            dialog.XamlRoot = Me.XamlRoot
+
+            Dim result = Await dialog.ShowAsync()
+
+            If result = ContentDialogResult.Primary Then
+                Await ProfileService.LogoutAsync()
+                UpdateStorageInfo()
+            End If
+        Catch ex As Exception
+            Debug.WriteLine($"MainPage: Clear login info dialog failed – {ex.Message}")
+        Finally
+            _dialogSemaphore.Release()
         End Try
     End Sub
 
@@ -399,7 +435,7 @@ Public NotInheritable Class MainPage
         Try
             Dim aboutDialog As New ContentDialog()
             aboutDialog.Title = "About"
-            aboutDialog.Content = $"Fort.ind desktop for UWP{vbCrLf}Version {AppConstants.AppVersionDisplay}{vbCrLf}{vbCrLf}Storage: Local JSON Files"
+            aboutDialog.Content = $"Fort.ind desktop{vbCrLf}Version {AppConstants.AppVersionDisplay}{vbCrLf}{vbCrLf}Storage: Local JSON Files"
             aboutDialog.PrimaryButtonText = "OK"
             aboutDialog.DefaultButton = ContentDialogButton.Primary
             aboutDialog.XamlRoot = Me.XamlRoot
@@ -662,7 +698,7 @@ Public NotInheritable Class MainPage
 
         Try
             Dim dontShowCheckBox As New CheckBox()
-            dontShowCheckBox.Content = "Don't show this again"
+            dontShowCheckBox.Content = "dont show me this again >:("
             dontShowCheckBox.Margin = New Thickness(0, 16, 0, 0)
 
             Dim contentPanel As New StackPanel()

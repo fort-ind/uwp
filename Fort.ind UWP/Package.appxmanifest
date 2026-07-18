@@ -9,12 +9,12 @@
   <Identity
     Name="842aa337-86c0-43da-82da-a0aa21c2fc6d"
     Publisher="CN=fort.ind"
-    Version="0.5.0.0" />
+    Version="2.0.10.0" />
 
   <mp:PhoneIdentity PhoneProductId="842aa337-86c0-43da-82da-a0aa21c2fc6d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Fort.ind for UWP</DisplayName>
+    <DisplayName>fort.desktop</DisplayName>
     <PublisherDisplayName>fort.ind</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -50,6 +50,13 @@
 		  <uap:Rotation Preference="landscape"/>
 		  <uap:Rotation Preference="landscapeFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="fortind">
+            <uap:DisplayName>Fort.ind</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 

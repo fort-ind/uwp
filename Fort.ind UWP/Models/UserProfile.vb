@@ -1,17 +1,29 @@
 Imports System.Runtime.Serialization
 
 ''' <summary>
-''' Represents a user profile with account information
-''' Designed for local storage now, ready for server sync later
+''' A cached snapshot of the signed-in fort.social (Misskey) account.
+''' The instance is the source of truth; this is a local copy for offline display.
 ''' </summary>
 <DataContract>
 Public Class UserProfile
 
     ''' <summary>
-    ''' Unique identifier for the user (GUID for local, can map to server ID later)
+    ''' The Misskey user ID on the instance.
     ''' </summary>
     <DataMember>
     Public Property UserId As String
+
+    ''' <summary>
+    ''' Misskey username (without the leading @ or host).
+    ''' </summary>
+    <DataMember>
+    Public Property Username As String
+
+    ''' <summary>
+    ''' Remote instance host, or Nothing/empty for a local fort.social account.
+    ''' </summary>
+    <DataMember>
+    Public Property Host As String
 
     ''' <summary>
     ''' Display name shown in the app
@@ -20,43 +32,25 @@ Public Class UserProfile
     Public Property DisplayName As String
 
     ''' <summary>
-    ''' Username for login
-    ''' </summary>
-    <DataMember>
-    Public Property Username As String
-
-    ''' <summary>
-    ''' Hashed password (for local auth, will use tokens for server)
-    ''' </summary>
-    <DataMember>
-    Public Property PasswordHash As String
-
-    ''' <summary>
-    ''' User's email address
-    ''' </summary>
-    <DataMember>
-    Public Property Email As String
-
-    ''' <summary>
-    ''' Optional bio/description
+    ''' Bio/description, as set on fort.social
     ''' </summary>
     <DataMember>
     Public Property Bio As String
 
     ''' <summary>
-    ''' Path to profile picture (local path or URL)
+    ''' URL of the user's avatar image on the instance.
     ''' </summary>
     <DataMember>
-    Public Property ProfilePicturePath As String
+    Public Property AvatarUrl As String
 
     ''' <summary>
-    ''' When the account was created
+    ''' When the fort.social account was created
     ''' </summary>
     <DataMember>
     Public Property CreatedDate As DateTime
 
     ''' <summary>
-    ''' Last login timestamp
+    ''' Last time this app signed the user in
     ''' </summary>
     <DataMember>
     Public Property LastLoginDate As DateTime
@@ -78,23 +72,8 @@ Public Class UserProfile
     End Property
     Private _preferences As UserPreferences
 
-    ''' <summary>
-    ''' Creates a new empty profile
-    ''' </summary>
     Public Sub New()
-        UserId = Guid.NewGuid().ToString()
-        CreatedDate = DateTime.Now
         Preferences = New UserPreferences()
-    End Sub
-
-    ''' <summary>
-    ''' Creates a new profile with basic info
-    ''' </summary>
-    Public Sub New(username As String, displayName As String, email As String)
-        Me.New()
-        Me.Username = username
-        Me.DisplayName = displayName
-        Me.Email = email
     End Sub
 
     ''' <summary>
@@ -105,12 +84,11 @@ Public Class UserProfile
     Public Function Clone() As UserProfile
         Dim copy As New UserProfile() With {
             .UserId = Me.UserId,
-            .DisplayName = Me.DisplayName,
             .Username = Me.Username,
-            .PasswordHash = Me.PasswordHash,
-            .Email = Me.Email,
+            .Host = Me.Host,
+            .DisplayName = Me.DisplayName,
             .Bio = Me.Bio,
-            .ProfilePicturePath = Me.ProfilePicturePath,
+            .AvatarUrl = Me.AvatarUrl,
             .CreatedDate = Me.CreatedDate,
             .LastLoginDate = Me.LastLoginDate
         }
@@ -118,8 +96,7 @@ Public Class UserProfile
         copy.Preferences = New UserPreferences() With {
             .EnableLiveTile = prefs.EnableLiveTile,
             .EnableNotifications = prefs.EnableNotifications,
-            .Theme = prefs.Theme,
-            .RememberLogin = prefs.RememberLogin
+            .Theme = prefs.Theme
         }
         Return copy
     End Function
@@ -149,11 +126,5 @@ Public Class UserPreferences
     ''' </summary>
     <DataMember>
     Public Property Theme As String = "Dark"
-
-    ''' <summary>
-    ''' Remember login between sessions
-    ''' </summary>
-    <DataMember>
-    Public Property RememberLogin As Boolean = True
 
 End Class

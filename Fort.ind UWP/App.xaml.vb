@@ -76,6 +76,46 @@ NotInheritable Class App
     End Sub
 
     ''' <summary>
+    ''' Invoked when the app is activated by something other than a normal launch - here, only
+    ''' the "fortind:" protocol, used as the MiAuth callback so the system browser can hand
+    ''' control back to the app once the user approves sign-in on fort.social.
+    ''' </summary>
+    Protected Overrides Async Sub OnActivated(args As Windows.ApplicationModel.Activation.IActivatedEventArgs)
+        Try
+            If args.Kind <> Windows.ApplicationModel.Activation.ActivationKind.Protocol Then Return
+
+            Dim protocolArgs = TryCast(args, Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs)
+            If protocolArgs Is Nothing Then Return
+
+            Debug.WriteLine($"OnActivated: protocol callback received - {protocolArgs.Uri}")
+
+            Dim rootFrame As Frame = TryCast(Window.Current.Content, Frame)
+            Dim isColdStart = rootFrame Is Nothing
+
+            If isColdStart Then
+                rootFrame = New Frame()
+                AddHandler rootFrame.NavigationFailed, AddressOf OnNavigationFailed
+                Window.Current.Content = rootFrame
+                Await LocalStorageService.InitializeAsync()
+                Await ProfileService.TryRestoreSessionAsync()
+            End If
+
+            Dim signInResult = Await MisskeyAuthService.HandleProtocolActivationAsync(protocolArgs.Uri)
+            If signInResult IsNot Nothing AndAlso signInResult.Success Then
+                Await ProfileService.ApplySignInResultAsync(signInResult)
+            End If
+
+            If isColdStart AndAlso rootFrame.Content Is Nothing Then
+                rootFrame.Navigate(GetType(MainPage))
+            End If
+
+            Window.Current.Activate()
+        Catch ex As Exception
+            Debug.WriteLine($"OnActivated failed: {ex.Message}")
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' Invoked when Navigation to a certain page fails
     ''' </summary>
     ''' <param name="sender">The Frame which failed navigation</param>

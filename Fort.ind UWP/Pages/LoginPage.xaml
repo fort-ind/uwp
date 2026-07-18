@@ -31,8 +31,8 @@
         </Grid.RowDefinitions>
 
         <!-- Title Bar -->
-        <Grid x:Name="AppTitleBar" 
-              Grid.Row="0" 
+        <Grid x:Name="AppTitleBar"
+              Grid.Row="0"
               Background="Transparent"
               HorizontalAlignment="Stretch">
             <TextBlock Text="Fort.ind"
@@ -49,7 +49,7 @@
                   Padding="40"
                   MinWidth="380"
                   MaxWidth="420">
-                
+
                 <StackPanel Spacing="16">
                     <!-- Logo/Title -->
                     <StackPanel HorizontalAlignment="Center" Margin="0,0,0,16">
@@ -59,165 +59,39 @@
                         <TextBlock Text="Fort.ind"
                                    Style="{StaticResource TitleTextBlockStyle}"
                                    HorizontalAlignment="Center"/>
-                        <TextBlock Text="Sign in to your account"
+                        <TextBlock Text="Sign in with your fort.social account"
                                    Style="{StaticResource BodyTextBlockStyle}"
                                    Opacity="0.7"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- Login Form -->
-                    <StackPanel x:Name="LoginForm" Spacing="12">
-                        <StackPanel>
-                            <TextBox x:Name="UsernameBox"
-                                     PlaceholderText="Username"
-                                     FontSize="14"
-                                     AutomationProperties.Name="Username"
-                                     AutomationProperties.HelpText="Enter your username"/>
-                            <TextBlock x:Name="UsernameHint"
-                                       FontSize="11"
-                                       Margin="0,2,0,0"
-                                       Visibility="Collapsed"/>
-                        </StackPanel>
-
-                        <PasswordBox x:Name="PasswordBox"
-                                     PlaceholderText="Password"
-                                     FontSize="14"
-                                     KeyDown="PasswordBox_KeyDown"
-                                     AutomationProperties.Name="Password"
-                                     AutomationProperties.HelpText="Enter your password"/>
-
-                        <CheckBox x:Name="RememberMeCheck"
-                                  Content="Remember me"
-                                  IsChecked="True"
-                                  AutomationProperties.Name="Remember me checkbox"/>
-
-                        <TextBlock x:Name="ErrorText"
-                                   Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
-                                   FontSize="12"
+                                   HorizontalAlignment="Center"
                                    TextWrapping="Wrap"
-                                   Visibility="Collapsed"
-                                   AutomationProperties.LiveSetting="Assertive"/>
-
-                        <Button x:Name="LoginButton"
-                                Content="Sign In"
-                                HorizontalAlignment="Stretch"
-                                Click="LoginButton_Click"
-                                Style="{StaticResource AccentButtonStyle}"
-                                AutomationProperties.Name="Sign in button"
-                                AutomationProperties.HelpText="Press to sign in with your account"/>
-
-                        <StackPanel Orientation="Horizontal" 
-                                    HorizontalAlignment="Center"
-                                    Spacing="4">
-                            <TextBlock Text="Don't have an account?"
-                                       Opacity="0.7"
-                                       VerticalAlignment="Center"/>
-                            <HyperlinkButton x:Name="ShowRegisterLink"
-                                             Content="Create one"
-                                             Click="ShowRegisterLink_Click"
-                                             AutomationProperties.Name="Create account link"/>
-                        </StackPanel>
+                                   TextAlignment="Center"/>
                     </StackPanel>
 
-                    <!-- Register Form (initially hidden) -->
-                    <StackPanel x:Name="RegisterForm" Spacing="12" Visibility="Collapsed">
-                        <StackPanel>
-                            <TextBox x:Name="RegUsernameBox"
-                                     PlaceholderText="Username"
-                                     FontSize="14"
-                                     TextChanged="RegUsernameBox_TextChanged"
-                                     AutomationProperties.Name="Username"
-                                     AutomationProperties.HelpText="Enter a username with only letters, numbers, hyphens and underscores"/>
-                            <StackPanel x:Name="RegUsernameHintPanel"
-                                        Orientation="Horizontal" Spacing="6"
-                                        Margin="0,2,0,0"
-                                        Visibility="Collapsed">
-                                <FontIcon x:Name="RegUsernameHintIcon"
-                                          FontSize="11"
-                                          VerticalAlignment="Top"
-                                          Margin="0,1,0,0"/>
-                                <TextBlock x:Name="RegUsernameHint"
-                                           FontSize="11"
-                                           TextWrapping="Wrap"
-                                           AutomationProperties.LiveSetting="Polite"/>
-                            </StackPanel>
+                    <TextBlock Text="Fort.ind uses fort.social, our Misskey server, for accounts. You'll be taken to fort.social to approve the sign-in, then brought back here."
+                               FontSize="12"
+                               Opacity="0.6"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"/>
+
+                    <TextBlock x:Name="ErrorText"
+                               Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Visibility="Collapsed"
+                               AutomationProperties.LiveSetting="Assertive"/>
+
+                    <Button x:Name="SignInButton"
+                            HorizontalAlignment="Stretch"
+                            Click="SignInButton_Click"
+                            Style="{StaticResource AccentButtonStyle}"
+                            AutomationProperties.Name="Sign in with fort.social"
+                            AutomationProperties.HelpText="Opens fort.social in your browser to approve sign-in">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                            <FontIcon Glyph="&#xE774;" FontSize="14"/>
+                            <TextBlock Text="Sign in with fort.social"/>
                         </StackPanel>
-
-                        <TextBox x:Name="RegDisplayNameBox"
-                                 PlaceholderText="Display Name (optional)"
-                                 FontSize="14"
-                                 AutomationProperties.Name="Display name"
-                                 AutomationProperties.HelpText="Optional display name for your profile"/>
-
-                        <StackPanel>
-                            <TextBox x:Name="RegEmailBox"
-                                     PlaceholderText="Email (optional)"
-                                     FontSize="14"
-                                     InputScope="EmailSmtpAddress"
-                                     TextChanged="RegEmailBox_TextChanged"
-                                     AutomationProperties.Name="Email address"
-                                     AutomationProperties.HelpText="Optional email address for your account"/>
-                            <StackPanel x:Name="RegEmailHintPanel"
-                                        Orientation="Horizontal" Spacing="6"
-                                        Margin="0,2,0,0"
-                                        Visibility="Collapsed">
-                                <FontIcon x:Name="RegEmailHintIcon"
-                                          FontSize="11"
-                                          VerticalAlignment="Top"
-                                          Margin="0,1,0,0"/>
-                                <TextBlock x:Name="RegEmailHint"
-                                           FontSize="11"
-                                           TextWrapping="Wrap"
-                                           AutomationProperties.LiveSetting="Polite"/>
-                            </StackPanel>
-                        </StackPanel>
-
-                        <PasswordBox x:Name="RegPasswordBox"
-                                     PlaceholderText="Password"
-                                     FontSize="14"
-                                     PasswordChanged="RegPasswordBox_PasswordChanged"
-                                     AutomationProperties.Name="Password"
-                                     AutomationProperties.HelpText="Enter a password with at least 8 characters"/>
-                        <TextBlock x:Name="RegPasswordStrengthText"
-                                   FontSize="11"
-                                   Margin="0,-4,0,0"
-                                   Visibility="Collapsed"
-                                   AutomationProperties.LiveSetting="Polite"/>
-
-                        <PasswordBox x:Name="RegConfirmPasswordBox"
-                                     PlaceholderText="Confirm Password"
-                                     FontSize="14"
-                                     KeyDown="RegConfirmPasswordBox_KeyDown"
-                                     AutomationProperties.Name="Confirm password"
-                                     AutomationProperties.HelpText="Re-enter your password to confirm"/>
-
-                        <TextBlock x:Name="RegErrorText"
-                                   Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
-                                   FontSize="12"
-                                   TextWrapping="Wrap"
-                                   Visibility="Collapsed"
-                                   AutomationProperties.LiveSetting="Assertive"/>
-
-                        <Button x:Name="RegisterButton"
-                                Content="Create Account"
-                                HorizontalAlignment="Stretch"
-                                Click="RegisterButton_Click"
-                                Style="{StaticResource AccentButtonStyle}"
-                                AutomationProperties.Name="Create account button"
-                                AutomationProperties.HelpText="Press to create your new account"/>
-
-                        <StackPanel Orientation="Horizontal" 
-                                    HorizontalAlignment="Center"
-                                    Spacing="4">
-                            <TextBlock Text="Already have an account?"
-                                       Opacity="0.7"
-                                       VerticalAlignment="Center"/>
-                            <HyperlinkButton x:Name="ShowLoginLink"
-                                             Content="Sign in"
-                                             Click="ShowLoginLink_Click"
-                                             AutomationProperties.Name="Sign in link"/>
-                        </StackPanel>
-                    </StackPanel>
+                    </Button>
 
                     <!-- Skip for now option -->
                     <HyperlinkButton x:Name="SkipButton"
@@ -232,13 +106,18 @@
         </Grid>
 
         <!-- Loading overlay -->
-        <Grid x:Name="LoadingOverlay" 
-              Grid.RowSpan="2" 
-              Background="{ThemeResource SystemControlPageBackgroundMediumAltMediumBrush}" 
+        <Grid x:Name="LoadingOverlay"
+              Grid.RowSpan="2"
+              Background="{ThemeResource SystemControlPageBackgroundMediumAltMediumBrush}"
               Visibility="Collapsed">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <ProgressRing IsActive="True" Width="40" Height="40"/>
-                <TextBlock Text="Please wait..." Margin="0,12,0,0" Opacity="0.8"/>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                <ProgressRing IsActive="True" Width="40" Height="40" HorizontalAlignment="Center"/>
+                <TextBlock Text="Waiting for fort.social in your browser..." Margin="0,12,0,0" Opacity="0.8" TextAlignment="Center"/>
+                <HyperlinkButton x:Name="CancelSignInButton"
+                                 Content="Cancel"
+                                 HorizontalAlignment="Center"
+                                 Click="CancelSignInButton_Click"
+                                 AutomationProperties.Name="Cancel sign-in"/>
             </StackPanel>
         </Grid>
     </Grid>
