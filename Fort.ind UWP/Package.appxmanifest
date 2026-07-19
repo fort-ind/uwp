@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="Fort.ind_UWP.App">
       <uap:VisualElements
-        DisplayName="fort.ind desktop for UWP"
+        DisplayName="fort.desktop"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="a version of fort.desktop made for arm platforms and UWP"
