@@ -58,7 +58,7 @@
                         <FontIcon Glyph="&#xE72E;"
                                   FontSize="48"
                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="Fort.ind"
+                        <TextBlock Text="fort.desktop"
                                    Style="{StaticResource TitleTextBlockStyle}"
                                    HorizontalAlignment="Center"/>
                         <TextBlock Text="Sign in with your fort.social account"
@@ -69,7 +69,7 @@
                                    TextAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock Text="Fort.ind uses fort.social, our Misskey server, for accounts. You'll be taken to fort.social to approve the sign-in, then brought back here."
+                    <TextBlock Text="You'll be taken to fort.social to login to your account you will be taken back here after signing in!"
                                FontSize="12"
                                Opacity="0.6"
                                TextWrapping="Wrap"
@@ -97,7 +97,7 @@
 
                     <!-- Skip for now option -->
                     <HyperlinkButton x:Name="SkipButton"
-                                     Content="Continue without account"
+                                     Content="skip connecting your account"
                                      HorizontalAlignment="Center"
                                      Opacity="0.6"
                                      Click="SkipButton_Click"
@@ -106,10 +106,10 @@
 
                     <muxc:TeachingTip x:Name="SkipHintTip"
                                       Target="{x:Bind SkipButton}"
-                                      Title="No account? No problem"
-                                      Subtitle="You can explore Fort.ind without signing in, and connect your fort.social account anytime later from Your Profile."
-                                      PreferredPlacement="Top"
-                                      CloseButtonContent="Got it"/>
+                                      Title="dont have an account?"
+                                      Subtitle="dont have a account? or if you dont wanna login thats perfectly fine! but in the future you might want to connect your account."
+                                      PreferredPlacement="Bottom"
+                                      CloseButtonContent="alrighty :)"/>
                 </StackPanel>
             </Grid>
         </Grid>
