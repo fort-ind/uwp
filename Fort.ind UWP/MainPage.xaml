@@ -14,7 +14,6 @@
                       BackgroundSource="HostBackdrop"
                       TintColor="{ThemeResource SystemChromeMediumLowColor}"
                       TintOpacity="0.8"
-                      TintLuminosityOpacity="0.85"
                       FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
 
         <!-- NavigationView Pane Acrylic - matches Windows 10 Settings sidebar -->
@@ -22,7 +21,6 @@
                       BackgroundSource="HostBackdrop"
                       TintColor="{ThemeResource SystemChromeMediumColor}"
                       TintOpacity="0.9"
-                      TintLuminosityOpacity="0.8"
                       FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
         <!-- Card Background - more prominent acrylic effect -->
@@ -30,7 +28,6 @@
                       BackgroundSource="HostBackdrop"
                       TintColor="{ThemeResource SystemChromeMediumHighColor}"
                       TintOpacity="0.7"
-                      TintLuminosityOpacity="0.85"
                       FallbackColor="{ThemeResource SystemChromeMediumHighColor}"/>
     </Page.Resources>
 

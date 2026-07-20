@@ -569,7 +569,6 @@ Public NotInheritable Class MainPage
                     .BackgroundSource = AcrylicBackgroundSource.HostBackdrop,
                     .TintColor = c,
                     .TintOpacity = tintOpacity,
-                    .TintLuminosityOpacity = 0.85,
                     .FallbackColor = c
                 }
             Catch ex As Exception

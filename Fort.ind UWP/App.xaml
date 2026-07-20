@@ -1,38 +1,44 @@
-﻿<Application
+<Application
     x:Class="Fort.ind_UWP.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Fort.ind_UWP">
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls">
 
     <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
-            </ResourceDictionary.MergedDictionaries>
+        <muxc:XamlControlsResources>
+            <muxc:XamlControlsResources.MergedDictionaries>
+                <ResourceDictionary>
 
-            <!-- Windows 10 Style Acrylic Background Brush - reduced opacity for better transparency -->
-            <AcrylicBrush x:Key="AppAcrylicBackgroundBrush"
-                          BackgroundSource="HostBackdrop"
-                          TintColor="{ThemeResource SystemChromeMediumLowColor}"
-                          TintOpacity="0.5"
-                          FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
+                    <!-- Square corners: WinUI 2.2+ rounds controls by default. Keep the W10 look. -->
+                    <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
+                    <CornerRadius x:Key="OverlayCornerRadius">0</CornerRadius>
 
-            <!-- NavigationView Acrylic Pane Background - lighter for better see-through -->
-            <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground"
-                          BackgroundSource="HostBackdrop"
-                          TintColor="{ThemeResource SystemChromeMediumColor}"
-                          TintOpacity="0.65"
-                          FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
+                    <!-- Windows 10 Style Acrylic Background Brush - reduced opacity for better transparency -->
+                    <AcrylicBrush x:Key="AppAcrylicBackgroundBrush"
+                                  BackgroundSource="HostBackdrop"
+                                  TintColor="{ThemeResource SystemChromeMediumLowColor}"
+                                  TintOpacity="0.5"
+                                  FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
 
-            <!-- NavigationViewItem foreground: high-contrast when idle, accent when selected -->
-            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{ThemeResource SystemBaseHighColor}"/>
-            <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
-            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColor}"/>
-            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColor}"/>
+                    <!-- NavigationView Acrylic Pane Background - lighter for better see-through -->
+                    <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground"
+                                  BackgroundSource="HostBackdrop"
+                                  TintColor="{ThemeResource SystemChromeMediumColor}"
+                                  TintOpacity="0.65"
+                                  FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
-            <!-- Reveal is intentionally NOT applied globally -->
+                    <!-- NavigationViewItem foreground: high-contrast when idle, accent when selected -->
+                    <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{ThemeResource SystemBaseHighColor}"/>
+                    <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
+                    <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColor}"/>
+                    <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColor}"/>
 
-        </ResourceDictionary>
+                    <!-- Reveal is intentionally NOT applied globally -->
+
+                </ResourceDictionary>
+            </muxc:XamlControlsResources.MergedDictionaries>
+        </muxc:XamlControlsResources>
     </Application.Resources>
 
 </Application>
