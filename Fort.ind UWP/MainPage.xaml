@@ -221,11 +221,11 @@
                                                        Style="{StaticResource CaptionTextBlockStyle}"
                                                        VerticalAlignment="Center"/>
                                         </StackPanel>
-                                        <TextBlock Text="welcome to the FIRST actual public beta of this app!"
+                                        <TextBlock Text="welcome to version 2.0 of fort.uwp!"
                                                    Style="{StaticResource SubtitleTextBlockStyle}"
                                                    TextWrapping="Wrap"
                                                    Margin="0,0,0,12"/>
-                                        <TextBlock Text="currently we have finished the base structure of the app :p more on the way"
+                                        <TextBlock Text="this update fixes many bugs add new features and we also added syncing accounts with fort.social"
                                                    Style="{StaticResource BodyTextBlockStyle}"
                                                    TextWrapping="Wrap"
                                                    Opacity="0.8"
@@ -250,7 +250,7 @@
                                                        Style="{StaticResource CaptionTextBlockStyle}"
                                                        VerticalAlignment="Center"/>
                                         </StackPanel>
-                                        <TextBlock Text="New Features Ahead"
+                                        <TextBlock Text="soon soon soon-"
                                                    Style="{StaticResource SubtitleTextBlockStyle}"
                                                    TextWrapping="Wrap"
                                                    Margin="0,0,0,12"/>
@@ -292,7 +292,7 @@
 
                         <!-- Settings Content -->
                         <StackPanel x:Name="SettingsPanel" Visibility="Collapsed">
-                            <TextBlock Text="Configure your application preferences"
+                            <TextBlock Text="make fort.desktop work for you :3 change it to how you like"
                                        Style="{StaticResource BodyTextBlockStyle}"
                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                        Margin="0,0,0,24"/>
