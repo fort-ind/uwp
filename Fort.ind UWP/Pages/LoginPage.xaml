@@ -5,8 +5,10 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
-    Background="Transparent">
+    Background="Transparent"
+    Loaded="LoginPage_Loaded">
 
     <Page.Resources>
         <!-- Acrylic background -->
@@ -101,6 +103,13 @@
                                      Click="SkipButton_Click"
                                      AutomationProperties.Name="Skip sign in"
                                      AutomationProperties.HelpText="Continue using the app without signing in"/>
+
+                    <muxc:TeachingTip x:Name="SkipHintTip"
+                                      Target="{x:Bind SkipButton}"
+                                      Title="No account? No problem"
+                                      Subtitle="You can explore Fort.ind without signing in, and connect your fort.social account anytime later from Your Profile."
+                                      PreferredPlacement="Top"
+                                      CloseButtonContent="Got it"/>
                 </StackPanel>
             </Grid>
         </Grid>

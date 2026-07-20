@@ -1,11 +1,26 @@
+Imports Windows.Storage
+
 ''' <summary>
 ''' Sign-in page: hands off to fort.social via MiAuth.
 ''' </summary>
 Public NotInheritable Class LoginPage
     Inherits Page
 
+    Private Const SkipHintSeenKey As String = "HasSeenSkipSignInTip"
+
     Public Sub New()
         Me.InitializeComponent()
+    End Sub
+
+    ''' <summary>
+    ''' Show the "continue without account" TeachingTip once, on first visit
+    ''' </summary>
+    Private Sub LoginPage_Loaded(sender As Object, e As RoutedEventArgs)
+        Dim settings = ApplicationData.Current.LocalSettings
+        If Not settings.Values.ContainsKey(SkipHintSeenKey) Then
+            settings.Values(SkipHintSeenKey) = True
+            SkipHintTip.IsOpen = True
+        End If
     End Sub
 
     ''' <summary>

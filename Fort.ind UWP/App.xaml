@@ -6,6 +6,10 @@
 
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
+            </ResourceDictionary.MergedDictionaries>
+
             <!-- Windows 10 Style Acrylic Background Brush - reduced opacity for better transparency -->
             <AcrylicBrush x:Key="AppAcrylicBackgroundBrush"
                           BackgroundSource="HostBackdrop"
