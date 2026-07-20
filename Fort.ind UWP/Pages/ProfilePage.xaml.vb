@@ -11,15 +11,23 @@ Public NotInheritable Class ProfilePage
     ' Guard to prevent multiple ContentDialogs from opening simultaneously
     Private _dialogSemaphore As New Threading.SemaphoreSlim(1, 1)
 
+    ' Tracks whether the AuthStateChanged handler is attached, so repeated Loaded/Unloaded
+    ' cycles (which UWP can fire more than once) don't attach it more than once, and so
+    ' the handler is reliably reattached after an Unloaded/Loaded pair instead of leaving
+    ' this page permanently deaf to sign-in/out.
+    Private _authHandlerAttached As Boolean = False
+
     Public Sub New()
         Me.InitializeComponent()
         AddHandler Loaded, AddressOf ProfilePage_Loaded
         AddHandler Unloaded, AddressOf ProfilePage_Unloaded
-        AddHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
     End Sub
 
     Private Sub ProfilePage_Unloaded(sender As Object, e As RoutedEventArgs)
-        RemoveHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
+        If _authHandlerAttached Then
+            RemoveHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
+            _authHandlerAttached = False
+        End If
     End Sub
 
     Private Async Sub OnAuthStateChanged(sender As Object, isLoggedIn As Boolean)
@@ -39,6 +47,10 @@ Public NotInheritable Class ProfilePage
     End Sub
 
     Private Sub ProfilePage_Loaded(sender As Object, e As RoutedEventArgs)
+        If Not _authHandlerAttached Then
+            AddHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
+            _authHandlerAttached = True
+        End If
         RefreshUI()
     End Sub
 
@@ -163,7 +175,14 @@ Public NotInheritable Class ProfilePage
                 Return
             End If
 
+            ' Decode at roughly the displayed 80x80 size (doubled for high-DPI), not the
+            ' source resolution - avatars served at 512px+ would otherwise sit in memory
+            ' fully decoded (several MB each) despite being drawn into an 80px circle.
+            ' Must be set before UriSource or the decode already happened at full size.
             Dim bitmap As New BitmapImage()
+            bitmap.DecodePixelType = DecodePixelType.Logical
+            bitmap.DecodePixelWidth = 160
+            bitmap.DecodePixelHeight = 160
             bitmap.UriSource = New Uri(avatarUrl)
             ProfileImage.Source = bitmap
             ProfileImage.Visibility = Visibility.Visible

@@ -54,6 +54,11 @@ Public NotInheritable Class MainPage
     ' cycles (which UWP can fire more than once) don't attach it multiple times.
     Private _keyHandlerAttached As Boolean = False
 
+    ' Tracks whether the AuthStateChanged handler is attached, for the same reason - and so
+    ' the handler is reliably reattached after an Unloaded/Loaded pair instead of leaving
+    ' this page permanently deaf to sign-in/out.
+    Private _authHandlerAttached As Boolean = False
+
     ' Light-mode equivalents for each dark tint color
     Private Shared ReadOnly s_lightTintMap As New Dictionary(Of String, String) From {
         {"#1E3A5F", "#C8E0F5"},
@@ -72,8 +77,6 @@ Public NotInheritable Class MainPage
         LoadSitemapItems()
         LoadAppearanceSettings()
 
-        ' Listen for auth state changes
-        AddHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
         AddHandler Unloaded, AddressOf MainPage_Unloaded
         AddHandler Loaded, AddressOf MainPage_Loaded
     End Sub
@@ -82,9 +85,15 @@ Public NotInheritable Class MainPage
         ' Attach keyboard handler only when loaded to prevent memory leaks.
         ' Guard against Loaded firing more than once, which would attach duplicate
         ' handlers and run the Ctrl+F / Escape logic multiple times per keypress.
-        If _keyHandlerAttached Then Return
-        AddHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
-        _keyHandlerAttached = True
+        If Not _keyHandlerAttached Then
+            AddHandler Window.Current.CoreWindow.KeyDown, AddressOf OnCoreKeyDown
+            _keyHandlerAttached = True
+        End If
+
+        If Not _authHandlerAttached Then
+            AddHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
+            _authHandlerAttached = True
+        End If
     End Sub
 
     Private Async Sub LoadSitemapItems()
@@ -124,7 +133,11 @@ Public NotInheritable Class MainPage
     End Sub
 
     Private Sub MainPage_Unloaded(sender As Object, e As RoutedEventArgs)
-        RemoveHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
+        If _authHandlerAttached Then
+            RemoveHandler ProfileService.AuthStateChanged, AddressOf OnAuthStateChanged
+            _authHandlerAttached = False
+        End If
+
         ' Remove keyboard handler to prevent memory leaks
         If _keyHandlerAttached Then
             Try
