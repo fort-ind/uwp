@@ -142,19 +142,33 @@ Public Class LiveTileService
     End Function
 
     ''' <summary>
-    ''' Escapes special XML characters
+    ''' Escapes special XML characters. Valid surrogate pairs (e.g. emoji) are passed through
+    ''' unchanged - they encode code points in the XML-legal #x10000-#x10FFFF range - while
+    ''' unpaired surrogates and control characters are dropped, same as before.
     ''' </summary>
     Private Shared Function EscapeXml(text As String) As String
         If String.IsNullOrEmpty(text) Then Return ""
 
         Dim sanitized As New StringBuilder(text.Length)
-        For Each ch As Char In text
+        Dim i As Integer = 0
+        While i < text.Length
+            Dim ch As Char = text(i)
+
+            If Char.IsHighSurrogate(ch) AndAlso i + 1 < text.Length AndAlso Char.IsLowSurrogate(text(i + 1)) Then
+                sanitized.Append(ch)
+                sanitized.Append(text(i + 1))
+                i += 2
+                Continue While
+            End If
+
             If (ch = vbTab) OrElse (ch = vbLf) OrElse (ch = vbCr) OrElse
                (ch >= ChrW(&H20) AndAlso ch <= ChrW(&HD7FF)) OrElse
                (ch >= ChrW(&HE000) AndAlso ch <= ChrW(&HFFFD)) Then
                 sanitized.Append(ch)
             End If
-        Next
+
+            i += 1
+        End While
 
         Return sanitized.ToString().Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("""", "&quot;").Replace("'", "&apos;")
     End Function
@@ -239,14 +253,22 @@ Public Class LiveTileService
     ''' Clears the Live Tile back to default
     ''' </summary>
     Public Shared Sub ClearTile()
-        TileUpdateManager.CreateTileUpdaterForApplication().Clear()
+        Try
+            TileUpdateManager.CreateTileUpdaterForApplication().Clear()
+        Catch ex As Exception
+            Debug.WriteLine($"LiveTileService: ClearTile failed – {ex.GetType().Name}: {ex.Message}")
+        End Try
     End Sub
 
     ''' <summary>
     ''' Clears the badge
     ''' </summary>
     Public Shared Sub ClearBadge()
-        BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear()
+        Try
+            BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear()
+        Catch ex As Exception
+            Debug.WriteLine($"LiveTileService: ClearBadge failed – {ex.GetType().Name}: {ex.Message}")
+        End Try
     End Sub
 
     Private Shared Function GetTileMonogram(primaryText As String, fallbackText As String) As String
