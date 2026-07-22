@@ -1,4 +1,4 @@
-# Fort.ind UWP Installer Script
+﻿# Fort.ind UWP Installer Script
 # This script checks and installs dependencies before installing the app
 
 $ErrorActionPreference = "Stop"
