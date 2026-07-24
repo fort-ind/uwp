@@ -19,20 +19,20 @@ function Write-Banner {
                                  > ^ <
 '@
     Write-Host ""
-    Write-Host "  ╔══════════════════════════════════════════╗" -ForegroundColor DarkMagenta
-    Write-Host "  ║                                          ║" -ForegroundColor DarkMagenta
-    Write-Host "  ║                fort.uwp                  ║" -ForegroundColor Magenta
-    Write-Host "  ║                Installer                 ║" -ForegroundColor DarkMagenta
-    Write-Host "  ║                                          ║" -ForegroundColor DarkMagenta
-    Write-Host "  ╚══════════════════════════════════════════╝" -ForegroundColor DarkMagenta
+    Write-Host "  +============================================+" -ForegroundColor DarkMagenta
+    Write-Host "  |                                            |" -ForegroundColor DarkMagenta
+    Write-Host "  |                fort.uwp                    |" -ForegroundColor Magenta
+    Write-Host "  |                Installer                   |" -ForegroundColor DarkMagenta
+    Write-Host "  |                                            |" -ForegroundColor DarkMagenta
+    Write-Host "  +============================================+" -ForegroundColor DarkMagenta
     Write-Host $cat -ForegroundColor Magenta
     Write-Host ""
 }
 
 function Write-Section($title) {
     Write-Host ""
-    Write-Host "  ── $title " -ForegroundColor DarkMagenta -NoNewline
-    Write-Host ("─" * [Math]::Max(1, 40 - $title.Length)) -ForegroundColor DarkMagenta
+    Write-Host "  -- $title " -ForegroundColor DarkMagenta -NoNewline
+    Write-Host ("-" * [Math]::Max(1, 40 - $title.Length)) -ForegroundColor DarkMagenta
 }
 
 Write-Banner
@@ -209,9 +209,9 @@ if ($msixFile) {
         Add-AppxPackage -Path $msixFile.FullName
         Write-Status "Fort.ind UWP installed successfully!" "Success"
         Write-Host ""
-        Write-Host "  ╔══════════════════════════════════════════╗" -ForegroundColor Magenta
-        Write-Host "  ║        Installation Complete!  =^..^=    ║" -ForegroundColor Magenta
-        Write-Host "  ╚══════════════════════════════════════════╝" -ForegroundColor Magenta
+        Write-Host "  +============================================+" -ForegroundColor Magenta
+        Write-Host "  |        Installation Complete!  =^..^=       |" -ForegroundColor Magenta
+        Write-Host "  +============================================+" -ForegroundColor Magenta
         Write-Host ""
         Write-Host "  Find Fort.uwp in your Start menu!" -ForegroundColor Magenta
         Write-Host "  If you run into any bugs, please open" -ForegroundColor DarkMagenta
