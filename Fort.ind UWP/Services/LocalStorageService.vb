@@ -92,6 +92,35 @@ Public Class LocalStorageService
         End Get
     End Property
 
+    ''' <summary>
+    ''' Deletes every file/folder this app has written to its local storage folder (cached
+    ''' profile, sitemap cache, anything added later) and clears every LocalSettings value
+    ''' (theme, tint color, welcome-dialog flag, settings panel expand states, sitemap cache
+    ''' timestamp, etc). Does NOT touch the PasswordVault-stored auth token - callers that
+    ''' want a full reset must also call MisskeyAuthService.ClearToken().
+    ''' Used by the "Reset app" button, which wipes everything back to a fresh install.
+    ''' </summary>
+    Public Shared Async Function ResetAllAppDataAsync() As Task
+        Try
+            Dim items = Await LocalFolder.GetItemsAsync()
+            For Each item In items
+                Try
+                    Await item.DeleteAsync(StorageDeleteOption.PermanentDelete)
+                Catch ex As Exception
+                    Debug.WriteLine($"Error deleting {item.Name} during app reset: {ex.Message}")
+                End Try
+            Next
+        Catch ex As Exception
+            Debug.WriteLine($"Error enumerating local folder during app reset: {ex.Message}")
+        End Try
+
+        Try
+            ApplicationData.Current.LocalSettings.Values.Clear()
+        Catch ex As Exception
+            Debug.WriteLine($"Error clearing local settings during app reset: {ex.Message}")
+        End Try
+    End Function
+
 #End Region
 
 #Region "JSON Serialization"

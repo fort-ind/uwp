@@ -46,7 +46,7 @@
                        VerticalAlignment="Center"
                        Margin="12,0,0,0"
                        Style="{StaticResource CaptionTextBlockStyle}"
-                       Opacity="0.8"/>
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"/>
             
             <!-- Loading Indicator for Sitemap -->
             <ProgressRing x:Name="LoadingIndicator"
@@ -102,9 +102,10 @@
 
             <NavigationView.AutoSuggestBox>
                 <AutoSuggestBox x:Name="NavSearchBox"
-                                PlaceholderText="Search for games pages and more.."
+                                PlaceholderText="Search for games, pages, and more..."
                                 QueryIcon="Find"
                                 MaxSuggestionListHeight="400"
+                                AutomationProperties.Name="Search for games, pages and more"
                                 TextChanged="NavSearchBox_TextChanged"
                                 QuerySubmitted="NavSearchBox_QuerySubmitted"
                                 SuggestionChosen="NavSearchBox_SuggestionChosen">
@@ -119,7 +120,7 @@
                                     <TextBlock Text="{Binding Title}"/>
                                     <TextBlock Text="{Binding Category}"
                                                Style="{ThemeResource CaptionTextBlockStyle}"
-                                               Opacity="0.6"/>
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>
@@ -173,15 +174,6 @@
                         <SymbolIcon Symbol="People"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="About" Tag="About"
-                                     ToolTipService.ToolTip="About (Alt+A)"
-                                     AccessKey="A"
-                                     AutomationProperties.Name="About"
-                                     AutomationProperties.HelpText="Learn more about Fort.ind">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Help"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <!-- Content Area -->
@@ -196,7 +188,7 @@
                         <StackPanel x:Name="LatestNewsPanel" Visibility="Visible">
                             <TextBlock Text="Check back here for the latest updates and announcements."
                                        Style="{StaticResource BodyTextBlockStyle}"
-                                       Opacity="0.7"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                        Margin="0,0,0,24"/>
 
                             <!-- News Cards Grid -->
@@ -228,11 +220,11 @@
                                         <TextBlock Text="this update fixes many bugs add new features and we also added syncing accounts with fort.social"
                                                    Style="{StaticResource BodyTextBlockStyle}"
                                                    TextWrapping="Wrap"
-                                                   Opacity="0.8"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
                                                    Margin="0,0,0,12"/>
                                         <TextBlock Text="Just now"
                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                   Opacity="0.5"/>
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
                                     </StackPanel>
                                 </Grid>
 
@@ -257,11 +249,11 @@
                                         <TextBlock Text="soon you will be able to manage your fort.ind account, view posts from social and play your games from fort1nd.com on windows! if you want to use the full experience for now go to fort1nd.com"
                                                    Style="{StaticResource BodyTextBlockStyle}"
                                                    TextWrapping="Wrap"
-                                                   Opacity="0.8"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
                                                    Margin="0,0,0,12"/>
                                         <TextBlock Text="in the future (maybe subject to change)"
                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                   Opacity="0.5"/>
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
                                     </StackPanel>
                                 </Grid>
                             </Grid>
@@ -315,7 +307,9 @@
                                                 MinWidth="0"
                                                 CornerRadius="0"
                                                 Padding="16,12"
-                                                Click="AppearanceHeader_Tapped">
+                                                Click="AppearanceHeader_Tapped"
+                                                AutomationProperties.Name="Appearance"
+                                                AutomationProperties.HelpText="Change app theme and background color">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -381,7 +375,8 @@
                                                                 Click="TintColorButton_Click"
                                                                 Width="32" Height="32" Padding="0" MinWidth="32"
                                                                 BorderThickness="2" BorderBrush="Transparent"
-                                                                ToolTipService.ToolTip="Default">
+                                                                ToolTipService.ToolTip="Default"
+                                                                AutomationProperties.Name="Default background tint">
                                                             <FontIcon Glyph="&#xE8D8;" FontSize="14"/>
                                                         </Button>
                                                         <Button x:Name="TintBlueButton" Tag="#1E3A5F"
@@ -389,31 +384,36 @@
                                                                 Width="32" Height="32" Padding="0" MinWidth="32"
                                                                 Background="#1D6FA5" BorderThickness="2"
                                                                 BorderBrush="Transparent"
-                                                                ToolTipService.ToolTip="Navy Blue"/>
+                                                                ToolTipService.ToolTip="Navy Blue"
+                                                                AutomationProperties.Name="Navy Blue background tint"/>
                                                         <Button x:Name="TintPurpleButton" Tag="#2D1B69"
                                                                 Click="TintColorButton_Click"
                                                                 Width="32" Height="32" Padding="0" MinWidth="32"
                                                                 Background="#6041B0" BorderThickness="2"
                                                                 BorderBrush="Transparent"
-                                                                ToolTipService.ToolTip="Deep Purple"/>
+                                                                ToolTipService.ToolTip="Deep Purple"
+                                                                AutomationProperties.Name="Deep Purple background tint"/>
                                                         <Button x:Name="TintGreenButton" Tag="#0F3D2E"
                                                                 Click="TintColorButton_Click"
                                                                 Width="32" Height="32" Padding="0" MinWidth="32"
                                                                 Background="#1B7A4E" BorderThickness="2"
                                                                 BorderBrush="Transparent"
-                                                                ToolTipService.ToolTip="Forest Green"/>
+                                                                ToolTipService.ToolTip="Forest Green"
+                                                                AutomationProperties.Name="Forest Green background tint"/>
                                                         <Button x:Name="TintRedButton" Tag="#3D1515"
                                                                 Click="TintColorButton_Click"
                                                                 Width="32" Height="32" Padding="0" MinWidth="32"
                                                                 Background="#B03232" BorderThickness="2"
                                                                 BorderBrush="Transparent"
-                                                                ToolTipService.ToolTip="Deep Red"/>
+                                                                ToolTipService.ToolTip="Deep Red"
+                                                                AutomationProperties.Name="Deep Red background tint"/>
                                                         <Button x:Name="TintSlateButton" Tag="#1A1A2E"
                                                                 Click="TintColorButton_Click"
                                                                 Width="32" Height="32" Padding="0" MinWidth="32"
                                                                 Background="#404080" BorderThickness="2"
                                                                 BorderBrush="Transparent"
-                                                                ToolTipService.ToolTip="Dark Slate"/>
+                                                                ToolTipService.ToolTip="Dark Slate"
+                                                                AutomationProperties.Name="Dark Slate background tint"/>
                                                     </StackPanel>
                                                 </StackPanel>
                                             </StackPanel>
@@ -431,7 +431,9 @@
                                                 MinWidth="0"
                                                 CornerRadius="0"
                                                 Padding="16,12"
-                                                Click="StorageHeader_Tapped">
+                                                Click="StorageHeader_Tapped"
+                                                AutomationProperties.Name="Data Storage"
+                                                AutomationProperties.HelpText="Manage local storage and view account data">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -477,19 +479,30 @@
                                                 </StackPanel>
                                                 <TextBlock x:Name="CacheDescriptionText"
                                                            Text="Not signed in."
-                                                           FontSize="12" Opacity="0.7" TextWrapping="Wrap"
+                                                           FontSize="12" TextWrapping="Wrap"
+                                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                            Margin="0,0,0,4"/>
                                                 <TextBlock x:Name="StoragePathText"
-                                                           FontSize="11" Opacity="0.5" TextWrapping="Wrap"/>
+                                                           FontSize="12" TextWrapping="Wrap"
+                                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
                                                 <TextBlock x:Name="UserCountText"
-                                                           FontSize="12" Opacity="0.7"/>
-                                                <Button x:Name="ClearLoginInfoButton"
-                                                        Content="Clear login info"
-                                                        Click="ClearLoginInfoButton_Click"
-                                                        Margin="0,4,0,0"
-                                                        HorizontalAlignment="Left"
-                                                        AutomationProperties.Name="Clear login info button"
-                                                        AutomationProperties.HelpText="Signs you out and clears the cached fort.social login"/>
+                                                           FontSize="12"
+                                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                                <StackPanel Orientation="Horizontal" Spacing="8"
+                                                            HorizontalAlignment="Left"
+                                                            Margin="0,4,0,0">
+                                                    <Button x:Name="ClearLoginInfoButton"
+                                                            Content="Clear login info"
+                                                            Click="ClearLoginInfoButton_Click"
+                                                            AutomationProperties.Name="Clear login info button"
+                                                            AutomationProperties.HelpText="Signs you out and clears the cached fort.social login"/>
+                                                    <Button x:Name="ResetAppButton"
+                                                            Content="Reset app"
+                                                            Click="ResetAppButton_Click"
+                                                            Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
+                                                            AutomationProperties.Name="Reset app button"
+                                                            AutomationProperties.HelpText="Signs you out and deletes all cached data and saved settings, resetting the app to a fresh install"/>
+                                                </StackPanel>
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
@@ -505,7 +518,9 @@
                                                 MinWidth="0"
                                                 CornerRadius="0"
                                                 Padding="16,12"
-                                                Click="TileHeader_Tapped">
+                                                Click="TileHeader_Tapped"
+                                                AutomationProperties.Name="Live Tile"
+                                                AutomationProperties.HelpText="Refresh or clear your Start menu tile">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -575,7 +590,9 @@
                                                 MinWidth="0"
                                                 CornerRadius="0"
                                                 Padding="16,12"
-                                                Click="WelcomeHeader_Tapped">
+                                                Click="WelcomeHeader_Tapped"
+                                                AutomationProperties.Name="Welcome Dialog"
+                                                AutomationProperties.HelpText="Reset the first-run welcome experience">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -615,7 +632,8 @@
                                                        Opacity="0.08"/>
                                             <StackPanel Spacing="10">
                                                 <TextBlock Text="The welcome dialog appears the first time you open the app."
-                                                           FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                                                           FontSize="12" TextWrapping="Wrap"
+                                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                                 <Button x:Name="ResetWelcomeButton"
                                                         Click="ResetWelcomeButton_Click"
                                                         Style="{StaticResource ButtonRevealStyle}">
@@ -639,7 +657,9 @@
                                                 MinWidth="0"
                                                 CornerRadius="0"
                                                 Padding="16,12"
-                                                Click="AboutHeader_Tapped">
+                                                Click="AboutHeader_Tapped"
+                                                AutomationProperties.Name="About"
+                                                AutomationProperties.HelpText="Version info, credits, and more">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>

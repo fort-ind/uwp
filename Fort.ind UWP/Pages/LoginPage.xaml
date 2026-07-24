@@ -37,7 +37,7 @@
               Grid.Row="0"
               Background="Transparent"
               HorizontalAlignment="Stretch">
-            <TextBlock Text="Fort.ind"
+            <TextBlock Text=""
                        VerticalAlignment="Center"
                        Margin="12,0,0,0"
                        Style="{StaticResource CaptionTextBlockStyle}"
@@ -63,7 +63,7 @@
                                    HorizontalAlignment="Center"/>
                         <TextBlock Text="Sign in with your fort.social account"
                                    Style="{StaticResource BodyTextBlockStyle}"
-                                   Opacity="0.7"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                    HorizontalAlignment="Center"
                                    TextWrapping="Wrap"
                                    TextAlignment="Center"/>
@@ -71,7 +71,7 @@
 
                     <TextBlock Text="You'll be taken to fort.social to login to your account you will be taken back here after signing in!"
                                FontSize="12"
-                               Opacity="0.6"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
 
@@ -99,7 +99,6 @@
                     <HyperlinkButton x:Name="SkipButton"
                                      Content="skip connecting your account"
                                      HorizontalAlignment="Center"
-                                     Opacity="0.6"
                                      Click="SkipButton_Click"
                                      AutomationProperties.Name="Skip sign in"
                                      AutomationProperties.HelpText="Continue using the app without signing in"/>
@@ -120,8 +119,12 @@
               Background="{ThemeResource SystemControlPageBackgroundMediumAltMediumBrush}"
               Visibility="Collapsed">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-                <ProgressRing IsActive="True" Width="40" Height="40" HorizontalAlignment="Center"/>
-                <TextBlock Text="Waiting for fort.social in your browser..." Margin="0,12,0,0" Opacity="0.8" TextAlignment="Center"/>
+                <ProgressRing IsActive="True" Width="40" Height="40" HorizontalAlignment="Center"
+                              AutomationProperties.Name="Waiting for sign-in"/>
+                <TextBlock Text="Waiting for fort.social in your browser..." Margin="0,12,0,0"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                           TextAlignment="Center"
+                           AutomationProperties.LiveSetting="Polite"/>
                 <HyperlinkButton x:Name="CancelSignInButton"
                                  Content="Cancel"
                                  HorizontalAlignment="Center"

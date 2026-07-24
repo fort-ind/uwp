@@ -24,7 +24,6 @@ Public NotInheritable Class AppConstants
     Public Const NavigationBetas As String = "Betas"
     Public Const NavigationProfile As String = "Profile"
     Public Const NavigationSocial As String = "Social"
-    Public Const NavigationAbout As String = "About"
     Public Const NavigationSettings As String = "Settings"
 
     ' Theme values

@@ -24,8 +24,8 @@
                       FallbackColor="{ThemeResource SystemChromeMediumHighColor}"/>
     </Page.Resources>
 
-    <ScrollViewer>
-        <StackPanel Padding="24" MaxWidth="600">
+    <ScrollViewer HorizontalContentAlignment="Center">
+        <StackPanel Padding="24" MaxWidth="600" HorizontalAlignment="Center">
 
             <!-- Not Logged In State -->
             <StackPanel x:Name="NotLoggedInPanel" Visibility="Collapsed">
@@ -43,7 +43,7 @@
                         <TextBlock Text="Sign in with your fort.social account to see your profile here"
                                    TextWrapping="Wrap"
                                    TextAlignment="Center"
-                                   Opacity="0.7"/>
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         <Button x:Name="SignInButton"
                                 Content="Sign In"
                                 HorizontalAlignment="Center"
@@ -90,16 +90,16 @@
                         <TextBlock x:Name="UsernameText"
                                    Text="@username@social.fort1nd.com"
                                    FontSize="14"
-                                   Opacity="0.7"/>
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         <TextBlock x:Name="MemberSinceText"
                                    Text="Member since..."
                                    FontSize="12"
-                                   Opacity="0.5"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
                                    Margin="0,4,0,0"/>
                         <TextBlock x:Name="LastLoginText"
                                    Text=""
                                    FontSize="12"
-                                   Opacity="0.5"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
                                    Margin="0,2,0,0"
                                    Visibility="Collapsed"/>
                     </StackPanel>
@@ -117,14 +117,14 @@
                         <TextBlock x:Name="BioText"
                                    Text="No bio yet"
                                    TextWrapping="Wrap"
-                                   Opacity="0.8"/>
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"/>
                     </StackPanel>
                 </Grid>
 
                 <TextBlock Text="Your profile is managed on fort.social. Edit your display name, bio, avatar, or account there."
                            TextWrapping="Wrap"
                            FontSize="12"
-                           Opacity="0.6"/>
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
 
                 <!-- Actions -->
                 <StackPanel Orientation="Horizontal" Spacing="12">

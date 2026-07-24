@@ -30,6 +30,17 @@ Public Class MisskeyAuthService
     Private Const CallbackHost As String = "miauth-callback"
     Private Const CallbackSessionParam As String = "session"
 
+    ''' <summary>
+    ''' Local-settings keys used to recognize our own callback across a suspend/terminate
+    ''' cycle (see HandleProtocolActivationAsync's cold-start path). Never trust a callback
+    ''' whose session doesn't match what's recorded here - anyone can invoke a registered
+    ''' custom URI scheme, so this is what stops a crafted "fortind://miauth-callback?session=..."
+    ''' link from signing the app into an attacker-controlled account.
+    ''' </summary>
+    Private Const PendingSessionSettingKey As String = "MisskeyAuth.PendingSession"
+    Private Const PendingSessionIssuedAtSettingKey As String = "MisskeyAuth.PendingSessionIssuedAtUtc"
+    Private Shared ReadOnly PendingSessionExpiry As TimeSpan = TimeSpan.FromMinutes(10)
+
     Private Shared ReadOnly s_lock As New Object()
     Private Shared s_pendingSession As String = Nothing
     Private Shared s_pendingCompletion As TaskCompletionSource(Of Boolean) = Nothing
@@ -54,6 +65,7 @@ Public Class MisskeyAuthService
             s_pendingSession = session
             s_pendingCompletion = completion
         End SyncLock
+        PersistPendingSession(session)
 
         Try
             Dim launched = Await Windows.System.Launcher.LaunchUriAsync(startUri)
@@ -83,28 +95,48 @@ Public Class MisskeyAuthService
 
     ''' <summary>
     ''' Call from App.OnActivated when the app is reactivated via the "fortind:" protocol.
-    ''' If a SignInAsync call is still waiting in this process, this simply unblocks it (it
-    ''' will do the token exchange itself). Otherwise - e.g. the app was suspended/restarted
-    ''' while the user was in the browser - the session is recovered from the callback URL's
-    ''' query string and the exchange is completed directly, returning the result so the
-    ''' caller (App.OnActivated) can apply it.
+    ''' Anyone can invoke a registered custom URI scheme - another installed app, a webpage
+    ''' link, a shortcut - so this never trusts an incoming callback on its own. It's only
+    ''' honored if its session matches a session *we* issued:
+    '''   - If a SignInAsync call is still waiting in this process, the callback's session
+    '''     must match that in-flight session; only then is it unblocked (it does the token
+    '''     exchange itself). A mismatched session is ignored and the real sign-in keeps
+    '''     waiting.
+    '''   - Otherwise - e.g. the app was suspended/terminated while the user was in the
+    '''     browser - the session must match the one persisted by SignInAsync and still be
+    '''     within PendingSessionExpiry. Only then is the exchange completed directly.
+    ''' Any callback that fails both checks is rejected outright.
     ''' </summary>
     Public Shared Async Function HandleProtocolActivationAsync(uri As Uri) As Task(Of MisskeyAuthResult)
-        Dim completion As TaskCompletionSource(Of Boolean) = Nothing
-        SyncLock s_lock
-            completion = s_pendingCompletion
-            s_pendingSession = Nothing
-            s_pendingCompletion = Nothing
-        End SyncLock
-
-        If completion IsNot Nothing Then
-            completion.TrySetResult(True)
-            Return Nothing
+        If uri Is Nothing OrElse Not String.Equals(uri.Host, CallbackHost, StringComparison.OrdinalIgnoreCase) Then
+            Return MisskeyAuthResult.Failed("Unrecognized sign-in callback.")
         End If
 
         Dim session = ExtractSessionFromCallback(uri)
         If String.IsNullOrWhiteSpace(session) Then
             Return MisskeyAuthResult.Failed("Sign-in link was missing session information.")
+        End If
+
+        Dim completion As TaskCompletionSource(Of Boolean) = Nothing
+        SyncLock s_lock
+            If s_pendingCompletion IsNot Nothing AndAlso String.Equals(s_pendingSession, session, StringComparison.Ordinal) Then
+                completion = s_pendingCompletion
+                s_pendingSession = Nothing
+                s_pendingCompletion = Nothing
+            End If
+        End SyncLock
+
+        If completion IsNot Nothing Then
+            ClearPersistedSession()
+            completion.TrySetResult(True)
+            Return Nothing
+        End If
+
+        ' No in-process sign-in waiting on this exact session. Only fall back to the
+        ' cold-start path if it's the session we ourselves persisted before launching the
+        ' browser - otherwise this is a foreign/forged callback and must be rejected.
+        If Not TryConsumePersistedSession(session) Then
+            Return MisskeyAuthResult.Failed("This sign-in link is not valid.")
         End If
 
         Return Await CompleteSessionAsync(session)
@@ -120,6 +152,7 @@ Public Class MisskeyAuthService
             s_pendingSession = Nothing
             s_pendingCompletion = Nothing
         End SyncLock
+        ClearPersistedSession()
         completion?.TrySetResult(False)
     End Sub
 
@@ -130,6 +163,52 @@ Public Class MisskeyAuthService
                 s_pendingCompletion = Nothing
             End If
         End SyncLock
+        ClearPersistedSession()
+    End Sub
+
+    ''' <summary>
+    ''' Records the session SignInAsync just issued so a cold-start callback (app suspended
+    ''' or terminated while the user was in the browser) can be verified against it later.
+    ''' </summary>
+    Private Shared Sub PersistPendingSession(session As String)
+        Dim values = Windows.Storage.ApplicationData.Current.LocalSettings.Values
+        values(PendingSessionSettingKey) = session
+        values(PendingSessionIssuedAtSettingKey) = DateTimeOffset.UtcNow.ToString("o")
+    End Sub
+
+    ''' <summary>
+    ''' Checks whether the given session matches the one persisted by PersistPendingSession
+    ''' and hasn't expired; if so, consumes (clears) it so it can't be replayed.
+    ''' </summary>
+    Private Shared Function TryConsumePersistedSession(session As String) As Boolean
+        Dim values = Windows.Storage.ApplicationData.Current.LocalSettings.Values
+        Dim storedSession = TryCast(values(PendingSessionSettingKey), String)
+        Dim storedIssuedAtRaw = TryCast(values(PendingSessionIssuedAtSettingKey), String)
+
+        If String.IsNullOrEmpty(storedSession) OrElse String.IsNullOrEmpty(storedIssuedAtRaw) Then
+            Return False
+        End If
+        If Not String.Equals(storedSession, session, StringComparison.Ordinal) Then
+            Return False
+        End If
+
+        Dim issuedAt As DateTimeOffset
+        If Not DateTimeOffset.TryParse(storedIssuedAtRaw, System.Globalization.CultureInfo.InvariantCulture,
+                                        System.Globalization.DateTimeStyles.RoundtripKind, issuedAt) Then
+            Return False
+        End If
+        If DateTimeOffset.UtcNow - issuedAt > PendingSessionExpiry Then
+            Return False
+        End If
+
+        ClearPersistedSession()
+        Return True
+    End Function
+
+    Private Shared Sub ClearPersistedSession()
+        Dim values = Windows.Storage.ApplicationData.Current.LocalSettings.Values
+        values.Remove(PendingSessionSettingKey)
+        values.Remove(PendingSessionIssuedAtSettingKey)
     End Sub
 
     Private Shared Function ExtractSessionFromCallback(uri As Uri) As String

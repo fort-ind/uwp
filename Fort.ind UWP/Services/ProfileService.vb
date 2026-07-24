@@ -62,6 +62,21 @@ Public Class ProfileService
     End Function
 
     ''' <summary>
+    ''' Full app reset: signs out, clears the stored auth token, clears the live tile/badge,
+    ''' and wipes every file and setting this app has ever written locally - cached profile,
+    ''' sitemap cache, theme/tint/panel preferences, everything. Leaves the app in the same
+    ''' state as a fresh install. Does not affect the fort.social account itself.
+    ''' </summary>
+    Public Shared Async Function ResetAppDataAsync() As Task
+        MisskeyAuthService.ClearToken()
+        CurrentUser = Nothing
+        LiveTileService.ClearTile()
+        LiveTileService.ClearBadge()
+        Await LocalStorageService.ResetAllAppDataAsync()
+        RaiseEvent AuthStateChanged(Nothing, False)
+    End Function
+
+    ''' <summary>
     ''' Restores a session at app startup. Shows the cached profile immediately (so the UI
     ''' isn't blocked on network access), then refreshes it from fort.social in the background.
     ''' If there's no cached profile yet (token present but first run after an update), it

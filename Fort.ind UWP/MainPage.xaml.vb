@@ -19,7 +19,6 @@ Public NotInheritable Class MainPage
         New SearchItem("Beta Programs", AppConstants.CategoryMenu, AppConstants.NavigationBetas),
         New SearchItem("Your Profile", AppConstants.CategoryMenu, AppConstants.NavigationProfile),
         New SearchItem("Social", AppConstants.CategoryMenu, AppConstants.NavigationSocial),
-        New SearchItem("About", AppConstants.CategoryMenu, AppConstants.NavigationAbout),
         New SearchItem("Settings", AppConstants.CategoryMenu, AppConstants.NavigationSettings),
         New SearchItem("Data Storage", AppConstants.CategorySettings, AppConstants.NavigationSettings),
         New SearchItem("Local JSON Storage", AppConstants.CategorySettings, AppConstants.NavigationSettings),
@@ -314,7 +313,7 @@ Public NotInheritable Class MainPage
             Case AppConstants.NavigationSettings
                 Return "Settings"
             Case Else
-                ' Home, About (a dialog over Home) and unknown tags all show the Home panel.
+                ' Home and unknown tags all show the Home panel.
                 Return "Welcome to Fort.ind"
         End Select
     End Function
@@ -354,11 +353,6 @@ Public NotInheritable Class MainPage
             Case AppConstants.NavigationSettings
                 ShowInlinePanel(SettingsPanel)
                 UpdateStorageInfo()
-            Case AppConstants.NavigationAbout
-                ' About is presented as a dialog overlay. Keep Home visible behind it so
-                ' the content area is not left blank once the dialog is dismissed.
-                ShowInlinePanel(LatestNewsPanel)
-                AboutButton_Click(Nothing, Nothing)
             Case Else
                 ' Home, Latest News, and any unknown tag fall back to the Home panel.
                 ShowInlinePanel(LatestNewsPanel)
@@ -452,27 +446,78 @@ Public NotInheritable Class MainPage
         End Try
     End Sub
 
-    Private Async Sub AboutButton_Click(sender As Object, e As RoutedEventArgs)
+    ''' <summary>
+    ''' Wipes all local app data. Destructive and irreversible, so it's gated behind two
+    ''' separate confirmations rather than one - the first explains what will happen, the
+    ''' second is a final "are you sure" with no way to back out afterward. Once the wipe is
+    ''' done, offers to restart the app immediately (via CoreApplication.RequestRestartAsync)
+    ''' since a handful of things - the appearance settings just re-read from LocalSettings
+    ''' during this same session, but anything cached only in memory elsewhere - are only
+    ''' guaranteed consistent after a fresh process start.
+    ''' </summary>
+    Private Async Sub ResetAppButton_Click(sender As Object, e As RoutedEventArgs)
         ' Use semaphore to prevent concurrent dialog opening
         If Not Await _dialogSemaphore.WaitAsync(0) Then
             Return ' Another dialog is already open
         End If
 
         Try
-            Dim aboutDialog As New ContentDialog()
-            aboutDialog.Title = "About"
-            aboutDialog.Content = $"Fort.ind desktop{vbCrLf}Version {AppConstants.AppVersionDisplay}{vbCrLf}{vbCrLf}Storage: Local JSON Files"
-            aboutDialog.PrimaryButtonText = "OK"
-            aboutDialog.DefaultButton = ContentDialogButton.Primary
-            aboutDialog.XamlRoot = Me.XamlRoot
+            Dim explainDialog As New ContentDialog()
+            explainDialog.Title = "Reset fort.desktop"
+            explainDialog.Content = "This signs you out and deletes everything the app has saved locally - your cached profile, the sitemap cache, and all preferences (theme, tint color, panel states). It resets the app to a fresh install. This does not affect your fort.social account."
+            explainDialog.PrimaryButtonText = "Continue"
+            explainDialog.CloseButtonText = "Cancel"
+            explainDialog.DefaultButton = ContentDialogButton.Close
+            explainDialog.XamlRoot = Me.XamlRoot
 
-            Await aboutDialog.ShowAsync()
+            If Await explainDialog.ShowAsync() <> ContentDialogResult.Primary Then Return
+
+            Dim confirmDialog As New ContentDialog()
+            confirmDialog.Title = "Are you absolutely sure?"
+            confirmDialog.Content = "This is permanent - everything fort.desktop has saved will be deleted and cannot be recovered."
+            confirmDialog.PrimaryButtonText = "Yes, Reset Everything"
+            confirmDialog.CloseButtonText = "Cancel"
+            confirmDialog.DefaultButton = ContentDialogButton.Close
+            confirmDialog.XamlRoot = Me.XamlRoot
+
+            If Await confirmDialog.ShowAsync() <> ContentDialogResult.Primary Then Return
+
+            Await ProfileService.ResetAppDataAsync()
+            LoadAppearanceSettings()
+            UpdateStorageInfo()
+
+            Dim restartDialog As New ContentDialog()
+            restartDialog.Title = "Reset complete"
+            restartDialog.Content = "fort.desktop has been reset to a fresh install. Restart the app now for everything to take full effect."
+            restartDialog.PrimaryButtonText = "Restart Now"
+            restartDialog.CloseButtonText = "Later"
+            restartDialog.DefaultButton = ContentDialogButton.Primary
+            restartDialog.XamlRoot = Me.XamlRoot
+
+            If Await restartDialog.ShowAsync() = ContentDialogResult.Primary Then
+                Await RequestAppRestartAsync()
+            End If
         Catch ex As Exception
-            Debug.WriteLine($"MainPage: About dialog failed – {ex.Message}")
+            Debug.WriteLine($"MainPage: Reset app dialog failed – {ex.Message}")
         Finally
             _dialogSemaphore.Release()
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Asks the OS to terminate and relaunch this app. On success the process is torn down
+    ''' before this call returns, so any code after the Await here only runs if the restart
+    ''' could NOT be started (e.g. the app isn't in the foreground) - in which case we just
+    ''' leave the (already-reset) app running and let the user restart it manually.
+    ''' </summary>
+    Private Async Function RequestAppRestartAsync() As Task
+        Try
+            Dim failureReason = Await Windows.ApplicationModel.Core.CoreApplication.RequestRestartAsync("")
+            Debug.WriteLine($"MainPage: App restart request did not restart the app - {failureReason}")
+        Catch ex As Exception
+            Debug.WriteLine($"MainPage: App restart request threw - {ex.Message}")
+        End Try
+    End Function
 
     Private Sub RefreshTileButton_Click(sender As Object, e As RoutedEventArgs)
         UpdateLiveTile()
@@ -580,11 +625,28 @@ Public NotInheritable Class MainPage
         End If
     End Sub
 
+    ' Base accessible names for the tint swatches, keyed by control – selection state is
+    ' appended below since the selected swatch is otherwise only shown via border color,
+    ' which a screen reader cannot see.
+    Private Shared ReadOnly s_tintSwatchNames As New Dictionary(Of String, String) From {
+        {"Default", "Default background tint"},
+        {"#1E3A5F", "Navy Blue background tint"},
+        {"#2D1B69", "Deep Purple background tint"},
+        {"#0F3D2E", "Forest Green background tint"},
+        {"#3D1515", "Deep Red background tint"},
+        {"#1A1A2E", "Dark Slate background tint"}
+    }
+
     Private Sub UpdateTintSelection(selectedTag As String)
         Dim swatches As Button() = {TintDefaultButton, TintBlueButton, TintPurpleButton,
                                     TintGreenButton, TintRedButton, TintSlateButton}
         For Each btn In swatches
             btn.BorderBrush = New SolidColorBrush(Colors.Transparent)
+            Dim baseName As String = Nothing
+            If Not s_tintSwatchNames.TryGetValue(If(btn.Tag?.ToString(), ""), baseName) Then
+                baseName = btn.Tag?.ToString()
+            End If
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(btn, baseName)
         Next
         Dim sel As Button = Nothing
         Select Case If(selectedTag, AppConstants.ThemeDefault)
@@ -602,6 +664,8 @@ Public NotInheritable Class MainPage
                             Application.Current.RequestedTheme = ApplicationTheme.Dark,
                             effTheme = ElementTheme.Dark)
             sel.BorderBrush = New SolidColorBrush(If(isDark, Colors.White, Colors.Black))
+            Dim selBaseName = Windows.UI.Xaml.Automation.AutomationProperties.GetName(sel)
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(sel, selBaseName & " (selected)")
         End If
     End Sub
 
