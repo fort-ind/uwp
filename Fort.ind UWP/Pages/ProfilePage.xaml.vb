@@ -17,6 +17,12 @@ Public NotInheritable Class ProfilePage
     ' this page permanently deaf to sign-in/out.
     Private _authHandlerAttached As Boolean = False
 
+    ' The avatar URL currently shown, so a second RefreshUI for the same profile (e.g. the
+    ' background refresh in ProfileService.TryRestoreSessionAsync firing shortly after the
+    ' cached profile is first shown) doesn't re-download/re-decode an unchanged avatar image
+    ' or replay its fade-in animation.
+    Private _lastAvatarUrl As String = Nothing
+
     Public Sub New()
         Me.InitializeComponent()
         AddHandler Loaded, AddressOf ProfilePage_Loaded
@@ -93,19 +99,23 @@ Public NotInheritable Class ProfilePage
         ' Set initials (up to two letters: first letter of each word)
         Dim name = If(String.IsNullOrWhiteSpace(user.DisplayName), user.Username, user.DisplayName)
         ProfileInitials.Text = GetInitials(name)
-        UpdateAvatarUI(user.AvatarUrl)
 
         ' Update bio
         BioText.Text = If(String.IsNullOrWhiteSpace(user.Bio), "No bio set", user.Bio)
 
-        ' Fade in the avatar
-        Dim sb = TryCast(Me.Resources("AvatarFadeIn"), Storyboard)
-        sb?.Begin()
+        ' Fade in the avatar - only when it's actually new/changed, not on every RefreshUI.
+        If UpdateAvatarUI(user.AvatarUrl) Then
+            Dim sb = TryCast(Me.Resources("AvatarFadeIn"), Storyboard)
+            sb?.Begin()
+        End If
     End Sub
 
     Private Sub ShowNotLoggedInState()
         NotLoggedInPanel.Visibility = Visibility.Visible
         LoggedInPanel.Visibility = Visibility.Collapsed
+        ' So the avatar reloads and fades in again on the next sign-in, even if it's the same
+        ' account/URL as before this sign-out.
+        _lastAvatarUrl = Nothing
     End Sub
 
     Private Sub SignInButton_Click(sender As Object, e As RoutedEventArgs)
@@ -166,13 +176,25 @@ Public NotInheritable Class ProfilePage
         Return parts(0).Substring(0, 1).ToUpper()
     End Function
 
-    Private Sub UpdateAvatarUI(avatarUrl As String)
+    ''' <summary>
+    ''' Applies the avatar image (or falls back to initials). Returns False without doing any
+    ''' work if avatarUrl is the same one already applied - RefreshUI can run more than once
+    ''' for the same profile (e.g. the background refresh in
+    ''' ProfileService.TryRestoreSessionAsync), and without this check each call would
+    ''' re-download/re-decode an unchanged image and the caller would replay its fade-in.
+    ''' </summary>
+    Private Function UpdateAvatarUI(avatarUrl As String) As Boolean
+        If String.Equals(avatarUrl, _lastAvatarUrl, StringComparison.Ordinal) Then
+            Return False
+        End If
+        _lastAvatarUrl = avatarUrl
+
         Try
             If String.IsNullOrWhiteSpace(avatarUrl) Then
                 ProfileImage.Source = Nothing
                 ProfileImage.Visibility = Visibility.Collapsed
                 ProfileInitials.Visibility = Visibility.Visible
-                Return
+                Return True
             End If
 
             ' Decode at roughly the displayed 80x80 size (doubled for high-DPI), not the
@@ -187,12 +209,14 @@ Public NotInheritable Class ProfilePage
             ProfileImage.Source = bitmap
             ProfileImage.Visibility = Visibility.Visible
             ProfileInitials.Visibility = Visibility.Collapsed
+            Return True
         Catch ex As Exception
             Debug.WriteLine($"ProfilePage: Avatar load failed - {ex.Message}")
             ProfileImage.Source = Nothing
             ProfileImage.Visibility = Visibility.Collapsed
             ProfileInitials.Visibility = Visibility.Visible
+            Return True
         End Try
-    End Sub
+    End Function
 
 End Class

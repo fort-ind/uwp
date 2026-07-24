@@ -123,6 +123,14 @@ Public Class ProfileService
             Dim fetched = Await MisskeyAuthService.FetchCurrentUserAsync(token)
             If fetched Is Nothing Then Return
 
+            ' The user may have signed out, reset the app, or signed into a different account
+            ' while this network call was in flight. Applying a stale result in that case would
+            ' silently resurrect a session the user just explicitly cleared (or clobber a newer
+            ' one), so only apply it if our token is still the one currently signed in.
+            If Not String.Equals(MisskeyAuthService.TryGetToken(), token, StringComparison.Ordinal) Then
+                Return
+            End If
+
             CurrentUser = fetched
             Await LocalStorageService.SaveProfileAsync(fetched)
             RaiseEvent AuthStateChanged(Nothing, True)

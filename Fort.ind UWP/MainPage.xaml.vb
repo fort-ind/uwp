@@ -58,6 +58,12 @@ Public NotInheritable Class MainPage
     ' this page permanently deaf to sign-in/out.
     Private _authHandlerAttached As Boolean = False
 
+    ' Guards NavView_Loaded's one-time startup initialization (selecting Home, closing the
+    ' pane, showing the welcome dialog) against UWP firing Loaded more than once - without
+    ' this, a second firing would silently snap the user back to the Home tab and re-close
+    ' the pane no matter what they were looking at.
+    Private _navViewInitialized As Boolean = False
+
     ' Light-mode equivalents for each dark tint color
     Private Shared ReadOnly s_lightTintMap As New Dictionary(Of String, String) From {
         {"#1E3A5F", "#C8E0F5"},
@@ -237,6 +243,9 @@ Public NotInheritable Class MainPage
     End Sub
 
     Private Async Sub NavView_Loaded(sender As Object, e As RoutedEventArgs)
+        If _navViewInitialized Then Return
+        _navViewInitialized = True
+
         Try
             ' Select the first item (Latest News) by default
             If NavView.MenuItems.Count > 0 Then
@@ -413,8 +422,11 @@ Public NotInheritable Class MainPage
                 ClearLoginInfoButton.Visibility = Visibility.Collapsed
             End If
         Catch ex As Exception
+            Debug.WriteLine($"MainPage: UpdateStorageInfo failed - {ex.Message}")
             StoragePathText.Text = ""
+            CacheDescriptionText.Text = ""
             UserCountText.Text = ""
+            ClearLoginInfoButton.Visibility = Visibility.Collapsed
         End Try
     End Sub
 
