@@ -22,6 +22,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -55,6 +56,37 @@
                            TextTrimming="CharacterEllipsis"
                            VerticalAlignment="Top"
                            AutomationProperties.AccessibilityView="Raw"/>
+
+                <!-- A ToggleButton rather than a Button so UIA reports the on/off state for free
+                     through IToggleProvider - the accessibility docs require a control to announce
+                     name, state and type, and a Button would need a custom peer to do it (see
+                     Controls/ExpanderHeaderButton.cs for that pattern).
+
+                     Mode=OneWay is load-bearing: x:Bind is OneTime by default, which would freeze
+                     each star at whatever the first item realised into that recycled container had.
+
+                     The glyph swap is the point of FavoriteGlyph - ToggleButtonRevealStyle's
+                     Checked state carries state by accent fill alone, and colour must never be the
+                     only carrier. This FontIcon is deliberately not AccessibilityView="Raw": unlike
+                     every other glyph in the app it is the control's only content, not decoration
+                     sitting beside a label that already names the thing. -->
+                <ToggleButton Grid.Column="2" Grid.RowSpan="2"
+                              Style="{StaticResource ToggleButtonRevealStyle}"
+                              IsChecked="{x:Bind IsFavorite, Mode=OneWay}"
+                              AutomationProperties.Name="{x:Bind FavoriteLabel}"
+                              Width="40" Height="40"
+                              MinWidth="40" MinHeight="40"
+                              Padding="0"
+                              CornerRadius="0"
+                              VerticalAlignment="Center"
+                              Margin="12,0,0,0"
+                              Checked="FavoriteToggle_Checked"
+                              Unchecked="FavoriteToggle_Unchecked">
+                    <FontIcon Glyph="{x:Bind FavoriteGlyph, Mode=OneWay}"
+                              FontFamily="{StaticResource SymbolThemeFontFamily}"
+                              FontSize="16"
+                              IsTextScaleFactorEnabled="False"/>
+                </ToggleButton>
             </Grid>
         </DataTemplate>
 

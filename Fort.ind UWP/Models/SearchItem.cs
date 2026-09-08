@@ -1,9 +1,13 @@
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Fort.ind_UWP
 {
-    public class SearchItem
+    public class SearchItem : INotifyPropertyChanged
     {
+        private bool _isFavorite;
+
         public string Title { get; set; }
 
         /// <summary>
@@ -26,6 +30,61 @@ namespace Fort.ind_UWP
 
         public string Icon { get; set; }
 
+        /// <summary>
+        /// Whether the user has starred this item. Bound OneWay from the games list, so it must
+        /// notify.
+        /// </summary>
+        /// <remarks>
+        /// Held on the model rather than in a lookup the views consult because every SearchItem is
+        /// a process singleton: SitemapService memoizes s_allItems, s_gameItems holds references
+        /// into that same list, and MainPage._allSearchItems appends those same instances. One
+        /// instance per game means Home, GamesPage and the nav search all observe a toggle with no
+        /// synchronization code between them.
+        /// </remarks>
+        public bool IsFavorite
+        {
+            get { return _isFavorite; }
+            set
+            {
+                if (_isFavorite == value) return;
+                _isFavorite = value;
+                OnPropertyChanged();
+                OnPropertyChanged("FavoriteGlyph");
+            }
+        }
+
+        /// <summary>
+        /// Outline star when off, filled when on - E734/E735 are FavoriteStar/FavoriteStarFill in
+        /// Segoe MDL2.
+        /// </summary>
+        /// <remarks>
+        /// Exposed on the model so the star carries its state as a shape and not only as a colour:
+        /// ToggleButtonRevealStyle's Checked state is an accent fill, and colour must never be the
+        /// only carrier. Lives here rather than on either page because Home and GamesPage both
+        /// render the same toggle.
+        /// </remarks>
+        public string FavoriteGlyph
+        {
+            get { return _isFavorite ? "\uE735" : "\uE734"; }
+        }
+
+        /// <summary>
+        /// Accessible name for the favorite toggle - "Favorite &lt;title&gt;", not a bare
+        /// "Favorite", so a screen reader never announces the control without its referent.
+        /// </summary>
+        public string FavoriteLabel { get; private set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
         public SearchItem(string title, string categoryKey, string navigationTag, string url = null)
         {
             this.Title = title;
@@ -38,6 +97,7 @@ namespace Fort.ind_UWP
             // reads Category under Task.Run, and off the UI thread LocalizedStrings degrades to
             // returning the key. Every construction path runs on the UI thread.
             this.Category = GetCategoryDisplayName(this.CategoryKey);
+            this.FavoriteLabel = LocalizedStrings.Format("FavoriteToggleNameFormat", this.Title);
         }
 
         private static string GetIconGlyph(string categoryKey)

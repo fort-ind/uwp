@@ -59,6 +59,10 @@ namespace Fort.ind_UWP
             // nav item an ms-appdata URI pointing at a file that no longer exists.
             AvatarIconService.InvalidateCache();
 
+            // Same class of problem: the favorites file is gone with the rest of LocalFolder, but
+            // the in-memory set behind it is static and would survive.
+            FavoritesService.ResetForAppDataWipe();
+
             AuthStateChanged?.Invoke(null, false);
         }
 

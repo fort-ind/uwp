@@ -588,7 +588,7 @@ Open your profile and try again.</value>
     <value>Change app theme and background color</value>
   </data>
   <data name="MainCheckBackHereFor.Text" xml:space="preserve">
-    <value>check back here for what's new and view your favorite games! (soon)</value>
+    <value>check back here for what's new and view your favorite games!</value>
   </data>
   <data name="MainClearLiveTile.Text" xml:space="preserve">
     <value>Clear Live Tile</value>
@@ -922,5 +922,33 @@ Open your profile and try again.</value>
   </data>
   <data name="WelcomeDontShowCheckBox.Content" xml:space="preserve">
     <value>dont show me this again &gt;:(</value>
+  </data>
+  <data name="HomeFavoritesHeader.Text" xml:space="preserve">
+    <value>Your favorites</value>
+  </data>
+  <data name="HomeFavoritesEmpty.Text" xml:space="preserve">
+    <value>star a game over in Games and it'll show up right here :3</value>
+  </data>
+  <data name="HomeFavoritesSeeAll.Content" xml:space="preserve">
+    <value>See all in Games</value>
+  </data>
+  <data name="HomeFavoritesSeeAll.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>Go to the Games page to see every game you have favorited</value>
+  </data>
+  <data name="FavoriteToggleNameFormat" xml:space="preserve">
+    <value>Favorite {0}</value>
+    <comment>Accessible name for the star toggle. {0} is the game title.</comment>
+  </data>
+  <data name="FavoriteAddedFormat" xml:space="preserve">
+    <value>Added {0} to favorites</value>
+    <comment>Screen reader announcement. {0} is the game title.</comment>
+  </data>
+  <data name="FavoriteRemovedFormat" xml:space="preserve">
+    <value>Removed {0} from favorites</value>
+    <comment>Screen reader announcement. {0} is the game title.</comment>
+  </data>
+  <data name="GamesEmptyFilterFormat" xml:space="preserve">
+    <value>No games match '{0}'</value>
+    <comment>{0} is the text the user typed into the games filter.</comment>
   </data>
 </root>

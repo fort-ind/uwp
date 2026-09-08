@@ -75,6 +75,8 @@ namespace Fort.ind_UWP
                 _systemBackHandlerAttached = true;
             }
 
+            AttachFavoritesHandler();
+
             UpdateProfileNavItem();
         }
 
@@ -98,6 +100,11 @@ namespace Fort.ind_UWP
             finally
             {
                 SetSitemapLoadingIndicator(false);
+
+                // In the finally, not the try: a failed sitemap load still has to resolve the
+                // favorites section, or Home renders its heading over nothing at all rather than
+                // over the empty-state hint.
+                InitializeFavorites();
             }
         }
 
@@ -110,6 +117,8 @@ namespace Fort.ind_UWP
 
         private void MainPage_Unloaded(object sender, RoutedEventArgs e)
         {
+            DetachFavoritesHandler();
+
             if (_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged -= OnAuthStateChanged;

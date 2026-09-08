@@ -17,6 +17,60 @@
     <Page.Resources>
         <CubicEase x:Key="PanelEnterEase" EasingMode="EaseOut"/>
 
+        <!-- One favorited game on Home. The launch button and the star are siblings in a Grid, not
+             nested, so neither swallows the other's input and each gets its own automation peer.
+             The launch button takes its accessible name from its own content - the glyph beside the
+             title is Raw, so what is left is the title. -->
+        <DataTemplate x:Key="HomeFavoriteItemTemplate" x:DataType="local:SearchItem">
+            <Grid Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Style="{StaticResource ButtonRevealStyle}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,10"
+                        CornerRadius="0"
+                        Click="HomeFavoriteItem_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="{x:Bind Icon}"
+                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   IsTextScaleFactorEnabled="False"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock Text="{x:Bind Title}"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Button>
+
+                <ToggleButton Grid.Column="1"
+                              Style="{StaticResource ToggleButtonRevealStyle}"
+                              IsChecked="{x:Bind IsFavorite, Mode=OneWay}"
+                              AutomationProperties.Name="{x:Bind FavoriteLabel}"
+                              Width="40" Height="40"
+                              MinWidth="40" MinHeight="40"
+                              Padding="0"
+                              CornerRadius="0"
+                              VerticalAlignment="Center"
+                              Margin="4,0,0,0"
+                              Checked="HomeFavoriteToggle_Checked"
+                              Unchecked="HomeFavoriteToggle_Unchecked">
+                    <FontIcon Glyph="{x:Bind FavoriteGlyph, Mode=OneWay}"
+                              FontFamily="{StaticResource SymbolThemeFontFamily}"
+                              FontSize="16"
+                              IsTextScaleFactorEnabled="False"/>
+                </ToggleButton>
+            </Grid>
+        </DataTemplate>
+
         <DataTemplate x:Key="WelcomeDialogContentTemplate">
             <StackPanel Spacing="12">
                 <StackPanel Orientation="Horizontal"
@@ -264,6 +318,40 @@
                                     </StackPanel>
                                 </Grid>
                             </Grid>
+
+                            <!-- Favorites, beneath the news cards. Lives inside LatestNewsPanel so
+                                 it is shown and hidden by the existing ShowContent default case
+                                 with no navigation changes at all.
+
+                                 An ItemsControl rather than a ListView: nothing here is selectable,
+                                 and a virtualizing list inside the page's own ScrollViewer would
+                                 reintroduce the nested-scrolling problem the games SemanticZoom
+                                 already has to work around. The cap makes virtualization pointless
+                                 anyway. -->
+                            <StackPanel x:Name="FavoritesSection" Margin="0,32,0,0">
+                                <TextBlock x:Uid="HomeFavoritesHeader"
+                                           Style="{StaticResource SubtitleTextBlockStyle}"
+                                           AutomationProperties.HeadingLevel="Level2"
+                                           Margin="0,0,0,12"/>
+
+                                <TextBlock x:Uid="HomeFavoritesEmpty"
+                                           x:Name="FavoritesEmptyText"
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           TextWrapping="Wrap"
+                                           Visibility="Collapsed"/>
+
+                                <ItemsControl x:Name="FavoritesList"
+                                              ItemTemplate="{StaticResource HomeFavoriteItemTemplate}"
+                                              MaxWidth="700"
+                                              HorizontalAlignment="Stretch"/>
+
+                                <HyperlinkButton x:Uid="HomeFavoritesSeeAll"
+                                                 x:Name="FavoritesSeeAllLink"
+                                                 Margin="0,8,0,0"
+                                                 Visibility="Collapsed"
+                                                 Click="FavoritesSeeAll_Click"/>
+                            </StackPanel>
                         </StackPanel>
 
                         <StackPanel x:Name="BetasPanel" Visibility="Collapsed">

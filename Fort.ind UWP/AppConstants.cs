@@ -62,6 +62,13 @@ namespace Fort.ind_UWP
         public const string SitemapCacheAppVersionKey = "SitemapCacheAppVersion";
         public const int SitemapCacheTtlHours = 24;
 
+        public const string FavoritesFileName = "favorites.json";
+
+        // Home shares one ScrollViewer with the news cards above it, so the favorites section is
+        // capped rather than allowed to grow without bound. Ordered newest-first (not
+        // alphabetically) so a game starting late in the alphabet can still reach the cap.
+        public const int HomeFavoritesMaxCount = 8;
+
         public const string VersionChannel = "";
 
         public static string AppVersionDisplay

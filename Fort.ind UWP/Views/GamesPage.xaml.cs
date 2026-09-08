@@ -117,6 +117,11 @@ namespace Fort.ind_UWP
 
                 var games = await SitemapService.LoadGameItemsAsync();
 
+                // Stamp the stars on before the list is bound, so no row renders unstarred and
+                // then flips. Idempotent, and cheap enough to repeat on a retry.
+                await FavoritesService.EnsureLoadedAsync();
+                FavoritesService.Apply(games);
+
                 List<SearchItem> sorted = new List<SearchItem>(games);
                 sorted.Sort((left, right) => string.Compare(left.Title, right.Title, StringComparison.OrdinalIgnoreCase));
                 _allGames = sorted.AsReadOnly();
@@ -196,7 +201,7 @@ namespace Fort.ind_UWP
             }
             else if (matches.Count == 0)
             {
-                EmptyText.Text = $"No games match '{trimmed}'";
+                EmptyText.Text = LocalizedStrings.Format("GamesEmptyFilterFormat", trimmed);
                 SetState(GamesPageState.Empty);
             }
             else
@@ -298,6 +303,53 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"GamesPage: Failed to launch game - {ex.Message}");
+            }
+        }
+
+        private void FavoriteToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            SetFavoriteFromToggleAsync(sender, true);
+        }
+
+        private void FavoriteToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SetFavoriteFromToggleAsync(sender, false);
+        }
+
+        /// <summary>
+        /// Shared body of the two toggle handlers.
+        /// </summary>
+        /// <remarks>
+        /// The IsChecked binding fires Checked/Unchecked as containers are recycled during
+        /// scrolling, not just when the user clicks - so this no-ops when the model already agrees
+        /// with the requested state. Without that guard every scroll would re-save the file and
+        /// re-announce to a screen reader. FavoritesService.SetFavoriteAsync is idempotent as well,
+        /// but the guard keeps the async churn off the scroll path entirely.
+        /// </remarks>
+        private async void SetFavoriteFromToggleAsync(object sender, bool isFavorite)
+        {
+            try
+            {
+                var toggle = sender as FrameworkElement;
+                if (toggle == null) return;
+
+                var item = toggle.DataContext as SearchItem;
+                if (item == null) return;
+
+                if (item.IsFavorite == isFavorite) return;
+
+                await FavoritesService.SetFavoriteAsync(item, isFavorite);
+
+                // Starring changes no text and moves no focus, so it is silent to a screen reader
+                // without an explicit notification.
+                AutomationHelper.AnnounceStatus(
+                    toggle,
+                    LocalizedStrings.Format(isFavorite ? "FavoriteAddedFormat" : "FavoriteRemovedFormat", item.Title),
+                    "GamesFavoriteToggle");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"GamesPage: Failed to toggle favorite - {ex.Message}");
             }
         }
 
