@@ -15,8 +15,6 @@
     </Page.KeyboardAccelerators>
 
     <Page.Resources>
-        <CubicEase x:Key="PanelEnterEase" EasingMode="EaseOut"/>
-
         <!-- One favorited game on Home. The launch button and the star are siblings in a Grid, not
              nested, so neither swallows the other's input and each gets its own automation peer.
              The launch button takes its accessible name from its own content - the glyph beside the
@@ -91,19 +89,6 @@
                           Margin="0,4,0,0"/>
             </StackPanel>
         </DataTemplate>
-
-        <Storyboard x:Key="PanelEnterStoryboard">
-            <DoubleAnimation Storyboard.TargetName="ContentPanel"
-                             Storyboard.TargetProperty="Opacity"
-                             From="0" To="1"
-                             Duration="0:0:0.3"
-                             EasingFunction="{StaticResource PanelEnterEase}"/>
-            <DoubleAnimation Storyboard.TargetName="ContentPanelTransform"
-                             Storyboard.TargetProperty="Y"
-                             From="24" To="0"
-                             Duration="0:0:0.3"
-                             EasingFunction="{StaticResource PanelEnterEase}"/>
-        </Storyboard>
     </Page.Resources>
 
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -239,10 +224,9 @@
                      the element ShowContent moves focus to after a nav gesture. It also gives the
                      scrollable region a keyboard stop of its own, so arrow keys scroll it. -->
                 <ScrollViewer x:Name="ContentScrollViewer" IsTabStop="True">
-                    <StackPanel x:Name="ContentPanel" RenderTransformOrigin="0.5,0.5">
-                        <StackPanel.RenderTransform>
-                            <TranslateTransform x:Name="ContentPanelTransform"/>
-                        </StackPanel.RenderTransform>
+                    <!-- No RenderTransform: PlayPanelEnterAnimation slides this with the composition
+                         Translation property, which the toolkit enables on the element itself. -->
+                    <StackPanel x:Name="ContentPanel">
                         <StackPanel x:Name="LatestNewsPanel" Visibility="Visible">
                             <TextBlock x:Uid="MainCheckBackHereFor"
                                        Style="{StaticResource BodyTextBlockStyle}"
@@ -891,6 +875,12 @@
                                                         <TextBlock x:Uid="AboutVersionText" x:Name="AboutVersionText"
                                                                    Style="{StaticResource CaptionTextBlockStyle}"
                                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                                        <!-- Filled by UpdateSystemInfo; selectable so it can be pasted into an issue. -->
+                                                        <TextBlock x:Name="AboutSystemInfoText"
+                                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                                                   IsTextSelectionEnabled="True"
+                                                                   Visibility="Collapsed"/>
                                                     </StackPanel>
                                                 </StackPanel>
 

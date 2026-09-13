@@ -128,12 +128,12 @@ namespace Fort.ind_UWP
 
         private void HomeFavoriteToggle_Checked(object sender, RoutedEventArgs e)
         {
-            SetHomeFavoriteAsync(sender, true);
+            SetHomeFavorite(sender, true);
         }
 
         private void HomeFavoriteToggle_Unchecked(object sender, RoutedEventArgs e)
         {
-            SetHomeFavoriteAsync(sender, false);
+            SetHomeFavorite(sender, false);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Fort.ind_UWP
         /// the only feedback a screen reader gets. Guarded against the container-recycling case the
         /// same way GamesPage is - the IsChecked binding raises these events itself.
         /// </summary>
-        private async void SetHomeFavoriteAsync(object sender, bool isFavorite)
+        private async void SetHomeFavorite(object sender, bool isFavorite)
         {
             try
             {

@@ -9,6 +9,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using AnimationBuilder = Microsoft.Toolkit.Uwp.UI.Animations.AnimationBuilder;
+using Axis = Microsoft.Toolkit.Uwp.UI.Animations.Axis;
 
 namespace Fort.ind_UWP
 {
@@ -245,6 +247,7 @@ namespace Fort.ind_UWP
                 case AppConstants.NavigationSettings:
                     ShowInlinePanel(SettingsPanel);
                     UpdateStorageInfo();
+                    UpdateSystemInfo();
                     break;
                 default:
                     ShowInlinePanel(LatestNewsPanel);
@@ -428,15 +431,35 @@ namespace Fort.ind_UWP
             PlayPanelEnterAnimation();
         }
 
+        // The Fluent "Enter" recipe (doc dump chunk_032, "Timing and easing"): 300ms with the
+        // Decelerate curve. EasingType.Default + EaseOut is the toolkit's name for exactly that
+        // curve on the composition layer, cubic-bezier(0.1, 0.9, 0.2, 1) - the CubicEase the old
+        // Storyboard used was only an approximation of it. Both animations run on the composition
+        // thread, and a builder holds no per-element state, so one instance serves every call.
+        //
+        // Built on first use inside the try below, not in a static initializer: a failure there
+        // would be a TypeInitializationException on MainPage itself, and a missing animation must
+        // never take out navigation.
+        private static readonly TimeSpan PanelEnterDuration = TimeSpan.FromMilliseconds(300);
+
+        private static AnimationBuilder s_panelEnterAnimation;
+
         private void PlayPanelEnterAnimation()
         {
             try
             {
-                var storyboard = Resources["PanelEnterStoryboard"] as Storyboard;
-                if (storyboard == null) return;
+                if (s_panelEnterAnimation == null)
+                {
+                    s_panelEnterAnimation = AnimationBuilder.Create()
+                        .Opacity(to: 1, from: 0, duration: PanelEnterDuration,
+                                 easingMode: EasingMode.EaseOut)
+                        .Translation(Axis.Y, to: 0, from: 24, duration: PanelEnterDuration,
+                                     easingMode: EasingMode.EaseOut);
+                }
 
-                storyboard.Stop();
-                storyboard.Begin();
+                // Starting a composition animation on a property replaces any still running on
+                // it, which is what the Storyboard's Stop-then-Begin used to do by hand.
+                s_panelEnterAnimation.Start(ContentPanel);
             }
             catch (Exception ex)
             {

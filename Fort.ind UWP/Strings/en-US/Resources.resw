@@ -126,6 +126,10 @@
   <data name="AboutVersionFormat" xml:space="preserve">
     <value>Version {0}</value>
   </data>
+  <data name="AboutSystemInfoFormat" xml:space="preserve">
+    <value>Windows {0} · {1}</value>
+    <comment>{0} is the OS version (for example 10.0.19045.4529), {1} the app's processor architecture (x64, x86, arm64).</comment>
+  </data>
   <data name="SearchProfileResultFormat" xml:space="preserve">
     <value>Profile: {0}</value>
   </data>

@@ -54,11 +54,11 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                ApplySearchSuggestionsAsync(sender, query, _searchDebounce.Restart());
+                ApplySearchSuggestions(sender, query, _searchDebounce.Restart());
             }
         }
 
-        private async void ApplySearchSuggestionsAsync(AutoSuggestBox sender, string query, CancellationToken cancellationToken)
+        private async void ApplySearchSuggestions(AutoSuggestBox sender, string query, CancellationToken cancellationToken)
         {
             try
             {
@@ -129,7 +129,7 @@ namespace Fort.ind_UWP
                     var item = args.ChosenSuggestion as SearchItem;
                     if (item != null)
                     {
-                        await NavigateToSearchItem(item);
+                        await NavigateToSearchItemAsync(item);
                     }
                 }
                 else
@@ -151,7 +151,7 @@ namespace Fort.ind_UWP
                         }
                         if (match != null)
                         {
-                            await NavigateToSearchItem(match);
+                            await NavigateToSearchItemAsync(match);
                         }
                     }
                 }
@@ -171,11 +171,11 @@ namespace Fort.ind_UWP
             }
         }
 
-        private async Task NavigateToSearchItem(SearchItem item)
+        private async Task NavigateToSearchItemAsync(SearchItem item)
         {
             if (item == null)
             {
-                Debug.WriteLine("MainPage: NavigateToSearchItem called with null item");
+                Debug.WriteLine("MainPage: NavigateToSearchItemAsync called with null item");
                 return;
             }
 

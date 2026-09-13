@@ -93,7 +93,7 @@ namespace Fort.ind_UWP
             EnsureItemsSources();
 
             if (_dataLoaded) return;
-            LoadGamesAsync();
+            LoadGames();
         }
 
         private void GamesPage_Unloaded(object sender, RoutedEventArgs e)
@@ -103,10 +103,10 @@ namespace Fort.ind_UWP
 
         private void RetryButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadGamesAsync();
+            LoadGames();
         }
 
-        private async void LoadGamesAsync()
+        private async void LoadGames()
         {
             if (_loadInProgress) return;
             _loadInProgress = true;
@@ -148,10 +148,10 @@ namespace Fort.ind_UWP
 
             CancellationTokenSource cts = new CancellationTokenSource();
             _filterDebounceCts = cts;
-            ApplyFilterDebouncedAsync(sender.Text, cts.Token);
+            ApplyFilterDebounced(sender.Text, cts.Token);
         }
 
-        private async void ApplyFilterDebouncedAsync(string query, CancellationToken cancellationToken)
+        private async void ApplyFilterDebounced(string query, CancellationToken cancellationToken)
         {
             try
             {
@@ -308,12 +308,12 @@ namespace Fort.ind_UWP
 
         private void FavoriteToggle_Checked(object sender, RoutedEventArgs e)
         {
-            SetFavoriteFromToggleAsync(sender, true);
+            SetFavoriteFromToggle(sender, true);
         }
 
         private void FavoriteToggle_Unchecked(object sender, RoutedEventArgs e)
         {
-            SetFavoriteFromToggleAsync(sender, false);
+            SetFavoriteFromToggle(sender, false);
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace Fort.ind_UWP
         /// re-announce to a screen reader. FavoritesService.SetFavoriteAsync is idempotent as well,
         /// but the guard keeps the async churn off the scroll path entirely.
         /// </remarks>
-        private async void SetFavoriteFromToggleAsync(object sender, bool isFavorite)
+        private async void SetFavoriteFromToggle(object sender, bool isFavorite)
         {
             try
             {
