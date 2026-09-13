@@ -1,5 +1,5 @@
 # fort.desktop
-fort.ind, but on windows! with all the features you want (and profiles!), made with winUI + C# ❤️ 
+fort.ind, but on windows! With all the features you want (and profiles!), made with winUI + C# ❤️ 
 
 <img width="1311" height="826" alt="image" src="https://github.com/user-attachments/assets/c698b6b0-2d43-4ccc-a70f-96fbaa25c35e" />
 
@@ -15,8 +15,12 @@ first install the .cer file to your local machine (otherwise it won't work 3:) c
 > If the script doesnt run (ps crashes right when you open it), right-click install.ps1 > properties > unblock file
 # buliding
 its strongly recommended to build this app on windows 10 21H2, the easiest way is to open the .sln file in visual studio and click "build solution" or just click the green play button to actually see the app 
-OR just run this :) dosent make the 
+OR just run this :) doesn't make the actual app tho; just builds 
 ```bash
 msbuild "Fort.ind UWP\Fort.ind UWP.csproj" /r /p:AppxPackageSigningEnabled=false /p:GenerateAppxPackageOnBuild=false
 ```
-for some reason those flags are needed otherwise it explodes :( 
+for some reason, those flags are needed otherwise, it explodes :( 
+## Credits to the really cool dependencies we used
+* [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows) 
+* [microsoft ui xaml](https://github.com/microsoft/microsoft-ui-XAML) 
+* [win2D](https://github.com/microsoft/Win2D/tree/uwp/main) 
