@@ -875,12 +875,6 @@
                                                         <TextBlock x:Uid="AboutVersionText" x:Name="AboutVersionText"
                                                                    Style="{StaticResource CaptionTextBlockStyle}"
                                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                                                        <!-- Filled by UpdateSystemInfo; selectable so it can be pasted into an issue. -->
-                                                        <TextBlock x:Name="AboutSystemInfoText"
-                                                                   Style="{StaticResource CaptionTextBlockStyle}"
-                                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                                                   IsTextSelectionEnabled="True"
-                                                                   Visibility="Collapsed"/>
                                                     </StackPanel>
                                                 </StackPanel>
 

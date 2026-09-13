@@ -247,7 +247,6 @@ namespace Fort.ind_UWP
                 case AppConstants.NavigationSettings:
                     ShowInlinePanel(SettingsPanel);
                     UpdateStorageInfo();
-                    UpdateSystemInfo();
                     break;
                 default:
                     ShowInlinePanel(LatestNewsPanel);
