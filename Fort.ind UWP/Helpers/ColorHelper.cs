@@ -35,9 +35,7 @@ namespace Fort.ind_UWP
             return preset != null ? HexToColor(preset) : LightenForLightTheme(HexToColor(darkHex));
         }
 
-        /// <summary>
-        /// Parses a #RRGGBB string, throwing on anything else.
-        /// </summary>
+        
         /// <remarks>
         /// Keep using this for the built-in palette, where the input is a literal in this file and
         /// a failure really is a bug. For anything read back from LocalSettings use
