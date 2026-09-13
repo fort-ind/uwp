@@ -401,6 +401,56 @@
 
 Open your profile and try again.</value>
   </data>
+  <data name="SignInErrorBrowserLaunch" xml:space="preserve">
+    <value>Couldn't open your browser to sign in.</value>
+  </data>
+  <data name="SignInErrorTimedOut" xml:space="preserve">
+    <value>Sign-in timed out. Please try again.</value>
+  </data>
+  <data name="SignInErrorCancelled" xml:space="preserve">
+    <value>Sign-in was cancelled.</value>
+  </data>
+  <data name="SignInErrorUnrecognizedCallback" xml:space="preserve">
+    <value>That sign-in link wasn't recognized.</value>
+  </data>
+  <data name="SignInErrorMissingSession" xml:space="preserve">
+    <value>The sign-in link was missing its session information.</value>
+  </data>
+  <data name="SignInErrorInvalidLink" xml:space="preserve">
+    <value>This sign-in link isn't valid anymore.</value>
+  </data>
+  <data name="SignInErrorNotApproved" xml:space="preserve">
+    <value>fort.social didn't approve the sign-in.</value>
+  </data>
+  <data name="SignInErrorNoToken" xml:space="preserve">
+    <value>fort.social didn't send back an access token.</value>
+  </data>
+  <data name="SignInErrorNoAccount" xml:space="preserve">
+    <value>fort.social didn't send back your account details.</value>
+  </data>
+  <data name="SignInErrorUnreachable" xml:space="preserve">
+    <value>Couldn't reach fort.social.</value>
+  </data>
+  <data name="SignInToastTitle" xml:space="preserve">
+    <value>You're signed in</value>
+  </data>
+  <data name="SignInToastBodyFormat" xml:space="preserve">
+    <value>Signed in as {0}</value>
+    <comment>{0} is the account's display name, or its username if it has none.</comment>
+  </data>
+  <data name="SignOutToastTitle" xml:space="preserve">
+    <value>Signed out</value>
+  </data>
+  <data name="SignOutToastBodyFormat" xml:space="preserve">
+    <value>Goodbye, {0}!</value>
+    <comment>{0} is the account's display name, or its username if it has none.</comment>
+  </data>
+  <data name="SessionExpiredToastTitle" xml:space="preserve">
+    <value>You've been signed out</value>
+  </data>
+  <data name="SessionExpiredToastBody" xml:space="preserve">
+    <value>Your fort.social session ended. Open your profile to sign in again.</value>
+  </data>
   <data name="TileDisplayName" xml:space="preserve">
     <value>Fort.ind</value>
   </data>

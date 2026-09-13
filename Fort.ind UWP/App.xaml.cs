@@ -15,6 +15,7 @@ namespace Fort.ind_UWP
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.Resuming += OnResuming;
         }
 
         public static bool ResumingFromTermination { get; private set; }
@@ -155,8 +156,33 @@ namespace Fort.ind_UWP
                 {
                     rootFrame = new Frame();
                     rootFrame.NavigationFailed += OnNavigationFailed;
+
+                    // The usual reason for a cold start here is that the app was terminated while
+                    // the user was in the browser, i.e. on LoginPage - so honour the last nav tag
+                    // the same way OnLaunched does, and they land back on Profile.
+                    ResumingFromTermination = args.PreviousExecutionState == ApplicationExecutionState.Terminated;
+
                     ApplySavedTheme(rootFrame);
                     Window.Current.Content = rootFrame;
+                    rootFrame.Navigate(typeof(MainPage));
+                }
+
+                // Before any network work, not after it. Restoring the session can fetch /api/i
+                // and completing the sign-in always posts to the instance; awaiting both first held
+                // the window on the splash for as long as a slow instance took to answer. MainPage
+                // picks the result up through AuthStateChanged, as it does on a normal launch.
+                Window.Current.Activate();
+
+                if (isColdStart)
+                {
+                    // Let the first frame render before starting, for the reason OnLaunched queues
+                    // its restore at Low: work started inline interleaves with MainPage's first
+                    // layout and the window stutters. Awaiting a Low-priority no-op yields until
+                    // the dispatcher has drained everything above it.
+                    await rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => { });
+
+                    // Sequential, and before the callback is handled: restore signs in with the
+                    // *old* token, so running it after would overwrite the new session.
                     await LocalStorageService.InitializeAsync();
                     await ProfileService.TryRestoreSessionAsync();
                 }
@@ -167,12 +193,10 @@ namespace Fort.ind_UWP
                     await ProfileService.ApplySignInResultAsync(signInResult);
                 }
 
-                if (isColdStart && rootFrame.Content == null)
+                if (isColdStart)
                 {
-                    rootFrame.Navigate(typeof(MainPage));
+                    await JumpListService.EnsureTasksAsync();
                 }
-
-                Window.Current.Activate();
 
                 if (signInResult != null && !signInResult.Success)
                 {
@@ -241,7 +265,13 @@ namespace Fort.ind_UWP
                 // this is one synchronous, self-guarding, best-effort call, and losing it costs
                 // nothing but a missing badge. Nothing that must survive termination lives here -
                 // that is all still written eagerly at the moment it changes.
-                LiveTileService.UpdateBadgeGlyph(LiveTileService.NewContentBadgeGlyph);
+                //
+                // Skipped when the user has cleared the tile from Settings: there is no content
+                // left for the badge to point at.
+                if (!LiveTileService.TileCleared)
+                {
+                    LiveTileService.UpdateBadgeGlyph(LiveTileService.NewContentBadgeGlyph);
+                }
             }
             catch (Exception ex)
             {
@@ -249,6 +279,28 @@ namespace Fort.ind_UWP
             }
 
             deferral.Complete();
+        }
+
+        /// <summary>
+        /// Clears the badge OnSuspending set, for the resume-without-termination case.
+        /// </summary>
+        /// <remarks>
+        /// MainPage's NavView_Loaded only clears it on a fresh launch - a resumed process keeps its
+        /// page, so Loaded never fires again. Minimising a desktop UWP app suspends it, so without
+        /// this the "content you haven't come back to" badge stayed lit on a window the user was
+        /// actively using. BadgeUpdateManager has no thread affinity, so the thread this is raised
+        /// on does not matter.
+        /// </remarks>
+        private void OnResuming(object sender, object e)
+        {
+            try
+            {
+                LiveTileService.ClearBadge();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: resume badge clear failed - {ex.Message}");
+            }
         }
     }
 }

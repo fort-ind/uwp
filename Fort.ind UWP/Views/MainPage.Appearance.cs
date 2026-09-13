@@ -188,13 +188,28 @@ namespace Fort.ind_UWP
             return ColorHelper.TryHexToColor(colorTag, out ignored);
         }
 
+        /// <remarks>
+        /// An explicit Light/Dark choice is read from RequestedTheme, which is exact the moment
+        /// ApplyTheme sets it. "System" is read from the frame's ActualTheme (16299+, so fine on
+        /// the 1809 floor), never Application.RequestedTheme: that one is fixed at startup, so
+        /// switching Windows between light and dark while the app ran left the title bar buttons
+        /// and the acrylic tint painted for the old theme. If ActualTheme has not caught up yet
+        /// when ApplyTheme calls this, ActualThemeChanged follows and OnActualThemeChanged repaints.
+        /// </remarks>
         private static bool IsEffectiveThemeDark()
         {
             var rootFrame = Window.Current.Content as Frame;
-            var effTheme = rootFrame != null ? rootFrame.RequestedTheme : ElementTheme.Default;
-            return effTheme == ElementTheme.Default
-                   ? Application.Current.RequestedTheme == ApplicationTheme.Dark
-                   : effTheme == ElementTheme.Dark;
+            if (rootFrame == null)
+            {
+                return Application.Current.RequestedTheme == ApplicationTheme.Dark;
+            }
+
+            if (rootFrame.RequestedTheme != ElementTheme.Default)
+            {
+                return rootFrame.RequestedTheme == ElementTheme.Dark;
+            }
+
+            return rootFrame.ActualTheme == ElementTheme.Dark;
         }
 
         private Dictionary<Button, string> _swatchBaseNames;

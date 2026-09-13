@@ -43,6 +43,7 @@ namespace Fort.ind_UWP
         public const string SettingSettingsStorageExpanded = "SettingsStorageExpanded";
         public const string SettingSettingsTileExpanded = "SettingsTileExpanded";
         public const string SettingShowTileBadge = "ShowTileBadge";
+        public const string SettingLiveTileCleared = "LiveTileCleared";
         public const string SettingSettingsWelcomeExpanded = "SettingsWelcomeExpanded";
         public const string SettingSettingsAboutExpanded = "SettingsAboutExpanded";
         public const string SettingLastNavTag = "LastNavTag";
@@ -54,10 +55,11 @@ namespace Fort.ind_UWP
         public const int SearchDebounceMilliseconds = 300;
         public const int SearchSuggestionLimit = 15;
 
-        public const string SitemapCacheFileName = "sitemap_urls.cache";
-        public const string SitemapCacheTimestampKey = "SitemapCacheUnixSeconds";
-        public const string SitemapCacheAppVersionKey = "SitemapCacheAppVersion";
-        public const int SitemapCacheTtlHours = 24;
+        // Legacy: the on-disk sitemap URL cache these named has been removed. Kept only so
+        // SitemapService can delete what older builds left behind.
+        public const string LegacySitemapCacheFileName = "sitemap_urls.cache";
+        public const string LegacySitemapCacheTimestampKey = "SitemapCacheUnixSeconds";
+        public const string LegacySitemapCacheAppVersionKey = "SitemapCacheAppVersion";
 
         public const string FavoritesFileName = "favorites.json";
 

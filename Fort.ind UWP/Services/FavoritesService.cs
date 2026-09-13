@@ -56,6 +56,7 @@ namespace Fort.ind_UWP
             if (s_loaded) return;
 
             await s_loadGate.WaitAsync();
+            StorageFile file = null;
             try
             {
                 if (s_loaded) return;
@@ -63,7 +64,7 @@ namespace Fort.ind_UWP
                 // TryGetItemAsync, not GetFileAsync: no favorites yet is a normal state on a fresh
                 // install and after a reset, and GetFileAsync signals it by throwing - putting a
                 // first-chance exception on the startup path for something that is not an error.
-                var file = await LocalFolder.TryGetItemAsync(AppConstants.FavoritesFileName) as StorageFile;
+                file = await LocalFolder.TryGetItemAsync(AppConstants.FavoritesFileName) as StorageFile;
                 if (file != null)
                 {
                     var json = await FileIO.ReadTextAsync(file);
@@ -88,11 +89,41 @@ namespace Fort.ind_UWP
                 // A corrupt or unreadable file must not take out startup - carry on with an empty
                 // set, and mark it loaded so this is not retried on every navigation.
                 Debug.WriteLine($"FavoritesService: Failed to load favorites - {ex.Message}");
+                s_order.Clear();
+                s_lookup.Clear();
                 s_loaded = true;
+
+                // But never let the next star overwrite it: that used to replace every favorite the
+                // user had with the one they had just added. Move it aside instead, and if even that
+                // fails (a transient lock rather than bad JSON, say) stop saving for this session.
+                if (file != null)
+                {
+                    s_saveBlocked = !await TryMoveAsideAsync(file);
+                }
             }
             finally
             {
                 s_loadGate.Release();
+            }
+        }
+
+        /// <summary>
+        /// Set when favorites.json could not be read or moved aside; saving would destroy it.
+        /// </summary>
+        private static bool s_saveBlocked;
+
+        private static async Task<bool> TryMoveAsideAsync(StorageFile file)
+        {
+            try
+            {
+                await file.RenameAsync(AppConstants.FavoritesFileName + ".bak", NameCollisionOption.ReplaceExisting);
+                Debug.WriteLine("FavoritesService: moved the unreadable favorites file aside as favorites.json.bak");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FavoritesService: could not move the unreadable favorites file aside - {ex.Message}");
+                return false;
             }
         }
 
@@ -207,6 +238,9 @@ namespace Fort.ind_UWP
             s_lookup.Clear();
             s_loaded = true;
 
+            // The unreadable file, if there was one, went with the rest of LocalFolder.
+            s_saveBlocked = false;
+
             RaiseFavoritesChanged();
         }
 
@@ -215,6 +249,12 @@ namespace Fort.ind_UWP
             await s_saveGate.WaitAsync();
             try
             {
+                if (s_saveBlocked)
+                {
+                    Debug.WriteLine("FavoritesService: not saving - the existing favorites file could not be read or moved aside");
+                    return;
+                }
+
                 var payload = new FavoritesPayload { Urls = new List<string>(s_order) };
                 var json = SerializeToJson(payload);
 

@@ -34,6 +34,12 @@ namespace Fort.ind_UWP
             {
                 var result = await ProfileService.LoginWithMisskeyAsync();
 
+                // The user can leave this page while the browser is open - clicking Games, say.
+                // The sign-in still completes (AuthStateChanged updates the shell), but GoBack on a
+                // Frame that has since moved on would swap the content out from under the other
+                // nav item. Only navigate if this page is still what the Frame is showing.
+                if (Frame == null || Frame.Content != this) return;
+
                 if (result.Success)
                 {
                     GoBackToProfile();

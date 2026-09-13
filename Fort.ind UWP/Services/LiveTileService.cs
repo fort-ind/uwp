@@ -14,11 +14,11 @@ namespace Fort.ind_UWP
 
         public const string NewContentBadgeGlyph = "newMessage";
 
-        public static void UpdateTileWithNews(string title, string message, string branding = "name", TileAnimation animationType = TileAnimation.FadeIn)
+        public static void UpdateTileWithNews(string title, string message, string branding = "name")
         {
             try
             {
-                var tileXml = CreateTileXml(title, message, branding, animationType);
+                var tileXml = CreateTileXml(title, message, branding);
 
                 TileNotification tileNotification = new TileNotification(tileXml);
                 TileUpdateManager.CreateTileUpdaterForApplication().Update(tileNotification);
@@ -40,21 +40,12 @@ namespace Fort.ind_UWP
 
                 tileUpdater.Clear();
 
-                TileAnimation[] animations = {
-                    TileAnimation.FadeIn,
-                    TileAnimation.SlideUp,
-                    TileAnimation.SlideDown,
-                    TileAnimation.SlideLeft,
-                    TileAnimation.SlideRight
-                };
-
                 for (int i = 0; i <= Math.Min(newsItems.Count - 1, 4); i++)
                 {
                     var item = newsItems[i];
                     if (item == null) continue;
 
-                    var animation = animations[i % animations.Length];
-                    var tileXml = CreateTileXml(item.Title, item.Message, "name", animation);
+                    var tileXml = CreateTileXml(item.Title, item.Message, "name");
                     TileNotification tileNotification = new TileNotification(tileXml);
                     tileNotification.Tag = string.IsNullOrWhiteSpace(item.Tag) ? $"news{i}" : item.Tag;
                     tileUpdater.Update(tileNotification);
@@ -66,9 +57,16 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static XmlDocument CreateTileXml(string title, string message, string branding, TileAnimation animation = TileAnimation.FadeIn)
+        /// <summary>
+        /// One style for every queued tile's title. Adaptive tile content has no animation hint to
+        /// set, so the old per-"animation" mapping only varied the title's text style as the queue
+        /// rotated - the first tile's title came out in CaptionSubtle, smaller than its own body.
+        /// </summary>
+        private const AdaptiveTextStyle TitleTextStyle = AdaptiveTextStyle.Base;
+
+        private static XmlDocument CreateTileXml(string title, string message, string branding)
         {
-            var titleStyle = GetTitleTextStyle(animation);
+            var titleStyle = TitleTextStyle;
             var safeBranding = ParseBranding(branding);
             var safeTitle = SanitizeText(title);
             var safeMessage = SanitizeText(message);
@@ -158,25 +156,6 @@ namespace Fort.ind_UWP
             return result;
         }
 
-        private static AdaptiveTextStyle GetTitleTextStyle(TileAnimation animation)
-        {
-            switch (animation)
-            {
-                case TileAnimation.FadeIn:
-                    return AdaptiveTextStyle.CaptionSubtle;
-                case TileAnimation.SlideUp:
-                    return AdaptiveTextStyle.Base;
-                case TileAnimation.SlideDown:
-                    return AdaptiveTextStyle.Body;
-                case TileAnimation.SlideLeft:
-                    return AdaptiveTextStyle.BodySubtle;
-                case TileAnimation.SlideRight:
-                    return AdaptiveTextStyle.Subtitle;
-                default:
-                    return AdaptiveTextStyle.Default;
-            }
-        }
-
         private static TileBranding ParseBranding(string branding)
         {
             switch ((branding ?? "").Trim().ToLowerInvariant())
@@ -251,6 +230,38 @@ namespace Fort.ind_UWP
                 }
 
                 if (!value) ClearBadge();
+            }
+        }
+
+        /// <summary>
+        /// Whether the user cleared the tile from Settings. Persisted so the choice survives the
+        /// next launch - MainPage pushes the tile on every startup, which used to repaint a tile the
+        /// user had just cleared. Refresh in Settings resets it.
+        /// </summary>
+        public static bool TileCleared
+        {
+            get
+            {
+                try
+                {
+                    return Convert.ToBoolean(Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLiveTileCleared]);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"LiveTileService: TileCleared read failed – {ex.GetType().Name}: {ex.Message}");
+                    return false;
+                }
+            }
+            set
+            {
+                try
+                {
+                    Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLiveTileCleared] = value;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"LiveTileService: TileCleared write failed – {ex.GetType().Name}: {ex.Message}");
+                }
             }
         }
 
@@ -405,15 +416,6 @@ namespace Fort.ind_UWP
                     return false;
             }
         }
-    }
-
-    public enum TileAnimation
-    {
-        FadeIn,
-        SlideUp,
-        SlideDown,
-        SlideLeft,
-        SlideRight
     }
 
     public class NewsItem

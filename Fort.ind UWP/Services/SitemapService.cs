@@ -73,27 +73,23 @@ namespace Fort.ind_UWP
 
             try
             {
-                var cachedUrls = await TryLoadCachedUrlsAsync();
-                if (cachedUrls != null && cachedUrls.Count > 0)
-                {
-                    return BuildSearchItemsFromUrls(cachedUrls);
-                }
-
+                // Read straight from the package every time. There used to be a 24h on-disk cache of
+                // the parsed URLs in front of this, keyed on the app version, which bought nothing -
+                // it traded one local file read for another - and cost correctness: an edited
+                // sitemap.xml deployed under the same version number stayed invisible for up to a
+                // day. The in-process memoization in LoadSearchItemsAsync is the only cache needed.
                 var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/sitemap.xml"));
                 var text = await FileIO.ReadTextAsync(file);
 
-                var urlsToCache = ReadLocValues(text);
-                if (urlsToCache == null)
+                var urls = ReadLocValues(text);
+                if (urls == null)
                 {
                     return items;
                 }
 
-                items = BuildSearchItemsFromUrls(urlsToCache);
+                items = BuildSearchItemsFromUrls(urls);
 
-                if (urlsToCache.Count > 0)
-                {
-                    await SaveCachedUrlsAsync(urlsToCache);
-                }
+                DeleteLegacyUrlCacheInBackground();
             }
             catch (Exception ex)
             {
@@ -179,114 +175,37 @@ namespace Fort.ind_UWP
                 .ToList();
         }
 
-        private static async Task<List<string>> TryLoadCachedUrlsAsync()
+        /// <summary>
+        /// Removes the URL cache file and its two settings that builds before the cache was
+        /// dropped wrote to LocalFolder, so they do not sit there forever.
+        /// </summary>
+        /// <remarks>
+        /// Gated on the timestamp setting, which is a cheap in-memory lookup, so an install that
+        /// never had the cache - or has already been cleaned - pays no file-system call per launch.
+        /// Fire-and-forget and best-effort: nothing reads these any more, so a failure costs only a
+        /// few kilobytes.
+        /// </remarks>
+        private static async void DeleteLegacyUrlCacheInBackground()
         {
             try
             {
-                var settings = ApplicationData.Current.LocalSettings;
-                if (!settings.Values.ContainsKey(AppConstants.SitemapCacheTimestampKey))
+                var values = ApplicationData.Current.LocalSettings.Values;
+                if (!values.ContainsKey(AppConstants.LegacySitemapCacheTimestampKey)) return;
+
+                var cacheFile = await ApplicationData.Current.LocalFolder.TryGetItemAsync(AppConstants.LegacySitemapCacheFileName);
+                if (cacheFile != null)
                 {
-                    return null;
+                    await cacheFile.DeleteAsync(StorageDeleteOption.PermanentDelete);
                 }
 
-                var cachedVersion = settings.Values[AppConstants.SitemapCacheAppVersionKey]?.ToString();
-                if (cachedVersion != AppConstants.AppVersionDisplay)
-                {
-                    return null;
-                }
-
-                var rawTimestamp = settings.Values[AppConstants.SitemapCacheTimestampKey];
-                long cacheUnixSeconds;
-                try
-                {
-                    cacheUnixSeconds = Convert.ToInt64(rawTimestamp);
-                }
-                catch (FormatException)
-                {
-                    return null;
-                }
-                catch (InvalidCastException)
-                {
-                    return null;
-                }
-                catch (OverflowException)
-                {
-                    return null;
-                }
-
-                var nowUnixSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                var maxAgeSeconds = (long)AppConstants.SitemapCacheTtlHours * 60L * 60L;
-                if ((nowUnixSeconds - cacheUnixSeconds) > maxAgeSeconds)
-                {
-                    return null;
-                }
-
-                var cacheFile = await ApplicationData.Current.LocalFolder.TryGetItemAsync(AppConstants.SitemapCacheFileName) as StorageFile;
-                if (cacheFile == null)
-                {
-                    return null;
-                }
-
-                var content = await FileIO.ReadTextAsync(cacheFile);
-                if (string.IsNullOrWhiteSpace(content))
-                {
-                    return null;
-                }
-
-                List<string> urls = new List<string>();
-                var lines = content.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var line in lines)
-                {
-                    var value = line.Trim();
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        urls.Add(value);
-                    }
-                }
-
-                if (urls.Count == 0)
-                {
-                    return null;
-                }
-
-                return urls;
+                // Settings last: the timestamp key is the gate, so if the delete above throws it
+                // stays in place and the cleanup is retried on the next launch.
+                values.Remove(AppConstants.LegacySitemapCacheTimestampKey);
+                values.Remove(AppConstants.LegacySitemapCacheAppVersionKey);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SitemapService: failed to load sitemap cache – {ex.Message}");
-                return null;
-            }
-        }
-
-        private static async Task SaveCachedUrlsAsync(IEnumerable<string> urls)
-        {
-            try
-            {
-                List<string> lines = new List<string>();
-                foreach (var url in urls)
-                {
-                    if (!string.IsNullOrWhiteSpace(url))
-                    {
-                        lines.Add(url);
-                    }
-                }
-
-                if (lines.Count == 0)
-                {
-                    return;
-                }
-
-                var cacheFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(
-                    AppConstants.SitemapCacheFileName,
-                    CreationCollisionOption.ReplaceExisting);
-
-                await FileIO.WriteTextAsync(cacheFile, string.Join(Environment.NewLine, lines));
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SitemapCacheTimestampKey] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SitemapCacheAppVersionKey] = AppConstants.AppVersionDisplay;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"SitemapService: failed to save sitemap cache – {ex.Message}");
+                Debug.WriteLine($"SitemapService: could not remove the legacy URL cache – {ex.Message}");
             }
         }
 

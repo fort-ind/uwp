@@ -244,7 +244,6 @@
                                       Background="{ThemeResource CardBackgroundBrush}"
                                       BorderBrush="{ThemeResource CardBorderBrush}"
                                       BorderThickness="1"
-                                      CornerRadius="4"
                                       Padding="20"
                                       MinHeight="180">
                                     <StackPanel>
@@ -275,7 +274,6 @@
                                       Background="{ThemeResource CardBackgroundBrush}"
                                       BorderBrush="{ThemeResource CardBorderBrush}"
                                       BorderThickness="1"
-                                      CornerRadius="4"
                                       Padding="20"
                                       MinHeight="180">
                                     <StackPanel>
@@ -382,7 +380,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Width="36" Height="36" CornerRadius="2"
+                                                <Grid Width="36" Height="36"
                                                       Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
                                                     <FontIcon Glyph="&#xE771;" FontSize="16"
                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -600,7 +598,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Width="36" Height="36" CornerRadius="2"
+                                                <Grid Width="36" Height="36"
                                                       Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
                                                     <FontIcon Glyph="&#xEDA2;" FontSize="16"
                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -682,7 +680,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Width="36" Height="36" CornerRadius="2"
+                                                <Grid Width="36" Height="36"
                                                       Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
                                                     <FontIcon Glyph="&#xE77F;" FontSize="16"
                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -760,7 +758,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Width="36" Height="36" CornerRadius="2"
+                                                <Grid Width="36" Height="36"
                                                       Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
                                                     <FontIcon Glyph="&#xEB51;" FontSize="16"
                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -828,7 +826,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Width="36" Height="36" CornerRadius="2"
+                                                <Grid Width="36" Height="36"
                                                       Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
                                                     <FontIcon Glyph="&#xE946;" FontSize="16"
                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -863,7 +861,7 @@
                                                        Opacity="0.08"/>
                                             <StackPanel Spacing="12">
                                                 <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
-                                                    <Border Width="44" Height="44" CornerRadius="2"
+                                                    <Border Width="44" Height="44"
                                                             Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
                                                         <FontIcon Glyph="&#xE774;" FontSize="22"
                                                                   HorizontalAlignment="Center"
@@ -911,7 +909,8 @@
                                                 <StackPanel Orientation="Horizontal" Spacing="6" Opacity="0.4">
                                                     <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
                                                     <TextBlock x:Uid="MainMadeWithLoveBy"
-                                                               FontSize="11" VerticalAlignment="Center"/>
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               VerticalAlignment="Center"/>
                                                     <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
                                                 </StackPanel>
 

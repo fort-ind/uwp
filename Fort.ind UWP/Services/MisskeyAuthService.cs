@@ -29,6 +29,9 @@ namespace Fort.ind_UWP
         private static string s_pendingSession = null;
         private static TaskCompletionSource<bool> s_pendingCompletion = null;
 
+        /// <summary>The session most recently completed by a callback, so a duplicate is ignored.</summary>
+        private static string s_lastHandledSession = null;
+
         private static readonly Lazy<HttpClient> s_client = new Lazy<HttpClient>(() => new HttpClient());
 
         private static readonly TimeSpan SignInTimeout = TimeSpan.FromMinutes(5);
@@ -45,12 +48,19 @@ namespace Fort.ind_UWP
                 $"&permission={RequestedPermissions}");
 
             TaskCompletionSource<bool> completion = new TaskCompletionSource<bool>();
+            TaskCompletionSource<bool> superseded;
             lock (s_lock)
             {
+                superseded = s_pendingCompletion;
                 s_pendingSession = session;
                 s_pendingCompletion = completion;
             }
             PersistPendingSession(session);
+
+            // Release whatever sign-in this one replaces. Left alone it sat awaiting its callback for
+            // the full timeout and then, on the way out, deleted the persisted session - which by
+            // then belonged to this attempt, so a cold-start callback for it was rejected.
+            superseded?.TrySetResult(false);
 
             try
             {
@@ -58,14 +68,14 @@ namespace Fort.ind_UWP
                 if (!launched)
                 {
                     ClearPending(session);
-                    return MisskeyAuthResult.Failed("Could not open your browser to sign in.");
+                    return MisskeyAuthResult.Failed("SignInErrorBrowserLaunch");
                 }
             }
             catch (Exception ex)
             {
                 ClearPending(session);
                 Debug.WriteLine($"MisskeyAuthService: launch failed - {ex.Message}");
-                return MisskeyAuthResult.Failed("Could not open your browser to sign in.");
+                return MisskeyAuthResult.Failed("SignInErrorBrowserLaunch");
             }
 
             Task finished = null;
@@ -84,13 +94,13 @@ namespace Fort.ind_UWP
             if (finished != completion.Task)
             {
                 ClearPending(session);
-                return MisskeyAuthResult.Failed("Sign-in timed out. Please try again.");
+                return MisskeyAuthResult.Failed("SignInErrorTimedOut");
             }
 
             var approved = await completion.Task;
             if (!approved)
             {
-                return MisskeyAuthResult.Failed("Sign-in was cancelled.");
+                return MisskeyAuthResult.Failed("SignInErrorCancelled");
             }
 
             return await CompleteSessionAsync(session);
@@ -100,16 +110,17 @@ namespace Fort.ind_UWP
         {
             if (uri == null || !string.Equals(uri.Host, CallbackHost, StringComparison.OrdinalIgnoreCase))
             {
-                return MisskeyAuthResult.Failed("Unrecognized sign-in callback.");
+                return MisskeyAuthResult.Failed("SignInErrorUnrecognizedCallback");
             }
 
             var session = ExtractSessionFromCallback(uri);
             if (string.IsNullOrWhiteSpace(session))
             {
-                return MisskeyAuthResult.Failed("Sign-in link was missing session information.");
+                return MisskeyAuthResult.Failed("SignInErrorMissingSession");
             }
 
             TaskCompletionSource<bool> completion = null;
+            bool alreadyHandled = false;
             lock (s_lock)
             {
                 if (s_pendingCompletion != null && string.Equals(s_pendingSession, session, StringComparison.Ordinal))
@@ -117,19 +128,39 @@ namespace Fort.ind_UWP
                     completion = s_pendingCompletion;
                     s_pendingSession = null;
                     s_pendingCompletion = null;
+                    s_lastHandledSession = session;
                 }
+                else if (string.Equals(s_lastHandledSession, session, StringComparison.Ordinal))
+                {
+                    alreadyHandled = true;
+                }
+            }
+
+            if (alreadyHandled)
+            {
+                // A browser can deliver the same fortind: callback twice. The first one already
+                // completed this session, so the repeat is ignored - it is not an invalid link, and
+                // reporting it as one put a failure dialog over a sign-in that had just succeeded.
+                // A null result is what App.OnActivated already treats as "nothing to report".
+                Debug.WriteLine("MisskeyAuthService: ignoring a repeat callback for a session already handled");
+                return null;
             }
 
             if (completion != null)
             {
-                ClearPersistedSession();
+                ClearPersistedSession(session);
                 completion.TrySetResult(true);
                 return null;
             }
 
             if (!TryConsumePersistedSession(session))
             {
-                return MisskeyAuthResult.Failed("This sign-in link is not valid.");
+                return MisskeyAuthResult.Failed("SignInErrorInvalidLink");
+            }
+
+            lock (s_lock)
+            {
+                s_lastHandledSession = session;
             }
 
             return await CompleteSessionAsync(session);
@@ -158,7 +189,11 @@ namespace Fort.ind_UWP
                     s_pendingCompletion = null;
                 }
             }
-            ClearPersistedSession();
+
+            // Scoped to this session, like the in-memory check above. A newer sign-in may have
+            // persisted its own session since this one started, and that is the one a cold-start
+            // callback will need.
+            ClearPersistedSession(session);
         }
 
         private static void PersistPendingSession(string session)
@@ -205,6 +240,19 @@ namespace Fort.ind_UWP
             values.Remove(PendingSessionIssuedAtSettingKey);
         }
 
+        /// <summary>Clears the persisted session only if it is still <paramref name="session"/>.</summary>
+        private static void ClearPersistedSession(string session)
+        {
+            var values = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
+            var stored = values[PendingSessionSettingKey] as string;
+            if (stored != null && !string.Equals(stored, session, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            ClearPersistedSession();
+        }
+
         private static string ExtractSessionFromCallback(Uri uri)
         {
             try
@@ -242,20 +290,25 @@ namespace Fort.ind_UWP
 
                         if (!json.GetNamedBoolean("ok", false))
                         {
-                            return MisskeyAuthResult.Failed("fort.social did not approve the sign-in.");
+                            return MisskeyAuthResult.Failed("SignInErrorNotApproved");
                         }
 
                         var token = json.GetNamedString("token", "");
                         if (string.IsNullOrWhiteSpace(token))
                         {
-                            return MisskeyAuthResult.Failed("fort.social did not return an access token.");
+                            return MisskeyAuthResult.Failed("SignInErrorNoToken");
                         }
 
                         var profile = ParseUser(GetNamedObjectOrNull(json, "user"));
                         if (profile == null)
                         {
-                            return MisskeyAuthResult.Failed("fort.social did not return account details.");
+                            return MisskeyAuthResult.Failed("SignInErrorNoAccount");
                         }
+
+                        // Stamped here and nowhere else: this is the one place an actual sign-in
+                        // happens. ParseUser also serves the background /api/i refresh, which used to
+                        // restamp it on every launch and turned "last signed in" into "last opened".
+                        profile.LastLoginDate = DateTime.Now;
 
                         SaveToken(token);
                         return MisskeyAuthResult.Succeeded(token, profile);
@@ -265,7 +318,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"MisskeyAuthService: check failed - {ex.Message}");
-                return MisskeyAuthResult.Failed("Could not reach fort.social.");
+                return MisskeyAuthResult.Failed("SignInErrorUnreachable");
             }
         }
 
@@ -338,7 +391,6 @@ namespace Fort.ind_UWP
             profile.DisplayName = JsonString(obj, "name");
             profile.Bio = JsonString(obj, "description");
             profile.AvatarUrl = JsonString(obj, "avatarUrl");
-            profile.LastLoginDate = DateTime.Now;
 
             var createdAt = JsonString(obj, "createdAt");
             DateTime parsedDate;
@@ -414,7 +466,20 @@ namespace Fort.ind_UWP
     public class MisskeyAuthResult
     {
         public bool Success { get; set; }
-        public string ErrorMessage { get; set; }
+
+        /// <summary>Resource key for the failure reason; see <see cref="ErrorMessage"/>.</summary>
+        public string ErrorKey { get; set; }
+
+        /// <summary>
+        /// The localized failure reason. Resolved on read rather than when the result is built:
+        /// LocalizedStrings degrades to the bare key off the UI thread, and the display sites
+        /// (LoginPage, App's sign-in failure dialog) are guaranteed to be on it.
+        /// </summary>
+        public string ErrorMessage
+        {
+            get { return string.IsNullOrEmpty(ErrorKey) ? null : LocalizedStrings.Get(ErrorKey); }
+        }
+
         public string Token { get; set; }
         public UserProfile Profile { get; set; }
 
@@ -422,9 +487,9 @@ namespace Fort.ind_UWP
         {
         }
 
-        public static MisskeyAuthResult Failed(string message)
+        public static MisskeyAuthResult Failed(string errorKey)
         {
-            return new MisskeyAuthResult { Success = false, ErrorMessage = message };
+            return new MisskeyAuthResult { Success = false, ErrorKey = errorKey };
         }
 
         public static MisskeyAuthResult Succeeded(string token, UserProfile profile)

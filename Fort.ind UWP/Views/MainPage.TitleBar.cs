@@ -56,7 +56,14 @@ namespace Fort.ind_UWP
             var isDark = IsEffectiveThemeDark();
 
             var fgColor = isDark ? Colors.White : Colors.Black;
-            var inactiveFg = isDark ? Color.FromArgb(128, 255, 255, 255) : Color.FromArgb(128, 0, 0, 0);
+
+            // Opaque on purpose. Per the title bar customization docs (doc dump chunk_035,
+            // "Transparency in caption buttons"), only the four Button*BackgroundColor properties
+            // honour alpha; every other colour ignores it. A half-transparent white here therefore
+            // drew full white, and the caption glyphs never dimmed when the window lost focus.
+            // These are the SystemBaseMediumColor values (60% white / 60% black) pre-blended over the
+            // chrome behind them.
+            var inactiveFg = isDark ? Color.FromArgb(255, 0x99, 0x99, 0x99) : Color.FromArgb(255, 0x66, 0x66, 0x66);
             var hoverBg = isDark ? Color.FromArgb(30, 255, 255, 255) : Color.FromArgb(30, 0, 0, 0);
             var pressedBg = isDark ? Color.FromArgb(50, 255, 255, 255) : Color.FromArgb(50, 0, 0, 0);
 
@@ -71,10 +78,23 @@ namespace Fort.ind_UWP
             titleBar.ButtonInactiveForegroundColor = inactiveFg;
         }
 
-        private void UpdateLiveTile()
+        /// <param name="userRequested">
+        /// True for the Settings refresh button, which also lifts a previous "clear tile". The
+        /// startup push passes false and leaves a tile the user cleared alone.
+        /// </param>
+        private void UpdateLiveTile(bool userRequested = false)
         {
             try
             {
+                if (userRequested)
+                {
+                    LiveTileService.TileCleared = false;
+                }
+                else if (LiveTileService.TileCleared)
+                {
+                    return;
+                }
+
                 List<NewsItem> newsItems = new List<NewsItem>()
                 {
                     new NewsItem(LocalizedStrings.Get("TileNewsWhatsNewTitle"),

@@ -32,7 +32,6 @@
                 <Grid Background="{ThemeResource CardBackgroundBrush}"
                       BorderBrush="{ThemeResource CardBorderBrush}"
                       BorderThickness="1"
-                      CornerRadius="4"
                       Padding="24">
                     <StackPanel HorizontalAlignment="Center" Spacing="16">
                         <FontIcon Glyph="&#xE77B;"
@@ -57,7 +56,6 @@
                 <Grid Background="{ThemeResource CardBackgroundBrush}"
                       BorderBrush="{ThemeResource CardBorderBrush}"
                       BorderThickness="1"
-                      CornerRadius="4"
                       Padding="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -104,7 +102,6 @@
                 <Grid Background="{ThemeResource CardBackgroundBrush}"
                       BorderBrush="{ThemeResource CardBorderBrush}"
                       BorderThickness="1"
-                      CornerRadius="4"
                       Padding="20">
                     <StackPanel>
                         <TextBlock x:Uid="ProfileAbout"

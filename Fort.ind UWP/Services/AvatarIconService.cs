@@ -27,6 +27,8 @@ namespace Fort.ind_UWP
 
         private static readonly TimeSpan TransientRetryDelay = TimeSpan.FromSeconds(2);
 
+        private static readonly TimeSpan DownloadTimeout = TimeSpan.FromSeconds(20);
+
         private static readonly Lazy<HttpClient> s_client = new Lazy<HttpClient>(CreateClient);
 
         private static HttpClient CreateClient()
@@ -150,21 +152,89 @@ namespace Fort.ind_UWP
             }
         }
 
+        /// <summary>
+        /// Downloads the avatar into memory, giving up past <see cref="MaxAvatarBytes"/> or
+        /// <see cref="DownloadTimeout"/>. Returns null (and disposes nothing the caller owns) when
+        /// the response is empty or over the cap.
+        /// </summary>
+        /// <remarks>
+        /// Streamed rather than GetBufferAsync, which read the entire body before the size check
+        /// could run - so the cap bounded nothing. The declared Content-Length rejects an honest
+        /// oversized response before any body is read; the running count catches a chunked or
+        /// lying one. The timeout matters because Windows.Web.Http has none of its own and this
+        /// runs under s_gate: a stalled instance would otherwise hold every later avatar request.
+        /// </remarks>
+        private static async Task<InMemoryRandomAccessStream> DownloadCappedAsync(Uri sourceUri)
+        {
+            using (var cts = new CancellationTokenSource(DownloadTimeout))
+            using (var response = await s_client.Value
+                .GetAsync(sourceUri, HttpCompletionOption.ResponseHeadersRead)
+                .AsTask(cts.Token))
+            {
+                response.EnsureSuccessStatusCode();
+
+                var declaredLength = response.Content.Headers.ContentLength;
+                if (declaredLength.HasValue && declaredLength.Value > MaxAvatarBytes)
+                {
+                    Debug.WriteLine($"AvatarIconService: avatar declares {declaredLength.Value} bytes, over the cap");
+                    return null;
+                }
+
+                var memory = new InMemoryRandomAccessStream();
+                try
+                {
+                    using (var input = await response.Content.ReadAsInputStreamAsync().AsTask(cts.Token))
+                    {
+                        var chunk = new Windows.Storage.Streams.Buffer(64 * 1024);
+                        ulong total = 0;
+
+                        while (true)
+                        {
+                            var read = await input.ReadAsync(chunk, chunk.Capacity, InputStreamOptions.Partial)
+                                                  .AsTask(cts.Token);
+                            if (read.Length == 0) break;
+
+                            total += read.Length;
+                            if (total > MaxAvatarBytes)
+                            {
+                                Debug.WriteLine("AvatarIconService: avatar body ran past the cap");
+                                memory.Dispose();
+                                return null;
+                            }
+
+                            await memory.WriteAsync(read).AsTask(cts.Token);
+                        }
+
+                        if (total == 0)
+                        {
+                            Debug.WriteLine("AvatarIconService: avatar response was empty");
+                            memory.Dispose();
+                            return null;
+                        }
+                    }
+
+                    await memory.FlushAsync();
+                    memory.Seek(0);
+                    return memory;
+                }
+                catch
+                {
+                    memory.Dispose();
+                    throw;
+                }
+            }
+        }
+
         private static async Task<CanvasRenderTarget> RenderCircularIconAsync(Uri sourceUri)
         {
-            var buffer = await s_client.Value.GetBufferAsync(sourceUri);
-            if (buffer == null || buffer.Length == 0 || buffer.Length > MaxAvatarBytes)
+            var downloaded = await DownloadCappedAsync(sourceUri);
+            if (downloaded == null)
             {
-                Debug.WriteLine("AvatarIconService: avatar response empty or too large");
                 return null;
             }
 
-            using (var stream = new InMemoryRandomAccessStream())
+            using (var stream = downloaded)
             {
-                await stream.WriteAsync(buffer);
-                await stream.FlushAsync();
-                stream.Seek(0);
-
                 var decoder = await BitmapDecoder.CreateAsync(stream);
                 if (decoder.PixelWidth == 0 || decoder.PixelHeight == 0)
                 {
@@ -298,8 +368,8 @@ namespace Fort.ind_UWP
         /// The file name carries a hash of the source URL so that a changed avatar lands on a new
         /// path (XAML's image cache holds the old bitmap for a reused one). The cost of that is a
         /// fresh PNG per avatar the user has ever had, with nothing removing the old ones. Only
-        /// files under the avatar prefix are touched, so the profile cache and the sitemap URL
-        /// cache sharing this folder are never in scope - and .tmp leftovers match the prefix too,
+        /// files under the avatar prefix are touched, so the profile cache and favorites file
+        /// sharing this folder are never in scope - and .tmp leftovers match the prefix too,
         /// so they get swept up here as well.
         /// </remarks>
         private static async Task PruneOtherAvatarsAsync(StorageFolder folder, string keepFileName)

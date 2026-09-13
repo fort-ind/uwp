@@ -10,28 +10,16 @@
     Background="Transparent"
     Loaded="LoginPage_Loaded">
 
-    <Grid Background="{ThemeResource AppSurfaceAcrylicBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Grid x:Name="AppTitleBar"
-              Grid.Row="0"
-              Background="Transparent"
-              HorizontalAlignment="Stretch">
-            <TextBlock Text=""
-                       VerticalAlignment="Center"
-                       Margin="12,0,0,0"
-                       Style="{StaticResource CaptionTextBlockStyle}"
-                       Opacity="0.8"/>
-        </Grid>
-
-        <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <!-- No background of its own. This page is hosted in MainPage's ContentFrame, over RootGrid's
+         acrylic, which carries the user's chosen tint; painting AppSurfaceAcrylicBrush here laid the
+         untinted default over it, so the tint vanished for as long as Login was showing. The
+         32px title-bar row that used to sit above the card is gone for the same reason: it dates
+         from when this was a top-level page, and MainPage already owns the title bar. -->
+    <Grid Background="Transparent">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid Background="{ThemeResource CardBackgroundBrush}"
                   BorderBrush="{ThemeResource CardBorderBrush}"
                   BorderThickness="1"
-                  CornerRadius="4"
                   Padding="40"
                   MinWidth="380"
                   MaxWidth="420">
@@ -53,14 +41,14 @@
                     </StackPanel>
 
                     <TextBlock x:Uid="LoginYouLlBeTaken"
-                               FontSize="12"
+                               Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
 
                     <TextBlock x:Name="ErrorText"
                                Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
-                               FontSize="12"
+                               Style="{StaticResource CaptionTextBlockStyle}"
                                TextWrapping="Wrap"
                                TextAlignment="Center"
                                Visibility="Collapsed"
@@ -88,7 +76,6 @@
         </Grid>
 
         <Grid x:Name="LoadingOverlay"
-              Grid.RowSpan="2"
               Background="{ThemeResource SystemControlPageBackgroundMediumAltMediumBrush}"
               Visibility="Collapsed">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">

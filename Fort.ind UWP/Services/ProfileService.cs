@@ -19,7 +19,7 @@ namespace Fort.ind_UWP
             }
 
             await ApplySignInResultAsync(result);
-            return new LoginResult(true, "Signed in!", result.Profile);
+            return new LoginResult(true, null, result.Profile);
         }
 
         public static async Task<bool> ApplySignInResultAsync(MisskeyAuthResult result)
@@ -30,20 +30,45 @@ namespace Fort.ind_UWP
             await LocalStorageService.SaveProfileAsync(result.Profile);
             AuthStateChanged?.Invoke(null, true);
 
-            var displayName = string.IsNullOrWhiteSpace(result.Profile.DisplayName) ? result.Profile.Username : result.Profile.DisplayName;
-            LiveTileService.SendToast("Welcome back!", $"Signed in as {displayName}");
+            LiveTileService.SendToast(LocalizedStrings.Get("SignInToastTitle"),
+                                      LocalizedStrings.Format("SignInToastBodyFormat", DisplayNameOf(result.Profile)));
 
             return true;
         }
 
-        public static async Task LogoutAsync()
+        public static Task LogoutAsync()
         {
-            var name = CurrentUser != null ? (string.IsNullOrWhiteSpace(CurrentUser.DisplayName) ? CurrentUser.Username : CurrentUser.DisplayName) : "";
+            return LogoutAsync(false);
+        }
+
+        /// <param name="tokenRejected">
+        /// True when the instance refused the stored token, rather than the user choosing to sign
+        /// out. The toast then says the session ended instead of saying goodbye - nobody asked to
+        /// leave, and a farewell out of nowhere reads as the app misbehaving.
+        /// </param>
+        private static async Task LogoutAsync(bool tokenRejected)
+        {
+            var name = CurrentUser != null ? DisplayNameOf(CurrentUser) : "";
             CurrentUser = null;
             MisskeyAuthService.ClearToken();
             await LocalStorageService.ClearProfileAsync();
             AuthStateChanged?.Invoke(null, false);
-            if (!string.IsNullOrEmpty(name)) LiveTileService.SendToast("Signed out", $"Goodbye, {name}!");
+
+            if (tokenRejected)
+            {
+                LiveTileService.SendToast(LocalizedStrings.Get("SessionExpiredToastTitle"),
+                                          LocalizedStrings.Get("SessionExpiredToastBody"));
+            }
+            else if (!string.IsNullOrEmpty(name))
+            {
+                LiveTileService.SendToast(LocalizedStrings.Get("SignOutToastTitle"),
+                                          LocalizedStrings.Format("SignOutToastBodyFormat", name));
+            }
+        }
+
+        private static string DisplayNameOf(UserProfile profile)
+        {
+            return string.IsNullOrWhiteSpace(profile.DisplayName) ? profile.Username : profile.DisplayName;
         }
 
         public static async Task ResetAppDataAsync()
@@ -88,7 +113,7 @@ namespace Fort.ind_UWP
                         // again; now the session simply stays unrestored until the next launch.
                         if (fetched.TokenRejected)
                         {
-                            await LogoutAsync();
+                            await LogoutAsync(true);
                         }
                         return false;
                     }
@@ -102,7 +127,7 @@ namespace Fort.ind_UWP
                 CurrentUser = cached;
                 AuthStateChanged?.Invoke(null, true);
 
-                RefreshCurrentUserInBackground(token);
+                RefreshCurrentUserInBackground(token, cached.LastLoginDate);
 
                 return true;
             }
@@ -113,7 +138,12 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async void RefreshCurrentUserInBackground(string token)
+        /// <param name="token">The token the session was restored with.</param>
+        /// <param name="lastLoginDate">
+        /// Carried over from the cached profile. /api/i describes the account, not this app's
+        /// sign-in, so the refreshed profile has no sign-in time of its own to offer.
+        /// </param>
+        private static async void RefreshCurrentUserInBackground(string token, DateTime lastLoginDate)
         {
             try
             {
@@ -133,12 +163,13 @@ namespace Fort.ind_UWP
                     // looking signed in indefinitely against credentials that can never work, with
                     // every request silently failing behind a perfectly normal-looking UI.
                     Debug.WriteLine("ProfileService: stored token was rejected; signing out");
-                    await LogoutAsync();
+                    await LogoutAsync(true);
                     return;
                 }
 
                 if (fetched.Profile == null) return;
 
+                fetched.Profile.LastLoginDate = lastLoginDate;
                 CurrentUser = fetched.Profile;
                 await LocalStorageService.SaveProfileAsync(fetched.Profile);
                 AuthStateChanged?.Invoke(null, true);

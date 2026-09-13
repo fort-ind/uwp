@@ -185,7 +185,9 @@ namespace Fort.ind_UWP
             }
             else if (!string.IsNullOrEmpty(item.NavigationTag))
             {
-                ShowContent(item.NavigationTag);
+                // NavigateToTag, not ShowContent: ShowContent swaps the content but leaves the pane
+                // lit on wherever the user searched from, and does not hand focus to the content.
+                NavigateToTag(item.NavigationTag);
             }
         }
     }

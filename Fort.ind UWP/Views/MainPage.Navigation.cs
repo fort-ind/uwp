@@ -26,6 +26,11 @@ namespace Fort.ind_UWP
                         try
                         {
                             UpdateProfileNavItem();
+
+                            // Settings > Data storage shows who is signed in, and it can be on
+                            // screen when that changes - a background refresh finding the token
+                            // revoked, or a sign-in arriving from the browser.
+                            UpdateStorageInfo();
                         }
                         catch (Exception ex)
                         {
@@ -520,9 +525,23 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"MainPage: Profile navigation failed – {ex.Message}");
-                NavView.Header = HeaderFor(AppConstants.NavigationLatestNews);
-                ShowInlinePanel(LatestNewsPanel);
+                FallBackToHome();
             }
+        }
+
+        /// <summary>
+        /// Where a page-backed view lands when its navigation throws.
+        /// </summary>
+        /// <remarks>
+        /// All of Home, not just its panel. The fallback used to swap in LatestNewsPanel and retitle
+        /// the header, but the pane stayed lit on the item that failed and ShowContent had already
+        /// saved that item's tag - so a later restore from termination went straight back to it.
+        /// The nested ShowContent is safe: Home is an inline panel and cannot fail this way.
+        /// </remarks>
+        private void FallBackToHome()
+        {
+            SelectNavItemForTag(AppConstants.NavigationLatestNews);
+            ShowContent(AppConstants.NavigationLatestNews);
         }
 
         private void ShowGamesPage()
@@ -541,8 +560,7 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"MainPage: Games navigation failed - {ex.GetType().Name}: {ex.Message}"
                                 + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
-                NavView.Header = HeaderFor(AppConstants.NavigationLatestNews);
-                ShowInlinePanel(LatestNewsPanel);
+                FallBackToHome();
             }
         }
 

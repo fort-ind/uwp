@@ -122,11 +122,13 @@ namespace Fort.ind_UWP
 
         private void RefreshTileButton_Click(object sender, RoutedEventArgs e)
         {
-            UpdateLiveTile();
+            UpdateLiveTile(true);
         }
 
         private void ClearTileButton_Click(object sender, RoutedEventArgs e)
         {
+            // Persisted, or the next launch's tile push paints it straight back.
+            LiveTileService.TileCleared = true;
             LiveTileService.ClearTile();
             LiveTileService.ClearBadge();
         }
