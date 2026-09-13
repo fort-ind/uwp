@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -81,13 +80,17 @@ namespace Fort.ind_UWP
                 var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/sitemap.xml"));
                 var text = await FileIO.ReadTextAsync(file);
 
-                var urls = ReadLocValues(text);
-                if (urls == null)
+                // The XML walk, URI validation and slug-to-title work is pure string handling, so
+                // it runs on the thread pool; it used to run on the UI thread in the middle of
+                // MainPage's first layout. Only the SearchItem construction comes back here, because
+                // that resolves display text through LocalizedStrings, which needs the UI thread.
+                var entries = await Task.Run(() => ReadSitemapEntries(text));
+                if (entries == null)
                 {
                     return items;
                 }
 
-                items = BuildSearchItemsFromUrls(urls);
+                items = BuildSearchItems(entries);
 
                 DeleteLegacyUrlCacheInBackground();
             }
@@ -142,7 +145,42 @@ namespace Fort.ind_UWP
             return urls;
         }
 
-        private static SearchItem CreateSearchItemFromUrl(string urlValue)
+        /// <summary>
+        /// One sitemap URL, parsed but not yet a <see cref="SearchItem"/>.
+        /// </summary>
+        private sealed class SitemapEntry
+        {
+            /// <summary>Null for the site root, whose title is a resource looked up later.</summary>
+            public string Title;
+            public string CategoryKey;
+            public string Url;
+        }
+
+        /// <summary>
+        /// Everything that can run off the UI thread: no resource lookups. Null if the XML is
+        /// unreadable.
+        /// </summary>
+        private static List<SitemapEntry> ReadSitemapEntries(string documentText)
+        {
+            var urls = ReadLocValues(documentText);
+            if (urls == null)
+            {
+                return null;
+            }
+
+            List<SitemapEntry> entries = new List<SitemapEntry>(urls.Count);
+            foreach (var url in urls)
+            {
+                var entry = CreateEntryFromUrl(url);
+                if (entry != null)
+                {
+                    entries.Add(entry);
+                }
+            }
+            return entries;
+        }
+
+        private static SitemapEntry CreateEntryFromUrl(string urlValue)
         {
             var uri = WebLauncher.TryCreateWebUri(urlValue);
             if (uri == null)
@@ -153,8 +191,7 @@ namespace Fort.ind_UWP
             var path = uri.AbsolutePath.Trim('/');
             if (string.IsNullOrEmpty(path))
             {
-                return new SearchItem(LocalizedStrings.Get("SearchItemHome"),
-                                      AppConstants.CategoryFortWebsite, null, urlValue);
+                return new SitemapEntry { Title = null, CategoryKey = AppConstants.CategoryFortWebsite, Url = urlValue };
             }
 
             if (path == "404")
@@ -162,17 +199,21 @@ namespace Fort.ind_UWP
                 return null;
             }
 
-            var category = GetCategory(path);
-            var title = GetTitle(path);
-            return new SearchItem(title, category, null, urlValue);
+            return new SitemapEntry { Title = GetTitle(path), CategoryKey = GetCategory(path), Url = urlValue };
         }
 
-        private static List<SearchItem> BuildSearchItemsFromUrls(IEnumerable<string> urls)
+        /// <summary>
+        /// Must run on the UI thread - the SearchItem constructor resolves localized text.
+        /// </summary>
+        private static List<SearchItem> BuildSearchItems(List<SitemapEntry> entries)
         {
-            return urls
-                .Select(CreateSearchItemFromUrl)
-                .Where(item => item != null)
-                .ToList();
+            List<SearchItem> items = new List<SearchItem>(entries.Count);
+            foreach (var entry in entries)
+            {
+                var title = entry.Title ?? LocalizedStrings.Get("SearchItemHome");
+                items.Add(new SearchItem(title, entry.CategoryKey, null, entry.Url));
+            }
+            return items;
         }
 
         /// <summary>

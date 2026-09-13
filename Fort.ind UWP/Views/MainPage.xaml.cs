@@ -36,11 +36,17 @@ namespace Fort.ind_UWP
             AboutVersionText.Text = LocalizedStrings.Format("AboutVersionFormat", AppConstants.AppVersionDisplay);
             SetupTitleBar();
             UpdateProfileNavItem();
-            LoadSitemapItems();
             LoadAppearanceSettings();
 
+            // The sitemap load is queued at Low with the tile push, for the reason App.OnLaunched
+            // queues session restore there: started inline, its continuation (building ~300
+            // SearchItems) interleaved with the first layout pass and made the window stutter as it
+            // appeared. Search works in the meantime off the static items _allSearchItems starts
+            // with, and GamesPage loads through SitemapService on its own if it gets there first.
             var ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
-                                              () => UpdateLiveTile());
+                                              () => LoadSitemapItems());
+            ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
+                                          () => UpdateLiveTile());
 
             Unloaded += MainPage_Unloaded;
             Loaded += MainPage_Loaded;

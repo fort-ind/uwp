@@ -448,10 +448,24 @@ namespace Fort.ind_UWP
 
         private static AnimationBuilder s_panelEnterAnimation;
 
+        private static Windows.UI.ViewManagement.UISettings s_uiSettings;
+
         private void PlayPanelEnterAnimation()
         {
             try
             {
+                // Settings > Ease of Access > "Show animations in Windows" (doc dump chunk_119,
+                // "Animations settings"), which says apps should respond to it; this animation plays
+                // on every nav gesture and nothing checked it. Read on every call rather than cached, so
+                // flipping the setting while the app runs takes effect on the next nav gesture.
+                // Skipping leaves the panel at rest: a completed animation holds its final values,
+                // opacity 1 and no offset.
+                if (s_uiSettings == null)
+                {
+                    s_uiSettings = new Windows.UI.ViewManagement.UISettings();
+                }
+                if (!s_uiSettings.AnimationsEnabled) return;
+
                 if (s_panelEnterAnimation == null)
                 {
                     s_panelEnterAnimation = AnimationBuilder.Create()

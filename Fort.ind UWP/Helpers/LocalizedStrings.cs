@@ -63,8 +63,16 @@ namespace Fort.ind_UWP
 
         public static string Format(string key, params object[] args)
         {
-            var pattern = Get(key);
+            return FormatPattern(Get(key), key, args);
+        }
 
+        /// <summary>
+        /// <see cref="Format"/> for a pattern the caller already fetched with <see cref="Get"/>,
+        /// so a loop over many items resolves the resource once rather than once per item.
+        /// <paramref name="key"/> is only used for the diagnostic.
+        /// </summary>
+        public static string FormatPattern(string pattern, string key, params object[] args)
+        {
             try
             {
                 return string.Format(pattern, args);

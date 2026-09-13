@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -97,7 +98,34 @@ namespace Fort.ind_UWP
             // reads Category under Task.Run, and off the UI thread LocalizedStrings degrades to
             // returning the key. Every construction path runs on the UI thread.
             this.Category = GetCategoryDisplayName(this.CategoryKey);
-            this.FavoriteLabel = LocalizedStrings.Format("FavoriteToggleNameFormat", this.Title);
+            this.FavoriteLabel = LocalizedStrings.FormatPattern(GetFavoriteLabelPattern(), FavoriteLabelKey, this.Title);
+        }
+
+        private const string FavoriteLabelKey = "FavoriteToggleNameFormat";
+
+        // The sitemap builds ~300 of these in one go at startup, and there are only 16 category
+        // names and one label pattern among them - so they are resolved once each rather than
+        // making two resource-loader calls per item. Memoized only once the loader is really
+        // there, for the reason SearchCatalog.GetStaticItems gives: a lookup that degraded to the
+        // bare key must not be cached. No staleness is added by this: the items themselves are
+        // already memoized for the life of the process.
+        private static readonly object s_resourceCacheLock = new object();
+        private static readonly Dictionary<string, string> s_categoryDisplayNames =
+            new Dictionary<string, string>(StringComparer.Ordinal);
+        private static string s_favoriteLabelPattern;
+
+        private static string GetFavoriteLabelPattern()
+        {
+            var cached = s_favoriteLabelPattern;
+            if (cached != null) return cached;
+
+            var canCache = LocalizedStrings.IsAvailable;
+            var pattern = LocalizedStrings.Get(FavoriteLabelKey);
+            if (canCache)
+            {
+                s_favoriteLabelPattern = pattern;
+            }
+            return pattern;
         }
 
         private static string GetIconGlyph(string categoryKey)
@@ -116,6 +144,26 @@ namespace Fort.ind_UWP
         }
 
         private static string GetCategoryDisplayName(string categoryKey)
+        {
+            string name;
+            lock (s_resourceCacheLock)
+            {
+                if (s_categoryDisplayNames.TryGetValue(categoryKey, out name)) return name;
+            }
+
+            var canCache = LocalizedStrings.IsAvailable;
+            name = ResolveCategoryDisplayName(categoryKey);
+            if (canCache)
+            {
+                lock (s_resourceCacheLock)
+                {
+                    s_categoryDisplayNames[categoryKey] = name;
+                }
+            }
+            return name;
+        }
+
+        private static string ResolveCategoryDisplayName(string categoryKey)
         {
             switch (categoryKey)
             {
