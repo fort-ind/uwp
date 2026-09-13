@@ -1,12 +1,5 @@
-# Analyzer severities only - no formatting rules live here.
+# Microsoft.VisualStudio.Threading.Analyzers
 
 [*.cs]
 
-# Microsoft.VisualStudio.Threading.Analyzers
-#
-# VSTHRD100 flags every async void, event handlers included, and cannot tell a handler that is
-# fully wrapped in try/catch (this codebase's rule - see CLAUDE.md) from one that is not. As a
-# warning it would fire on every legitimate handler and make a warning-free build unreachable, so
-# it is kept visible in the IDE as a suggestion rather than switched off: a new async void still
-# shows up there, and whoever writes it still owes it the try/catch.
 dotnet_diagnostic.VSTHRD100.severity = suggestion
