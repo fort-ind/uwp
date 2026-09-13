@@ -468,7 +468,7 @@ Open your profile and try again.</value>
     <value>No bio yet</value>
   </data>
   <data name="CacheDescriptionText.Text" xml:space="preserve">
-    <value>Not signed in.</value>
+    <value>you arent logged in :(</value>
   </data>
   <data name="CancelSignInButton.Content" xml:space="preserve">
     <value>Cancel</value>
@@ -576,7 +576,7 @@ Open your profile and try again.</value>
     <value>Beta Programs</value>
   </data>
   <data name="MainBetaPrograms.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Join beta programs</value>
+    <value>join the beta</value>
   </data>
   <data name="MainBetaPrograms.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Beta Programs</value>
@@ -927,10 +927,10 @@ Open your profile and try again.</value>
     <value>Your favorites</value>
   </data>
   <data name="HomeFavoritesEmpty.Text" xml:space="preserve">
-    <value>star a game over in Games and it'll show up right here :3</value>
+    <value>when you star a game it will show here so you can easily get to em</value>
   </data>
   <data name="HomeFavoritesSeeAll.Content" xml:space="preserve">
-    <value>See all in Games</value>
+    <value>see all your games</value>
   </data>
   <data name="HomeFavoritesSeeAll.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
     <value>Go to the Games page to see every game you have favorited</value>
