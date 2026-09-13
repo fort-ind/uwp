@@ -2,9 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Geometry;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI;
 using Windows.Web.Http;
 
 namespace Fort.ind_UWP
@@ -91,21 +94,24 @@ namespace Fort.ind_UWP
                 var existing = await folder.TryGetItemAsync(fileName);
                 if (existing == null)
                 {
-                    var pixels = await TryRenderCircularPixelsAsync(sourceUri);
-                    if (pixels == null)
+                    var icon = await TryRenderCircularIconAsync(sourceUri);
+                    if (icon == null)
                     {
                         await Task.Delay(TransientRetryDelay);
-                        pixels = await TryRenderCircularPixelsAsync(sourceUri);
+                        icon = await TryRenderCircularIconAsync(sourceUri);
                     }
 
-                    if (pixels == null)
+                    if (icon == null)
                     {
                         return null;
                     }
 
-                    if (!await WritePngAsync(folder, fileName, pixels))
+                    using (icon)
                     {
-                        return null;
+                        if (!await WritePngAsync(folder, fileName, icon))
+                        {
+                            return null;
+                        }
                     }
                 }
 
@@ -131,11 +137,11 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<byte[]> TryRenderCircularPixelsAsync(Uri sourceUri)
+        private static async Task<CanvasRenderTarget> TryRenderCircularIconAsync(Uri sourceUri)
         {
             try
             {
-                return await RenderCircularPixelsAsync(sourceUri);
+                return await RenderCircularIconAsync(sourceUri);
             }
             catch (Exception ex)
             {
@@ -144,7 +150,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<byte[]> RenderCircularPixelsAsync(Uri sourceUri)
+        private static async Task<CanvasRenderTarget> RenderCircularIconAsync(Uri sourceUri)
         {
             var buffer = await s_client.Value.GetBufferAsync(sourceUri);
             if (buffer == null || buffer.Length == 0 || buffer.Length > MaxAvatarBytes)
@@ -181,55 +187,79 @@ namespace Fort.ind_UWP
                     Height = IconPixelSize
                 };
 
-                var pixelData = await decoder.GetPixelDataAsync(
+                // The decode stays on BitmapDecoder rather than CanvasBitmap.LoadAsync: the
+                // transform scales and crops during the decode, so an 8 MB source never has to fit
+                // in a GPU texture whole, and the EXIF behaviour above is the one already known to
+                // be right. Premultiplied, because that is what CreateFromSoftwareBitmap accepts.
+                using (var decoded = await decoder.GetSoftwareBitmapAsync(
                     BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Straight,
+                    BitmapAlphaMode.Premultiplied,
                     transform,
                     ExifOrientationMode.IgnoreExifOrientation,
-                    ColorManagementMode.DoNotColorManage);
-
-                var pixels = pixelData.DetachPixelData();
-
-                if (pixels.Length < IconPixelSize * IconPixelSize * 4)
+                    ColorManagementMode.DoNotColorManage))
                 {
-                    Debug.WriteLine($"AvatarIconService: unexpected pixel buffer size {pixels.Length}");
-                    return null;
-                }
-
-                ApplyCircularMask(pixels);
-                return pixels;
-            }
-        }
-
-        private static void ApplyCircularMask(byte[] pixels)
-        {
-            const double center = IconPixelSize / 2.0;
-
-            for (int y = 0; y < IconPixelSize; y++)
-            {
-                double dy = (y + 0.5) - center;
-                int rowStart = y * IconPixelSize * 4;
-
-                for (int x = 0; x < IconPixelSize; x++)
-                {
-                    double dx = (x + 0.5) - center;
-                    double coverage = center - Math.Sqrt((dx * dx) + (dy * dy)) + 0.5;
-
-                    if (coverage >= 1.0)
+                    if (decoded.PixelWidth != IconPixelSize || decoded.PixelHeight != IconPixelSize)
                     {
-                        continue;
+                        Debug.WriteLine($"AvatarIconService: unexpected decode size {decoded.PixelWidth}x{decoded.PixelHeight}");
+                        return null;
                     }
 
-                    int alphaIndex = rowStart + (x * 4) + 3;
-
-                    pixels[alphaIndex] = coverage <= 0.0
-                        ? (byte)0
-                        : (byte)Math.Round(pixels[alphaIndex] * coverage, MidpointRounding.ToEven);
+                    return DrawCircularIcon(decoded);
                 }
             }
         }
 
-        private static async Task<bool> WritePngAsync(StorageFolder folder, string fileName, byte[] pixels)
+        /// <summary>
+        /// Draws <paramref name="decoded"/> through an antialiased circular clip into a new
+        /// transparent render target. The caller owns (and must dispose) the result.
+        /// </summary>
+        /// <remarks>
+        /// GetSharedDevice re-creates the device itself if it has been lost, so a device-lost
+        /// failure here only needs reporting: the retry in GetCircularAvatarUriAsync then runs
+        /// against a fresh device.
+        /// </remarks>
+        private static CanvasRenderTarget DrawCircularIcon(SoftwareBitmap decoded)
+        {
+            var device = CanvasDevice.GetSharedDevice();
+            CanvasRenderTarget target = null;
+
+            try
+            {
+                // 96 DPI makes one DIP one pixel, so every coordinate below is in pixels.
+                target = new CanvasRenderTarget(device, IconPixelSize, IconPixelSize, 96);
+
+                using (var source = CanvasBitmap.CreateFromSoftwareBitmap(device, decoded))
+                using (var session = target.CreateDrawingSession())
+                {
+                    // A render target starts with undefined content, not transparent.
+                    session.Clear(Colors.Transparent);
+                    session.Antialiasing = CanvasAntialiasing.Antialiased;
+
+                    float radius = IconPixelSize / 2f;
+                    using (var circle = CanvasGeometry.CreateCircle(device, radius, radius, radius))
+                    using (session.CreateLayer(1f, circle))
+                    {
+                        session.DrawImage(source);
+                    }
+                }
+
+                return target;
+            }
+            catch (Exception ex) when (device.IsDeviceLost(ex.HResult))
+            {
+                target?.Dispose();
+                device.RaiseDeviceLost();
+                Debug.WriteLine("AvatarIconService: graphics device lost while drawing the avatar");
+                return null;
+            }
+            catch
+            {
+                target?.Dispose();
+                throw;
+            }
+        }
+
+        private static async Task<bool> WritePngAsync(StorageFolder folder, string fileName, CanvasRenderTarget icon)
         {
             var tempFile = await folder.CreateFileAsync(fileName + ".tmp", CreationCollisionOption.ReplaceExisting);
 
@@ -237,16 +267,7 @@ namespace Fort.ind_UWP
             {
                 using (var fileStream = await tempFile.OpenAsync(FileAccessMode.ReadWrite))
                 {
-                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, fileStream);
-                    encoder.SetPixelData(
-                        BitmapPixelFormat.Bgra8,
-                        BitmapAlphaMode.Straight,
-                        IconPixelSize,
-                        IconPixelSize,
-                        96,
-                        96,
-                        pixels);
-                    await encoder.FlushAsync();
+                    await icon.SaveAsync(fileStream, CanvasBitmapFileFormat.Png);
                 }
 
                 await tempFile.RenameAsync(fileName, NameCollisionOption.ReplaceExisting);

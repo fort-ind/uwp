@@ -10,6 +10,36 @@ namespace Fort.ind_UWP
 {
     public sealed partial class MainPage : Page
     {
+        private bool _systemInfoResolved = false;
+
+        // Called when Settings is shown rather than from the constructor: SystemInformation.Instance
+        // builds itself on first touch - an EasClientDeviceInformation query plus a handful of
+        // LocalSettings reads and writes (the toolkit's first-run and version-tracking keys) -
+        // none of which the launch path needs. Its constructor can also throw (it parses the
+        // DeviceFamilyVersion string), which surfaces as a TypeInitializationException, so the
+        // line simply stays hidden if it does.
+        private void UpdateSystemInfo()
+        {
+            if (_systemInfoResolved) return;
+            _systemInfoResolved = true;
+
+            try
+            {
+                var info = Microsoft.Toolkit.Uwp.Helpers.SystemInformation.Instance;
+                var os = info.OperatingSystemVersion;
+                var version = $"{os.Major}.{os.Minor}.{os.Build}.{os.Revision}";
+                var architecture = info.OperatingSystemArchitecture.ToString().ToLowerInvariant();
+
+                AboutSystemInfoText.Text = LocalizedStrings.Format("AboutSystemInfoFormat", version, architecture);
+                AboutSystemInfoText.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: UpdateSystemInfo failed - {ex.GetType().Name}: {ex.Message}");
+                AboutSystemInfoText.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private void UpdateStorageInfo()
         {
             try
