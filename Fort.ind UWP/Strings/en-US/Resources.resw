@@ -190,19 +190,19 @@
     <value>This is permanent - everything fort.desktop has saved will be deleted and cannot be recovered.</value>
   </data>
   <data name="ResetConfirmDialogConfirm" xml:space="preserve">
-    <value>Yes, Reset Everything</value>
+    <value>yup, im sure :(</value>
   </data>
   <data name="ResetDoneDialogTitle" xml:space="preserve">
-    <value>Reset complete</value>
+    <value>done</value>
   </data>
   <data name="ResetDoneDialogBody" xml:space="preserve">
-    <value>fort.desktop has been reset to a fresh install. Restart the app now for everything to take full effect.</value>
+    <value>your done! restart the app so we can finish cleaning up a few things</value>
   </data>
   <data name="ResetDoneDialogRestart" xml:space="preserve">
-    <value>Restart Now</value>
+    <value>alright</value>
   </data>
   <data name="ResetDoneDialogLater" xml:space="preserve">
-    <value>Later</value>
+    <value>ill do it later..</value>
   </data>
   <data name="WelcomeDialogTitle" xml:space="preserve">
     <value>Hi :)</value>
@@ -405,10 +405,10 @@ Open your profile and try again.</value>
     <value>Couldn't open your browser to sign in.</value>
   </data>
   <data name="SignInErrorTimedOut" xml:space="preserve">
-    <value>Sign-in timed out. Please try again.</value>
+    <value>seems like that took a bit longer than we expected.. try that again</value>
   </data>
   <data name="SignInErrorCancelled" xml:space="preserve">
-    <value>Sign-in was cancelled.</value>
+    <value>seems like you canceled logging in </value>
   </data>
   <data name="SignInErrorUnrecognizedCallback" xml:space="preserve">
     <value>That sign-in link wasn't recognized.</value>
@@ -417,19 +417,19 @@ Open your profile and try again.</value>
     <value>The sign-in link was missing its session information.</value>
   </data>
   <data name="SignInErrorInvalidLink" xml:space="preserve">
-    <value>This sign-in link isn't valid anymore.</value>
+    <value>the link expired :( - try logging in again</value>
   </data>
   <data name="SignInErrorNotApproved" xml:space="preserve">
-    <value>fort.social didn't approve the sign-in.</value>
+    <value>it seems like you did not approve the login, try it again?</value>
   </data>
   <data name="SignInErrorNoToken" xml:space="preserve">
-    <value>fort.social didn't send back an access token.</value>
+    <value>we did not get a token.. try logging in again</value>
   </data>
   <data name="SignInErrorNoAccount" xml:space="preserve">
     <value>fort.social didn't send back your account details.</value>
   </data>
   <data name="SignInErrorUnreachable" xml:space="preserve">
-    <value>Couldn't reach fort.social.</value>
+    <value>hm, we cant reach fort.social right now :( check your connection, or make sure we arent down</value>
   </data>
   <data name="SignInToastTitle" xml:space="preserve">
     <value>You're signed in</value>
@@ -515,7 +515,7 @@ Open your profile and try again.</value>
     <value>Fort.ind</value>
   </data>
   <data name="BioText.Text" xml:space="preserve">
-    <value>No bio yet</value>
+    <value>No bio yet.. go make one! tell people who you are :)</value>
   </data>
   <data name="CacheDescriptionText.Text" xml:space="preserve">
     <value>you arent logged in :(</value>
@@ -539,7 +539,7 @@ Open your profile and try again.</value>
     <value>Display Name</value>
   </data>
   <data name="EmptyText.Text" xml:space="preserve">
-    <value>No games match that filter</value>
+    <value>no games were found :( ouch</value>
   </data>
   <data name="FilterBox.PlaceholderText" xml:space="preserve">
     <value>search for games :p</value>
@@ -857,7 +857,7 @@ Open your profile and try again.</value>
     <value>Sign In</value>
   </data>
   <data name="SitemapLoadingBar.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Loading site content</value>
+    <value>finishing up..</value>
   </data>
   <data name="SkipButton.Content" xml:space="preserve">
     <value>skip connecting your account</value>
