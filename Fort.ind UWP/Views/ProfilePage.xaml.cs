@@ -19,6 +19,14 @@ namespace Fort.ind_UWP
         public ProfilePage()
         {
             this.InitializeComponent();
+
+            // Cached, like GamesPage, so switching between Profile and Games in the pane does not
+            // re-parse this page and rebuild its acrylic cards every time. Enabled rather than
+            // Required so the Frame may still evict it. Nothing here depends on a fresh instance:
+            // Loaded runs RefreshUI on every visit, and the auth handler is detached in Unloaded
+            // and reattached behind _authHandlerAttached.
+            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+
             Loaded += ProfilePage_Loaded;
             Unloaded += ProfilePage_Unloaded;
         }

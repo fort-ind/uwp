@@ -81,34 +81,65 @@ namespace Fort.ind_UWP
                 case AppConstants.ThemeDark: rootFrame.RequestedTheme = ElementTheme.Dark; break;
                 default: rootFrame.RequestedTheme = ElementTheme.Default; break;
             }
-            if (!_loadingSettings)
+            if (_loadingSettings)
             {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTheme] = theme;
+                // LoadAppearanceSettings applies the tint itself straight after this.
+                UpdateTitleBarColors();
+                return;
             }
-            UpdateTitleBarColors();
-            if (!_loadingSettings)
-            {
-                var savedTint = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
-                if (string.IsNullOrEmpty(savedTint)) savedTint = AppConstants.ThemeDefault;
-                ApplyTintColor(savedTint);
-                UpdateTintSelection(savedTint);
-            }
+
+            ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTheme] = theme;
+            RepaintThemeDependentChrome();
         }
 
         private void OnActualThemeChanged(FrameworkElement sender, object args)
         {
             try
             {
-                UpdateTitleBarColors();
-                var savedTint = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
-                if (string.IsNullOrEmpty(savedTint)) savedTint = AppConstants.ThemeDefault;
-                ApplyTintColor(savedTint);
-                UpdateTintSelection(savedTint);
+                RepaintThemeDependentChrome();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"MainPage: OnActualThemeChanged failed – {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// The (effective theme, tint) pair the chrome was last fully repainted for, or null when
+        /// something has painted the tint since and the pair can no longer be trusted.
+        /// </summary>
+        private string _themePaintKey;
+
+        /// <summary>
+        /// Title bar, acrylic tint and swatches for the current effective theme and saved tint -
+        /// skipped when they are already painted for exactly that pair.
+        /// </summary>
+        /// <remarks>
+        /// Both ApplyTheme and OnActualThemeChanged repaint, and setting RequestedTheme raises
+        /// ActualThemeChanged, so an explicit Light/Dark switch used to do the whole repaint twice.
+        /// Neither call can simply be dropped. ActualThemeChanged does not fire when the effective
+        /// theme stays the same (Dark to System on a dark PC), so ApplyTheme must paint; and for
+        /// System, ActualTheme can lag RequestedTheme, so ApplyTheme may paint the old theme and
+        /// the event is what corrects it. Keying on what was actually painted keeps both and makes
+        /// whichever runs second a no-op only when it would repaint the same thing.
+        ///
+        /// ApplyTintColor clears the key, so a swatch click, the custom-colour preview or a
+        /// settings reload - none of which go through here - can never leave it vouching for a
+        /// paint that has since been replaced.
+        /// </remarks>
+        private void RepaintThemeDependentChrome()
+        {
+            var savedTint = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
+            if (string.IsNullOrEmpty(savedTint)) savedTint = AppConstants.ThemeDefault;
+
+            var key = (IsEffectiveThemeDark() ? "Dark|" : "Light|") + savedTint;
+            if (string.Equals(key, _themePaintKey, StringComparison.Ordinal)) return;
+
+            UpdateTitleBarColors();
+            ApplyTintColor(savedTint);
+            UpdateTintSelection(savedTint);
+
+            _themePaintKey = key;
         }
 
         private AcrylicBrush _surfaceBrush;
@@ -119,6 +150,8 @@ namespace Fort.ind_UWP
 
         private void ApplyTintColor(string colorTag)
         {
+            _themePaintKey = null;
+
             // Normalise an unusable tag up front, before anything can persist it. The catch below
             // used to swallow the parse failure and the write at the bottom then stored the bad tag
             // anyway - so one corrupt value made every subsequent launch fail in exactly the same

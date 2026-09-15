@@ -23,4 +23,3 @@ for some reason, those flags are needed otherwise, it explodes :(
 ## Credits to the really cool dependencies we used
 * [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows) 
 * [microsoft ui xaml](https://github.com/microsoft/microsoft-ui-XAML) 
-* [win2D](https://github.com/microsoft/Win2D/tree/uwp/main) 

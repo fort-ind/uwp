@@ -52,6 +52,10 @@ namespace Fort.ind_UWP
 
         public const string SettingJumpListRevision = "JumpListRevision";
 
+        // Set once AvatarIconService has swept LocalFolder for avatar PNGs left by builds that
+        // never pruned. After that, pruning only follows a write.
+        public const string SettingAvatarLegacySweepDone = "AvatarLegacySweepDone";
+
         public const int SearchDebounceMilliseconds = 300;
         public const int SearchSuggestionLimit = 15;
 

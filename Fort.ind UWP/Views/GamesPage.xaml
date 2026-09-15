@@ -48,7 +48,13 @@
                            VerticalAlignment="Bottom"
                            AutomationProperties.AccessibilityView="Raw"/>
 
+                <!-- x:Phase="1" here and on the star: a container realised during a fast scroll or a
+                     jump from the zoomed-out grid renders its icon and title first, and the
+                     secondary text and the ToggleButton (a templated control, by far the heaviest
+                     part of the row) bind on a later pass. Doc dump chunk_078, "Progressive data
+                     template updates using x:Phase". -->
                 <TextBlock Grid.Column="1" Grid.Row="1"
+                           x:Phase="1"
                            Text="{x:Bind Category}"
                            Style="{StaticResource BodyTextBlockStyle}"
                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
@@ -71,6 +77,7 @@
                      every other glyph in the app it is the control's only content, not decoration
                      sitting beside a label that already names the thing. -->
                 <ToggleButton Grid.Column="2" Grid.RowSpan="2"
+                              x:Phase="1"
                               Style="{StaticResource ToggleButtonRevealStyle}"
                               IsChecked="{x:Bind IsFavorite, Mode=OneWay}"
                               AutomationProperties.Name="{x:Bind FavoriteLabel}"
@@ -82,7 +89,8 @@
                               Margin="12,0,0,0"
                               Checked="FavoriteToggle_Checked"
                               Unchecked="FavoriteToggle_Unchecked">
-                    <FontIcon Glyph="{x:Bind FavoriteGlyph, Mode=OneWay}"
+                    <FontIcon x:Phase="1"
+                              Glyph="{x:Bind FavoriteGlyph, Mode=OneWay}"
                               FontFamily="{StaticResource SymbolThemeFontFamily}"
                               FontSize="16"
                               IsTextScaleFactorEnabled="False"/>

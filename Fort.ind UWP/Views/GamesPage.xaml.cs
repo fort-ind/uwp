@@ -25,7 +25,36 @@ namespace Fort.ind_UWP
             Failed
         }
 
-        private readonly ObservableCollection<GameGroup> _groups = new ObservableCollection<GameGroup>();
+        private readonly GroupCollection _groups = new GroupCollection();
+
+        /// <summary>
+        /// An ObservableCollection whose contents can be swapped with a single Reset.
+        /// </summary>
+        /// <remarks>
+        /// The filter used to Clear() and then Add each group, which is one Reset followed by up to
+        /// 27 Add notifications per debounced keystroke - and the grouped view and both
+        /// SemanticZoom views react to every one of them. The instance is still mutated in place
+        /// rather than replaced, because GamesViewSource.Source and both ItemsSources hold it (see
+        /// EnsureItemsSources).
+        /// </remarks>
+        private sealed class GroupCollection : ObservableCollection<GameGroup>
+        {
+            public void ReplaceAll(IEnumerable<GameGroup> groups)
+            {
+                CheckReentrancy();
+
+                Items.Clear();
+                foreach (var group in groups)
+                {
+                    Items.Add(group);
+                }
+
+                OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("Count"));
+                OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("Item[]"));
+                OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(
+                    System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
+            }
+        }
 
         private readonly CollectionViewSource _viewSource;
 
@@ -217,11 +246,7 @@ namespace Fort.ind_UWP
                 GamesZoom.IsZoomedInViewActive = true;
             }
 
-            _groups.Clear();
-            foreach (var group in BuildGroups(matches))
-            {
-                _groups.Add(group);
-            }
+            _groups.ReplaceAll(BuildGroups(matches));
         }
 
         private static List<GameGroup> BuildGroups(IEnumerable<SearchItem> items)

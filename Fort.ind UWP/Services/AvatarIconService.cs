@@ -2,12 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Graphics.Canvas;
-using Microsoft.Graphics.Canvas.Geometry;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI;
 using Windows.Web.Http;
 
 namespace Fort.ind_UWP
@@ -96,33 +93,35 @@ namespace Fort.ind_UWP
                 var existing = await folder.TryGetItemAsync(fileName);
                 if (existing == null)
                 {
-                    var icon = await TryRenderCircularIconAsync(sourceUri);
-                    if (icon == null)
+                    var pixels = await TryRenderCircularIconAsync(sourceUri);
+                    if (pixels == null)
                     {
                         await Task.Delay(TransientRetryDelay);
-                        icon = await TryRenderCircularIconAsync(sourceUri);
+                        pixels = await TryRenderCircularIconAsync(sourceUri);
                     }
 
-                    if (icon == null)
+                    if (pixels == null)
                     {
                         return null;
                     }
 
-                    using (icon)
+                    if (!await WritePngAsync(folder, fileName, pixels))
                     {
-                        if (!await WritePngAsync(folder, fileName, icon))
-                        {
-                            return null;
-                        }
+                        return null;
                     }
-                }
 
-                // Outside the write branch on purpose. Getting this far means the memoized URI did
-                // not match, which happens at most once per avatar per process - cheap enough to
-                // enumerate the folder for - and doing it here also sweeps up files that
-                // accumulated before there was any pruning at all, which a write-only prune would
-                // leave behind forever for anyone whose avatar never changes again.
-                await PruneOtherAvatarsAsync(folder, fileName);
+                    // A new file is the only thing that can leave an old one behind, so this is
+                    // where pruning belongs.
+                    await PruneOtherAvatarsAsync(folder, fileName);
+                }
+                else
+                {
+                    // The common case - the same avatar as last launch - used to enumerate
+                    // LocalFolder on every single start, because the memoized URI is per process.
+                    // Only files that predate any pruning at all still need that, and one sweep
+                    // clears them for good.
+                    await SweepLegacyAvatarsOnceAsync(folder, fileName);
+                }
 
                 s_cachedUrl = avatarUrl;
                 s_cachedUri = localUri;
@@ -139,7 +138,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<CanvasRenderTarget> TryRenderCircularIconAsync(Uri sourceUri)
+        private static async Task<byte[]> TryRenderCircularIconAsync(Uri sourceUri)
         {
             try
             {
@@ -225,7 +224,11 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<CanvasRenderTarget> RenderCircularIconAsync(Uri sourceUri)
+        /// <summary>
+        /// Downloads, centre-crops and circle-masks the avatar. Returns straight-alpha BGRA8
+        /// pixels, <see cref="IconPixelSize"/> square, or null.
+        /// </summary>
+        private static async Task<byte[]> RenderCircularIconAsync(Uri sourceUri)
         {
             var downloaded = await DownloadCappedAsync(sourceUri);
             if (downloaded == null)
@@ -257,79 +260,67 @@ namespace Fort.ind_UWP
                     Height = IconPixelSize
                 };
 
-                // The decode stays on BitmapDecoder rather than CanvasBitmap.LoadAsync: the
-                // transform scales and crops during the decode, so an 8 MB source never has to fit
-                // in a GPU texture whole, and the EXIF behaviour above is the one already known to
-                // be right. Premultiplied, because that is what CreateFromSoftwareBitmap accepts.
-                using (var decoded = await decoder.GetSoftwareBitmapAsync(
+                // The transform scales and crops during the decode, so an 8 MB source is never
+                // held whole. Straight alpha, not premultiplied: the circle mask below then only has
+                // to scale the alpha channel, and it is what the PNG encoder stores anyway.
+                var pixelData = await decoder.GetPixelDataAsync(
                     BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Premultiplied,
+                    BitmapAlphaMode.Straight,
                     transform,
                     ExifOrientationMode.IgnoreExifOrientation,
-                    ColorManagementMode.DoNotColorManage))
-                {
-                    if (decoded.PixelWidth != IconPixelSize || decoded.PixelHeight != IconPixelSize)
-                    {
-                        Debug.WriteLine($"AvatarIconService: unexpected decode size {decoded.PixelWidth}x{decoded.PixelHeight}");
-                        return null;
-                    }
+                    ColorManagementMode.DoNotColorManage);
 
-                    return DrawCircularIcon(decoded);
+                var pixels = pixelData.DetachPixelData();
+                if (pixels == null || pixels.Length != IconPixelSize * IconPixelSize * 4)
+                {
+                    Debug.WriteLine($"AvatarIconService: unexpected decode size {pixels?.Length ?? 0} bytes");
+                    return null;
                 }
+
+                ApplyCircleMask(pixels, IconPixelSize);
+                return pixels;
             }
         }
 
         /// <summary>
-        /// Draws <paramref name="decoded"/> through an antialiased circular clip into a new
-        /// transparent render target. The caller owns (and must dispose) the result.
+        /// Scales each pixel's alpha by how much of it lies inside the inscribed circle, which
+        /// antialiases the edge by about one pixel.
         /// </summary>
         /// <remarks>
-        /// GetSharedDevice re-creates the device itself if it has been lost, so a device-lost
-        /// failure here only needs reporting: the retry in GetCircularAvatarUriAsync then runs
-        /// against a fresh device.
+        /// This used to be a Win2D layer clip. At 48x48 that meant creating a Direct3D device and
+        /// shipping a native graphics library to touch 2,304 pixels; the arithmetic is the same
+        /// coverage estimate its antialiaser makes along an edge, done on the CPU.
         /// </remarks>
-        private static CanvasRenderTarget DrawCircularIcon(SoftwareBitmap decoded)
+        private static void ApplyCircleMask(byte[] bgra, int size)
         {
-            var device = CanvasDevice.GetSharedDevice();
-            CanvasRenderTarget target = null;
+            double radius = size / 2.0;
 
-            try
+            for (int y = 0; y < size; y++)
             {
-                // 96 DPI makes one DIP one pixel, so every coordinate below is in pixels.
-                target = new CanvasRenderTarget(device, IconPixelSize, IconPixelSize, 96);
-
-                using (var source = CanvasBitmap.CreateFromSoftwareBitmap(device, decoded))
-                using (var session = target.CreateDrawingSession())
+                double dy = y + 0.5 - radius;
+                for (int x = 0; x < size; x++)
                 {
-                    // A render target starts with undefined content, not transparent.
-                    session.Clear(Colors.Transparent);
-                    session.Antialiasing = CanvasAntialiasing.Antialiased;
+                    double dx = x + 0.5 - radius;
+                    double distance = Math.Sqrt(dx * dx + dy * dy);
 
-                    float radius = IconPixelSize / 2f;
-                    using (var circle = CanvasGeometry.CreateCircle(device, radius, radius, radius))
-                    using (session.CreateLayer(1f, circle))
+                    // 1 inside, 0 outside, a linear ramp across the pixel the edge passes through.
+                    double coverage = radius - distance + 0.5;
+                    if (coverage >= 1.0) continue;
+
+                    int alphaIndex = (y * size + x) * 4 + 3;
+                    if (coverage <= 0.0)
                     {
-                        session.DrawImage(source);
+                        bgra[alphaIndex] = 0;
+                    }
+                    else
+                    {
+                        bgra[alphaIndex] = (byte)Math.Round(bgra[alphaIndex] * coverage, MidpointRounding.ToEven);
                     }
                 }
-
-                return target;
-            }
-            catch (Exception ex) when (device.IsDeviceLost(ex.HResult))
-            {
-                target?.Dispose();
-                device.RaiseDeviceLost();
-                Debug.WriteLine("AvatarIconService: graphics device lost while drawing the avatar");
-                return null;
-            }
-            catch
-            {
-                target?.Dispose();
-                throw;
             }
         }
 
-        private static async Task<bool> WritePngAsync(StorageFolder folder, string fileName, CanvasRenderTarget icon)
+        private static async Task<bool> WritePngAsync(StorageFolder folder, string fileName, byte[] pixels)
         {
             var tempFile = await folder.CreateFileAsync(fileName + ".tmp", CreationCollisionOption.ReplaceExisting);
 
@@ -337,7 +328,10 @@ namespace Fort.ind_UWP
             {
                 using (var fileStream = await tempFile.OpenAsync(FileAccessMode.ReadWrite))
                 {
-                    await icon.SaveAsync(fileStream, CanvasBitmapFileFormat.Png);
+                    var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, fileStream);
+                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight,
+                                         (uint)IconPixelSize, (uint)IconPixelSize, 96, 96, pixels);
+                    await encoder.FlushAsync();
                 }
 
                 await tempFile.RenameAsync(fileName, NameCollisionOption.ReplaceExisting);
@@ -372,7 +366,8 @@ namespace Fort.ind_UWP
         /// sharing this folder are never in scope - and .tmp leftovers match the prefix too,
         /// so they get swept up here as well.
         /// </remarks>
-        private static async Task PruneOtherAvatarsAsync(StorageFolder folder, string keepFileName)
+        /// <returns>False if the folder could not be enumerated at all.</returns>
+        private static async Task<bool> PruneOtherAvatarsAsync(StorageFolder folder, string keepFileName)
         {
             try
             {
@@ -393,10 +388,41 @@ namespace Fort.ind_UWP
                         Debug.WriteLine($"AvatarIconService: could not delete stale avatar {file.Name} - {ex.Message}");
                     }
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"AvatarIconService: avatar prune failed - {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Runs <see cref="PruneOtherAvatarsAsync"/> once per install, for avatar files written by
+        /// builds that never pruned. Gated on a LocalSettings flag, which is an in-memory lookup,
+        /// so the steady state costs no file-system call.
+        /// </summary>
+        /// <remarks>
+        /// An app-data reset clears the flag along with LocalFolder, so the sweep runs once more
+        /// against a folder that is already empty - harmless. The flag is only set when the
+        /// enumeration worked, so a failure is retried next launch.
+        /// </remarks>
+        private static async Task SweepLegacyAvatarsOnceAsync(StorageFolder folder, string keepFileName)
+        {
+            try
+            {
+                var values = ApplicationData.Current.LocalSettings.Values;
+                if (values.ContainsKey(AppConstants.SettingAvatarLegacySweepDone)) return;
+
+                if (await PruneOtherAvatarsAsync(folder, keepFileName))
+                {
+                    values[AppConstants.SettingAvatarLegacySweepDone] = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AvatarIconService: legacy avatar sweep failed - {ex.Message}");
             }
         }
 

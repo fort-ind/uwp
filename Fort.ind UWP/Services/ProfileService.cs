@@ -169,6 +169,12 @@ namespace Fort.ind_UWP
 
                 if (fetched.Profile == null) return;
 
+                // The usual answer is "nothing changed", and acting on it anyway rewrote the cache
+                // file and raised AuthStateChanged on every launch - repainting the nav item,
+                // Settings > Data storage and ProfilePage for a profile identical to the one they
+                // were already showing.
+                if (HasSameAccountDetails(CurrentUser, fetched.Profile)) return;
+
                 fetched.Profile.LastLoginDate = lastLoginDate;
                 CurrentUser = fetched.Profile;
                 await LocalStorageService.SaveProfileAsync(fetched.Profile);
@@ -178,6 +184,29 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"RefreshCurrentUserInBackground failed: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// True when <paramref name="fetched"/> carries nothing <paramref name="current"/> does not
+        /// already show - i.e. every field /api/i supplies is unchanged.
+        /// </summary>
+        /// <remarks>
+        /// LastLoginDate and Preferences are deliberately not compared: the instance supplies
+        /// neither. CreatedDate compares by Ticks because the cache's JSON round trip can change a
+        /// DateTime's Kind but not its instant. A false mismatch costs nothing but the save and
+        /// event this exists to skip.
+        /// </remarks>
+        private static bool HasSameAccountDetails(UserProfile current, UserProfile fetched)
+        {
+            if (current == null || fetched == null) return false;
+
+            return string.Equals(current.UserId, fetched.UserId, StringComparison.Ordinal)
+                   && string.Equals(current.Username, fetched.Username, StringComparison.Ordinal)
+                   && string.Equals(current.Host, fetched.Host, StringComparison.Ordinal)
+                   && string.Equals(current.DisplayName, fetched.DisplayName, StringComparison.Ordinal)
+                   && string.Equals(current.Bio, fetched.Bio, StringComparison.Ordinal)
+                   && string.Equals(current.AvatarUrl, fetched.AvatarUrl, StringComparison.Ordinal)
+                   && current.CreatedDate.Ticks == fetched.CreatedDate.Ticks;
         }
     }
 
