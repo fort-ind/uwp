@@ -8,8 +8,6 @@ namespace Fort.ind_UWP
 {
     public sealed partial class LoginPage : Page
     {
-        private const string SkipHintSeenKey = "HasSeenSkipSignInTip";
-
         public LoginPage()
         {
             this.InitializeComponent();
@@ -17,11 +15,21 @@ namespace Fort.ind_UWP
 
         private void LoginPage_Loaded(object sender, RoutedEventArgs e)
         {
-            var settings = ApplicationData.Current.LocalSettings;
-            if (!settings.Values.ContainsKey(SkipHintSeenKey))
+            // Guarded because an exception escaping a Loaded handler is unhandled and takes the
+            // app down - and this one reads LocalSettings, which is exactly the kind of thing
+            // LoadAppearanceSettings already wraps for the same reason.
+            try
             {
-                settings.Values[SkipHintSeenKey] = true;
-                SkipHintTip.IsOpen = true;
+                var settings = ApplicationData.Current.LocalSettings;
+                if (!settings.Values.ContainsKey(AppConstants.SettingHasSeenSkipSignInTip))
+                {
+                    settings.Values[AppConstants.SettingHasSeenSkipSignInTip] = true;
+                    SkipHintTip.IsOpen = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"LoginPage: skip-hint tip failed - {ex.Message}");
             }
         }
 
@@ -84,10 +92,22 @@ namespace Fort.ind_UWP
             }
         }
 
+        /// <summary>
+        /// Shows the sign-in error and announces it.
+        /// </summary>
+        /// <remarks>
+        /// The announcement is not optional decoration: the error appears with no focus change and
+        /// no new focusable element, so without it a screen-reader user is told nothing at all and
+        /// the page simply looks like it did nothing. ErrorText's LiveSetting="Assertive" only
+        /// declares the politeness level - see AutomationHelper.AnnounceLiveRegion. Raised after
+        /// the text is set, which is the order the docs require.
+        /// </remarks>
         private void ShowError(string message)
         {
             ErrorText.Text = message;
             ErrorText.Visibility = Visibility.Visible;
+
+            AutomationHelper.AnnounceLiveRegion(ErrorText);
         }
 
         private void ShowLoading(bool show)
@@ -95,6 +115,13 @@ namespace Fort.ind_UWP
             LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
             SignInButton.IsEnabled = !show;
             SkipButton.IsEnabled = !show;
+
+            // Only on the way in. The overlay going away is followed either by GoBackToProfile or
+            // by ShowError, both of which say something of their own.
+            if (show)
+            {
+                AutomationHelper.AnnounceLiveRegion(WaitingText);
+            }
         }
     }
 }

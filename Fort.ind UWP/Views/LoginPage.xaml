@@ -28,7 +28,8 @@
                     <StackPanel HorizontalAlignment="Center" Margin="0,0,0,16">
                         <FontIcon Glyph="&#xE72E;"
                                   FontSize="48"
-                                  HorizontalAlignment="Center"/>
+                                  HorizontalAlignment="Center"
+                                  AutomationProperties.AccessibilityView="Raw"/>
                         <TextBlock x:Uid="LoginFortDesktop"
                                    Style="{StaticResource TitleTextBlockStyle}"
                                    HorizontalAlignment="Center"/>
@@ -59,7 +60,7 @@
                             Click="SignInButton_Click"
                             Style="{StaticResource AccentButtonStyle}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-                            <FontIcon Glyph="&#xE774;" FontSize="14"/>
+                            <FontIcon Glyph="&#xE774;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
                             <TextBlock x:Uid="LoginSignInWithFort"/>
                         </StackPanel>
                     </Button>
@@ -80,7 +81,9 @@
               Visibility="Collapsed">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
                 <ProgressRing x:Uid="LoginWaitingForSignIn" IsActive="True" Width="40" Height="40" HorizontalAlignment="Center"/>
-                <TextBlock x:Uid="LoginWaitingForFortSocial" Margin="0,12,0,0"
+                <!-- Named so ShowLoading can raise LiveRegionChanged on it: LiveSetting alone
+                     announces nothing (see AutomationHelper.AnnounceLiveRegion). -->
+                <TextBlock x:Uid="LoginWaitingForFortSocial" x:Name="WaitingText" Margin="0,12,0,0"
                            Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
                            TextAlignment="Center"
                            AutomationProperties.LiveSetting="Polite"/>

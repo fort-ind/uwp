@@ -60,7 +60,12 @@ namespace Fort.ind_UWP
 
         private IReadOnlyList<SearchItem> _allGames = Array.Empty<SearchItem>();
 
-        private CancellationTokenSource _filterDebounceCts;
+        /// <summary>
+        /// The shared debouncer, not a hand-rolled CancellationTokenSource field. It already gets
+        /// the ordering right - Cancel nulls the field before disposing, so a late caller can
+        /// never reach a dead source - and MainPage's search box uses the same one.
+        /// </summary>
+        private readonly Debouncer _filterDebounce = new Debouncer();
 
         private bool _dataLoaded = false;
 
@@ -127,7 +132,7 @@ namespace Fort.ind_UWP
 
         private void GamesPage_Unloaded(object sender, RoutedEventArgs e)
         {
-            CancelPendingFilter();
+            _filterDebounce.Cancel();
         }
 
         private void RetryButton_Click(object sender, RoutedEventArgs e)
@@ -173,11 +178,7 @@ namespace Fort.ind_UWP
         {
             if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
 
-            CancelPendingFilter();
-
-            CancellationTokenSource cts = new CancellationTokenSource();
-            _filterDebounceCts = cts;
-            ApplyFilterDebounced(sender.Text, cts.Token);
+            ApplyFilterDebounced(sender.Text, _filterDebounce.Restart());
         }
 
         private async void ApplyFilterDebounced(string query, CancellationToken cancellationToken)
@@ -314,6 +315,38 @@ namespace Fort.ind_UWP
 
             LoadingRing.IsActive = (state == GamesPageState.Loading);
             FilterBox.IsEnabled = (state == GamesPageState.Content || state == GamesPageState.Empty);
+
+            AnnounceState(state);
+        }
+
+        /// <summary>
+        /// Speaks whichever state text has just become the live one.
+        /// </summary>
+        /// <remarks>
+        /// The AutomationProperties.LiveSetting values in the markup only declare a politeness
+        /// level - nothing at all is announced until LiveRegionChanged is raised, which is what
+        /// AutomationHelper.AnnounceLiveRegion does. Driven from SetState because that is the one
+        /// point every transition passes through, and each text is written before it runs:
+        /// UpdateCountText precedes it and ApplyFilter sets EmptyText.Text first.
+        ///
+        /// Content announces the count, which is the whole reason CountText carries Polite - a
+        /// debounced filter rewrites it with no focus change and no new element, so it is
+        /// otherwise silent. ErrorPanel has no live region of its own, so Failed says nothing yet.
+        /// </remarks>
+        private void AnnounceState(GamesPageState state)
+        {
+            switch (state)
+            {
+                case GamesPageState.Loading:
+                    AutomationHelper.AnnounceLiveRegion(LoadingText);
+                    break;
+                case GamesPageState.Content:
+                    AutomationHelper.AnnounceLiveRegion(CountText);
+                    break;
+                case GamesPageState.Empty:
+                    AutomationHelper.AnnounceLiveRegion(EmptyText);
+                    break;
+            }
         }
 
         private async void GamesList_ItemClick(object sender, ItemClickEventArgs e)
@@ -406,22 +439,6 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"GamesPage: Semantic zoom accelerator failed - {ex.Message}");
             }
-        }
-
-        private void CancelPendingFilter()
-        {
-            var cts = _filterDebounceCts;
-            _filterDebounceCts = null;
-            if (cts == null) return;
-
-            try
-            {
-                cts.Cancel();
-            }
-            catch (ObjectDisposedException)
-            {
-            }
-            cts.Dispose();
         }
     }
 }

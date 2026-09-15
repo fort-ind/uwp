@@ -36,6 +36,12 @@ namespace Fort.ind_UWP
         public const string ThemeDark = "Dark";
 
         public const string SettingHideWelcomeDialog = "HideWelcomeDialog";
+
+        // The one-shot TeachingTip pointing at LoginPage's skip link. Kept here with the rest of
+        // them: the value is the literal LoginPage shipped with, so existing installs that have
+        // already seen the tip keep their state.
+        public const string SettingHasSeenSkipSignInTip = "HasSeenSkipSignInTip";
+
         public const string SettingAppTheme = "AppTheme";
         public const string SettingAppTintColor = "AppTintColor";
         public const string SettingAppCustomTintColor = "AppCustomTintColor";

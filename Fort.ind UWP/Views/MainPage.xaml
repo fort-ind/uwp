@@ -837,9 +837,20 @@
                                                             Margin="0,4,0,0">
                                                     <Button x:Uid="ClearLoginInfoButton" x:Name="ClearLoginInfoButton"
                                                             Click="ClearLoginInfoButton_Click"/>
+                                                    <!-- The error colour sits on the content, not on the Button. A local
+                                                         Foreground on a Button only reaches its ContentPresenter by
+                                                         inheritance, and generic.xaml's Button template overwrites
+                                                         ContentPresenter.Foreground outright in PointerOver, Pressed and
+                                                         Disabled - so the red disappeared exactly when the pointer was on
+                                                         the button, i.e. when the warning matters. A local value on the
+                                                         content itself outranks the inherited one in every state.
+                                                         Deliberately unstyled: a bare TextBlock inherits the Button's own
+                                                         font, so this renders identically to plain string content. -->
                                                     <Button x:Uid="ResetAppButton" x:Name="ResetAppButton"
-                                                            Click="ResetAppButton_Click"
-                                                            Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"/>
+                                                            Click="ResetAppButton_Click">
+                                                        <TextBlock x:Uid="ResetAppButtonText"
+                                                                   Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"/>
+                                                    </Button>
                                                 </StackPanel>
                                             </StackPanel>
                                         </StackPanel>
@@ -1090,12 +1101,23 @@
                                                     </HyperlinkButton>
                                                 </StackPanel>
 
-                                                <StackPanel Orientation="Horizontal" Spacing="6" Opacity="0.4">
-                                                    <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
+                                                <!-- Subdued with a theme brush, not Opacity. Opacity 0.4 over this
+                                                     surface blended 12px Caption text down to roughly 3.5:1, under the
+                                                     4.5:1 minimum for visible text (doc dump chunk_049, "Accessible text
+                                                     requirements"); BaseMedium is the platform's own secondary-text value
+                                                     and clears it. It also keeps the pair of glyphs legible, which an
+                                                     opacity on the panel dimmed along with the words. -->
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"
+                                                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                                              AutomationProperties.AccessibilityView="Raw"/>
                                                     <TextBlock x:Uid="MainMadeWithLoveBy"
                                                                Style="{StaticResource CaptionTextBlockStyle}"
+                                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                VerticalAlignment="Center"/>
-                                                    <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
+                                                    <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"
+                                                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                                              AutomationProperties.AccessibilityView="Raw"/>
                                                 </StackPanel>
 
                                             </StackPanel>

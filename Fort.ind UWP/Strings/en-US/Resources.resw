@@ -862,8 +862,9 @@ Open your profile and try again.</value>
   <data name="ProfileYourProfileIsManaged.Text" xml:space="preserve">
     <value>Your profile is managed on fort.social. Edit your display name, bio, avatar, or account there.</value>
   </data>
-  <data name="ResetAppButton.Content" xml:space="preserve">
+  <data name="ResetAppButtonText.Text" xml:space="preserve">
     <value>Reset app</value>
+    <comment>Label inside the Reset app button. On the TextBlock rather than the Button's Content so the error colour survives the pointer-over state.</comment>
   </data>
   <data name="ResetAppButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
     <value>Signs you out and deletes all cached data and saved settings, resetting the app to a fresh install</value>

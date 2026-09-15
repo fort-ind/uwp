@@ -163,9 +163,49 @@ namespace Fort.ind_UWP
             _avatarApplied = false;
         }
 
-        private void SignInButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Opens LoginPage in the shell's content frame.
+        /// </summary>
+        /// <remarks>
+        /// Guarded, unlike it used to be: Frame.Navigate rethrows whatever a page's constructor or
+        /// its XAML parse threw unless a NavigationFailed handler marks it handled, and
+        /// ContentFrame - unlike the root frame App wires up - has none. Unguarded, a LoginPage
+        /// that failed to parse took the app down from the one button the signed-out card offers.
+        ///
+        /// The notice is reported rather than only logged, because the alternative is a primary
+        /// button that visibly does nothing. Raised through the flag-then-await shape
+        /// App.OnLaunched uses, so the await is not inside a catch: an async void has to be
+        /// wrapped end to end, and an exception escaping one crashes the app.
+        /// </remarks>
+        private async void SignInButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(LoginPage));
+            bool showNavigationError = false;
+
+            try
+            {
+                Frame.Navigate(typeof(LoginPage));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: Sign-in navigation failed - {ex.GetType().Name}: {ex.Message}"
+                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                showNavigationError = true;
+            }
+
+            if (showNavigationError)
+            {
+                try
+                {
+                    await DialogService.ShowMessageAsync(this,
+                                                         LocalizedStrings.Get("NavigationErrorDialogTitle"),
+                                                         LocalizedStrings.Get("NavigationErrorDialogBody"),
+                                                         LocalizedStrings.Get("DialogOk"));
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"ProfilePage: could not report the navigation failure - {ex.Message}");
+                }
+            }
         }
 
         private async void ManageOnFortSocialButton_Click(object sender, RoutedEventArgs e)

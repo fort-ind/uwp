@@ -36,7 +36,8 @@
                     <StackPanel HorizontalAlignment="Center" Spacing="16">
                         <FontIcon Glyph="&#xE77B;"
                                   FontSize="48"
-                                  HorizontalAlignment="Center"/>
+                                  HorizontalAlignment="Center"
+                                  AutomationProperties.AccessibilityView="Raw"/>
                         <TextBlock x:Uid="ProfileNotSignedIn"
                                    Style="{StaticResource SubtitleTextBlockStyle}"
                                    HorizontalAlignment="Center"/>
@@ -123,7 +124,7 @@
                             Click="ManageOnFortSocialButton_Click"
                             AccessKey="M">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE774;" FontSize="14"/>
+                            <FontIcon Glyph="&#xE774;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
                             <TextBlock x:Uid="ProfileManageOnFortSocial"/>
                         </StackPanel>
                     </Button>
@@ -131,7 +132,7 @@
                             Click="LogoutButton_Click"
                             AccessKey="O">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xF3B1;" FontSize="14"/>
+                            <FontIcon Glyph="&#xF3B1;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
                             <TextBlock x:Uid="ProfileSignOut"/>
                         </StackPanel>
                     </Button>

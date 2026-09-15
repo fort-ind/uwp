@@ -105,6 +105,23 @@
                             <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
 
+                            <!-- The rest and selected states have to be defined here even though
+                                 the Default dictionary above already carries the keys - precisely
+                                 because it does. A key missing from HighContrast falls through to
+                                 Default, which paints these with a transparent RevealBackgroundBrush,
+                                 so the selected item ended up as SystemColorHighlightTextColor text
+                                 on the plain window background: invisible in HC Black, where
+                                 HighlightText is black. Values mirror generic.xaml's own
+                                 HighContrast dictionary, where NavigationViewItemBackgroundSelected
+                                 is SystemControlHighlightListLowRevealBackgroundBrush (= Highlight)
+                                 and the item borders are SystemControlBackgroundTransparentRevealBorderBrush
+                                 (= ButtonText). ButtonFace is the partner of the ButtonText
+                                 foreground this dictionary already picks for the rest state. -->
+                            <SolidColorBrush x:Key="NavigationViewItemBackground" Color="{ThemeResource SystemColorButtonFaceColor}"/>
+                            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{ThemeResource SystemColorHighlightColor}"/>
+                            <SolidColorBrush x:Key="NavigationViewItemBorderBrush" Color="{ThemeResource SystemColorButtonTextColor}"/>
+                            <SolidColorBrush x:Key="NavigationViewItemBorderBrushSelected" Color="{ThemeResource SystemColorButtonTextColor}"/>
+
                             <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="{ThemeResource SystemColorHighlightColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPointerOver" Color="{ThemeResource SystemColorHighlightColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="{ThemeResource SystemColorHighlightColor}"/>

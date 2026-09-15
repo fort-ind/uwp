@@ -43,5 +43,37 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"AutomationHelper: notification failed - {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Announces that a live region has refreshed in place.
+        /// </summary>
+        /// <remarks>
+        /// <c>AutomationProperties.LiveSetting</c> on its own does nothing at all - it only
+        /// declares the politeness level a client should use. (No cref: it is an attached
+        /// property with no CLR member behind it, only Get/SetLiveSetting, so one is CS1574.) The
+        /// accessibility docs ("A screen reader isn't announcing an update to a status string or
+        /// error string") are explicit that the app must raise LiveRegionChanged itself, and
+        /// always <i>after</i> the updated text has been set on the element. Every LiveSetting in
+        /// this app is paired with a call to this; a declaration without one is silent.
+        ///
+        /// FromElement, not CreatePeerForElement, the same way ExpanderHeaderButton does it: with
+        /// no assistive technology attached no peer exists, and there is nobody to notify.
+        /// </remarks>
+        public static void AnnounceLiveRegion(UIElement source)
+        {
+            try
+            {
+                if (source == null) return;
+
+                var peer = FrameworkElementAutomationPeer.FromElement(source);
+                if (peer == null) return;
+
+                peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AutomationHelper: live region event failed - {ex.Message}");
+            }
+        }
     }
 }
