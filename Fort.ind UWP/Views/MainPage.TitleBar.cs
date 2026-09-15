@@ -49,6 +49,8 @@ namespace Fort.ind_UWP
             }
         }
 
+        private static readonly AccessibilitySettings s_accessibilitySettings = new AccessibilitySettings();
+
         private void UpdateTitleBarColors()
         {
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
@@ -67,14 +69,32 @@ namespace Fort.ind_UWP
             var hoverBg = isDark ? Color.FromArgb(30, 255, 255, 255) : Color.FromArgb(30, 0, 0, 0);
             var pressedBg = isDark ? Color.FromArgb(50, 255, 255, 255) : Color.FromArgb(50, 0, 0, 0);
 
+            var hoverFg = fgColor;
+            var pressedFg = fgColor;
+
+            // A custom accent colours the caption buttons' hover and pressed states. Read from
+            // ActiveAccentHex, not the saved choice, so the title bar agrees with the controls
+            // until the restart that applies a new one. The Windows accent keeps the neutral
+            // overlay the shell's own title bars use, and so does high contrast.
+            Color accent;
+            if (AccentColorService.ActiveAccentHex != null
+                && !s_accessibilitySettings.HighContrast
+                && ColorHelper.TryHexToColor(AccentColorService.ActiveAccentHex, out accent))
+            {
+                hoverBg = accent;
+                pressedBg = ColorHelper.AccentShade(accent, -1);
+                hoverFg = ColorHelper.ContrastingForeground(hoverBg);
+                pressedFg = ColorHelper.ContrastingForeground(pressedBg);
+            }
+
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             titleBar.ButtonHoverBackgroundColor = hoverBg;
             titleBar.ButtonPressedBackgroundColor = pressedBg;
 
             titleBar.ButtonForegroundColor = fgColor;
-            titleBar.ButtonHoverForegroundColor = fgColor;
-            titleBar.ButtonPressedForegroundColor = fgColor;
+            titleBar.ButtonHoverForegroundColor = hoverFg;
+            titleBar.ButtonPressedForegroundColor = pressedFg;
             titleBar.ButtonInactiveForegroundColor = inactiveFg;
         }
 

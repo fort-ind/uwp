@@ -89,6 +89,29 @@
                           Margin="0,4,0,0"/>
             </StackPanel>
         </DataTemplate>
+
+        <!-- A template, not a field, for the reason the welcome dialog is one: a reused
+             ContentDialog stops animating. It also lets the warning use the type ramp style,
+             which lives in generic.xaml where a code-side Resources lookup cannot reach it. -->
+        <DataTemplate x:Key="CustomAccentDialogContentTemplate">
+            <StackPanel Spacing="12">
+                <ColorPicker x:Name="AccentPicker"
+                             IsAlphaEnabled="False"
+                             IsHexInputVisible="True"
+                             IsColorChannelTextInputVisible="True"/>
+                <Grid x:Name="AccentContrastWarning" Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Glyph="&#xE7BA;" FontSize="14" VerticalAlignment="Top" Margin="0,2,0,0"
+                              AutomationProperties.AccessibilityView="Raw"/>
+                    <TextBlock x:Name="AccentContrastWarningText" Grid.Column="1" Margin="8,0,0,0"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               TextWrapping="Wrap"/>
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -573,6 +596,167 @@
                                                                 </Grid>
                                                             </Button>
                                                         </StackPanel>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                                <StackPanel Spacing="8">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon Glyph="&#xE790;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                                                        <TextBlock x:Uid="MainAccentColor" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                                                   AutomationProperties.HeadingLevel="Level3"/>
+                                                    </StackPanel>
+                                                    <!-- Accent colours are theme-agnostic, so unlike the tint chips these
+                                                         paint the same in Light and Dark. The presets are from the Windows 10
+                                                         accent palette, each 4.5:1 on white and above 3:1 on the dark surface. -->
+                                                    <StackPanel Spacing="8">
+                                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                                            <Button x:Uid="AccentSystemButton" x:Name="AccentSystemButton" Tag="Default"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    HorizontalContentAlignment="Stretch"
+                                                                    VerticalContentAlignment="Stretch"
+                                                                    BorderThickness="2" BorderBrush="Transparent">
+                                                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                                    <FontIcon Glyph="&#xE770;" FontSize="14" AutomationProperties.AccessibilityView="Raw"
+                                                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    <FontIcon x:Name="AccentSystemCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                              HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                              Margin="0,0,2,1" Visibility="Collapsed"
+                                                                              AutomationProperties.AccessibilityView="Raw"/>
+                                                                </Grid>
+                                                            </Button>
+                                                            <Button x:Uid="AccentMatchTintButton" x:Name="AccentMatchTintButton" Tag="MatchTint"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    HorizontalContentAlignment="Stretch"
+                                                                    VerticalContentAlignment="Stretch"
+                                                                    BorderThickness="2" BorderBrush="Transparent">
+                                                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                                    <FontIcon x:Name="AccentMatchTintIcon" Glyph="&#xE71B;" FontSize="14" AutomationProperties.AccessibilityView="Raw"
+                                                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    <FontIcon x:Name="AccentMatchTintCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                              HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                              Margin="0,0,2,1" Visibility="Collapsed"
+                                                                              AutomationProperties.AccessibilityView="Raw"/>
+                                                                </Grid>
+                                                            </Button>
+                                                            <Button x:Uid="AccentBlueButton" x:Name="AccentBlueButton" Tag="#0078D7"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#0078D7" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentBlueCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentIrisButton" x:Name="AccentIrisButton" Tag="#8764B8"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#8764B8" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentIrisCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentOrchidButton" x:Name="AccentOrchidButton" Tag="#C239B3"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#C239B3" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentOrchidCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentRoseButton" x:Name="AccentRoseButton" Tag="#EA005E"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#EA005E" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentRoseCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                                            <Button x:Uid="AccentRedButton" x:Name="AccentRedButton" Tag="#E81123"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#E81123" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentRedCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentOrangeButton" x:Name="AccentOrangeButton" Tag="#CA5010"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#CA5010" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentOrangeCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentGreenButton" x:Name="AccentGreenButton" Tag="#10893E"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#10893E" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentGreenCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentSeafoamButton" x:Name="AccentSeafoamButton" Tag="#038387"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#038387" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentSeafoamCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentGrayButton" x:Name="AccentGrayButton" Tag="#7A7574"
+                                                                    Click="AccentColorButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    Background="#7A7574" BorderThickness="2"
+                                                                    BorderBrush="Transparent">
+                                                                <FontIcon x:Name="AccentGrayCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                          HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                          Margin="0,0,2,1" Visibility="Collapsed"
+                                                                          AutomationProperties.AccessibilityView="Raw"/>
+                                                            </Button>
+                                                            <Button x:Uid="AccentCustomButton" x:Name="AccentCustomButton"
+                                                                    Click="CustomAccentButton_Click"
+                                                                    Width="40" Height="40" Padding="0" MinWidth="40"
+                                                                    HorizontalContentAlignment="Stretch"
+                                                                    VerticalContentAlignment="Stretch"
+                                                                    BorderThickness="2" BorderBrush="Transparent">
+                                                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                                    <FontIcon x:Name="AccentCustomIcon" Glyph="&#xE790;" FontSize="14" AutomationProperties.AccessibilityView="Raw"
+                                                                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                    <FontIcon x:Name="AccentCustomCheck" Glyph="&#xE73E;" FontSize="12"
+                                                                              HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                              Margin="0,0,2,1" Visibility="Collapsed"
+                                                                              AutomationProperties.AccessibilityView="Raw"/>
+                                                                </Grid>
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <StackPanel x:Name="AccentRestartNotice" Visibility="Collapsed"
+                                                                Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
+                                                        <TextBlock x:Uid="AccentRestartNoticeText"
+                                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                                                   VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="260"/>
+                                                        <Button x:Uid="AccentRestartButton" x:Name="AccentRestartButton"
+                                                                Click="AccentRestartButton_Click"
+                                                                VerticalAlignment="Center"/>
                                                     </StackPanel>
                                                 </StackPanel>
                                             </StackPanel>

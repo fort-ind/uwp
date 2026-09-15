@@ -58,6 +58,7 @@ namespace Fort.ind_UWP
                 new SearchItem(LocalizedStrings.Get("SearchItemBackgroundColor"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
                 new SearchItem(LocalizedStrings.Get("SearchItemBackgroundTint"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
                 new SearchItem(LocalizedStrings.Get("SearchItemCustomBackgroundTint"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
+                new SearchItem(LocalizedStrings.Get("SearchItemAccentColor"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
                 new SearchItem(LocalizedStrings.Get("SearchItemAccount"), AppConstants.CategoryProfile, AppConstants.NavigationProfile),
                 new SearchItem(LocalizedStrings.Get("SearchItemSignIn"), AppConstants.CategoryProfile, AppConstants.NavigationProfile)
             };

@@ -419,6 +419,11 @@ namespace Fort.ind_UWP
                 Windows.UI.Xaml.Automation.AutomationProperties.SetName(
                     sel, LocalizedStrings.Format("TintSwatchSelectedSuffixFormat", selBaseName));
             }
+
+            // Everything that repaints the tint swatches also changes what the accent row shows:
+            // the theme its borders follow, and the tint that Match tint and the restart notice
+            // depend on (MainPage.Accent.cs).
+            UpdateAccentSelection();
         }
 
         private void ShowCustomSwatchColor(string hex)

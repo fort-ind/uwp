@@ -39,6 +39,11 @@ namespace Fort.ind_UWP
         public const string SettingAppTheme = "AppTheme";
         public const string SettingAppTintColor = "AppTintColor";
         public const string SettingAppCustomTintColor = "AppCustomTintColor";
+
+        // "Default" (the Windows accent), AccentMatchTint, or a #RRGGBB colour.
+        public const string SettingAppAccentColor = "AppAccentColor";
+        public const string SettingAppCustomAccentColor = "AppCustomAccentColor";
+        public const string AccentMatchTint = "MatchTint";
         public const string SettingSettingsAppearanceExpanded = "SettingsAppearanceExpanded";
         public const string SettingSettingsStorageExpanded = "SettingsStorageExpanded";
         public const string SettingSettingsTileExpanded = "SettingsTileExpanded";

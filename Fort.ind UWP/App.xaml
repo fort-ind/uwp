@@ -51,8 +51,14 @@
 
                             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{ThemeResource SystemBaseHighColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
-                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColor}"/>
-                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColor}"/>
+                            <!-- Accent-coloured text uses a shade, not the accent: plain accent is
+                                 ~3:1 on the dark surface, under the 4.5:1 text minimum (doc dump
+                                 chunk_049). Light2 clears it for every preset. The shade pair is
+                                 mirrored in AccentColorService.DarkThemeTextShade/LightThemeTextShade,
+                                 which the custom picker's contrast warning checks. -->
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColorLight2}"/>
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColorLight2}"/>
+                            <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource SystemAccentColorLight2}"/>
                         </ResourceDictionary>
 
                         <ResourceDictionary x:Key="Light">
@@ -87,8 +93,10 @@
 
                             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{ThemeResource SystemBaseHighColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
-                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColor}"/>
-                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColor}"/>
+                            <!-- Dark1 here, for the same 4.5:1 reason as Light2 in the dark dictionary. -->
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColorDark1}"/>
+                            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColorDark1}"/>
+                            <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource SystemAccentColorDark1}"/>
                         </ResourceDictionary>
 
                         <ResourceDictionary x:Key="HighContrast">
@@ -110,6 +118,9 @@
                             <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemColorHighlightTextColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                            <!-- The platform's own high-contrast value (generic.xaml), defined here so
+                                 the lookup does not fall through to the Default dictionary's shade. -->
+                            <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource SystemColorHotlightColor}"/>
                         </ResourceDictionary>
 
                     </ResourceDictionary.ThemeDictionaries>

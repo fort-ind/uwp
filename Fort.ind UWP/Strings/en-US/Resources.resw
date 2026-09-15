@@ -225,6 +225,27 @@
   <data name="CustomTintDialogApply" xml:space="preserve">
     <value>Apply</value>
   </data>
+  <data name="CustomAccentDialogTitle" xml:space="preserve">
+    <value>Custom accent color</value>
+  </data>
+  <data name="CustomAccentDialogApply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="AccentContrastWarningDark" xml:space="preserve">
+    <value>This color may be hard to read in dark theme.</value>
+  </data>
+  <data name="AccentContrastWarningLight" xml:space="preserve">
+    <value>This color may be hard to read in light theme.</value>
+  </data>
+  <data name="AccentContrastWarningBoth" xml:space="preserve">
+    <value>This color may be hard to read in both light and dark theme.</value>
+  </data>
+  <data name="AccentRestartFailedDialogTitle" xml:space="preserve">
+    <value>Couldn't restart</value>
+  </data>
+  <data name="AccentRestartFailedDialogBody" xml:space="preserve">
+    <value>Close and reopen the app to apply your new accent color.</value>
+  </data>
   <data name="TintSwatchSelectedSuffixFormat" xml:space="preserve">
     <value>{0} (selected)</value>
   </data>
@@ -377,6 +398,9 @@
   </data>
   <data name="SearchItemBackgroundTint" xml:space="preserve">
     <value>Background Tint</value>
+  </data>
+  <data name="SearchItemAccentColor" xml:space="preserve">
+    <value>Accent Color</value>
   </data>
   <data name="SearchItemCustomBackgroundTint" xml:space="preserve">
     <value>Custom Background Tint</value>
@@ -622,6 +646,15 @@ Open your profile and try again.</value>
   <data name="MainBackgroundTint.Text" xml:space="preserve">
     <value>Background Tint</value>
   </data>
+  <data name="MainAccentColor.Text" xml:space="preserve">
+    <value>Accent Color</value>
+  </data>
+  <data name="AccentRestartNoticeText.Text" xml:space="preserve">
+    <value>Restart the app to apply your new accent color.</value>
+  </data>
+  <data name="AccentRestartButton.Content" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
   <data name="MainBetaPrograms.Content" xml:space="preserve">
     <value>Beta Programs</value>
   </data>
@@ -635,7 +668,7 @@ Open your profile and try again.</value>
     <value>Beta Programs</value>
   </data>
   <data name="MainChangeAppThemeAnd.Text" xml:space="preserve">
-    <value>Change app theme and background color</value>
+    <value>Change app theme, background and accent color</value>
   </data>
   <data name="MainCheckBackHereFor.Text" xml:space="preserve">
     <value>check back here for what's new and view your favorite games!</value>
@@ -966,6 +999,78 @@ Open your profile and try again.</value>
   </data>
   <data name="TintTealButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Deep Teal</value>
+  </data>
+  <data name="AccentSystemButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Windows accent color</value>
+  </data>
+  <data name="AccentSystemButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Use Windows accent</value>
+  </data>
+  <data name="AccentMatchTintButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Accent color matching the background tint</value>
+  </data>
+  <data name="AccentMatchTintButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Match background tint</value>
+  </data>
+  <data name="AccentBlueButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Blue accent color</value>
+  </data>
+  <data name="AccentBlueButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="AccentIrisButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Iris accent color</value>
+  </data>
+  <data name="AccentIrisButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Iris</value>
+  </data>
+  <data name="AccentOrchidButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Orchid accent color</value>
+  </data>
+  <data name="AccentOrchidButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Orchid</value>
+  </data>
+  <data name="AccentRoseButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Rose accent color</value>
+  </data>
+  <data name="AccentRoseButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Rose</value>
+  </data>
+  <data name="AccentRedButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Red accent color</value>
+  </data>
+  <data name="AccentRedButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Red</value>
+  </data>
+  <data name="AccentOrangeButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Orange accent color</value>
+  </data>
+  <data name="AccentOrangeButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Orange</value>
+  </data>
+  <data name="AccentGreenButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Green accent color</value>
+  </data>
+  <data name="AccentGreenButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Green</value>
+  </data>
+  <data name="AccentSeafoamButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Seafoam accent color</value>
+  </data>
+  <data name="AccentSeafoamButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Seafoam</value>
+  </data>
+  <data name="AccentGrayButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Gray accent color</value>
+  </data>
+  <data name="AccentGrayButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Gray</value>
+  </data>
+  <data name="AccentCustomButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Custom accent color</value>
+  </data>
+  <data name="AccentCustomButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Custom color…</value>
   </data>
   <data name="UsernameText.Text" xml:space="preserve">
     <value>@username@social.fort1nd.com</value>

@@ -34,6 +34,11 @@ namespace Fort.ind_UWP
             bool showStartupErrorDialog = false;
             try
             {
+                // Before the first Frame, so no brush that reads SystemAccentColor exists yet. Not
+                // in the constructor: Application.Resources throws E_UNEXPECTED there, and an
+                // exception out of App's constructor fail-fasts before a debugger can attach.
+                AccentColorService.ApplySavedAccent();
+
                 Frame rootFrame = Window.Current.Content as Frame;
 
                 if (rootFrame == null)
@@ -154,6 +159,9 @@ namespace Fort.ind_UWP
 
                 if (isColdStart)
                 {
+                    // A cold start here never goes through OnLaunched; see the note there.
+                    AccentColorService.ApplySavedAccent();
+
                     rootFrame = new Frame();
                     rootFrame.NavigationFailed += OnNavigationFailed;
 
