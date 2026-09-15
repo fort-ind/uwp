@@ -310,7 +310,7 @@
     <value>Games — Flash</value>
   </data>
   <data name="CategoryGamesCodePen" xml:space="preserve">
-    <value>Games — CodePen</value>
+    <value>Games — Codepen</value>
   </data>
   <data name="CategoryGamesRetro" xml:space="preserve">
     <value>Games — Retro</value>
@@ -545,7 +545,7 @@ Open your profile and try again.</value>
     <value>you arent logged in :(</value>
   </data>
   <data name="CancelSignInButton.Content" xml:space="preserve">
-    <value>Cancel</value>
+    <value>cancel</value>
   </data>
   <data name="CancelSignInButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Cancel sign-in</value>
@@ -554,7 +554,7 @@ Open your profile and try again.</value>
     <value>Clear login info</value>
   </data>
   <data name="ClearLoginInfoButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Signs you out and clears the cached fort.social login</value>
+    <value>Signs you out and clears your fort.social login </value>
   </data>
   <data name="ClearLoginInfoButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Clear login info button</value>
@@ -650,7 +650,7 @@ Open your profile and try again.</value>
     <value>Accent Color</value>
   </data>
   <data name="AccentRestartNoticeText.Text" xml:space="preserve">
-    <value>Restart the app to apply your new accent color.</value>
+    <value>almost there.. restart the app to apply the new accent color</value>
   </data>
   <data name="AccentRestartButton.Content" xml:space="preserve">
     <value>Restart now</value>
@@ -1001,13 +1001,13 @@ Open your profile and try again.</value>
     <value>Deep Teal</value>
   </data>
   <data name="AccentSystemButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Windows accent color</value>
+    <value>Default accent color</value>
   </data>
   <data name="AccentSystemButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Use Windows accent</value>
+    <value>use the default accent color</value>
   </data>
   <data name="AccentMatchTintButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Accent color matching the background tint</value>
+    <value>match the bg tint for the accent color</value>
   </data>
   <data name="AccentMatchTintButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Match background tint</value>
