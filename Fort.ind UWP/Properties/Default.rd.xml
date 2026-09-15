@@ -17,9 +17,6 @@
 
 <Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
   <Application>
-    
     <Assembly Name="Fort.ind UWP" Dynamic="Required All" />
-
-
   </Application>
 </Directives>

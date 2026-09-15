@@ -19,7 +19,7 @@
        below, which is already generating one entry per resw language folder. PublisherDisplayName
        stays literal: it is a legal entity name, not display copy. -->
   <Properties>
-    <DisplayName>ms-resource:AppDisplayName</DisplayName>
+    <DisplayName>fort.desktop</DisplayName>
     <PublisherDisplayName>fort.ind</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
