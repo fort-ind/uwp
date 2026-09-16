@@ -185,7 +185,10 @@ namespace Fort.ind_UWP
         {
             try
             {
-                await Task.Delay(AppConstants.SearchDebounceMilliseconds, cancellationToken);
+                // Untokenized on purpose - see the note on the same call in MainPage.Search.cs.
+                // The token would make every superseded keystroke throw TaskCanceledException;
+                // the check below is what actually stops the stale filter.
+                await Task.Delay(AppConstants.SearchDebounceMilliseconds);
 
                 if (cancellationToken.IsCancellationRequested) return;
                 if (!_dataLoaded) return;

@@ -159,8 +159,11 @@ namespace Fort.ind_UWP
         /// "Local values are not allowed in resource dictionary with Source set". WinUI 2's own
         /// setup docs send app overrides to its MergedDictionaries instead. The last dictionary
         /// with no Source is App.xaml's; if that ever goes away, an empty one is appended.
+        ///
+        /// internal rather than private because MainPage.Appearance.cs needs the same dictionary
+        /// to reach the pane acrylic brushes inside its ThemeDictionaries.
         /// </remarks>
-        private static ResourceDictionary FindOverrideDictionary(ResourceDictionary root)
+        internal static ResourceDictionary FindOverrideDictionary(ResourceDictionary root)
         {
             var merged = root.MergedDictionaries;
             for (var i = merged.Count - 1; i >= 0; i--)

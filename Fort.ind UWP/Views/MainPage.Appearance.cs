@@ -7,6 +7,7 @@ using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 
 namespace Fort.ind_UWP
@@ -43,6 +44,12 @@ namespace Fort.ind_UWP
                 }
                 TintCustomButton.ClearValue(Control.BackgroundProperty);
                 TintCustomIcon.Visibility = Visibility.Visible;
+
+                // Before ApplyTintColor, which paints with them. An absent key has to reapply
+                // the default rather than keep whatever the fields already hold: a reset clears
+                // LocalSettings wholesale and then calls this method again, so "leave it alone"
+                // would report restored defaults while the surfaces stayed as the user left them.
+                LoadAcrylicSettings(localSettings);
 
                 ApplyTintColor(tintTag);
                 UpdateTintSelection(tintTag);
@@ -139,6 +146,10 @@ namespace Fort.ind_UWP
             ApplyTintColor(savedTint);
             UpdateTintSelection(savedTint);
 
+            // The legibility floor is per-theme (70% dark, 50% light), so a theme switch can put
+            // an unchanged slider on the other side of it.
+            UpdateAcrylicLegibilityWarnings();
+
             _themePaintKey = key;
         }
 
@@ -147,6 +158,20 @@ namespace Fort.ind_UWP
         private static readonly Color s_surfaceTintDark = Color.FromArgb(255, 0x2B, 0x2B, 0x2B);
         private static readonly Color s_surfaceTintLight = Colors.White;
         private static readonly Color s_surfaceFallbackLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
+
+        // The untinted nav pane, mirroring what App.xaml declares its two pane brushes with:
+        // SystemChromeMediumColor (#1F1F1F) in dark, SystemChromeMediumLowColor (#F2F2F2) in
+        // light. Literals here for the same reason the window acrylic pair above is - a
+        // ResourceDictionary indexer does not search ThemeDictionaries, so the declared values
+        // cannot be read back out. Keep them in step with App.xaml.
+        private static readonly Color s_paneTintDark = Color.FromArgb(255, 0x1F, 0x1F, 0x1F);
+        private static readonly Color s_paneTintLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
+
+        private double _bodyAcrylicOpacity = AppConstants.DefaultBodyAcrylicOpacity;
+        private double _paneAcrylicOpacity = AppConstants.DefaultPaneAcrylicOpacity;
+        private string _tintScope = AppConstants.TintScopeDefault;
+
+        private readonly Debouncer _acrylicPersistDebouncer = new Debouncer();
 
         private void ApplyTintColor(string colorTag)
         {
@@ -162,25 +187,46 @@ namespace Fort.ind_UWP
                 colorTag = AppConstants.ThemeDefault;
             }
 
+            ApplySurfaceBrushes(colorTag);
+
+            if (!_loadingSettings)
+            {
+                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor] = colorTag;
+            }
+        }
+
+        /// <summary>
+        /// Repaints the window body and the nav pane for the given tint tag, the saved tint scope
+        /// and the two saved opacities. The caller must have normalised <paramref name="colorTag"/>
+        /// already (see <see cref="IsUsableTintTag"/>).
+        /// </summary>
+        /// <remarks>
+        /// Separate from ApplyTintColor so the sliders and the scope radios can repaint without
+        /// going near the tint tag's persistence.
+        /// </remarks>
+        private void ApplySurfaceBrushes(string colorTag)
+        {
             try
             {
                 var isDark = IsEffectiveThemeDark();
+                var isTinted = !(string.IsNullOrEmpty(colorTag) || colorTag == AppConstants.ThemeDefault);
 
-                Color tint;
-                Color fallback;
-                double tintOpacity;
+                // The scope says which surfaces the colour reaches; the other one falls back to
+                // its plain chrome surface rather than to no acrylic at all.
+                var tintBody = isTinted && _tintScope != AppConstants.TintScopeSidebar;
+                var tintPane = isTinted && _tintScope != AppConstants.TintScopeContent;
 
-                if (string.IsNullOrEmpty(colorTag) || colorTag == AppConstants.ThemeDefault)
+                Color bodyTint;
+                Color bodyFallback;
+                if (tintBody)
                 {
-                    tint = isDark ? s_surfaceTintDark : s_surfaceTintLight;
-                    fallback = isDark ? s_surfaceTintDark : s_surfaceFallbackLight;
-                    tintOpacity = 0.8;
+                    bodyTint = isDark ? ColorHelper.HexToColor(colorTag) : ColorHelper.ForLightTheme(colorTag);
+                    bodyFallback = bodyTint;
                 }
                 else
                 {
-                    tint = isDark ? ColorHelper.HexToColor(colorTag) : ColorHelper.ForLightTheme(colorTag);
-                    fallback = tint;
-                    tintOpacity = isDark ? 0.8 : 0.85;
+                    bodyTint = isDark ? s_surfaceTintDark : s_surfaceTintLight;
+                    bodyFallback = isDark ? s_surfaceTintDark : s_surfaceFallbackLight;
                 }
 
                 if (_surfaceBrush == null)
@@ -190,23 +236,115 @@ namespace Fort.ind_UWP
                         BackgroundSource = AcrylicBackgroundSource.HostBackdrop
                     };
                 }
-                _surfaceBrush.TintColor = tint;
-                _surfaceBrush.TintOpacity = tintOpacity;
-                _surfaceBrush.FallbackColor = fallback;
+                _surfaceBrush.TintColor = bodyTint;
+                _surfaceBrush.TintOpacity = _bodyAcrylicOpacity;
+                _surfaceBrush.FallbackColor = bodyFallback;
 
                 if (!ReferenceEquals(RootGrid.Background, _surfaceBrush))
                 {
                     RootGrid.Background = _surfaceBrush;
                 }
+
+                ApplyPaneBrushes(colorTag, tintPane);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: ApplyTintColor failed – {ex.Message}");
+                Debug.WriteLine($"MainPage: ApplySurfaceBrushes failed – {ex.Message}");
+            }
+        }
+
+        /// <remarks>
+        /// Both themes' brushes are repainted, not just the active one, so a later theme switch
+        /// already finds the inactive dictionary correct - the framework re-resolves the
+        /// {ThemeResource} to the other instance and never comes back through here for it.
+        /// </remarks>
+        private void ApplyPaneBrushes(string colorTag, bool tinted)
+        {
+            var darkTint = tinted ? ColorHelper.HexToColor(colorTag) : s_paneTintDark;
+            var lightTint = tinted ? ColorHelper.ForLightTheme(colorTag) : s_paneTintLight;
+
+            foreach (var pair in PaneAcrylicBrushes())
+            {
+                var tint = pair.Key ? darkTint : lightTint;
+                pair.Value.TintColor = tint;
+                pair.Value.FallbackColor = tint;
+                pair.Value.TintOpacity = _paneAcrylicOpacity;
+            }
+        }
+
+        // Expanded pane mode uses the first; every other mode - the compact rail and the overlay
+        // pane a narrow window opens - uses the second. generic.xaml applies the Expanded one from
+        // a VisualState setter, which is also why the brush *instances* are mutated here rather
+        // than RootSplitView.PaneBackground being assigned: the next state change would overwrite
+        // an assignment, but nothing reassigns a brush's own dependency properties.
+        private static readonly string[] s_paneBrushKeys =
+        {
+            "NavigationViewExpandedPaneBackground",
+            "NavigationViewDefaultPaneBackground",
+        };
+
+        /// <summary>
+        /// Every pane acrylic brush App.xaml declares, paired with true for the dark theme.
+        /// </summary>
+        /// <remarks>
+        /// ThemeDictionaries is indexed by name on purpose: a ResourceDictionary's own indexer
+        /// does not search them, so there is no way to reach these through the flat dictionary
+        /// AccentColorService writes the accent shades into.
+        ///
+        /// HighContrast is deliberately not visited. Its entries are SolidColorBrushes - acrylic
+        /// there makes the framework fall back to a fixed FallbackColor and ignore the user's
+        /// chosen scheme - so the transparency sliders simply do not apply in high contrast. The
+        /// cast below would drop them anyway.
+        /// </remarks>
+        private static List<KeyValuePair<bool, AcrylicBrush>> s_paneBrushes;
+
+        private static List<KeyValuePair<bool, AcrylicBrush>> PaneAcrylicBrushes()
+        {
+            // Resolved once: these instances live in App.xaml's dictionary for the life of the
+            // process, and a slider drag asks for them on every tick.
+            if (s_paneBrushes != null) return s_paneBrushes;
+
+            var found = new List<KeyValuePair<bool, AcrylicBrush>>(s_paneBrushKeys.Length * 2);
+
+            try
+            {
+                var themes = AccentColorService.FindOverrideDictionary(Application.Current.Resources).ThemeDictionaries;
+
+                // "Default" is this app's dark dictionary; App.xaml never declares a "Dark" one.
+                CollectPaneBrushes(themes, "Default", true, found);
+                CollectPaneBrushes(themes, AppConstants.ThemeLight, false, found);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not reach the pane acrylic brushes – {ex.Message}");
             }
 
-            if (!_loadingSettings)
+            // A failed or empty resolution is not cached, so a later call can still succeed
+            // rather than the pane being stuck untouchable for the rest of the process.
+            if (found.Count > 0) s_paneBrushes = found;
+
+            return found;
+        }
+
+        private static void CollectPaneBrushes(IDictionary<object, object> themes, string themeKey, bool isDark,
+                                               List<KeyValuePair<bool, AcrylicBrush>> into)
+        {
+            object entry;
+            if (!themes.TryGetValue(themeKey, out entry)) return;
+
+            var dictionary = entry as ResourceDictionary;
+            if (dictionary == null) return;
+
+            foreach (var key in s_paneBrushKeys)
             {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor] = colorTag;
+                object value;
+                if (!dictionary.TryGetValue(key, out value)) continue;
+
+                var acrylic = value as AcrylicBrush;
+                if (acrylic != null)
+                {
+                    into.Add(new KeyValuePair<bool, AcrylicBrush>(isDark, acrylic));
+                }
             }
         }
 
@@ -454,6 +592,11 @@ namespace Fort.ind_UWP
             ToggleSettingsRow(AppearanceHeader, AppearanceContent, AppearanceChevronRotation, AppConstants.SettingSettingsAppearanceExpanded);
         }
 
+        private void TransparencyHeader_Tapped(object sender, RoutedEventArgs e)
+        {
+            ToggleSettingsRow(TransparencyHeader, TransparencyContent, TransparencyChevronRotation, AppConstants.SettingSettingsTransparencyExpanded);
+        }
+
         private void ThemeRadio_Checked(object sender, RoutedEventArgs e)
         {
             if (_loadingSettings) return;
@@ -555,6 +698,272 @@ namespace Fort.ind_UWP
             finally
             {
                 _loadingSettings = wasLoading;
+            }
+        }
+
+        private void LoadAcrylicSettings(ApplicationDataContainer localSettings)
+        {
+            _bodyAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppBodyAcrylicOpacity,
+                                              AppConstants.DefaultBodyAcrylicOpacity);
+            _paneAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppPaneAcrylicOpacity,
+                                              AppConstants.DefaultPaneAcrylicOpacity);
+
+            _tintScope = AppConstants.TintScopeDefault;
+            if (localSettings.Values.ContainsKey(AppConstants.SettingAppTintScope))
+            {
+                var saved = localSettings.Values[AppConstants.SettingAppTintScope]?.ToString();
+                if (IsUsableTintScope(saved)) _tintScope = saved;
+            }
+
+            // _loadingSettings is set for the whole of LoadAppearanceSettings, so neither of these
+            // reaches its handler - nothing is persisted and nothing is painted twice. The caller
+            // paints once, through ApplyTintColor, after this returns.
+            BodyAcrylicSlider.Value = _bodyAcrylicOpacity * 100.0;
+            PaneAcrylicSlider.Value = _paneAcrylicOpacity * 100.0;
+
+            switch (_tintScope)
+            {
+                case AppConstants.TintScopeSidebar: TintScopeSidebarRadio.IsChecked = true; break;
+                case AppConstants.TintScopeBoth: TintScopeBothRadio.IsChecked = true; break;
+                default: TintScopeContentRadio.IsChecked = true; break;
+            }
+
+            UpdateAcrylicValueLabels();
+        }
+
+        private static bool IsUsableTintScope(string scope)
+        {
+            return scope == AppConstants.TintScopeContent
+                   || scope == AppConstants.TintScopeSidebar
+                   || scope == AppConstants.TintScopeBoth;
+        }
+
+        /// <remarks>
+        /// Convert.ToDouble rather than a (double) cast, for the reason every other read here uses
+        /// Convert.ToBoolean: the cast throws on anything that is not a boxed double, and this runs
+        /// on the path out of the MainPage constructor. Out-of-range values are clamped rather than
+        /// rejected - TintOpacity is documented as 0 to 1.0 and coerces silently, so a stored 5
+        /// would have shown a slider at 500%.
+        /// </remarks>
+        private static double ReadOpacity(ApplicationDataContainer localSettings, string key, double fallback)
+        {
+            try
+            {
+                if (!localSettings.Values.ContainsKey(key)) return fallback;
+
+                var raw = localSettings.Values[key];
+                if (raw == null) return fallback;
+
+                var value = Convert.ToDouble(raw);
+                if (double.IsNaN(value)) return fallback;
+
+                return Math.Max(0.0, Math.Min(1.0, value));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not read {key} – {ex.Message}");
+                return fallback;
+            }
+        }
+
+        private static Windows.Globalization.NumberFormatting.PercentFormatter s_percentFormatter;
+
+        /// <remarks>
+        /// A formatter rather than a "{0}%" resource, for the reason dates go through
+        /// DateTimeFormatter: percent placement and the space before the sign are not universal.
+        /// Built lazily, so nothing activates a WinRT formatter at type load.
+        /// </remarks>
+        private static string FormatPercent(double fraction)
+        {
+            try
+            {
+                if (s_percentFormatter == null)
+                {
+                    s_percentFormatter = new Windows.Globalization.NumberFormatting.PercentFormatter()
+                    {
+                        FractionDigits = 0
+                    };
+                }
+
+                return s_percentFormatter.Format(fraction);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: percent formatting failed – {ex.Message}");
+                return string.Empty;
+            }
+        }
+
+        private void UpdateAcrylicValueLabels()
+        {
+            BodyAcrylicValue.Text = FormatPercent(_bodyAcrylicOpacity);
+            PaneAcrylicValue.Text = FormatPercent(_paneAcrylicOpacity);
+            UpdateAcrylicLegibilityWarnings();
+        }
+
+        /// <summary>
+        /// Shows the legibility caution naming whichever slider sits below the tint opacity the
+        /// current theme needs.
+        /// </summary>
+        /// <remarks>
+        /// A threshold, not a measurement: acrylic samples the desktop wallpaper, which the app
+        /// cannot see, so ColorHelper.ContrastRatio has nothing to compare against. The two floors
+        /// are the doc dump's (chunk_030, "Legibility considerations"): "In dark mode, tint opacity
+        /// can be 70%, while light mode acrylic will meet contrast ratios at 50%." The floor moves
+        /// with the theme, which is why RepaintThemeDependentChrome calls this as well.
+        ///
+        /// Opacity, never Visibility, and the text stays put when the warning is hidden: this runs
+        /// on every tick of a slider drag, and a collapsing row would change this section's height
+        /// under the cursor - which RepositionThemeTransition would then animate for every section
+        /// below it. AccessibilityView is what actually hides it, so nothing reads text that is
+        /// not on screen.
+        /// </remarks>
+        private void UpdateAcrylicLegibilityWarnings()
+        {
+            try
+            {
+                var isDark = IsEffectiveThemeDark();
+                var floor = isDark ? AppConstants.AcrylicLegibilityFloorDark
+                                   : AppConstants.AcrylicLegibilityFloorLight;
+
+                var bodyLow = _bodyAcrylicOpacity < floor;
+                var paneLow = _paneAcrylicOpacity < floor;
+
+                // Set unconditionally, including when neither slider is low: an empty TextBlock
+                // has no height, so leaving it blank would collapse the row this is here to
+                // reserve and reintroduce the jump on the first crossing. The Content wording is
+                // the placeholder - it is invisible and out of the automation tree.
+                string key;
+                if (bodyLow && paneLow) key = "AcrylicLegibilityWarningBothFormat";
+                else if (paneLow) key = "AcrylicLegibilityWarningSidebarFormat";
+                else key = "AcrylicLegibilityWarningContentFormat";
+
+                AcrylicWarningText.Text = LocalizedStrings.Format(key, FormatPercent(floor));
+
+                var show = bodyLow || paneLow;
+                AcrylicWarning.Opacity = show ? 1 : 0;
+                Windows.UI.Xaml.Automation.AutomationProperties.SetAccessibilityView(
+                    AcrylicWarning,
+                    show ? Windows.UI.Xaml.Automation.Peers.AccessibilityView.Content
+                         : Windows.UI.Xaml.Automation.Peers.AccessibilityView.Raw);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: UpdateAcrylicLegibilityWarnings failed – {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// The saved tint tag, normalised the way ApplyTintColor normalises what it is handed.
+        /// </summary>
+        private static string CurrentTintTag()
+        {
+            string tag = null;
+            try
+            {
+                tag = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not read the saved tint – {ex.Message}");
+            }
+
+            if (string.IsNullOrEmpty(tag) || !IsUsableTintTag(tag)) return AppConstants.ThemeDefault;
+            return tag;
+        }
+
+        private void BodyAcrylicSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            try
+            {
+                _bodyAcrylicOpacity = e.NewValue / 100.0;
+                ApplySurfaceBrushes(CurrentTintTag());
+                UpdateAcrylicValueLabels();
+                QueueAcrylicPersist();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: BodyAcrylicSlider_ValueChanged failed – {ex.Message}");
+            }
+        }
+
+        private void PaneAcrylicSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            try
+            {
+                _paneAcrylicOpacity = e.NewValue / 100.0;
+                ApplySurfaceBrushes(CurrentTintTag());
+                UpdateAcrylicValueLabels();
+                QueueAcrylicPersist();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: PaneAcrylicSlider_ValueChanged failed – {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Saves both opacities once a drag settles.
+        /// </summary>
+        /// <remarks>
+        /// The brushes are repainted on every ValueChanged - a dependency property set on one
+        /// reused brush, which is cheap - but a drag raises hundreds of them and each write to
+        /// LocalSettings hits disk. One debouncer covers both sliders and its flush writes both
+        /// values: dragging the second slider cancels the first one's pending flush, so a
+        /// per-slider payload would have dropped that value on the floor.
+        /// </remarks>
+        private async void QueueAcrylicPersist()
+        {
+            try
+            {
+                var token = _acrylicPersistDebouncer.Restart();
+
+                // The token is deliberately NOT passed to Task.Delay. Handing it over makes the
+                // delay throw TaskCanceledException the moment the next tick calls Restart, and a
+                // single slider drag raises hundreds of ticks - hundreds of first-chance exceptions
+                // in the debugger, for a cancellation that is the normal case rather than a fault.
+                // The check below is what actually stops the stale flush, and it is safe on a token
+                // whose source Restart has already disposed: IsCancellationRequested is one of the
+                // few members that does not throw after Dispose (unlike Token, Cancel, CancelAfter).
+                // The cost is a timer that runs to completion and then does nothing.
+                await Task.Delay(AppConstants.AcrylicPersistDebounceMilliseconds);
+                if (token.IsCancellationRequested) return;
+
+                var values = ApplicationData.Current.LocalSettings.Values;
+                values[AppConstants.SettingAppBodyAcrylicOpacity] = _bodyAcrylicOpacity;
+                values[AppConstants.SettingAppPaneAcrylicOpacity] = _paneAcrylicOpacity;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not save the acrylic opacities – {ex.Message}");
+            }
+        }
+
+        private void TintScopeRadio_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            try
+            {
+                var radio = sender as RadioButton;
+                if (radio == null) return;
+
+                var scope = radio.Tag?.ToString();
+                if (!IsUsableTintScope(scope)) return;
+
+                _tintScope = scope;
+
+                // Saved at once, not debounced: this is a discrete choice, not a drag.
+                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintScope] = scope;
+                ApplySurfaceBrushes(CurrentTintTag());
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: TintScopeRadio_Checked failed – {ex.Message}");
             }
         }
     }

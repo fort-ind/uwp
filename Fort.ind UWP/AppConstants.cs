@@ -50,7 +50,41 @@ namespace Fort.ind_UWP
         public const string SettingAppAccentColor = "AppAccentColor";
         public const string SettingAppCustomAccentColor = "AppCustomAccentColor";
         public const string AccentMatchTint = "MatchTint";
+
+        // AcrylicBrush.TintOpacity for the two surfaces the user can tune, stored as 0..1.
+        public const string SettingAppBodyAcrylicOpacity = "AppBodyAcrylicOpacity";
+        public const string SettingAppPaneAcrylicOpacity = "AppPaneAcrylicOpacity";
+
+        // Which surfaces the chosen background tint colour is painted onto: one of the
+        // TintScope* values below.
+        public const string SettingAppTintScope = "AppTintScope";
+
+        public const string TintScopeContent = "Content";
+        public const string TintScopeSidebar = "Sidebar";
+        public const string TintScopeBoth = "Both";
+
+        // Content-only is what the app did before the scope existed, so an existing install
+        // looks unchanged after the update. Nothing else depends on which value this is.
+        public const string TintScopeDefault = TintScopeContent;
+
+        // The values these two replaced: 0.8 is the window surface MainPage.Appearance.cs used
+        // to hardcode and the doc dump's general-purpose default (chunk_030, "Acrylic theme
+        // resources"); 0.9 is what App.xaml's pane brushes shipped with.
+        public const double DefaultBodyAcrylicOpacity = 0.8;
+        public const double DefaultPaneAcrylicOpacity = 0.9;
+
+        // Below these, text over acrylic stops meeting contrast ratios and the settings panel
+        // says so. chunk_030, "Legibility considerations": "In dark mode, tint opacity can be
+        // 70%, while light mode acrylic will meet contrast ratios at 50%."
+        public const double AcrylicLegibilityFloorDark = 0.70;
+        public const double AcrylicLegibilityFloorLight = 0.50;
+
+        // A slider drag raises ValueChanged continuously. The brushes are repainted on every
+        // one of those (a dependency property set, which is cheap); only the LocalSettings
+        // write waits for the drag to settle.
+        public const int AcrylicPersistDebounceMilliseconds = 400;
         public const string SettingSettingsAppearanceExpanded = "SettingsAppearanceExpanded";
+        public const string SettingSettingsTransparencyExpanded = "SettingsTransparencyExpanded";
         public const string SettingSettingsStorageExpanded = "SettingsStorageExpanded";
         public const string SettingSettingsTileExpanded = "SettingsTileExpanded";
         public const string SettingShowTileBadge = "ShowTileBadge";

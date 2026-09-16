@@ -62,7 +62,13 @@ namespace Fort.ind_UWP
         {
             try
             {
-                await Task.Delay(AppConstants.SearchDebounceMilliseconds, cancellationToken);
+                // Not Task.Delay(ms, cancellationToken): the token there makes every keystroke's
+                // superseded delay throw TaskCanceledException, which is a first-chance flood in
+                // the debugger for what is the normal case. The check below already does the work,
+                // and it stays valid after Restart has disposed the source - IsCancellationRequested
+                // is one of the few members that does not throw once disposed. Task.Run below keeps
+                // its token, where cancelling genuinely avoids running the search.
+                await Task.Delay(AppConstants.SearchDebounceMilliseconds);
 
                 if (cancellationToken.IsCancellationRequested)
                 {

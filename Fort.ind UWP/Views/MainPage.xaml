@@ -597,7 +597,27 @@
                                                             </Button>
                                                         </StackPanel>
                                                     </StackPanel>
+
+                                                    <!-- Which surfaces the colour above is painted onto. Content-only is
+                                                         what the app did before this existed, so it stays the default. -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock x:Uid="MainApplyTintTo"
+                                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                                        <StackPanel Orientation="Horizontal" Spacing="16">
+                                                            <RadioButton x:Uid="TintScopeContentRadio" x:Name="TintScopeContentRadio"
+                                                                         GroupName="AppTintScope" Tag="Content"
+                                                                         Checked="TintScopeRadio_Checked"/>
+                                                            <RadioButton x:Uid="TintScopeSidebarRadio" x:Name="TintScopeSidebarRadio"
+                                                                         GroupName="AppTintScope" Tag="Sidebar"
+                                                                         Checked="TintScopeRadio_Checked"/>
+                                                            <RadioButton x:Uid="TintScopeBothRadio" x:Name="TintScopeBothRadio"
+                                                                         GroupName="AppTintScope" Tag="Both"
+                                                                         Checked="TintScopeRadio_Checked"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
                                                 </StackPanel>
+
                                                 <StackPanel Spacing="8">
                                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                                         <FontIcon Glyph="&#xE790;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
@@ -759,6 +779,137 @@
                                                                 VerticalAlignment="Center"/>
                                                     </StackPanel>
                                                 </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border BorderThickness="0,0,0,1"
+                                        BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+                                    <StackPanel>
+                                        <local:ExpanderHeaderButton x:Uid="MainTransparency" x:Name="TransparencyHeader"
+                                                Style="{StaticResource ButtonRevealStyle}"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch"
+                                                MinWidth="0"
+                                                CornerRadius="0"
+                                                Padding="16,12"
+                                                AutomationProperties.HeadingLevel="Level2"
+                                                Click="TransparencyHeader_Tapped">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Width="36" Height="36"
+                                                      Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                                    <FontIcon Glyph="&#xE706;" FontSize="16"
+                                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                              AutomationProperties.AccessibilityView="Raw"/>
+                                                </Grid>
+                                                <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock x:Uid="MainTransparency2" Style="{StaticResource BaseTextBlockStyle}"/>
+                                                    <TextBlock x:Uid="MainTransparencyDescription"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                                </StackPanel>
+                                                <FontIcon x:Name="TransparencyChevron" Grid.Column="2" Glyph="&#xE76C;"
+                                                          FontSize="12" VerticalAlignment="Center"
+                                                          AutomationProperties.AccessibilityView="Raw"
+                                                          Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                                          RenderTransformOrigin="0.5,0.5">
+                                                    <FontIcon.RenderTransform>
+                                                        <RotateTransform x:Name="TransparencyChevronRotation" Angle="0"/>
+                                                    </FontIcon.RenderTransform>
+                                                </FontIcon>
+                                            </Grid>
+                                        </local:ExpanderHeaderButton>
+                                        <StackPanel x:Name="TransparencyContent" Visibility="Collapsed"
+                                                    Padding="20,0,20,16">
+                                            <StackPanel.ChildrenTransitions>
+                                                <TransitionCollection>
+                                                    <EntranceThemeTransition FromVerticalOffset="20"/>
+                                                </TransitionCollection>
+                                            </StackPanel.ChildrenTransitions>
+                                            <Rectangle Height="1" Margin="0,0,0,14"
+                                                       Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                                       Opacity="0.08"/>
+                                            <StackPanel Spacing="12">
+                                                <TextBlock x:Uid="MainTransparencyHint"
+                                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+
+                                                <!-- Width 280 is not arbitrary: it is the width of the tint swatch
+                                                     row above (6 x 40 plus five 8px gaps), so the two line up on the
+                                                     same column instead of the sliders alone running to the panel
+                                                     edge. An Auto column needs the explicit width - a Slider's
+                                                     template stretches, so it has no natural desired width to size to.
+
+                                                     The value labels are AccessibilityView=Raw: a Slider already
+                                                     announces its own value, so exposing the text reads it twice. -->
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock x:Uid="MainContentTransparency"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Slider x:Uid="BodyAcrylicSlider" x:Name="BodyAcrylicSlider"
+                                                                Width="280"
+                                                                Minimum="0" Maximum="100" StepFrequency="1"
+                                                                VerticalAlignment="Center"
+                                                                ValueChanged="BodyAcrylicSlider_ValueChanged"/>
+                                                        <TextBlock x:Name="BodyAcrylicValue" Grid.Column="1"
+                                                                   Margin="12,0,0,0"
+                                                                   VerticalAlignment="Center"
+                                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   AutomationProperties.AccessibilityView="Raw"/>
+                                                    </Grid>
+                                                </StackPanel>
+
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock x:Uid="MainSidebarTransparency"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Slider x:Uid="PaneAcrylicSlider" x:Name="PaneAcrylicSlider"
+                                                                Width="280"
+                                                                Minimum="0" Maximum="100" StepFrequency="1"
+                                                                VerticalAlignment="Center"
+                                                                ValueChanged="PaneAcrylicSlider_ValueChanged"/>
+                                                        <TextBlock x:Name="PaneAcrylicValue" Grid.Column="1"
+                                                                   Margin="12,0,0,0"
+                                                                   VerticalAlignment="Center"
+                                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                                   AutomationProperties.AccessibilityView="Raw"/>
+                                                    </Grid>
+                                                </StackPanel>
+
+                                                <!-- One warning for both sliders, and it never collapses: its text is
+                                                     kept in place and only its Opacity is toggled, so crossing the
+                                                     legibility floor mid-drag cannot change this section's height.
+                                                     A height change here would animate every section below it -
+                                                     RepositionThemeTransition is on the panel these Borders sit in -
+                                                     and the whole list of settings lurched under the cursor. Hidden,
+                                                     it is also pulled out of the automation tree in code, or a
+                                                     screen reader would read stale text nobody can see. -->
+                                                <Grid x:Name="AcrylicWarning" Opacity="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <FontIcon x:Name="AcrylicWarningIcon" Glyph="&#xE7BA;" FontSize="14"
+                                                              VerticalAlignment="Top" Margin="0,2,0,0"
+                                                              AutomationProperties.AccessibilityView="Raw"/>
+                                                    <TextBlock x:Name="AcrylicWarningText" Grid.Column="1" Margin="8,0,0,0"
+                                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                                               TextWrapping="Wrap"/>
+                                                </Grid>
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>

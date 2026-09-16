@@ -28,6 +28,27 @@
                                           TintOpacity="0.9"
                                           FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
+                            <!-- The pane in every mode *except* Expanded: generic.xaml applies
+                                 NavigationViewExpandedPaneBackground from a VisualState setter
+                                 that only runs in Expanded, and falls back to this key for the
+                                 compact rail and the overlay pane. Without it the sidebar
+                                 transparency slider and the sidebar tint silently stopped
+                                 applying as soon as the window narrowed.
+
+                                 Backdrop, not HostBackdrop, and that difference is deliberate:
+                                 this pane opens *over* the content, and the doc dump asks for
+                                 in-app acrylic there ("If your vertical panes open on top of
+                                 content, like in NavigationView's Compact or Minimal modes, we
+                                 suggest you use in-app acrylic" - chunk_030, "When to use
+                                 acrylic"). It is also what the platform default this replaces,
+                                 SystemControlChromeMediumLowAcrylicElementMediumBrush, already
+                                 sampled. -->
+                            <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
+                                          BackgroundSource="Backdrop"
+                                          TintColor="{ThemeResource SystemChromeMediumColor}"
+                                          TintOpacity="0.9"
+                                          FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
+
                             <AcrylicBrush x:Key="CardBackgroundBrush"
                                           BackgroundSource="Backdrop"
                                           TintColor="{ThemeResource SystemChromeMediumHighColor}"
@@ -74,6 +95,14 @@
                                           TintOpacity="0.9"
                                           FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
 
+                            <!-- Backdrop rather than HostBackdrop, for the reason spelled out
+                                 on the Default dictionary's copy of this key. -->
+                            <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
+                                          BackgroundSource="Backdrop"
+                                          TintColor="{ThemeResource SystemChromeMediumLowColor}"
+                                          TintOpacity="0.9"
+                                          FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
+
                             <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemChromeWhiteColor}"/>
 
                             <SolidColorBrush x:Key="CardBorderBrush" Color="#22000000"/>
@@ -102,6 +131,11 @@
                         <ResourceDictionary x:Key="HighContrast">
                             <SolidColorBrush x:Key="AppSurfaceAcrylicBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
+                            <!-- Solid, like every other surface here: acrylic in high contrast
+                                 makes the framework fall back to a fixed FallbackColor and
+                                 ignore the user's scheme. The transparency sliders skip these
+                                 two keys for the same reason - see PaneAcrylicBrushes. -->
+                            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
 
