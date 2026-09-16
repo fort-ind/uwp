@@ -1,0 +1,115 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '27 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-csharp:
+    name: Analyze (csharp)
+    runs-on: windows-2022
+    timeout-minutes: 60
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+      packages: read
+
+    env:
+      Solution_Name: Fort.ind UWP.sln
+      Project_Path: Fort.ind UWP\Fort.ind UWP.csproj
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v3
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v4
+
+    - name: Resolve Visual Studio MSBuild path
+      id: msbuild
+      shell: pwsh
+      run: |
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        if (-not (Test-Path $vswhere)) {
+          throw "vswhere.exe not found at expected path: $vswhere"
+        }
+
+        $msbuildPath = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
+        if ([string]::IsNullOrWhiteSpace($msbuildPath)) {
+          throw "Could not locate Visual Studio MSBuild.exe via vswhere"
+        }
+
+        Write-Host "Using MSBuild: $msbuildPath"
+        "msbuild_path=$msbuildPath" >> $env:GITHUB_OUTPUT
+
+    - name: Restore solution
+      shell: pwsh
+      run: |
+        & "${{ steps.msbuild.outputs.msbuild_path }}" "${{ env.Solution_Name }}" `
+          /t:Restore `
+          /p:Configuration=Debug `
+          /p:Platform=x64 `
+          /p:VisualStudioVersion=17.0 `
+          /nologo
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: csharp
+        build-mode: manual
+
+    - name: Build (traced by CodeQL)
+      shell: pwsh
+      run: |
+        & "${{ steps.msbuild.outputs.msbuild_path }}" "${{ env.Project_Path }}" `
+          /t:Rebuild `
+          /p:Configuration=Debug `
+          /p:Platform=x64 `
+          /p:VisualStudioVersion=17.0 `
+          /p:UseSharedCompilation=false `
+          /p:AppxPackageSigningEnabled=false `
+          /p:GenerateAppxPackageOnBuild=false `
+          /nr:false `
+          /nologo `
+          /v:minimal
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:csharp"
+
+  analyze-actions:
+    name: Analyze (actions)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: actions
+        build-mode: none
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:actions"
