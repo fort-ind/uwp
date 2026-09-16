@@ -860,7 +860,9 @@
                                                                 Width="280"
                                                                 Minimum="0" Maximum="100" StepFrequency="1"
                                                                 VerticalAlignment="Center"
-                                                                ValueChanged="BodyAcrylicSlider_ValueChanged"/>
+                                                                ValueChanged="BodyAcrylicSlider_ValueChanged"
+                                                                PointerCaptureLost="AcrylicSlider_PointerCaptureLost"
+                                                                LostFocus="AcrylicSlider_LostFocus"/>
                                                         <TextBlock x:Name="BodyAcrylicValue" Grid.Column="1"
                                                                    Margin="12,0,0,0"
                                                                    VerticalAlignment="Center"
@@ -881,7 +883,9 @@
                                                                 Width="280"
                                                                 Minimum="0" Maximum="100" StepFrequency="1"
                                                                 VerticalAlignment="Center"
-                                                                ValueChanged="PaneAcrylicSlider_ValueChanged"/>
+                                                                ValueChanged="PaneAcrylicSlider_ValueChanged"
+                                                                PointerCaptureLost="AcrylicSlider_PointerCaptureLost"
+                                                                LostFocus="AcrylicSlider_LostFocus"/>
                                                         <TextBlock x:Name="PaneAcrylicValue" Grid.Column="1"
                                                                    Margin="12,0,0,0"
                                                                    VerticalAlignment="Center"
@@ -903,7 +907,7 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <FontIcon x:Name="AcrylicWarningIcon" Glyph="&#xE7BA;" FontSize="14"
+                                                    <FontIcon Glyph="&#xE7BA;" FontSize="14"
                                                               VerticalAlignment="Top" Margin="0,2,0,0"
                                                               AutomationProperties.AccessibilityView="Raw"/>
                                                     <TextBlock x:Name="AcrylicWarningText" Grid.Column="1" Margin="8,0,0,0"

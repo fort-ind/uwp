@@ -948,16 +948,20 @@ Open your profile and try again.</value>
     <value>Higher is more solid.</value>
   </data>
   <data name="MainContentTransparency.Text" xml:space="preserve">
-    <value>Content</value>
+    <value>Content opacity</value>
+    <comment>Labels a slider whose value is opacity - 100% is fully solid. "Transparency" here would read backwards against the number.</comment>
   </data>
   <data name="MainSidebarTransparency.Text" xml:space="preserve">
-    <value>Sidebar</value>
+    <value>Sidebar opacity</value>
+    <comment>Labels a slider whose value is opacity - 100% is fully solid. "Transparency" here would read backwards against the number.</comment>
   </data>
   <data name="BodyAcrylicSlider.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Content transparency</value>
+    <value>Content opacity</value>
+    <comment>Announced on focus, so it must agree with the value the slider reports: 100 is fully solid.</comment>
   </data>
   <data name="PaneAcrylicSlider.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Sidebar transparency</value>
+    <value>Sidebar opacity</value>
+    <comment>Announced on focus, so it must agree with the value the slider reports: 100 is fully solid.</comment>
   </data>
   <data name="ThemeDarkRadio.Content" xml:space="preserve">
     <value>Dark</value>

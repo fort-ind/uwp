@@ -8,6 +8,7 @@ using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 
 namespace Fort.ind_UWP
@@ -171,6 +172,23 @@ namespace Fort.ind_UWP
         private double _paneAcrylicOpacity = AppConstants.DefaultPaneAcrylicOpacity;
         private string _tintScope = AppConstants.TintScopeDefault;
 
+        /// <summary>
+        /// The normalised tint tag the surfaces are currently painted with.
+        /// </summary>
+        /// <remarks>
+        /// Kept here rather than re-read from LocalSettings by the sliders: they repaint on every
+        /// tick of a drag, and a settings read plus a hex parse per tick is work this already knows
+        /// the answer to. ApplyTintColor is the only writer, and it writes the value it has already
+        /// validated.
+        /// </remarks>
+        private string _tintTag = AppConstants.ThemeDefault;
+
+        // What UpdateAcrylicLegibilityWarnings last painted, so a drag that changes nothing on
+        // screen does not re-resolve the resource string.
+        private string _warningKey;
+        private double _warningFloor = -1;
+        private bool _warningShown;
+
         private readonly Debouncer _acrylicPersistDebouncer = new Debouncer();
 
         private void ApplyTintColor(string colorTag)
@@ -187,6 +205,7 @@ namespace Fort.ind_UWP
                 colorTag = AppConstants.ThemeDefault;
             }
 
+            _tintTag = colorTag;
             ApplySurfaceBrushes(colorTag);
 
             if (!_loadingSettings)
@@ -838,38 +857,39 @@ namespace Fort.ind_UWP
                 else if (paneLow) key = "AcrylicLegibilityWarningSidebarFormat";
                 else key = "AcrylicLegibilityWarningContentFormat";
 
-                AcrylicWarningText.Text = LocalizedStrings.Format(key, FormatPercent(floor));
-
                 var show = bodyLow || paneLow;
+
+                // This runs on every tick of a slider drag, and LocalizedStrings.Get is not
+                // memoized - it opens the resource loader per call - so repainting identical text
+                // hundreds of times per drag is a real cost for no change on screen.
+                if (show == _warningShown
+                    && floor == _warningFloor
+                    && string.Equals(key, _warningKey, StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                _warningShown = show;
+                _warningFloor = floor;
+                _warningKey = key;
+
+                AcrylicWarningText.Text = LocalizedStrings.Format(key, FormatPercent(floor));
                 AcrylicWarning.Opacity = show ? 1 : 0;
-                Windows.UI.Xaml.Automation.AutomationProperties.SetAccessibilityView(
-                    AcrylicWarning,
-                    show ? Windows.UI.Xaml.Automation.Peers.AccessibilityView.Content
-                         : Windows.UI.Xaml.Automation.Peers.AccessibilityView.Raw);
+
+                // Set on the TextBlock, not just its parent Grid: AccessibilityView is documented
+                // per element and does not prune a subtree (that is why frameworks that want the
+                // cascading behaviour, like MAUI, ship a separate ExcludedWithChildren). Raw on
+                // the Grid alone left the child TextBlock in the content view, so a screen reader
+                // could still read a warning nobody can see. The FontIcon is already Raw in markup.
+                var view = show ? Windows.UI.Xaml.Automation.Peers.AccessibilityView.Content
+                                : Windows.UI.Xaml.Automation.Peers.AccessibilityView.Raw;
+                Windows.UI.Xaml.Automation.AutomationProperties.SetAccessibilityView(AcrylicWarning, view);
+                Windows.UI.Xaml.Automation.AutomationProperties.SetAccessibilityView(AcrylicWarningText, view);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"MainPage: UpdateAcrylicLegibilityWarnings failed – {ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// The saved tint tag, normalised the way ApplyTintColor normalises what it is handed.
-        /// </summary>
-        private static string CurrentTintTag()
-        {
-            string tag = null;
-            try
-            {
-                tag = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"MainPage: could not read the saved tint – {ex.Message}");
-            }
-
-            if (string.IsNullOrEmpty(tag) || !IsUsableTintTag(tag)) return AppConstants.ThemeDefault;
-            return tag;
         }
 
         private void BodyAcrylicSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
@@ -879,7 +899,7 @@ namespace Fort.ind_UWP
             try
             {
                 _bodyAcrylicOpacity = e.NewValue / 100.0;
-                ApplySurfaceBrushes(CurrentTintTag());
+                ApplySurfaceBrushes(_tintTag);
                 UpdateAcrylicValueLabels();
                 QueueAcrylicPersist();
             }
@@ -896,7 +916,7 @@ namespace Fort.ind_UWP
             try
             {
                 _paneAcrylicOpacity = e.NewValue / 100.0;
-                ApplySurfaceBrushes(CurrentTintTag());
+                ApplySurfaceBrushes(_tintTag);
                 UpdateAcrylicValueLabels();
                 QueueAcrylicPersist();
             }
@@ -943,6 +963,47 @@ namespace Fort.ind_UWP
             }
         }
 
+        /// <summary>
+        /// Writes both opacities now and drops any pending debounced write.
+        /// </summary>
+        /// <remarks>
+        /// The debounce is right for the middle of a drag and wrong at the end of one. Closing or
+        /// terminating the app inside the 400ms window left the continuation un-run and the value
+        /// lost, which is exactly what this codebase legislates against: state that survives
+        /// termination is written at the moment it changes, not batched. Releasing the thumb and
+        /// leaving the slider are both "the moment it changes", so they write straight through.
+        /// </remarks>
+        private void FlushAcrylicPersist()
+        {
+            try
+            {
+                _acrylicPersistDebouncer.Cancel();
+
+                var values = ApplicationData.Current.LocalSettings.Values;
+                values[AppConstants.SettingAppBodyAcrylicOpacity] = _bodyAcrylicOpacity;
+                values[AppConstants.SettingAppPaneAcrylicOpacity] = _paneAcrylicOpacity;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not flush the acrylic opacities – {ex.Message}");
+            }
+        }
+
+        // Pointer capture ends a mouse or touch drag; LostFocus covers the keyboard, where arrow
+        // keys change the value and no pointer is involved. Both are cheap enough to run
+        // unconditionally - the write is two values, and Cancel makes the pending one a no-op.
+        private void AcrylicSlider_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+        {
+            if (_loadingSettings) return;
+            FlushAcrylicPersist();
+        }
+
+        private void AcrylicSlider_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (_loadingSettings) return;
+            FlushAcrylicPersist();
+        }
+
         private void TintScopeRadio_Checked(object sender, RoutedEventArgs e)
         {
             if (_loadingSettings) return;
@@ -959,7 +1020,7 @@ namespace Fort.ind_UWP
 
                 // Saved at once, not debounced: this is a discrete choice, not a drag.
                 ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintScope] = scope;
-                ApplySurfaceBrushes(CurrentTintTag());
+                ApplySurfaceBrushes(_tintTag);
             }
             catch (Exception ex)
             {
