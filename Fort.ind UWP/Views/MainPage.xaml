@@ -840,7 +840,14 @@
                                                            Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
 
-                                                <!-- Width 280 is not arbitrary: it is the width of the tint swatch
+                                                <!-- Minimum="20" mirrors AppConstants.MinimumAcrylicOpacity, which
+                                                     LoadAcrylicSettings assigns over the top of it - the constant is
+                                                     the source of truth, this is here so the control is still
+                                                     floored if that code path ever fails. Below roughly this value a
+                                                     HostBackdrop surface stops reading as a surface and becomes a
+                                                     clear window onto whatever is behind the app.
+
+                                                     Width 280 is not arbitrary: it is the width of the tint swatch
                                                      row above (6 x 40 plus five 8px gaps), so the two line up on the
                                                      same column instead of the sliders alone running to the panel
                                                      edge. An Auto column needs the explicit width - a Slider's
@@ -858,7 +865,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <Slider x:Uid="BodyAcrylicSlider" x:Name="BodyAcrylicSlider"
                                                                 Width="280"
-                                                                Minimum="0" Maximum="100" StepFrequency="1"
+                                                                Minimum="20" Maximum="100" StepFrequency="1"
                                                                 VerticalAlignment="Center"
                                                                 ValueChanged="BodyAcrylicSlider_ValueChanged"
                                                                 PointerCaptureLost="AcrylicSlider_PointerCaptureLost"
@@ -881,7 +888,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <Slider x:Uid="PaneAcrylicSlider" x:Name="PaneAcrylicSlider"
                                                                 Width="280"
-                                                                Minimum="0" Maximum="100" StepFrequency="1"
+                                                                Minimum="20" Maximum="100" StepFrequency="1"
                                                                 VerticalAlignment="Center"
                                                                 ValueChanged="PaneAcrylicSlider_ValueChanged"
                                                                 PointerCaptureLost="AcrylicSlider_PointerCaptureLost"

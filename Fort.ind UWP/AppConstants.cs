@@ -73,6 +73,19 @@ namespace Fort.ind_UWP
         public const double DefaultBodyAcrylicOpacity = 0.8;
         public const double DefaultPaneAcrylicOpacity = 0.9;
 
+        // The lowest tint opacity the sliders offer. Not a legibility threshold - that is the pair
+        // below, and the warning still covers 20-70% in dark theme. This is the point past which a
+        // HostBackdrop surface stops reading as a surface at all: with almost no tint left it is a
+        // clear window onto whatever is behind the app. Background acrylic also falls back to a
+        // solid FallbackColor whenever the window deactivates (chunk_030, "Usability and
+        // adaptability"), so a near-zero value gave the harshest possible pairing - invisible while
+        // focused, fully solid the moment the window lost focus.
+        //
+        // LoadAcrylicSettings pushes this onto both sliders' Minimum and ReadOpacity clamps to it,
+        // so a value saved by a build that allowed less migrates up on load instead of leaving the
+        // slider and the painted surface disagreeing.
+        public const double MinimumAcrylicOpacity = 0.20;
+
         // Below these, text over acrylic stops meeting contrast ratios and the settings panel
         // says so. chunk_030, "Legibility considerations": "In dark mode, tint opacity can be
         // 70%, while light mode acrylic will meet contrast ratios at 50%."

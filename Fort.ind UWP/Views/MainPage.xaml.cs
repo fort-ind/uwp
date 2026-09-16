@@ -14,7 +14,22 @@ namespace Fort.ind_UWP
     {
         private IReadOnlyList<SearchItem> _allSearchItems = SearchCatalog.GetStaticItems();
 
-        private bool _loadingSettings = false;
+        /// <summary>
+        /// True while settings are being restored into the controls, so their change handlers do
+        /// not treat that as a user edit. Starts true, and LoadAppearanceSettings' finally is what
+        /// first clears it.
+        /// </summary>
+        /// <remarks>
+        /// The initial true is load-bearing, not tidiness. Setting a Slider's Minimum in markup
+        /// coerces its Value up to that minimum, which raises ValueChanged *during*
+        /// InitializeComponent - before the elements declared after it in the XAML have been
+        /// assigned to their fields. With this false, the transparency sliders' handlers ran at
+        /// that moment against a null BodyAcrylicValue, and would also have persisted a value read
+        /// off a control that had not been restored yet. Anything between InitializeComponent and
+        /// LoadAppearanceSettings is by definition not a user edit, so the flag covers that whole
+        /// window.
+        /// </remarks>
+        private bool _loadingSettings = true;
 
         private readonly Debouncer _searchDebounce = new Debouncer();
 

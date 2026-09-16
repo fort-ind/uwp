@@ -734,6 +734,13 @@ namespace Fort.ind_UWP
                 if (IsUsableTintScope(saved)) _tintScope = saved;
             }
 
+            // Minimum before Value, and from the constant rather than the markup, so the floor has
+            // one source of truth. Assigning Value first would let the control coerce it up to the
+            // old minimum and silently disagree with the field the brushes are painted from.
+            var minimum = AppConstants.MinimumAcrylicOpacity * 100.0;
+            BodyAcrylicSlider.Minimum = minimum;
+            PaneAcrylicSlider.Minimum = minimum;
+
             // _loadingSettings is set for the whole of LoadAppearanceSettings, so neither of these
             // reaches its handler - nothing is persisted and nothing is painted twice. The caller
             // paints once, through ApplyTintColor, after this returns.
@@ -776,7 +783,7 @@ namespace Fort.ind_UWP
                 var value = Convert.ToDouble(raw);
                 if (double.IsNaN(value)) return fallback;
 
-                return Math.Max(0.0, Math.Min(1.0, value));
+                return Math.Max(AppConstants.MinimumAcrylicOpacity, Math.Min(1.0, value));
             }
             catch (Exception ex)
             {
