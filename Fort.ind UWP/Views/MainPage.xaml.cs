@@ -156,6 +156,8 @@ namespace Fort.ind_UWP
             }
 
             _searchDebounce.Cancel();
+
+            CancelPendingReveal();
         }
     }
 }

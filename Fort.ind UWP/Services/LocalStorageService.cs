@@ -32,8 +32,11 @@ namespace Fort.ind_UWP
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var file = await LocalFolder.CreateFileAsync(PROFILE_FILE, CreationCollisionOption.ReplaceExisting);
                 var json = SerializeToJson(profile);
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var file = await LocalFolder.CreateFileAsync(PROFILE_FILE, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(file, json).AsTask(cancellationToken);
 
                 return true;

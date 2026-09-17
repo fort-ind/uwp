@@ -7,7 +7,7 @@ namespace Fort.ind_UWP
 {
     public static class ColorHelper
     {
-        private static readonly Dictionary<string, string> s_lightTintMap = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> s_lightTintMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "#1E3A5F", "#C8E0F5" },
             { "#2D1B69", "#DDD0F5" },

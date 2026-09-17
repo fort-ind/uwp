@@ -144,12 +144,9 @@ namespace Fort.ind_UWP
         {
             try
             {
-                if (args.Kind != Windows.ApplicationModel.Activation.ActivationKind.Protocol) return;
-
-                var protocolArgs = args as Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs;
-                if (protocolArgs == null) return;
-
-                Debug.WriteLine($"OnActivated: protocol callback received for {protocolArgs.Uri.Scheme}://{protocolArgs.Uri.Host}");
+                var protocolArgs = args.Kind == Windows.ApplicationModel.Activation.ActivationKind.Protocol
+                                   ? args as Windows.ApplicationModel.Activation.ProtocolActivatedEventArgs
+                                   : null;
 
                 Frame rootFrame = Window.Current.Content as Frame;
                 var isColdStart = rootFrame == null;
@@ -178,10 +175,16 @@ namespace Fort.ind_UWP
                     await ProfileService.TryRestoreSessionAsync();
                 }
 
-                var signInResult = await MisskeyAuthService.HandleProtocolActivationAsync(protocolArgs.Uri);
-                if (signInResult != null && signInResult.Success)
+                MisskeyAuthResult signInResult = null;
+                if (protocolArgs != null)
                 {
-                    await ProfileService.ApplySignInResultAsync(signInResult);
+                    Debug.WriteLine($"OnActivated: protocol callback received for {protocolArgs.Uri.Scheme}://{protocolArgs.Uri.Host}");
+
+                    signInResult = await MisskeyAuthService.HandleProtocolActivationAsync(protocolArgs.Uri);
+                    if (signInResult != null && signInResult.Success)
+                    {
+                        await ProfileService.ApplySignInResultAsync(signInResult);
+                    }
                 }
 
                 if (isColdStart)
@@ -221,6 +224,8 @@ namespace Fort.ind_UWP
 
         private async void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
+            e.Handled = true;
+
             try
             {
                 Debug.WriteLine($"Navigation failed: {e.SourcePageType.FullName} - {(e.Exception != null ? e.Exception.Message : "Unknown error")}");
@@ -251,8 +256,10 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"App: suspend badge update failed - {ex.Message}");
             }
-
-            deferral.Complete();
+            finally
+            {
+                deferral.Complete();
+            }
         }
 
         private void OnResuming(object sender, object e)

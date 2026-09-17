@@ -207,18 +207,18 @@ namespace Fort.ind_UWP
 
         private async void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            var confirmed = await DialogService.ShowConfirmAsync(
-                this,
-                LocalizedStrings.Get("SignOutDialogTitle"),
-                LocalizedStrings.Get("SignOutDialogBody"),
-                LocalizedStrings.Get("SignOutDialogConfirm"),
-                LocalizedStrings.Get("DialogCancel"),
-                ContentDialogButton.Close);
-
-            if (!confirmed) return;
-
             try
             {
+                var confirmed = await DialogService.ShowConfirmAsync(
+                    this,
+                    LocalizedStrings.Get("SignOutDialogTitle"),
+                    LocalizedStrings.Get("SignOutDialogBody"),
+                    LocalizedStrings.Get("SignOutDialogConfirm"),
+                    LocalizedStrings.Get("DialogCancel"),
+                    ContentDialogButton.Close);
+
+                if (!confirmed) return;
+
                 await ProfileService.LogoutAsync();
                 RefreshUI();
             }

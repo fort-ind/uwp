@@ -168,7 +168,7 @@ if ($certFile) {
         }
     } catch {
         Write-Status "Failed to install certificate: $($_.Exception.Message)" "Error"
-        $continue = Read-Host "conntinue without the app cert? (y/N)"
+        $continue = Read-Host "Continue without the app cert? (y/N)"
         if ($continue -ne "y" -and $continue -ne "Y") {
             exit 1
         }
@@ -188,12 +188,24 @@ if ($msixFile) {
 
     $existingApp = Get-AppxPackage -Name "*Fort.ind*" -ErrorAction SilentlyContinue
     if ($existingApp) {
-        Write-Status "almost done here..." "Info"
-        $existingApp | Remove-AppxPackage -ErrorAction SilentlyContinue
+        Write-Status "Upgrading over version $($existingApp.Version) - your settings and favourites are kept" "Info"
     }
 
     try {
-        Add-AppxPackage -Path $msixFile.FullName
+        $installed = $false
+        try {
+            Add-AppxPackage -Path $msixFile.FullName -ForceApplicationShutdown -ErrorAction Stop
+            $installed = $true
+        } catch {
+            if (-not $existingApp) { throw }
+
+            Write-Status "Retrying as a same-or-lower version upgrade..." "Warning"
+            Add-AppxPackage -Path $msixFile.FullName -ForceUpdateFromAnyVersion -ForceApplicationShutdown -ErrorAction Stop
+            $installed = $true
+        }
+
+        if (-not $installed) { throw "The package could not be installed." }
+
         Write-Status "Fort.ind UWP installed successfully!" "Success"
         Write-Host ""
         Write-Host "  +============================================+" -ForegroundColor Magenta
@@ -211,6 +223,13 @@ if ($msixFile) {
         Write-Status "1. Make sure Developer Mode is enabled in Windows Settings" "Info"
         Write-Status "2. Try restarting your computer and running this installer again" "Info"
         Write-Status "3. Check if Windows Update has pending updates" "Info"
+
+        if ($existingApp) {
+            Write-Host ""
+            Write-Status "The installed copy was left alone, so nothing was lost." "Info"
+            Write-Status "As a last resort you can uninstall Fort.ind UWP from Settings > Apps" "Info"
+            Write-Status "and run this installer again - that WILL erase your app settings." "Warning"
+        }
     }
 } else {
     Write-Status "seems like the APPX/MSIX package is missing, (did you extract the zip right?)" "Error"

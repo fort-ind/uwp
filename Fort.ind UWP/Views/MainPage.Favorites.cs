@@ -69,7 +69,12 @@ namespace Fort.ind_UWP
                 _favoritesItemsSourceSet = true;
             }
 
-            var favorites = FavoritesService.GetFavorites(_allSearchItems, AppConstants.HomeFavoritesMaxCount);
+            var favorites = FavoritesService.GetFavorites(_allSearchItems, AppConstants.HomeFavoritesMaxCount + 1);
+            var hasOverflow = favorites.Count > AppConstants.HomeFavoritesMaxCount;
+            if (hasOverflow)
+            {
+                favorites.RemoveAt(favorites.Count - 1);
+            }
 
             _homeFavorites.Clear();
             foreach (var item in favorites)
@@ -81,9 +86,7 @@ namespace Fort.ind_UWP
             FavoritesList.Visibility = hasAny ? Visibility.Visible : Visibility.Collapsed;
             FavoritesEmptyText.Visibility = hasAny ? Visibility.Collapsed : Visibility.Visible;
 
-            FavoritesSeeAllLink.Visibility = FavoritesService.Count > AppConstants.HomeFavoritesMaxCount
-                ? Visibility.Visible
-                : Visibility.Collapsed;
+            FavoritesSeeAllLink.Visibility = hasOverflow ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private async void HomeFavoriteItem_Click(object sender, RoutedEventArgs e)

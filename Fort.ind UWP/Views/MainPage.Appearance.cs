@@ -406,7 +406,7 @@ namespace Fort.ind_UWP
             if (swatch == null || !SwatchChecks.TryGetValue(swatch, out check) || check == null) return;
 
             var brush = swatch.Background as SolidColorBrush;
-            if (brush != null)
+            if (brush != null && swatch.ReadLocalValue(Control.BackgroundProperty) != DependencyProperty.UnsetValue)
             {
                 check.Foreground = new SolidColorBrush(ColorHelper.ContrastingForeground(brush.Color));
             }
@@ -521,6 +521,18 @@ namespace Fort.ind_UWP
         }
 
         private async void CustomTintButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await ShowCustomTintDialogAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: Custom tint flow failed – {ex.Message}");
+            }
+        }
+
+        private async Task ShowCustomTintDialogAsync()
         {
             var localSettings = ApplicationData.Current.LocalSettings;
             string previousTag = localSettings.Values[AppConstants.SettingAppTintColor]?.ToString()

@@ -43,18 +43,18 @@ namespace Fort.ind_UWP
 
         private async void ClearLoginInfoButton_Click(object sender, RoutedEventArgs e)
         {
-            var confirmed = await DialogService.ShowConfirmAsync(
-                this,
-                LocalizedStrings.Get("ClearLoginDialogTitle"),
-                LocalizedStrings.Get("ClearLoginDialogBody"),
-                LocalizedStrings.Get("ClearLoginDialogConfirm"),
-                LocalizedStrings.Get("DialogCancel"),
-                ContentDialogButton.Close);
-
-            if (!confirmed) return;
-
             try
             {
+                var confirmed = await DialogService.ShowConfirmAsync(
+                    this,
+                    LocalizedStrings.Get("ClearLoginDialogTitle"),
+                    LocalizedStrings.Get("ClearLoginDialogBody"),
+                    LocalizedStrings.Get("ClearLoginDialogConfirm"),
+                    LocalizedStrings.Get("DialogCancel"),
+                    ContentDialogButton.Close);
+
+                if (!confirmed) return;
+
                 await ProfileService.LogoutAsync();
                 UpdateStorageInfo();
             }
@@ -66,45 +66,52 @@ namespace Fort.ind_UWP
 
         private async void ResetAppButton_Click(object sender, RoutedEventArgs e)
         {
-            await DialogService.RunExclusiveAsync(async () =>
+            try
             {
-                var explained = await DialogService.ShowConfirmCoreAsync(
-                    this,
-                    LocalizedStrings.Get("ResetExplainDialogTitle"),
-                    LocalizedStrings.Get("ResetExplainDialogBody"),
-                    LocalizedStrings.Get("ResetExplainDialogConfirm"),
-                    LocalizedStrings.Get("DialogCancel"),
-                    ContentDialogButton.Close);
-
-                if (!explained) return;
-
-                var confirmed = await DialogService.ShowConfirmCoreAsync(
-                    this,
-                    LocalizedStrings.Get("ResetConfirmDialogTitle"),
-                    LocalizedStrings.Get("ResetConfirmDialogBody"),
-                    LocalizedStrings.Get("ResetConfirmDialogConfirm"),
-                    LocalizedStrings.Get("DialogCancel"),
-                    ContentDialogButton.Close);
-
-                if (!confirmed) return;
-
-                await ProfileService.ResetAppDataAsync();
-                LoadAppearanceSettings();
-                UpdateStorageInfo();
-
-                var restartNow = await DialogService.ShowConfirmCoreAsync(
-                    this,
-                    LocalizedStrings.Get("ResetDoneDialogTitle"),
-                    LocalizedStrings.Get("ResetDoneDialogBody"),
-                    LocalizedStrings.Get("ResetDoneDialogRestart"),
-                    LocalizedStrings.Get("ResetDoneDialogLater"),
-                    ContentDialogButton.Primary);
-
-                if (restartNow)
+                await DialogService.RunExclusiveAsync(async () =>
                 {
-                    await RequestAppRestartAsync();
-                }
-            });
+                    var explained = await DialogService.ShowConfirmCoreAsync(
+                        this,
+                        LocalizedStrings.Get("ResetExplainDialogTitle"),
+                        LocalizedStrings.Get("ResetExplainDialogBody"),
+                        LocalizedStrings.Get("ResetExplainDialogConfirm"),
+                        LocalizedStrings.Get("DialogCancel"),
+                        ContentDialogButton.Close);
+
+                    if (!explained) return;
+
+                    var confirmed = await DialogService.ShowConfirmCoreAsync(
+                        this,
+                        LocalizedStrings.Get("ResetConfirmDialogTitle"),
+                        LocalizedStrings.Get("ResetConfirmDialogBody"),
+                        LocalizedStrings.Get("ResetConfirmDialogConfirm"),
+                        LocalizedStrings.Get("DialogCancel"),
+                        ContentDialogButton.Close);
+
+                    if (!confirmed) return;
+
+                    await ProfileService.ResetAppDataAsync();
+                    LoadAppearanceSettings();
+                    UpdateStorageInfo();
+
+                    var restartNow = await DialogService.ShowConfirmCoreAsync(
+                        this,
+                        LocalizedStrings.Get("ResetDoneDialogTitle"),
+                        LocalizedStrings.Get("ResetDoneDialogBody"),
+                        LocalizedStrings.Get("ResetDoneDialogRestart"),
+                        LocalizedStrings.Get("ResetDoneDialogLater"),
+                        ContentDialogButton.Primary);
+
+                    if (restartNow)
+                    {
+                        await RequestAppRestartAsync();
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: App reset flow failed - {ex.Message}");
+            }
         }
 
         private async Task RequestAppRestartAsync()

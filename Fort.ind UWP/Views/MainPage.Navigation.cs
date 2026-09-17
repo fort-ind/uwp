@@ -397,6 +397,8 @@ namespace Fort.ind_UWP
 
         private void ShowInlinePanel(UIElement panel)
         {
+            CancelPendingReveal();
+
             ContentFrame.Visibility = Visibility.Collapsed;
             ContentScrollViewer.Visibility = Visibility.Visible;
 
@@ -405,7 +407,7 @@ namespace Fort.ind_UWP
             SocialPanel.Visibility = panel == SocialPanel ? Visibility.Visible : Visibility.Collapsed;
             SettingsPanel.Visibility = panel == SettingsPanel ? Visibility.Visible : Visibility.Collapsed;
 
-            PlayPanelEnterAnimation();
+            PlayPanelEnterAnimation(ContentPanel);
         }
 
         private static readonly TimeSpan PanelEnterDuration = TimeSpan.FromMilliseconds(300);
@@ -414,15 +416,21 @@ namespace Fort.ind_UWP
 
         private static Windows.UI.ViewManagement.UISettings s_uiSettings;
 
-        private void PlayPanelEnterAnimation()
+        private void PlayPanelEnterAnimation(UIElement target)
         {
             try
             {
+                if (target == null) return;
+
                 if (s_uiSettings == null)
                 {
                     s_uiSettings = new Windows.UI.ViewManagement.UISettings();
                 }
-                if (!s_uiSettings.AnimationsEnabled) return;
+                if (!s_uiSettings.AnimationsEnabled)
+                {
+                    target.Opacity = 1;
+                    return;
+                }
 
                 if (s_panelEnterAnimation == null)
                 {
@@ -433,11 +441,12 @@ namespace Fort.ind_UWP
                                      easingMode: EasingMode.EaseOut);
                 }
 
-                s_panelEnterAnimation.Start(ContentPanel);
+                s_panelEnterAnimation.Start(target);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Panel enter animation failed - {ex.Message}");
+                target.Opacity = 1;
+                Debug.WriteLine($"MainPage: Content enter animation failed - {ex.Message}");
             }
         }
 
@@ -475,28 +484,97 @@ namespace Fort.ind_UWP
 
         private void ShowProfilePage()
         {
-            ContentScrollViewer.Visibility = Visibility.Collapsed;
-            ContentFrame.Visibility = Visibility.Visible;
             try
             {
-                if (ContentFrame != null)
+                if (ContentFrame == null) return;
+
+                if (ContentFrame.Content is ProfilePage)
                 {
-                    if (ContentFrame.Content is ProfilePage)
-                    {
-                        ((ProfilePage)ContentFrame.Content).RefreshUI();
-                    }
-                    else
-                    {
-                        ContentFrame.Navigate(typeof(ProfilePage));
-                        TrimContentBackStack();
-                    }
+                    ((ProfilePage)ContentFrame.Content).RefreshUI();
                 }
+                else
+                {
+                    ContentFrame.Navigate(typeof(ProfilePage));
+                    TrimContentBackStack();
+                }
+
+                RevealContentFrame();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"MainPage: Profile navigation failed – {ex.Message}");
                 FallBackToHome();
             }
+        }
+
+        private const int MaxRevealFrames = 15;
+
+        private FrameworkElement _revealTarget;
+        private int _revealFrames;
+        private bool _revealHooked;
+
+        private void RevealContentFrame()
+        {
+            ContentScrollViewer.Visibility = Visibility.Collapsed;
+
+            CancelPendingReveal();
+
+            ContentFrame.Opacity = 0;
+            ContentFrame.Visibility = Visibility.Visible;
+
+            _revealTarget = ContentFrame.Content as FrameworkElement;
+            if (_revealTarget == null)
+            {
+                CompletePendingReveal();
+                return;
+            }
+
+            _revealFrames = 0;
+            CompositionTarget.Rendering += OnRevealRendering;
+            _revealHooked = true;
+        }
+
+        private void OnRevealRendering(object sender, object e)
+        {
+            try
+            {
+                _revealFrames += 1;
+
+                var target = _revealTarget;
+                var presented = target != null
+                                && VisualTreeHelper.GetParent(target) != null
+                                && target.ActualHeight > 0
+                                && target.ActualWidth > 0;
+
+                if (presented || _revealFrames >= MaxRevealFrames)
+                {
+                    Debug.WriteLine($"MainPage: content frame revealed after {_revealFrames} frame(s), presented={presented}");
+                    CompletePendingReveal();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: content reveal tick failed - {ex.Message}");
+                CompletePendingReveal();
+            }
+        }
+
+        private void CompletePendingReveal()
+        {
+            CancelPendingReveal();
+
+            ContentFrame.Opacity = 1;
+        }
+
+        private void CancelPendingReveal()
+        {
+            if (_revealHooked)
+            {
+                CompositionTarget.Rendering -= OnRevealRendering;
+                _revealHooked = false;
+            }
+
+            _revealTarget = null;
         }
 
         private void FallBackToHome()
@@ -507,15 +585,17 @@ namespace Fort.ind_UWP
 
         private void ShowGamesPage()
         {
-            ContentScrollViewer.Visibility = Visibility.Collapsed;
-            ContentFrame.Visibility = Visibility.Visible;
             try
             {
-                if (ContentFrame != null && !(ContentFrame.Content is GamesPage))
+                if (ContentFrame == null) return;
+
+                if (!(ContentFrame.Content is GamesPage))
                 {
                     ContentFrame.Navigate(typeof(GamesPage));
                     TrimContentBackStack();
                 }
+
+                RevealContentFrame();
             }
             catch (Exception ex)
             {
