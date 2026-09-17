@@ -45,18 +45,6 @@ namespace Fort.ind_UWP
         }
         private UserPreferences _preferences;
 
-        /// <summary>
-        /// "No date" for <see cref="CreatedDate"/> and <see cref="LastLoginDate"/>: DateTime.MinValue
-        /// with Kind Utc.
-        /// </summary>
-        /// <remarks>
-        /// The Kind is the point. DataContractJsonSerializer converts any non-Utc DateTime to UTC
-        /// before writing it, and default(DateTime) is Unspecified, which it treats as local time -
-        /// so east of UTC, MinValue minus the offset falls below the representable range and the
-        /// save throws. SaveProfileAsync swallowed that, so an account whose createdAt did not parse
-        /// was never cached at all in those time zones. Utc MinValue writes as-is, and still compares
-        /// equal to DateTime.MinValue, which is all ProfilePage's "is it set" checks look at.
-        /// </remarks>
         public static readonly DateTime UnsetDate = DateTime.SpecifyKind(DateTime.MinValue, DateTimeKind.Utc);
 
         public UserProfile()

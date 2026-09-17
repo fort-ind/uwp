@@ -127,7 +127,6 @@ namespace Fort.ind_UWP
 
         private void ClearTileButton_Click(object sender, RoutedEventArgs e)
         {
-            // Persisted, or the next launch's tile push paints it straight back.
             LiveTileService.TileCleared = true;
             LiveTileService.ClearTile();
             LiveTileService.ClearBadge();
@@ -159,10 +158,6 @@ namespace Fort.ind_UWP
             ToggleSettingsRow(AboutHeader, AboutContent, AboutChevronRotation, AppConstants.SettingSettingsAboutExpanded);
         }
 
-        // The header button is passed in as well as the panel because IsExpanded is what the
-        // ExpandCollapse automation pattern reads. Visibility and the chevron angle are visual
-        // only - neither reaches UI Automation, which is why a screen reader used to hear
-        // "button" and nothing about the section being open or closed.
         private void ToggleSettingsRow(ExpanderHeaderButton header, StackPanel content,
                                        RotateTransform chevronTransform, string settingKey = null)
         {
@@ -218,10 +213,6 @@ namespace Fort.ind_UWP
             {
                 var localSettings = ApplicationData.Current.LocalSettings;
 
-                // An absent key means "never set, or just wiped by a reset", and it has to apply
-                // the collapsed default rather than return. Returning left the section in whatever
-                // state it already had, so a reset - which clears LocalSettings wholesale - said it
-                // had restored defaults while every section stayed exactly as the user left it.
                 var isExpanded = false;
                 if (localSettings.Values.ContainsKey(settingKey))
                 {

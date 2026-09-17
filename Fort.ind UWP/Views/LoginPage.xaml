@@ -10,11 +10,6 @@
     Background="Transparent"
     Loaded="LoginPage_Loaded">
 
-    <!-- No background of its own. This page is hosted in MainPage's ContentFrame, over RootGrid's
-         acrylic, which carries the user's chosen tint; painting AppSurfaceAcrylicBrush here laid the
-         untinted default over it, so the tint vanished for as long as Login was showing. The
-         32px title-bar row that used to sit above the card is gone for the same reason: it dates
-         from when this was a top-level page, and MainPage already owns the title bar. -->
     <Grid Background="Transparent">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid Background="{ThemeResource CardBackgroundBrush}"
@@ -81,8 +76,6 @@
               Visibility="Collapsed">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
                 <ProgressRing x:Uid="LoginWaitingForSignIn" IsActive="True" Width="40" Height="40" HorizontalAlignment="Center"/>
-                <!-- Named so ShowLoading can raise LiveRegionChanged on it: LiveSetting alone
-                     announces nothing (see AutomationHelper.AnnounceLiveRegion). -->
                 <TextBlock x:Uid="LoginWaitingForFortSocial" x:Name="WaitingText" Margin="0,12,0,0"
                            Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
                            TextAlignment="Center"

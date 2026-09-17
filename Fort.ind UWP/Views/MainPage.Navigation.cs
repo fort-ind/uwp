@@ -27,9 +27,6 @@ namespace Fort.ind_UWP
                         {
                             UpdateProfileNavItem();
 
-                            // Settings > Data storage shows who is signed in, and it can be on
-                            // screen when that changes - a background refresh finding the token
-                            // revoked, or a sign-in arriving from the browser.
                             UpdateStorageInfo();
                         }
                         catch (Exception ex)
@@ -217,21 +214,12 @@ namespace Fort.ind_UWP
             ContentPanel.Padding = new Thickness(inset);
         }
 
-        /// <param name="tag">The nav tag to show; see the Navigation* constants on AppConstants.</param>
-        /// <param name="moveFocus">
-        /// True when the user drove this, false for the startup and session-restore paths. A nav
-        /// gesture that only flips Visibility leaves keyboard focus stranded in the pane and tells
-        /// assistive technology nothing, so a user-initiated switch hands focus to the content
-        /// region; doing the same at startup would be an unrequested context change.
-        /// </param>
         private void ShowContent(string tag, bool moveFocus = false)
         {
             var header = HeaderFor(tag);
             NavView.Header = header;
             RememberLastNavTag(tag);
 
-            // The content host is the Main landmark and the focus target, so it carries the
-            // section name - that is what gets read out when focus lands on it.
             Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentHost, header);
             Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentScrollViewer, header);
 
@@ -264,11 +252,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Moves keyboard focus out of the nav pane and onto whichever content host is showing.
-        /// Programmatic focus, so no focus rectangle is drawn - the point is where the next Tab
-        /// and the next screen-reader read start from, not a visible highlight.
-        /// </summary>
         private void FocusContentRegion()
         {
             try
@@ -279,9 +262,6 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                // Page-backed views: the page itself, when it will take focus. GamesPage and
-                // ProfilePage are ordinary Pages and may decline, which is fine - they hold real
-                // controls a Tab away, and the header has already been retitled.
                 var page = ContentFrame.Content as Control;
                 if (page != null)
                 {
@@ -294,17 +274,10 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Tags the pane as the Navigation landmark. It has to be done from code against the
-        /// template part: the pane lives inside NavigationView's template, and putting the
-        /// landmark on NavView itself would wrap the content in it too.
-        /// </summary>
         private void MarkNavigationPaneLandmark()
         {
             try
             {
-                // PaneContentGrid is the platform NavigationView's pane container - see
-                // generic.xaml, the ControlTemplate for Windows.UI.Xaml.Controls.NavigationView.
                 var pane = VisualTreeSearch.FindDescendantByName(NavView, "PaneContentGrid");
                 if (pane == null)
                 {
@@ -435,15 +408,6 @@ namespace Fort.ind_UWP
             PlayPanelEnterAnimation();
         }
 
-        // The Fluent "Enter" recipe (doc dump chunk_032, "Timing and easing"): 300ms with the
-        // Decelerate curve. EasingType.Default + EaseOut is the toolkit's name for exactly that
-        // curve on the composition layer, cubic-bezier(0.1, 0.9, 0.2, 1) - the CubicEase the old
-        // Storyboard used was only an approximation of it. Both animations run on the composition
-        // thread, and a builder holds no per-element state, so one instance serves every call.
-        //
-        // Built on first use inside the try below, not in a static initializer: a failure there
-        // would be a TypeInitializationException on MainPage itself, and a missing animation must
-        // never take out navigation.
         private static readonly TimeSpan PanelEnterDuration = TimeSpan.FromMilliseconds(300);
 
         private static AnimationBuilder s_panelEnterAnimation;
@@ -454,12 +418,6 @@ namespace Fort.ind_UWP
         {
             try
             {
-                // Settings > Ease of Access > "Show animations in Windows" (doc dump chunk_119,
-                // "Animations settings"), which says apps should respond to it; this animation plays
-                // on every nav gesture and nothing checked it. Read on every call rather than cached, so
-                // flipping the setting while the app runs takes effect on the next nav gesture.
-                // Skipping leaves the panel at rest: a completed animation holds its final values,
-                // opacity 1 and no offset.
                 if (s_uiSettings == null)
                 {
                     s_uiSettings = new Windows.UI.ViewManagement.UISettings();
@@ -475,8 +433,6 @@ namespace Fort.ind_UWP
                                      easingMode: EasingMode.EaseOut);
                 }
 
-                // Starting a composition animation on a property replaces any still running on
-                // it, which is what the Storyboard's Stop-then-Begin used to do by hand.
                 s_panelEnterAnimation.Start(ContentPanel);
             }
             catch (Exception ex)
@@ -543,15 +499,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Where a page-backed view lands when its navigation throws.
-        /// </summary>
-        /// <remarks>
-        /// All of Home, not just its panel. The fallback used to swap in LatestNewsPanel and retitle
-        /// the header, but the pane stayed lit on the item that failed and ShowContent had already
-        /// saved that item's tag - so a later restore from termination went straight back to it.
-        /// The nested ShowContent is safe: Home is an inline panel and cannot fail this way.
-        /// </remarks>
         private void FallBackToHome()
         {
             SelectNavItemForTag(AppConstants.NavigationLatestNews);

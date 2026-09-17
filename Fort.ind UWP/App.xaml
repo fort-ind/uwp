@@ -28,21 +28,6 @@
                                           TintOpacity="0.9"
                                           FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
-                            <!-- The pane in every mode *except* Expanded: generic.xaml applies
-                                 NavigationViewExpandedPaneBackground from a VisualState setter
-                                 that only runs in Expanded, and falls back to this key for the
-                                 compact rail and the overlay pane. Without it the sidebar
-                                 transparency slider and the sidebar tint silently stopped
-                                 applying as soon as the window narrowed.
-
-                                 Backdrop, not HostBackdrop, and that difference is deliberate:
-                                 this pane opens *over* the content, and the doc dump asks for
-                                 in-app acrylic there ("If your vertical panes open on top of
-                                 content, like in NavigationView's Compact or Minimal modes, we
-                                 suggest you use in-app acrylic" - chunk_030, "When to use
-                                 acrylic"). It is also what the platform default this replaces,
-                                 SystemControlChromeMediumLowAcrylicElementMediumBrush, already
-                                 sampled. -->
                             <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
                                           BackgroundSource="Backdrop"
                                           TintColor="{ThemeResource SystemChromeMediumColor}"
@@ -72,11 +57,6 @@
 
                             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{ThemeResource SystemBaseHighColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
-                            <!-- Accent-coloured text uses a shade, not the accent: plain accent is
-                                 ~3:1 on the dark surface, under the 4.5:1 text minimum (doc dump
-                                 chunk_049). Light2 clears it for every preset. The shade pair is
-                                 mirrored in AccentColorService.DarkThemeTextShade/LightThemeTextShade,
-                                 which the custom picker's contrast warning checks. -->
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColorLight2}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColorLight2}"/>
                             <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource SystemAccentColorLight2}"/>
@@ -95,8 +75,6 @@
                                           TintOpacity="0.9"
                                           FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
 
-                            <!-- Backdrop rather than HostBackdrop, for the reason spelled out
-                                 on the Default dictionary's copy of this key. -->
                             <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
                                           BackgroundSource="Backdrop"
                                           TintColor="{ThemeResource SystemChromeMediumLowColor}"
@@ -122,7 +100,6 @@
 
                             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="{ThemeResource SystemBaseHighColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
-                            <!-- Dark1 here, for the same 4.5:1 reason as Light2 in the dark dictionary. -->
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemAccentColorDark1}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemAccentColorDark1}"/>
                             <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource SystemAccentColorDark1}"/>
@@ -131,26 +108,10 @@
                         <ResourceDictionary x:Key="HighContrast">
                             <SolidColorBrush x:Key="AppSurfaceAcrylicBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
-                            <!-- Solid, like every other surface here: acrylic in high contrast
-                                 makes the framework fall back to a fixed FallbackColor and
-                                 ignore the user's scheme. The transparency sliders skip these
-                                 two keys for the same reason - see PaneAcrylicBrushes. -->
                             <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
 
-                            <!-- The rest and selected states have to be defined here even though
-                                 the Default dictionary above already carries the keys - precisely
-                                 because it does. A key missing from HighContrast falls through to
-                                 Default, which paints these with a transparent RevealBackgroundBrush,
-                                 so the selected item ended up as SystemColorHighlightTextColor text
-                                 on the plain window background: invisible in HC Black, where
-                                 HighlightText is black. Values mirror generic.xaml's own
-                                 HighContrast dictionary, where NavigationViewItemBackgroundSelected
-                                 is SystemControlHighlightListLowRevealBackgroundBrush (= Highlight)
-                                 and the item borders are SystemControlBackgroundTransparentRevealBorderBrush
-                                 (= ButtonText). ButtonFace is the partner of the ButtonText
-                                 foreground this dictionary already picks for the rest state. -->
                             <SolidColorBrush x:Key="NavigationViewItemBackground" Color="{ThemeResource SystemColorButtonFaceColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{ThemeResource SystemColorHighlightColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemBorderBrush" Color="{ThemeResource SystemColorButtonTextColor}"/>
@@ -169,8 +130,6 @@
                             <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="{ThemeResource SystemColorHighlightTextColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
-                            <!-- The platform's own high-contrast value (generic.xaml), defined here so
-                                 the lookup does not fall through to the Default dictionary's shade. -->
                             <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource SystemColorHotlightColor}"/>
                         </ResourceDictionary>
 

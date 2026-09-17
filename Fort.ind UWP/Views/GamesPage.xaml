@@ -48,11 +48,6 @@
                            VerticalAlignment="Bottom"
                            AutomationProperties.AccessibilityView="Raw"/>
 
-                <!-- x:Phase="1" here and on the star: a container realised during a fast scroll or a
-                     jump from the zoomed-out grid renders its icon and title first, and the
-                     secondary text and the ToggleButton (a templated control, by far the heaviest
-                     part of the row) bind on a later pass. Doc dump chunk_078, "Progressive data
-                     template updates using x:Phase". -->
                 <TextBlock Grid.Column="1" Grid.Row="1"
                            x:Phase="1"
                            Text="{x:Bind Category}"
@@ -63,19 +58,6 @@
                            VerticalAlignment="Top"
                            AutomationProperties.AccessibilityView="Raw"/>
 
-                <!-- A ToggleButton rather than a Button so UIA reports the on/off state for free
-                     through IToggleProvider - the accessibility docs require a control to announce
-                     name, state and type, and a Button would need a custom peer to do it (see
-                     Controls/ExpanderHeaderButton.cs for that pattern).
-
-                     Mode=OneWay is load-bearing: x:Bind is OneTime by default, which would freeze
-                     each star at whatever the first item realised into that recycled container had.
-
-                     The glyph swap is the point of FavoriteGlyph - ToggleButtonRevealStyle's
-                     Checked state carries state by accent fill alone, and colour must never be the
-                     only carrier. This FontIcon is deliberately not AccessibilityView="Raw": unlike
-                     every other glyph in the app it is the control's only content, not decoration
-                     sitting beside a label that already names the thing. -->
                 <ToggleButton Grid.Column="2" Grid.RowSpan="2"
                               x:Phase="1"
                               Style="{StaticResource ToggleButtonRevealStyle}"
@@ -224,8 +206,6 @@
                               IsActive="True"
                               Width="32" Height="32"
                               HorizontalAlignment="Center"/>
-                <!-- Named so SetState can raise LiveRegionChanged on it: LiveSetting alone
-                     announces nothing (see AutomationHelper.AnnounceLiveRegion). -->
                 <TextBlock x:Uid="GamesLoadingGames" x:Name="LoadingText"
                            Style="{StaticResource BodyTextBlockStyle}"
                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"

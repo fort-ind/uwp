@@ -52,18 +52,6 @@ namespace Fort.ind_UWP
         private static string s_cachedUrl;
         private static Uri s_cachedUri;
 
-        /// <summary>
-        /// Drops the memoized icon URI. Call this whenever the backing PNG may have been deleted
-        /// out from under the cache - the full app-data reset being the one path that does that.
-        /// </summary>
-        /// <remarks>
-        /// Without it, signing back in after a reset with the same avatar returned the remembered
-        /// ms-appdata URI for a file the reset had just deleted, and the nav item's BitmapIcon drew
-        /// nothing at all - there is no failure signal on that pipeline to fall back from.
-        /// Deliberately not taking s_gate: this is synchronous, and blocking a UI-thread caller on
-        /// an in-flight download to clear two references would be a far worse trade than the
-        /// vanishingly narrow race of a concurrent fetch repopulating them.
-        /// </remarks>
         public static void InvalidateCache()
         {
             s_cachedUrl = null;
@@ -110,16 +98,10 @@ namespace Fort.ind_UWP
                         return null;
                     }
 
-                    // A new file is the only thing that can leave an old one behind, so this is
-                    // where pruning belongs.
                     await PruneOtherAvatarsAsync(folder, fileName);
                 }
                 else
                 {
-                    // The common case - the same avatar as last launch - used to enumerate
-                    // LocalFolder on every single start, because the memoized URI is per process.
-                    // Only files that predate any pruning at all still need that, and one sweep
-                    // clears them for good.
                     await SweepLegacyAvatarsOnceAsync(folder, fileName);
                 }
 
@@ -151,18 +133,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Downloads the avatar into memory, giving up past <see cref="MaxAvatarBytes"/> or
-        /// <see cref="DownloadTimeout"/>. Returns null (and disposes nothing the caller owns) when
-        /// the response is empty or over the cap.
-        /// </summary>
-        /// <remarks>
-        /// Streamed rather than GetBufferAsync, which read the entire body before the size check
-        /// could run - so the cap bounded nothing. The declared Content-Length rejects an honest
-        /// oversized response before any body is read; the running count catches a chunked or
-        /// lying one. The timeout matters because Windows.Web.Http has none of its own and this
-        /// runs under s_gate: a stalled instance would otherwise hold every later avatar request.
-        /// </remarks>
         private static async Task<InMemoryRandomAccessStream> DownloadCappedAsync(Uri sourceUri)
         {
             using (var cts = new CancellationTokenSource(DownloadTimeout))
@@ -224,10 +194,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Downloads, centre-crops and circle-masks the avatar. Returns straight-alpha BGRA8
-        /// pixels, <see cref="IconPixelSize"/> square, or null.
-        /// </summary>
         private static async Task<byte[]> RenderCircularIconAsync(Uri sourceUri)
         {
             var downloaded = await DownloadCappedAsync(sourceUri);
@@ -260,9 +226,6 @@ namespace Fort.ind_UWP
                     Height = IconPixelSize
                 };
 
-                // The transform scales and crops during the decode, so an 8 MB source is never
-                // held whole. Straight alpha, not premultiplied: the circle mask below then only has
-                // to scale the alpha channel, and it is what the PNG encoder stores anyway.
                 var pixelData = await decoder.GetPixelDataAsync(
                     BitmapPixelFormat.Bgra8,
                     BitmapAlphaMode.Straight,
@@ -282,15 +245,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Scales each pixel's alpha by how much of it lies inside the inscribed circle, which
-        /// antialiases the edge by about one pixel.
-        /// </summary>
-        /// <remarks>
-        /// This used to be a Win2D layer clip. At 48x48 that meant creating a Direct3D device and
-        /// shipping a native graphics library to touch 2,304 pixels; the arithmetic is the same
-        /// coverage estimate its antialiaser makes along an edge, done on the CPU.
-        /// </remarks>
         private static void ApplyCircleMask(byte[] bgra, int size)
         {
             double radius = size / 2.0;
@@ -303,7 +257,6 @@ namespace Fort.ind_UWP
                     double dx = x + 0.5 - radius;
                     double distance = Math.Sqrt(dx * dx + dy * dy);
 
-                    // 1 inside, 0 outside, a linear ramp across the pixel the edge passes through.
                     double coverage = radius - distance + 0.5;
                     if (coverage >= 1.0) continue;
 
@@ -338,8 +291,6 @@ namespace Fort.ind_UWP
             }
             catch
             {
-                // The file is created before the encode, so a throw anywhere in there strands a
-                // zero-length .tmp in LocalFolder - one more per failed attempt, forever.
                 try
                 {
                     await tempFile.DeleteAsync(StorageDeleteOption.PermanentDelete);
@@ -355,18 +306,6 @@ namespace Fort.ind_UWP
             return true;
         }
 
-        /// <summary>
-        /// Deletes every avatar file in <paramref name="folder"/> except the one just written.
-        /// </summary>
-        /// <remarks>
-        /// The file name carries a hash of the source URL so that a changed avatar lands on a new
-        /// path (XAML's image cache holds the old bitmap for a reused one). The cost of that is a
-        /// fresh PNG per avatar the user has ever had, with nothing removing the old ones. Only
-        /// files under the avatar prefix are touched, so the profile cache and favorites file
-        /// sharing this folder are never in scope - and .tmp leftovers match the prefix too,
-        /// so they get swept up here as well.
-        /// </remarks>
-        /// <returns>False if the folder could not be enumerated at all.</returns>
         private static async Task<bool> PruneOtherAvatarsAsync(StorageFolder folder, string keepFileName)
         {
             try
@@ -398,16 +337,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Runs <see cref="PruneOtherAvatarsAsync"/> once per install, for avatar files written by
-        /// builds that never pruned. Gated on a LocalSettings flag, which is an in-memory lookup,
-        /// so the steady state costs no file-system call.
-        /// </summary>
-        /// <remarks>
-        /// An app-data reset clears the flag along with LocalFolder, so the sweep runs once more
-        /// against a folder that is already empty - harmless. The flag is only set when the
-        /// enumeration worked, so a failure is retried next launch.
-        /// </remarks>
         private static async Task SweepLegacyAvatarsOnceAsync(StorageFolder folder, string keepFileName)
         {
             try

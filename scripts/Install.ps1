@@ -1,6 +1,4 @@
-﻿# Fort.ind UWP Installer Script
-# This script checks and installs dependencies before installing the app
-
+﻿
 $ErrorActionPreference = "Stop"
 
 function Write-Status($message, $type = "Info") {
@@ -37,7 +35,6 @@ function Write-Section($title) {
 
 Write-Banner
 
-# Check for Administrator privileges
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
     Write-Status "Restarting as Administrator..." "Warning"
@@ -47,7 +44,6 @@ if (-not $isAdmin) {
 
 Write-Status "Running with Administrator privileges" "Success"
 
-# ===== DEPENDENCY CHECK: Windows Version =====
 Write-Section "Windows Version"
 $osVersion = [System.Environment]::OSVersion.Version
 $minVersion = [Version]"10.0.17763"  # Windows 10 version 1809
@@ -60,7 +56,6 @@ if ($osVersion -lt $minVersion) {
 }
 Write-Status "Windows version $($osVersion.Build) meets requirements" "Success"
 
-# ===== DEPENDENCY CHECK: Developer Mode / Sideloading =====
 Write-Section "Sideloading Settings"
 
 $devModeEnabled = $false
@@ -73,7 +68,6 @@ try {
         $sideloadEnabled = ($devModeKey.AllowAllTrustedApps -eq 1)
     }
 } catch {
-    # Registry key might not exist
 }
 
 if ($devModeEnabled) {
@@ -100,7 +94,6 @@ if ($devModeEnabled) {
     }
 }
 
-# ===== DEPENDENCY CHECK: VCLibs (Visual C++ Runtime for UWP) =====
 Write-Section "Visual C++ Runtime (VCLibs)"
 
 $arch = if ([Environment]::Is64BitOperatingSystem) { "x64" } else { "x86" }
@@ -135,7 +128,6 @@ if ($vclibsPackage) {
     }
 }
 
-# ===== DEPENDENCY CHECK: Microsoft.UI.Xaml (WinUI) =====
 Write-Section "Microsoft.UI.Xaml (WinUI)"
 
 $winuiPackage = Get-AppxPackage -Name "Microsoft.UI.Xaml.2.8" -ErrorAction SilentlyContinue
@@ -145,7 +137,6 @@ if ($winuiPackage) {
 } else {
     Write-Status "Microsoft.UI.Xaml 2.8 not found. Will be installed with the app..." "Info"
 
-    # Check for bundled dependency in the package folder
     $dependencyPath = Join-Path $PSScriptRoot "Dependencies\$arch"
     if (Test-Path $dependencyPath) {
         Write-Status "Found bundled dependencies, installing..."
@@ -161,13 +152,11 @@ if ($winuiPackage) {
     }
 }
 
-# ===== CERTIFICATE INSTALLATION =====
 Write-Section "Signing Certificate"
 $certFile = Get-ChildItem -Path $PSScriptRoot -Filter "*.cer" | Select-Object -First 1
 if ($certFile) {
     Write-Status "Installing signing certificate..."
     try {
-        # Check if certificate is already installed
         $certThumbprint = (Get-PfxCertificate -FilePath $certFile.FullName).Thumbprint
         $existingCert = Get-ChildItem -Path Cert:\LocalMachine\TrustedPeople | Where-Object { $_.Thumbprint -eq $certThumbprint }
 
@@ -188,7 +177,6 @@ if ($certFile) {
     Write-Status "No certificate file found. The package may be unsigned." "Warning"
 }
 
-# ===== APP INSTALLATION =====
 Write-Section "Installing Fort.ind UWP"
 $msixFile = Get-ChildItem -Path $PSScriptRoot -Filter "*.msix" | Select-Object -First 1
 if (-not $msixFile) {
@@ -198,7 +186,6 @@ if (-not $msixFile) {
 if ($msixFile) {
     Write-Status "Installing Fort.ind UWP..."
 
-    # Check if app is already installed and remove old version
     $existingApp = Get-AppxPackage -Name "*Fort.ind*" -ErrorAction SilentlyContinue
     if ($existingApp) {
         Write-Status "almost done here..." "Info"

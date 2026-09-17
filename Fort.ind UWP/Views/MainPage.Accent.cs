@@ -17,9 +17,6 @@ namespace Fort.ind_UWP
 
         private Button[] _accentTagSwatches;
 
-        /// <summary>
-        /// Every accent swatch whose Tag is the choice it stands for - all but Custom.
-        /// </summary>
         private Button[] AccentTagSwatches
         {
             get
@@ -63,16 +60,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Border, checkmark and automation name for the saved accent, the colours of the two
-        /// swatches that depend on other settings, and the restart notice.
-        /// </summary>
-        /// <remarks>
-        /// Called at the end of UpdateTintSelection rather than from each of its callers: all of
-        /// them - settings load, theme repaint, a tint pick - change something this reads. The
-        /// rest/selected borders follow the theme, and the Match tint swatch and the restart
-        /// notice both follow the tint.
-        /// </remarks>
         private void UpdateAccentSelection()
         {
             try
@@ -101,8 +88,6 @@ namespace Fort.ind_UWP
                 AutomationProperties.SetName(AccentCustomButton, BaseSwatchName(AccentCustomButton));
                 if (sel == null)
                 {
-                    // SavedAccentTag only ever returns Default, MatchTint or a parseable colour, so
-                    // anything no tagged swatch claims is a custom colour.
                     sel = AccentCustomButton;
                     PaintCustomAccentSwatch(selectedTag);
                     AutomationProperties.SetName(
@@ -136,17 +121,12 @@ namespace Fort.ind_UWP
             }
             else
             {
-                // An unpainted swatch keeps the theme's button background and its paired foreground.
                 check.ClearValue(IconElement.ForegroundProperty);
             }
 
             check.Visibility = Visibility.Visible;
         }
 
-        /// <summary>
-        /// Paints the Match tint swatch with the accent the current tint would give, so the user
-        /// sees what they are choosing; unpainted when the tint is the default surface.
-        /// </summary>
         private void PaintMatchTintSwatch()
         {
             var tint = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
@@ -210,7 +190,6 @@ namespace Fort.ind_UWP
                     var content = contentTemplate?.LoadContent() as FrameworkElement;
                     if (content == null) return;
 
-                    // x:Name inside a DataTemplate resolves against the stamped copy, not the page.
                     var picker = content.FindName("AccentPicker") as ColorPicker;
                     var warning = content.FindName("AccentContrastWarning") as FrameworkElement;
                     var warningText = content.FindName("AccentContrastWarningText") as TextBlock;
@@ -257,10 +236,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Shows, rewords or hides the picker's contrast warning. Only announced when its text
-        /// actually changes: ColorChanged fires continuously while the user drags.
-        /// </summary>
         private static void UpdateContrastWarning(Color color, FrameworkElement warning, TextBlock warningText, bool announce)
         {
             bool failsDark, failsLight;
@@ -290,8 +265,6 @@ namespace Fort.ind_UWP
             {
                 await RequestAppRestartAsync();
 
-                // RequestRestartAsync only returns when the restart did not happen. The user asked
-                // for it, so unlike the reset flow this cannot just log and carry on.
                 await DialogService.ShowMessageAsync(this,
                                                      LocalizedStrings.Get("AccentRestartFailedDialogTitle"),
                                                      LocalizedStrings.Get("AccentRestartFailedDialogBody"),

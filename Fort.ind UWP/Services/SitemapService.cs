@@ -48,9 +48,6 @@ namespace Fort.ind_UWP
             List<SearchItem> games = new List<SearchItem>();
             foreach (var item in all)
             {
-                // CategoryKey, not Category: Category is the localized display name now, and
-                // matching a translated string against an English constant would empty this list
-                // in every other language.
                 if (item.CategoryKey != null &&
                     item.CategoryKey.StartsWith(AppConstants.CategoryGames, StringComparison.Ordinal))
                 {
@@ -72,18 +69,9 @@ namespace Fort.ind_UWP
 
             try
             {
-                // Read straight from the package every time. There used to be a 24h on-disk cache of
-                // the parsed URLs in front of this, keyed on the app version, which bought nothing -
-                // it traded one local file read for another - and cost correctness: an edited
-                // sitemap.xml deployed under the same version number stayed invisible for up to a
-                // day. The in-process memoization in LoadSearchItemsAsync is the only cache needed.
                 var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/sitemap.xml"));
                 var text = await FileIO.ReadTextAsync(file);
 
-                // The XML walk, URI validation and slug-to-title work is pure string handling, so
-                // it runs on the thread pool; it used to run on the UI thread in the middle of
-                // MainPage's first layout. Only the SearchItem construction comes back here, because
-                // that resolves display text through LocalizedStrings, which needs the UI thread.
                 var entries = await Task.Run(() => ReadSitemapEntries(text));
                 if (entries == null)
                 {
@@ -145,21 +133,13 @@ namespace Fort.ind_UWP
             return urls;
         }
 
-        /// <summary>
-        /// One sitemap URL, parsed but not yet a <see cref="SearchItem"/>.
-        /// </summary>
         private sealed class SitemapEntry
         {
-            /// <summary>Null for the site root, whose title is a resource looked up later.</summary>
             public string Title;
             public string CategoryKey;
             public string Url;
         }
 
-        /// <summary>
-        /// Everything that can run off the UI thread: no resource lookups. Null if the XML is
-        /// unreadable.
-        /// </summary>
         private static List<SitemapEntry> ReadSitemapEntries(string documentText)
         {
             var urls = ReadLocValues(documentText);
@@ -202,9 +182,6 @@ namespace Fort.ind_UWP
             return new SitemapEntry { Title = GetTitle(path), CategoryKey = GetCategory(path), Url = urlValue };
         }
 
-        /// <summary>
-        /// Must run on the UI thread - the SearchItem constructor resolves localized text.
-        /// </summary>
         private static List<SearchItem> BuildSearchItems(List<SitemapEntry> entries)
         {
             List<SearchItem> items = new List<SearchItem>(entries.Count);
@@ -216,16 +193,6 @@ namespace Fort.ind_UWP
             return items;
         }
 
-        /// <summary>
-        /// Removes the URL cache file and its two settings that builds before the cache was
-        /// dropped wrote to LocalFolder, so they do not sit there forever.
-        /// </summary>
-        /// <remarks>
-        /// Gated on the timestamp setting, which is a cheap in-memory lookup, so an install that
-        /// never had the cache - or has already been cleaned - pays no file-system call per launch.
-        /// Fire-and-forget and best-effort: nothing reads these any more, so a failure costs only a
-        /// few kilobytes.
-        /// </remarks>
         private static async void DeleteLegacyUrlCacheInBackground()
         {
             try
@@ -239,8 +206,6 @@ namespace Fort.ind_UWP
                     await cacheFile.DeleteAsync(StorageDeleteOption.PermanentDelete);
                 }
 
-                // Settings last: the timestamp key is the gate, so if the delete above throws it
-                // stays in place and the cleanup is retried on the next launch.
                 values.Remove(AppConstants.LegacySitemapCacheTimestampKey);
                 values.Remove(AppConstants.LegacySitemapCacheAppVersionKey);
             }
@@ -250,15 +215,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Maps a sitemap path to an AppConstants category KEY - never to display text.
-        /// </summary>
-        /// <remarks>
-        /// These used to be inline English literals ("Games — HTML") that went straight into
-        /// SearchItem.Category and out to the group headers and search results untranslated.
-        /// StringComparison.Ordinal throughout: these are URL paths, and the culture-sensitive
-        /// StartsWith overload has no business deciding whether one begins with "games/".
-        /// </remarks>
         private static string GetCategory(string path)
         {
             if (path.StartsWith("games/html/", StringComparison.Ordinal)) return AppConstants.CategoryGamesHtml;

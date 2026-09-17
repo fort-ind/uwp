@@ -11,18 +11,8 @@ namespace Fort.ind_UWP
 
         public string Title { get; set; }
 
-        /// <summary>
-        /// Stable, ordinal, never displayed - one of the AppConstants.Category* values.
-        /// </summary>
-        /// <remarks>
-        /// Split out from <see cref="Category"/> because that one value was doing two
-        /// incompatible jobs: it was both the grouping/icon key matched with StartsWith and the
-        /// text shown under every search result. Localizing it in place would have quietly broken
-        /// the games filter and the icon table for every language but English.
-        /// </remarks>
         public string CategoryKey { get; set; }
 
-        /// <summary>Localized display name for <see cref="CategoryKey"/>.</summary>
         public string Category { get; set; }
 
         public string NavigationTag { get; set; }
@@ -31,17 +21,6 @@ namespace Fort.ind_UWP
 
         public string Icon { get; set; }
 
-        /// <summary>
-        /// Whether the user has starred this item. Bound OneWay from the games list, so it must
-        /// notify.
-        /// </summary>
-        /// <remarks>
-        /// Held on the model rather than in a lookup the views consult because every SearchItem is
-        /// a process singleton: SitemapService memoizes s_allItems, s_gameItems holds references
-        /// into that same list, and MainPage._allSearchItems appends those same instances. One
-        /// instance per game means Home, GamesPage and the nav search all observe a toggle with no
-        /// synchronization code between them.
-        /// </remarks>
         public bool IsFavorite
         {
             get { return _isFavorite; }
@@ -54,25 +33,11 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Outline star when off, filled when on - E734/E735 are FavoriteStar/FavoriteStarFill in
-        /// Segoe MDL2.
-        /// </summary>
-        /// <remarks>
-        /// Exposed on the model so the star carries its state as a shape and not only as a colour:
-        /// ToggleButtonRevealStyle's Checked state is an accent fill, and colour must never be the
-        /// only carrier. Lives here rather than on either page because Home and GamesPage both
-        /// render the same toggle.
-        /// </remarks>
         public string FavoriteGlyph
         {
             get { return _isFavorite ? "\uE735" : "\uE734"; }
         }
 
-        /// <summary>
-        /// Accessible name for the favorite toggle - "Favorite &lt;title&gt;", not a bare
-        /// "Favorite", so a screen reader never announces the control without its referent.
-        /// </summary>
         public string FavoriteLabel { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -94,21 +59,12 @@ namespace Fort.ind_UWP
             this.Url = url;
             this.Icon = GetIconGlyph(this.CategoryKey);
 
-            // Resolved eagerly rather than from a property getter: SearchCatalog.BuildSuggestions
-            // reads Category under Task.Run, and off the UI thread LocalizedStrings degrades to
-            // returning the key. Every construction path runs on the UI thread.
             this.Category = GetCategoryDisplayName(this.CategoryKey);
             this.FavoriteLabel = LocalizedStrings.FormatPattern(GetFavoriteLabelPattern(), FavoriteLabelKey, this.Title);
         }
 
         private const string FavoriteLabelKey = "FavoriteToggleNameFormat";
 
-        // The sitemap builds ~300 of these in one go at startup, and there are only 16 category
-        // names and one label pattern among them - so they are resolved once each rather than
-        // making two resource-loader calls per item. Memoized only once the loader is really
-        // there, for the reason SearchCatalog.GetStaticItems gives: a lookup that degraded to the
-        // bare key must not be cached. No staleness is added by this: the items themselves are
-        // already memoized for the life of the process.
         private static readonly object s_resourceCacheLock = new object();
         private static readonly Dictionary<string, string> s_categoryDisplayNames =
             new Dictionary<string, string>(StringComparer.Ordinal);

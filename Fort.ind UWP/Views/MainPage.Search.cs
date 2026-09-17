@@ -62,12 +62,6 @@ namespace Fort.ind_UWP
         {
             try
             {
-                // Not Task.Delay(ms, cancellationToken): the token there makes every keystroke's
-                // superseded delay throw TaskCanceledException, which is a first-chance flood in
-                // the debugger for what is the normal case. The check below already does the work,
-                // and it stays valid after Restart has disposed the source - IsCancellationRequested
-                // is one of the few members that does not throw once disposed. Task.Run below keeps
-                // its token, where cancelling genuinely avoids running the search.
                 await Task.Delay(AppConstants.SearchDebounceMilliseconds);
 
                 if (cancellationToken.IsCancellationRequested)
@@ -77,8 +71,6 @@ namespace Fort.ind_UWP
 
                 var snapshot = _allSearchItems;
 
-                // Built here, on the UI thread, and passed into the Task.Run below: it needs the
-                // resource loader, which is unavailable off the UI thread.
                 var profileResult = SearchCatalog.BuildProfileResultItem(ProfileService.CurrentUser);
 
                 var results = await Task.Run(() => SearchCatalog.BuildSuggestions(query, snapshot, profileResult), cancellationToken);
@@ -98,12 +90,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Speaks the size of the suggestion list. Replacing an AutoSuggestBox's ItemsSource
-        /// raises nothing a screen reader reports, and the empty case is the one that matters:
-        /// without this, typing a query that matches nothing is indistinguishable from typing one
-        /// whose results have not arrived yet.
-        /// </summary>
         private void AnnounceSearchResultCount(int count)
         {
             string message;
@@ -113,9 +99,6 @@ namespace Fort.ind_UWP
             }
             else if (count == 1)
             {
-                // A separate resource rather than a "1" substituted into the plural string:
-                // languages differ on which counts take which form, and a format string here
-                // would force every translator into the wrong one.
                 message = LocalizedStrings.Get("SearchResultsOne");
             }
             else
@@ -191,8 +174,6 @@ namespace Fort.ind_UWP
             }
             else if (!string.IsNullOrEmpty(item.NavigationTag))
             {
-                // NavigateToTag, not ShowContent: ShowContent swaps the content but leaves the pane
-                // lit on wherever the user searched from, and does not hand focus to the content.
                 NavigateToTag(item.NavigationTag);
             }
         }

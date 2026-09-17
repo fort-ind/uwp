@@ -10,47 +10,22 @@ using Windows.Storage;
 
 namespace Fort.ind_UWP
 {
-    /// <summary>
-    /// The set of games the user has starred, persisted to <c>favorites.json</c> in LocalFolder.
-    /// </summary>
-    /// <remarks>
-    /// Keyed by URL because <see cref="SearchItem"/> carries no identifier of its own and the URL
-    /// is what the sitemap actually provides. Consequence worth knowing: the sitemap is bundled, so
-    /// a URL that changes between releases silently orphans that favorite - it is kept in the file
-    /// rather than pruned, so a later build that restores the URL restores the star with it.
-    ///
-    /// Deliberately not wired into <see cref="SitemapService"/>. Applying favorites inside
-    /// LoadSearchItemsAsync would be one tidy call site, but that method holds a non-reentrant
-    /// SemaphoreSlim, and re-taking one of those fails silently rather than throwing. Callers apply
-    /// favorites themselves after loading; <see cref="Apply"/> is idempotent.
-    /// </remarks>
     public class FavoritesService
     {
         private static readonly StorageFolder LocalFolder = ApplicationData.Current.LocalFolder;
 
-        /// <summary>Favorited URLs, newest first - the order the Home section shows them in.</summary>
         private static readonly List<string> s_order = new List<string>();
 
-        /// <summary>Membership test for <see cref="s_order"/>, which is a linear scan otherwise.</summary>
         private static readonly HashSet<string> s_lookup = new HashSet<string>(StringComparer.Ordinal);
 
         private static bool s_loaded;
 
         private static readonly SemaphoreSlim s_loadGate = new SemaphoreSlim(1, 1);
 
-        /// <summary>
-        /// Separate from <see cref="s_loadGate"/> on purpose: SemaphoreSlim is not reentrant, and a
-        /// save happens while a load may already hold its own gate.
-        /// </summary>
         private static readonly SemaphoreSlim s_saveGate = new SemaphoreSlim(1, 1);
 
-        /// <summary>
-        /// Raised after any change to the set. Subscribers must detach in Unloaded and guard
-        /// reattachment with a flag - UWP can raise Loaded/Unloaded more than once on one instance.
-        /// </summary>
         public static event EventHandler FavoritesChanged;
 
-        /// <summary>Reads the persisted set once per process.</summary>
         public static async Task EnsureLoadedAsync()
         {
             if (s_loaded) return;
@@ -61,9 +36,6 @@ namespace Fort.ind_UWP
             {
                 if (s_loaded) return;
 
-                // TryGetItemAsync, not GetFileAsync: no favorites yet is a normal state on a fresh
-                // install and after a reset, and GetFileAsync signals it by throwing - putting a
-                // first-chance exception on the startup path for something that is not an error.
                 file = await LocalFolder.TryGetItemAsync(AppConstants.FavoritesFileName) as StorageFile;
                 if (file != null)
                 {
@@ -86,16 +58,11 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                // A corrupt or unreadable file must not take out startup - carry on with an empty
-                // set, and mark it loaded so this is not retried on every navigation.
                 Debug.WriteLine($"FavoritesService: Failed to load favorites - {ex.Message}");
                 s_order.Clear();
                 s_lookup.Clear();
                 s_loaded = true;
 
-                // But never let the next star overwrite it: that used to replace every favorite the
-                // user had with the one they had just added. Move it aside instead, and if even that
-                // fails (a transient lock rather than bad JSON, say) stop saving for this session.
                 if (file != null)
                 {
                     s_saveBlocked = !await TryMoveAsideAsync(file);
@@ -107,9 +74,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Set when favorites.json could not be read or moved aside; saving would destroy it.
-        /// </summary>
         private static bool s_saveBlocked;
 
         private static async Task<bool> TryMoveAsideAsync(StorageFile file)
@@ -138,10 +102,6 @@ namespace Fort.ind_UWP
             get { return s_order.Count; }
         }
 
-        /// <summary>
-        /// Stamps <see cref="SearchItem.IsFavorite"/> onto already-loaded items. Sets the flag in
-        /// both directions, so calling this after <see cref="ResetForAppDataWipe"/> clears every star.
-        /// </summary>
         public static void Apply(IEnumerable<SearchItem> items)
         {
             if (items == null) return;
@@ -153,10 +113,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// The favorited members of <paramref name="source"/>, newest first, capped at
-        /// <paramref name="max"/>. Items whose URL is no longer in the sitemap are skipped.
-        /// </summary>
         public static List<SearchItem> GetFavorites(IEnumerable<SearchItem> source, int max)
         {
             var results = new List<SearchItem>();
@@ -184,10 +140,6 @@ namespace Fort.ind_UWP
             return results;
         }
 
-        /// <summary>
-        /// Toggles one item and writes the file immediately. Eager rather than batched into
-        /// OnSuspending, which runs under a deadline that is not guaranteed to complete.
-        /// </summary>
         public static async Task SetFavoriteAsync(SearchItem item, bool isFavorite)
         {
             if (item == null || string.IsNullOrEmpty(item.Url)) return;
@@ -200,8 +152,6 @@ namespace Fort.ind_UWP
                 changed = s_lookup.Add(item.Url);
                 if (changed)
                 {
-                    // Newest first, so a game starting late in the alphabet still reaches the cap
-                    // the Home section applies.
                     s_order.Insert(0, item.Url);
                 }
             }
@@ -222,23 +172,12 @@ namespace Fort.ind_UWP
             RaiseFavoritesChanged();
         }
 
-        /// <summary>
-        /// Drops every favorite from memory after the app-data wipe has already deleted the file.
-        /// </summary>
-        /// <remarks>
-        /// Deliberately does not write: LocalStorageService.ResetAllAppDataAsync has just removed
-        /// favorites.json along with the rest of LocalFolder, and saving here would recreate the
-        /// file the reset just deleted. This exists at all because the static state above outlives
-        /// that wipe - the same trap AvatarIconService.InvalidateCache covers for the cached avatar.
-        /// Stays marked loaded so the now-empty set is not re-read from a file that is gone.
-        /// </remarks>
         public static void ResetForAppDataWipe()
         {
             s_order.Clear();
             s_lookup.Clear();
             s_loaded = true;
 
-            // The unreadable file, if there was one, went with the rest of LocalFolder.
             s_saveBlocked = false;
 
             RaiseFavoritesChanged();

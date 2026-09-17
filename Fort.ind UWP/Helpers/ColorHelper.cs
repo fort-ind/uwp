@@ -29,9 +29,6 @@ namespace Fort.ind_UWP
             return s_lightTintMap.TryGetValue(darkHex, out lightHex) ? lightHex : null;
         }
 
-        // The tint presets are dark surface colours and fail contrast as accents. Each maps to the
-        // brighter chip colour its swatch already shows in Settings, so "match tint" gives the
-        // user exactly the colour they clicked on.
         private static readonly Dictionary<string, string> s_tintAccentMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "#1E3A5F", "#1D6FA5" },
@@ -46,10 +43,6 @@ namespace Fort.ind_UWP
             { "#232323", "#5A5A5A" }
         };
 
-        /// <summary>
-        /// The accent that pairs with a background tint tag, or null when the tag is the default
-        /// surface (or not a colour) and there is nothing to match.
-        /// </summary>
         public static string AccentForTint(string tintTag)
         {
             if (string.IsNullOrEmpty(tintTag)) return null;
@@ -60,28 +53,11 @@ namespace Fort.ind_UWP
             Color tint;
             if (!TryHexToColor(tintTag, out tint)) return null;
 
-            // A custom tint keeps its hue and saturation and is lifted into the lightness band
-            // the presets above occupy.
             double h, s, l;
             ToHsl(tint, out h, out s, out l);
             return ColorToHex(FromHsl(h, s, Math.Max(0.40, Math.Min(0.55, l))));
         }
 
-        /// <summary>
-        /// One step of the accent palette: 1-3 for SystemAccentColorLight1-3, -1 to -3 for
-        /// Dark1-3, 0 for the accent itself.
-        /// </summary>
-        /// <remarks>
-        /// The shell's own shade algorithm is not public (doc dump chunk_029, "Accent color
-        /// palette", says only that one exists). The step sizes below are measured from a palette
-        /// the shell actually generated - HKCU\...\Explorer\Accent\AccentPalette for #2475D1:
-        /// Light3 #AFE5F7, Light2 #86C4EC, Light1 #3A8BDD, Dark1 #1C5CB4, Dark2 #123C90, Dark3
-        /// #061866. Lightness moves that fraction of the way to white or black, and saturation
-        /// rises toward the extremes by the same ratio it did there, which matches that palette's
-        /// lightness and saturation at every step (Light2 comes out #86B6EC). Not modelled: the
-        /// shell also rotates the hue (toward cyan for lights, violet for darks, on blue), and one
-        /// sample says nothing about which way it turns for other hues.
-        /// </remarks>
         public static Color AccentShade(Color accent, int step)
         {
             if (step == 0) return accent;
@@ -101,8 +77,6 @@ namespace Fort.ind_UWP
                 s *= s_darkSaturationRatio[index];
             }
 
-            // A ratio, not an offset, so a grey accent (s = 0) stays grey instead of picking up
-            // the red of hue 0.
             return FromHsl(h, Math.Min(1, s), l);
         }
 
@@ -165,13 +139,6 @@ namespace Fort.ind_UWP
             return preset != null ? HexToColor(preset) : LightenForLightTheme(HexToColor(darkHex));
         }
 
-        
-        /// <remarks>
-        /// Keep using this for the built-in palette, where the input is a literal in this file and
-        /// a failure really is a bug. For anything read back from LocalSettings use
-        /// <see cref="TryHexToColor"/>: the old version had four distinct ways to throw on a value
-        /// a user could have corrupted, and the caller's catch then swallowed it.
-        /// </remarks>
         public static Color HexToColor(string hex)
         {
             Color color;
@@ -183,9 +150,6 @@ namespace Fort.ind_UWP
             return color;
         }
 
-        /// <summary>
-        /// Parses a #RRGGBB string, returning false rather than throwing on malformed input.
-        /// </summary>
         public static bool TryHexToColor(string hex, out Color color)
         {
             color = Colors.Transparent;
@@ -226,21 +190,11 @@ namespace Fort.ind_UWP
                                   (byte)Math.Round(255 - (255 - (int)c.B) * keep, MidpointRounding.ToEven));
         }
 
-        /// <summary>
-        /// Black or white, whichever reads better on <paramref name="background"/>. Used for the
-        /// checkmark drawn on the selected tint swatch, which sits on twelve different chip
-        /// colours - a fixed foreground fails half of them.
-        /// </summary>
         public static Color ContrastingForeground(Color background)
         {
-            // The 0.179 threshold is the luminance where contrast against black and against white
-            // are equal, so it maximises whichever we pick.
             return RelativeLuminance(background) > 0.179 ? Colors.Black : Colors.White;
         }
 
-        /// <summary>
-        /// WCAG contrast ratio between two colours, from 1 (identical) to 21 (black on white).
-        /// </summary>
         public static double ContrastRatio(Color a, Color b)
         {
             var la = RelativeLuminance(a);

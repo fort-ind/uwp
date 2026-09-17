@@ -23,20 +23,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Shows an acknowledge-only message, <b>waiting</b> for any open dialog to close first.
-        /// </summary>
-        /// <remarks>
-        /// Queued rather than dropped, unlike every other entry point here. Its callers are all the
-        /// app reporting something the user did not ask for - a startup failure, a navigation
-        /// failure, a cold-start sign-in that did not complete - and those arrive whenever they
-        /// arrive, including while the welcome dialog is up. Dropping one lost the only notice the
-        /// user would get. The user-initiated dialogs keep drop-if-busy, which is what stops a
-        /// double click from stacking two copies of the same confirmation.
-        ///
-        /// Never call this from inside a <see cref="RunExclusiveAsync"/> body: the gate is not
-        /// reentrant, and where that used to fail silently it would now wait forever.
-        /// </remarks>
         public static async Task<bool> ShowMessageAsync(UIElement owner, string title, string content, string closeText)
         {
             return await RunGatedAsync(true, async () =>
@@ -102,10 +88,6 @@ namespace Fort.ind_UWP
             return result;
         }
 
-        /// <summary>
-        /// Runs <paramref name="body"/> under the dialog gate, or returns false at once if a
-        /// dialog is already open.
-        /// </summary>
         public static Task<bool> RunExclusiveAsync(Func<Task> body)
         {
             return RunGatedAsync(false, body);

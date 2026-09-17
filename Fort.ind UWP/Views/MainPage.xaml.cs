@@ -14,21 +14,6 @@ namespace Fort.ind_UWP
     {
         private IReadOnlyList<SearchItem> _allSearchItems = SearchCatalog.GetStaticItems();
 
-        /// <summary>
-        /// True while settings are being restored into the controls, so their change handlers do
-        /// not treat that as a user edit. Starts true, and LoadAppearanceSettings' finally is what
-        /// first clears it.
-        /// </summary>
-        /// <remarks>
-        /// The initial true is load-bearing, not tidiness. Setting a Slider's Minimum in markup
-        /// coerces its Value up to that minimum, which raises ValueChanged *during*
-        /// InitializeComponent - before the elements declared after it in the XAML have been
-        /// assigned to their fields. With this false, the transparency sliders' handlers ran at
-        /// that moment against a null BodyAcrylicValue, and would also have persisted a value read
-        /// off a control that had not been restored yet. Anything between InitializeComponent and
-        /// LoadAppearanceSettings is by definition not a user edit, so the flag covers that whole
-        /// window.
-        /// </remarks>
         private bool _loadingSettings = true;
 
         private readonly Debouncer _searchDebounce = new Debouncer();
@@ -53,11 +38,6 @@ namespace Fort.ind_UWP
             UpdateProfileNavItem();
             LoadAppearanceSettings();
 
-            // The sitemap load is queued at Low with the tile push, for the reason App.OnLaunched
-            // queues session restore there: started inline, its continuation (building ~300
-            // SearchItems) interleaved with the first layout pass and made the window stutter as it
-            // appeared. Search works in the meantime off the static items _allSearchItems starts
-            // with, and GamesPage loads through SitemapService on its own if it gets there first.
             var ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                               () => LoadSitemapItems());
             ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
@@ -122,9 +102,6 @@ namespace Fort.ind_UWP
             {
                 SetSitemapLoadingIndicator(false);
 
-                // In the finally, not the try: a failed sitemap load still has to resolve the
-                // favorites section, or Home renders its heading over nothing at all rather than
-                // over the empty-state hint.
                 InitializeFavorites();
             }
         }

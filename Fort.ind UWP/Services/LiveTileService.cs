@@ -57,11 +57,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// One style for every queued tile's title. Adaptive tile content has no animation hint to
-        /// set, so the old per-"animation" mapping only varied the title's text style as the queue
-        /// rotated - the first tile's title came out in CaptionSubtle, smaller than its own body.
-        /// </summary>
         private const AdaptiveTextStyle TitleTextStyle = AdaptiveTextStyle.Base;
 
         private static XmlDocument CreateTileXml(string title, string message, string branding)
@@ -233,11 +228,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Whether the user cleared the tile from Settings. Persisted so the choice survives the
-        /// next launch - MainPage pushes the tile on every startup, which used to repaint a tile the
-        /// user had just cleared. Refresh in Settings resets it.
-        /// </summary>
         public static bool TileCleared
         {
             get
@@ -371,25 +361,12 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Initials for the small tile, which has room for about two characters.
-        /// </summary>
-        /// <remarks>
-        /// The fallback is the app's own initialism, like PublisherDisplayName in the manifest, so
-        /// it stays literal rather than moving to the resw - a resource lookup here can run off the
-        /// UI thread, where LocalizedStrings degrades to returning the key, and a 20-character key
-        /// is a far worse monogram than two wrong letters. The caller used to pass the *branding*
-        /// argument as the fallback text, so an empty title rendered the small tile as "NA", the
-        /// first two letters of "name".
-        /// </remarks>
         private static string GetTileMonogram(string primaryText)
         {
             if (string.IsNullOrWhiteSpace(primaryText)) return DefaultMonogram;
 
             var trimmed = primaryText.Trim();
 
-            // Whole text elements, not chars: a title starting with an emoji is a surrogate pair
-            // and Substring(0, 2) would hand the tile half of one.
             var monogram = TextHelper.FirstTextElements(trimmed, 2).ToUpperInvariant();
             return string.IsNullOrEmpty(monogram) ? DefaultMonogram : monogram;
         }

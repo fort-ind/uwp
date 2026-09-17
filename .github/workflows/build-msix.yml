@@ -36,7 +36,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v7
       with:
-        # Full history: the build number is a commit count since the last Major.Minor bump.
         fetch-depth: 0
 
     - name: Setup MSBuild
@@ -76,23 +75,12 @@ jobs:
       id: version
       shell: pwsh
       env:
-        # Passed as env rather than inlined with ${{ }} so ref/input text can't be
-        # spliced into the script body.
         GH_REF: ${{ github.ref }}
         GH_REF_NAME: ${{ github.ref_name }}
         VERSION_INPUT: ${{ github.event.inputs.version }}
       run: |
-        # Version policy, in precedence order:
-        #   1. a v* tag           -> the tag is authoritative
-        #   2. workflow_dispatch  -> the optional "version" input
-        #   3. everything else    -> Major.Minor from Package.appxmanifest, and the build
-        #                            number is the commit count since that Major.Minor first
-        #                            appeared in the manifest.
-        # (3) means bumping the app version is a one-line manifest edit: the build number
-        # restarts at 0 on the bump commit on its own. Nothing to reset in this file.
 
         $manifestPath = "${{ env.Manifest_Path }}"
-        # git wants forward slashes even on Windows
         $manifestGitPath = $manifestPath -replace '\\', '/'
 
         [xml]$manifest = Get-Content $manifestPath
@@ -100,7 +88,6 @@ jobs:
         $series = "$($manifestVersion.Major).$($manifestVersion.Minor)"
 
         function Format-FourPart([string]$raw) {
-          # Strip any prerelease suffix (v2.1.0-beta -> 2.1.0); MSIX versions are numeric only.
           $parts = (($raw -split '-')[0]).Split('.')
           while ($parts.Count -lt 4) { $parts += '0' }
           return ($parts[0..3] -join '.')
@@ -115,13 +102,10 @@ jobs:
           $source = "workflow_dispatch input"
         }
         else {
-          # Walk the manifest's history newest-first; the oldest consecutive commit still
-          # carrying this Major.Minor is the commit that introduced it.
           $bumpCommit = $null
           foreach ($sha in @(git log --format=%H -- $manifestGitPath)) {
             $blob = git show "${sha}:$manifestGitPath" 2>$null
             if ($LASTEXITCODE -ne 0 -or -not $blob) { break }
-            # The manifest is BOM-prefixed; a leading U+FEFF makes the [xml] cast throw.
             try { [xml]$old = ($blob -join "`n").TrimStart([char]0xFEFF, ' ', "`t", "`r", "`n") } catch { break }
             $v = [Version]$old.Package.Identity.Version
             if ("$($v.Major).$($v.Minor)" -ne $series) { break }
@@ -132,7 +116,6 @@ jobs:
             $build = [int](git rev-list --count "$bumpCommit..HEAD")
             Write-Host "$series was introduced by $bumpCommit"
           } else {
-            # The manifest at HEAD isn't the one in git history (e.g. an uncommitted bump).
             Write-Warning "Could not locate the commit that introduced $series; using build 0"
             $build = 0
           }
@@ -234,11 +217,9 @@ jobs:
       run: |
         $packageDir = Get-ChildItem -Path "Fort.ind UWP\AppPackages" -Directory | Select-Object -First 1
         if ($packageDir) {
-          # Copy the installer script
           Copy-Item "scripts\Install.ps1" -Destination "$($packageDir.FullName)\Install.ps1"
           Write-Host "Copied Install.ps1 to package directory"
           
-          # Copy certificate if it exists
           if (Test-Path "Fort.ind UWP\Fort.ind_UWP.cer") {
             Copy-Item "Fort.ind UWP\Fort.ind_UWP.cer" -Destination "$($packageDir.FullName)\Fort.ind_UWP.cer"
             Write-Host "Copied certificate to package directory"

@@ -20,11 +20,6 @@ namespace Fort.ind_UWP
         {
             this.InitializeComponent();
 
-            // Cached, like GamesPage, so switching between Profile and Games in the pane does not
-            // re-parse this page and rebuild its acrylic cards every time. Enabled rather than
-            // Required so the Frame may still evict it. Nothing here depends on a fresh instance:
-            // Loaded runs RefreshUI on every visit, and the auth handler is detached in Unloaded
-            // and reattached behind _authHandlerAttached.
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
 
             Loaded += ProfilePage_Loaded;
@@ -126,9 +121,6 @@ namespace Fort.ind_UWP
                 PlayAvatarFadeIn();
             }
 
-            // Belt and braces on top of PlayAvatarFadeIn's own fallback: AvatarGrid starts at
-            // Opacity 0 in markup and the storyboard is the only thing that raises it, so any
-            // path that skips the animation must still leave the avatar visible.
             AvatarGrid.Opacity = 1;
         }
 
@@ -148,8 +140,6 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                // A missing or broken animation must never take out the profile card - this runs
-                // from Loaded, where an escaping exception is unhandled.
                 Debug.WriteLine($"ProfilePage: avatar fade-in failed - {ex.Message}");
                 AvatarGrid.Opacity = 1;
             }
@@ -163,20 +153,6 @@ namespace Fort.ind_UWP
             _avatarApplied = false;
         }
 
-        /// <summary>
-        /// Opens LoginPage in the shell's content frame.
-        /// </summary>
-        /// <remarks>
-        /// Guarded, unlike it used to be: Frame.Navigate rethrows whatever a page's constructor or
-        /// its XAML parse threw unless a NavigationFailed handler marks it handled, and
-        /// ContentFrame - unlike the root frame App wires up - has none. Unguarded, a LoginPage
-        /// that failed to parse took the app down from the one button the signed-out card offers.
-        ///
-        /// The notice is reported rather than only logged, because the alternative is a primary
-        /// button that visibly does nothing. Raised through the flag-then-await shape
-        /// App.OnLaunched uses, so the await is not inside a catch: an async void has to be
-        /// wrapped end to end, and an exception escaping one crashes the app.
-        /// </remarks>
         private async void SignInButton_Click(object sender, RoutedEventArgs e)
         {
             bool showNavigationError = false;
@@ -297,8 +273,6 @@ namespace Fort.ind_UWP
                 return "?";
             }
 
-            // TextHelper rather than Substring(0, 1): a display name beginning with an emoji is a
-            // surrogate pair, and taking one char off it renders as a replacement box.
             if (parts.Length >= 2 && parts[1].Length > 0)
             {
                 return (TextHelper.FirstTextElements(parts[0], 1) +
@@ -310,10 +284,6 @@ namespace Fort.ind_UWP
 
         private bool UpdateAvatarUI(string avatarUrl)
         {
-            // _avatarApplied, not just the URL comparison: _lastAvatarUrl starts null, so an
-            // account with no avatar made the very first call look like "already applied" and
-            // return false. ShowLoggedInState then skipped the fade-in and AvatarGrid stayed at
-            // Opacity 0 - a fully transparent circle with the initials invisible inside it.
             if (_avatarApplied && string.Equals(avatarUrl, _lastAvatarUrl, StringComparison.Ordinal))
             {
                 return false;

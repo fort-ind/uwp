@@ -15,10 +15,6 @@
     </Page.KeyboardAccelerators>
 
     <Page.Resources>
-        <!-- One favorited game on Home. The launch button and the star are siblings in a Grid, not
-             nested, so neither swallows the other's input and each gets its own automation peer.
-             The launch button takes its accessible name from its own content - the glyph beside the
-             title is Raw, so what is left is the title. -->
         <DataTemplate x:Key="HomeFavoriteItemTemplate" x:DataType="local:SearchItem">
             <Grid Margin="0,0,0,4">
                 <Grid.ColumnDefinitions>
@@ -90,9 +86,6 @@
             </StackPanel>
         </DataTemplate>
 
-        <!-- A template, not a field, for the reason the welcome dialog is one: a reused
-             ContentDialog stops animating. It also lets the warning use the type ramp style,
-             which lives in generic.xaml where a code-side Resources lookup cannot reach it. -->
         <DataTemplate x:Key="CustomAccentDialogContentTemplate">
             <StackPanel Spacing="12">
                 <ColorPicker x:Name="AccentPicker"
@@ -230,12 +223,6 @@
                   AutomationProperties.LandmarkType="Main">
                 <Frame x:Name="ContentFrame" Visibility="Collapsed"/>
 
-                <!-- An indeterminate ProgressBar, not a ProgressRing. The sitemap loads in the
-                     background and the user can navigate, search and click throughout; chunk_027
-                     ("When to use each control") reserves the ring for modal waits - "the user is
-                     blocked until the ProgressRing disappears" - and lists "Loading..." among the
-                     keywords that call for a ProgressBar instead. Canvas.ZIndex keeps it over the
-                     content it sits above regardless of declaration order. -->
                 <ProgressBar x:Uid="SitemapLoadingBar" x:Name="LoadingIndicator"
                              IsIndeterminate="False"
                              Visibility="Collapsed"
@@ -243,12 +230,7 @@
                              HorizontalAlignment="Stretch"
                              Canvas.ZIndex="1"/>
 
-                <!-- IsTabStop because generic.xaml's ScrollViewer style sets it False, and this is
-                     the element ShowContent moves focus to after a nav gesture. It also gives the
-                     scrollable region a keyboard stop of its own, so arrow keys scroll it. -->
                 <ScrollViewer x:Name="ContentScrollViewer" IsTabStop="True">
-                    <!-- No RenderTransform: PlayPanelEnterAnimation slides this with the composition
-                         Translation property, which the toolkit enables on the element itself. -->
                     <StackPanel x:Name="ContentPanel">
                         <StackPanel x:Name="LatestNewsPanel" Visibility="Visible">
                             <TextBlock x:Uid="MainCheckBackHereFor"
@@ -324,15 +306,6 @@
                                 </Grid>
                             </Grid>
 
-                            <!-- Favorites, beneath the news cards. Lives inside LatestNewsPanel so
-                                 it is shown and hidden by the existing ShowContent default case
-                                 with no navigation changes at all.
-
-                                 An ItemsControl rather than a ListView: nothing here is selectable,
-                                 and a virtualizing list inside the page's own ScrollViewer would
-                                 reintroduce the nested-scrolling problem the games SemanticZoom
-                                 already has to work around. The cap makes virtualization pointless
-                                 anyway. -->
                             <StackPanel x:Name="FavoritesSection" Margin="0,32,0,0">
                                 <TextBlock x:Uid="HomeFavoritesHeader"
                                            Style="{StaticResource SubtitleTextBlockStyle}"
@@ -598,8 +571,6 @@
                                                         </StackPanel>
                                                     </StackPanel>
 
-                                                    <!-- Which surfaces the colour above is painted onto. Content-only is
-                                                         what the app did before this existed, so it stays the default. -->
                                                     <StackPanel Spacing="4">
                                                         <TextBlock x:Uid="MainApplyTintTo"
                                                                    Style="{StaticResource CaptionTextBlockStyle}"
@@ -624,9 +595,6 @@
                                                         <TextBlock x:Uid="MainAccentColor" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
                                                                    AutomationProperties.HeadingLevel="Level3"/>
                                                     </StackPanel>
-                                                    <!-- Accent colours are theme-agnostic, so unlike the tint chips these
-                                                         paint the same in Light and Dark. The presets are from the Windows 10
-                                                         accent palette, each 4.5:1 on white and above 3:1 on the dark surface. -->
                                                     <StackPanel Spacing="8">
                                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                                             <Button x:Uid="AccentSystemButton" x:Name="AccentSystemButton" Tag="Default"
@@ -840,21 +808,6 @@
                                                            Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
 
-                                                <!-- Minimum="20" mirrors AppConstants.MinimumAcrylicOpacity, which
-                                                     LoadAcrylicSettings assigns over the top of it - the constant is
-                                                     the source of truth, this is here so the control is still
-                                                     floored if that code path ever fails. Below roughly this value a
-                                                     HostBackdrop surface stops reading as a surface and becomes a
-                                                     clear window onto whatever is behind the app.
-
-                                                     Width 280 is not arbitrary: it is the width of the tint swatch
-                                                     row above (6 x 40 plus five 8px gaps), so the two line up on the
-                                                     same column instead of the sliders alone running to the panel
-                                                     edge. An Auto column needs the explicit width - a Slider's
-                                                     template stretches, so it has no natural desired width to size to.
-
-                                                     The value labels are AccessibilityView=Raw: a Slider already
-                                                     announces its own value, so exposing the text reads it twice. -->
                                                 <StackPanel Spacing="4">
                                                     <TextBlock x:Uid="MainContentTransparency"
                                                                Style="{StaticResource CaptionTextBlockStyle}"/>
@@ -901,14 +854,6 @@
                                                     </Grid>
                                                 </StackPanel>
 
-                                                <!-- One warning for both sliders, and it never collapses: its text is
-                                                     kept in place and only its Opacity is toggled, so crossing the
-                                                     legibility floor mid-drag cannot change this section's height.
-                                                     A height change here would animate every section below it -
-                                                     RepositionThemeTransition is on the panel these Borders sit in -
-                                                     and the whole list of settings lurched under the cursor. Hidden,
-                                                     it is also pulled out of the automation tree in code, or a
-                                                     screen reader would read stale text nobody can see. -->
                                                 <Grid x:Name="AcrylicWarning" Opacity="0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto"/>
@@ -999,15 +944,6 @@
                                                             Margin="0,4,0,0">
                                                     <Button x:Uid="ClearLoginInfoButton" x:Name="ClearLoginInfoButton"
                                                             Click="ClearLoginInfoButton_Click"/>
-                                                    <!-- The error colour sits on the content, not on the Button. A local
-                                                         Foreground on a Button only reaches its ContentPresenter by
-                                                         inheritance, and generic.xaml's Button template overwrites
-                                                         ContentPresenter.Foreground outright in PointerOver, Pressed and
-                                                         Disabled - so the red disappeared exactly when the pointer was on
-                                                         the button, i.e. when the warning matters. A local value on the
-                                                         content itself outranks the inherited one in every state.
-                                                         Deliberately unstyled: a bare TextBlock inherits the Button's own
-                                                         font, so this renders identically to plain string content. -->
                                                     <Button x:Uid="ResetAppButton" x:Name="ResetAppButton"
                                                             Click="ResetAppButton_Click">
                                                         <TextBlock x:Uid="ResetAppButtonText"
@@ -1263,12 +1199,6 @@
                                                     </HyperlinkButton>
                                                 </StackPanel>
 
-                                                <!-- Subdued with a theme brush, not Opacity. Opacity 0.4 over this
-                                                     surface blended 12px Caption text down to roughly 3.5:1, under the
-                                                     4.5:1 minimum for visible text (doc dump chunk_049, "Accessible text
-                                                     requirements"); BaseMedium is the platform's own secondary-text value
-                                                     and clears it. It also keeps the pair of glyphs legible, which an
-                                                     opacity on the panel dimmed along with the words. -->
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"
                                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"

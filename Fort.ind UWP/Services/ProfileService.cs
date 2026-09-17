@@ -41,11 +41,6 @@ namespace Fort.ind_UWP
             return LogoutAsync(false);
         }
 
-        /// <param name="tokenRejected">
-        /// True when the instance refused the stored token, rather than the user choosing to sign
-        /// out. The toast then says the session ended instead of saying goodbye - nobody asked to
-        /// leave, and a farewell out of nowhere reads as the app misbehaving.
-        /// </param>
         private static async Task LogoutAsync(bool tokenRejected)
         {
             var name = CurrentUser != null ? DisplayNameOf(CurrentUser) : "";
@@ -79,13 +74,8 @@ namespace Fort.ind_UWP
             LiveTileService.ClearBadge();
             await LocalStorageService.ResetAllAppDataAsync();
 
-            // The wipe deletes the cached avatar PNG, but AvatarIconService remembers its URI in a
-            // static that outlives the reset - so signing back in with the same avatar handed the
-            // nav item an ms-appdata URI pointing at a file that no longer exists.
             AvatarIconService.InvalidateCache();
 
-            // Same class of problem: the favorites file is gone with the rest of LocalFolder, but
-            // the in-memory set behind it is static and would survive.
             FavoritesService.ResetForAppDataWipe();
 
             AuthStateChanged?.Invoke(null, false);
@@ -107,10 +97,6 @@ namespace Fort.ind_UWP
                     var fetched = await MisskeyAuthService.FetchCurrentUserAsync(token);
                     if (fetched.Profile == null)
                     {
-                        // Only discard the token when the instance actually refused it. This used
-                        // to sign the user out on any null, so launching with no network and no
-                        // cached profile threw away a perfectly good token and made them sign in
-                        // again; now the session simply stays unrestored until the next launch.
                         if (fetched.TokenRejected)
                         {
                             await LogoutAsync(true);
@@ -138,19 +124,12 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <param name="token">The token the session was restored with.</param>
-        /// <param name="lastLoginDate">
-        /// Carried over from the cached profile. /api/i describes the account, not this app's
-        /// sign-in, so the refreshed profile has no sign-in time of its own to offer.
-        /// </param>
         private static async void RefreshCurrentUserInBackground(string token, DateTime lastLoginDate)
         {
             try
             {
                 var fetched = await MisskeyAuthService.FetchCurrentUserAsync(token);
 
-                // Check the token is still the live one before acting on anything: the user may
-                // have signed out, or signed in as someone else, while this was in flight.
                 if (!string.Equals(await MisskeyAuthService.TryGetTokenAsync(), token, StringComparison.Ordinal))
                 {
                     return;
@@ -158,10 +137,6 @@ namespace Fort.ind_UWP
 
                 if (fetched.TokenRejected)
                 {
-                    // The instance says this token is gone - revoked from fort.social's settings,
-                    // or the account was deleted. The cached profile would otherwise keep the app
-                    // looking signed in indefinitely against credentials that can never work, with
-                    // every request silently failing behind a perfectly normal-looking UI.
                     Debug.WriteLine("ProfileService: stored token was rejected; signing out");
                     await LogoutAsync(true);
                     return;
@@ -169,10 +144,6 @@ namespace Fort.ind_UWP
 
                 if (fetched.Profile == null) return;
 
-                // The usual answer is "nothing changed", and acting on it anyway rewrote the cache
-                // file and raised AuthStateChanged on every launch - repainting the nav item,
-                // Settings > Data storage and ProfilePage for a profile identical to the one they
-                // were already showing.
                 if (HasSameAccountDetails(CurrentUser, fetched.Profile)) return;
 
                 fetched.Profile.LastLoginDate = lastLoginDate;
@@ -186,16 +157,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// True when <paramref name="fetched"/> carries nothing <paramref name="current"/> does not
-        /// already show - i.e. every field /api/i supplies is unchanged.
-        /// </summary>
-        /// <remarks>
-        /// LastLoginDate and Preferences are deliberately not compared: the instance supplies
-        /// neither. CreatedDate compares by Ticks because the cache's JSON round trip can change a
-        /// DateTime's Kind but not its instant. A false mismatch costs nothing but the save and
-        /// event this exists to skip.
-        /// </remarks>
         private static bool HasSameAccountDetails(UserProfile current, UserProfile fetched)
         {
             if (current == null || fetched == null) return false;

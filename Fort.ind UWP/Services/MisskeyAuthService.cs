@@ -29,7 +29,6 @@ namespace Fort.ind_UWP
         private static string s_pendingSession = null;
         private static TaskCompletionSource<bool> s_pendingCompletion = null;
 
-        /// <summary>The session most recently completed by a callback, so a duplicate is ignored.</summary>
         private static string s_lastHandledSession = null;
 
         private static readonly Lazy<HttpClient> s_client = new Lazy<HttpClient>(() => new HttpClient());
@@ -57,9 +56,6 @@ namespace Fort.ind_UWP
             }
             PersistPendingSession(session);
 
-            // Release whatever sign-in this one replaces. Left alone it sat awaiting its callback for
-            // the full timeout and then, on the way out, deleted the persisted session - which by
-            // then belonged to this attempt, so a cold-start callback for it was rejected.
             superseded?.TrySetResult(false);
 
             try
@@ -138,10 +134,6 @@ namespace Fort.ind_UWP
 
             if (alreadyHandled)
             {
-                // A browser can deliver the same fortind: callback twice. The first one already
-                // completed this session, so the repeat is ignored - it is not an invalid link, and
-                // reporting it as one put a failure dialog over a sign-in that had just succeeded.
-                // A null result is what App.OnActivated already treats as "nothing to report".
                 Debug.WriteLine("MisskeyAuthService: ignoring a repeat callback for a session already handled");
                 return null;
             }
@@ -190,9 +182,6 @@ namespace Fort.ind_UWP
                 }
             }
 
-            // Scoped to this session, like the in-memory check above. A newer sign-in may have
-            // persisted its own session since this one started, and that is the one a cold-start
-            // callback will need.
             ClearPersistedSession(session);
         }
 
@@ -240,7 +229,6 @@ namespace Fort.ind_UWP
             values.Remove(PendingSessionIssuedAtSettingKey);
         }
 
-        /// <summary>Clears the persisted session only if it is still <paramref name="session"/>.</summary>
         private static void ClearPersistedSession(string session)
         {
             var values = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
@@ -305,9 +293,6 @@ namespace Fort.ind_UWP
                             return MisskeyAuthResult.Failed("SignInErrorNoAccount");
                         }
 
-                        // Stamped here and nowhere else: this is the one place an actual sign-in
-                        // happens. ParseUser also serves the background /api/i refresh, which used to
-                        // restamp it on every launch and turned "last signed in" into "last opened".
                         profile.LastLoginDate = DateTime.Now;
 
                         SaveToken(token);
@@ -322,18 +307,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Fetches the signed-in account, distinguishing "this token is dead" from "could not ask".
-        /// </summary>
-        /// <remarks>
-        /// The distinction is the whole point of the return type. Collapsing both into a null
-        /// profile - as this used to - forced every caller to guess, and they guessed opposite ways:
-        /// the restore path signed the user out on a flaky network, while the background refresh
-        /// ignored a genuinely revoked token forever and left the app looking signed in against
-        /// credentials that could never work again. Only 401/403 are treated as fatal, so anything
-        /// the instance answers that is not clearly an auth rejection fails safe towards keeping
-        /// the session.
-        /// </remarks>
         public static async Task<MisskeyUserFetchResult> FetchCurrentUserAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token)) return MisskeyUserFetchResult.Rejected();
@@ -467,14 +440,8 @@ namespace Fort.ind_UWP
     {
         public bool Success { get; set; }
 
-        /// <summary>Resource key for the failure reason; see <see cref="ErrorMessage"/>.</summary>
         public string ErrorKey { get; set; }
 
-        /// <summary>
-        /// The localized failure reason. Resolved on read rather than when the result is built:
-        /// LocalizedStrings degrades to the bare key off the UI thread, and the display sites
-        /// (LoginPage, App's sign-in failure dialog) are guaranteed to be on it.
-        /// </summary>
         public string ErrorMessage
         {
             get { return string.IsNullOrEmpty(ErrorKey) ? null : LocalizedStrings.Get(ErrorKey); }
@@ -498,18 +465,10 @@ namespace Fort.ind_UWP
         }
     }
 
-    /// <summary>
-    /// Outcome of re-reading the signed-in account from the instance.
-    /// </summary>
     public class MisskeyUserFetchResult
     {
-        /// <summary>The account, or null if it could not be read.</summary>
         public UserProfile Profile { get; set; }
 
-        /// <summary>
-        /// True only when the instance actively refused the token, meaning it will never work
-        /// again. A network failure leaves this false so the session survives it.
-        /// </summary>
         public bool TokenRejected { get; set; }
 
         private MisskeyUserFetchResult()

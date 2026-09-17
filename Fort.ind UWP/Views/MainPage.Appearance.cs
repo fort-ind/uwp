@@ -22,9 +22,6 @@ namespace Fort.ind_UWP
             {
                 var localSettings = ApplicationData.Current.LocalSettings;
 
-                // ?? on top of ContainsKey: the key can be present with a null value, and ToString()
-                // on that throws - out of the MainPage constructor, which fails the Navigate that
-                // created the page and takes the app down through OnNavigationFailed.
                 string theme = AppConstants.ThemeDefault;
                 if (localSettings.Values.ContainsKey(AppConstants.SettingAppTheme))
                 {
@@ -46,10 +43,6 @@ namespace Fort.ind_UWP
                 TintCustomButton.ClearValue(Control.BackgroundProperty);
                 TintCustomIcon.Visibility = Visibility.Visible;
 
-                // Before ApplyTintColor, which paints with them. An absent key has to reapply
-                // the default rather than keep whatever the fields already hold: a reset clears
-                // LocalSettings wholesale and then calls this method again, so "leave it alone"
-                // would report restored defaults while the surfaces stayed as the user left them.
                 LoadAcrylicSettings(localSettings);
 
                 ApplyTintColor(tintTag);
@@ -67,10 +60,6 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                // This runs from the MainPage constructor, where an escaping exception fails the
-                // Navigate that created the page and takes the whole app down through
-                // OnNavigationFailed - a settings value that will not read is not worth that. The
-                // app comes up with whatever appearance was already applied instead.
                 Debug.WriteLine($"MainPage: LoadAppearanceSettings failed - {ex.Message}");
             }
             finally
@@ -91,7 +80,6 @@ namespace Fort.ind_UWP
             }
             if (_loadingSettings)
             {
-                // LoadAppearanceSettings applies the tint itself straight after this.
                 UpdateTitleBarColors();
                 return;
             }
@@ -112,29 +100,8 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// The (effective theme, tint) pair the chrome was last fully repainted for, or null when
-        /// something has painted the tint since and the pair can no longer be trusted.
-        /// </summary>
         private string _themePaintKey;
 
-        /// <summary>
-        /// Title bar, acrylic tint and swatches for the current effective theme and saved tint -
-        /// skipped when they are already painted for exactly that pair.
-        /// </summary>
-        /// <remarks>
-        /// Both ApplyTheme and OnActualThemeChanged repaint, and setting RequestedTheme raises
-        /// ActualThemeChanged, so an explicit Light/Dark switch used to do the whole repaint twice.
-        /// Neither call can simply be dropped. ActualThemeChanged does not fire when the effective
-        /// theme stays the same (Dark to System on a dark PC), so ApplyTheme must paint; and for
-        /// System, ActualTheme can lag RequestedTheme, so ApplyTheme may paint the old theme and
-        /// the event is what corrects it. Keying on what was actually painted keeps both and makes
-        /// whichever runs second a no-op only when it would repaint the same thing.
-        ///
-        /// ApplyTintColor clears the key, so a swatch click, the custom-colour preview or a
-        /// settings reload - none of which go through here - can never leave it vouching for a
-        /// paint that has since been replaced.
-        /// </remarks>
         private void RepaintThemeDependentChrome()
         {
             var savedTint = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
@@ -147,8 +114,6 @@ namespace Fort.ind_UWP
             ApplyTintColor(savedTint);
             UpdateTintSelection(savedTint);
 
-            // The legibility floor is per-theme (70% dark, 50% light), so a theme switch can put
-            // an unchanged slider on the other side of it.
             UpdateAcrylicLegibilityWarnings();
 
             _themePaintKey = key;
@@ -160,11 +125,6 @@ namespace Fort.ind_UWP
         private static readonly Color s_surfaceTintLight = Colors.White;
         private static readonly Color s_surfaceFallbackLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
 
-        // The untinted nav pane, mirroring what App.xaml declares its two pane brushes with:
-        // SystemChromeMediumColor (#1F1F1F) in dark, SystemChromeMediumLowColor (#F2F2F2) in
-        // light. Literals here for the same reason the window acrylic pair above is - a
-        // ResourceDictionary indexer does not search ThemeDictionaries, so the declared values
-        // cannot be read back out. Keep them in step with App.xaml.
         private static readonly Color s_paneTintDark = Color.FromArgb(255, 0x1F, 0x1F, 0x1F);
         private static readonly Color s_paneTintLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
 
@@ -172,19 +132,8 @@ namespace Fort.ind_UWP
         private double _paneAcrylicOpacity = AppConstants.DefaultPaneAcrylicOpacity;
         private string _tintScope = AppConstants.TintScopeDefault;
 
-        /// <summary>
-        /// The normalised tint tag the surfaces are currently painted with.
-        /// </summary>
-        /// <remarks>
-        /// Kept here rather than re-read from LocalSettings by the sliders: they repaint on every
-        /// tick of a drag, and a settings read plus a hex parse per tick is work this already knows
-        /// the answer to. ApplyTintColor is the only writer, and it writes the value it has already
-        /// validated.
-        /// </remarks>
         private string _tintTag = AppConstants.ThemeDefault;
 
-        // What UpdateAcrylicLegibilityWarnings last painted, so a drag that changes nothing on
-        // screen does not re-resolve the resource string.
         private string _warningKey;
         private double _warningFloor = -1;
         private bool _warningShown;
@@ -195,10 +144,6 @@ namespace Fort.ind_UWP
         {
             _themePaintKey = null;
 
-            // Normalise an unusable tag up front, before anything can persist it. The catch below
-            // used to swallow the parse failure and the write at the bottom then stored the bad tag
-            // anyway - so one corrupt value made every subsequent launch fail in exactly the same
-            // way, silently, with the window coming up untinted and no way to notice why.
             if (!IsUsableTintTag(colorTag))
             {
                 Debug.WriteLine($"MainPage: tint tag '{colorTag}' is not a colour; using the default surface");
@@ -214,15 +159,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Repaints the window body and the nav pane for the given tint tag, the saved tint scope
-        /// and the two saved opacities. The caller must have normalised <paramref name="colorTag"/>
-        /// already (see <see cref="IsUsableTintTag"/>).
-        /// </summary>
-        /// <remarks>
-        /// Separate from ApplyTintColor so the sliders and the scope radios can repaint without
-        /// going near the tint tag's persistence.
-        /// </remarks>
         private void ApplySurfaceBrushes(string colorTag)
         {
             try
@@ -230,8 +166,6 @@ namespace Fort.ind_UWP
                 var isDark = IsEffectiveThemeDark();
                 var isTinted = !(string.IsNullOrEmpty(colorTag) || colorTag == AppConstants.ThemeDefault);
 
-                // The scope says which surfaces the colour reaches; the other one falls back to
-                // its plain chrome surface rather than to no acrylic at all.
                 var tintBody = isTinted && _tintScope != AppConstants.TintScopeSidebar;
                 var tintPane = isTinted && _tintScope != AppConstants.TintScopeContent;
 
@@ -272,11 +206,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <remarks>
-        /// Both themes' brushes are repainted, not just the active one, so a later theme switch
-        /// already finds the inactive dictionary correct - the framework re-resolves the
-        /// {ThemeResource} to the other instance and never comes back through here for it.
-        /// </remarks>
         private void ApplyPaneBrushes(string colorTag, bool tinted)
         {
             var darkTint = tinted ? ColorHelper.HexToColor(colorTag) : s_paneTintDark;
@@ -291,36 +220,16 @@ namespace Fort.ind_UWP
             }
         }
 
-        // Expanded pane mode uses the first; every other mode - the compact rail and the overlay
-        // pane a narrow window opens - uses the second. generic.xaml applies the Expanded one from
-        // a VisualState setter, which is also why the brush *instances* are mutated here rather
-        // than RootSplitView.PaneBackground being assigned: the next state change would overwrite
-        // an assignment, but nothing reassigns a brush's own dependency properties.
         private static readonly string[] s_paneBrushKeys =
         {
             "NavigationViewExpandedPaneBackground",
             "NavigationViewDefaultPaneBackground",
         };
 
-        /// <summary>
-        /// Every pane acrylic brush App.xaml declares, paired with true for the dark theme.
-        /// </summary>
-        /// <remarks>
-        /// ThemeDictionaries is indexed by name on purpose: a ResourceDictionary's own indexer
-        /// does not search them, so there is no way to reach these through the flat dictionary
-        /// AccentColorService writes the accent shades into.
-        ///
-        /// HighContrast is deliberately not visited. Its entries are SolidColorBrushes - acrylic
-        /// there makes the framework fall back to a fixed FallbackColor and ignore the user's
-        /// chosen scheme - so the transparency sliders simply do not apply in high contrast. The
-        /// cast below would drop them anyway.
-        /// </remarks>
         private static List<KeyValuePair<bool, AcrylicBrush>> s_paneBrushes;
 
         private static List<KeyValuePair<bool, AcrylicBrush>> PaneAcrylicBrushes()
         {
-            // Resolved once: these instances live in App.xaml's dictionary for the life of the
-            // process, and a slider drag asks for them on every tick.
             if (s_paneBrushes != null) return s_paneBrushes;
 
             var found = new List<KeyValuePair<bool, AcrylicBrush>>(s_paneBrushKeys.Length * 2);
@@ -329,7 +238,6 @@ namespace Fort.ind_UWP
             {
                 var themes = AccentColorService.FindOverrideDictionary(Application.Current.Resources).ThemeDictionaries;
 
-                // "Default" is this app's dark dictionary; App.xaml never declares a "Dark" one.
                 CollectPaneBrushes(themes, "Default", true, found);
                 CollectPaneBrushes(themes, AppConstants.ThemeLight, false, found);
             }
@@ -338,8 +246,6 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"MainPage: could not reach the pane acrylic brushes – {ex.Message}");
             }
 
-            // A failed or empty resolution is not cached, so a later call can still succeed
-            // rather than the pane being stuck untouchable for the rest of the process.
             if (found.Count > 0) s_paneBrushes = found;
 
             return found;
@@ -367,9 +273,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// True for the sentinel "Default" and for any tag that really parses as a colour.
-        /// </summary>
         private static bool IsUsableTintTag(string colorTag)
         {
             if (string.IsNullOrEmpty(colorTag) || colorTag == AppConstants.ThemeDefault) return true;
@@ -378,14 +281,6 @@ namespace Fort.ind_UWP
             return ColorHelper.TryHexToColor(colorTag, out ignored);
         }
 
-        /// <remarks>
-        /// An explicit Light/Dark choice is read from RequestedTheme, which is exact the moment
-        /// ApplyTheme sets it. "System" is read from the frame's ActualTheme (16299+, so fine on
-        /// the 1809 floor), never Application.RequestedTheme: that one is fixed at startup, so
-        /// switching Windows between light and dark while the app ran left the title bar buttons
-        /// and the acrylic tint painted for the old theme. If ActualTheme has not caught up yet
-        /// when ApplyTheme calls this, ActualThemeChanged follows and OnActualThemeChanged repaints.
-        /// </remarks>
         private static bool IsEffectiveThemeDark()
         {
             var rootFrame = Window.Current.Content as Frame;
@@ -471,9 +366,6 @@ namespace Fort.ind_UWP
 
         private Dictionary<Button, FontIcon> _swatchChecks;
 
-        // The selected swatch used to be marked by its border colour alone, which is the one thing
-        // the accessibility checklist says must not carry information by itself. The checkmark is
-        // the second, non-colour cue.
         private Dictionary<Button, FontIcon> SwatchChecks
         {
             get
@@ -513,8 +405,6 @@ namespace Fort.ind_UWP
             FontIcon check;
             if (swatch == null || !SwatchChecks.TryGetValue(swatch, out check) || check == null) return;
 
-            // Called after UpdateSwatchChipColors, so Background is the current theme's chip
-            // colour and the check can be contrasted against what is actually painted.
             var brush = swatch.Background as SolidColorBrush;
             if (brush != null)
             {
@@ -522,8 +412,6 @@ namespace Fort.ind_UWP
             }
             else
             {
-                // The Default chip keeps the theme's own button background, whose paired
-                // foreground already contrasts with it.
                 check.ClearValue(IconElement.ForegroundProperty);
             }
 
@@ -577,9 +465,6 @@ namespace Fort.ind_UWP
                     sel, LocalizedStrings.Format("TintSwatchSelectedSuffixFormat", selBaseName));
             }
 
-            // Everything that repaints the tint swatches also changes what the accent row shows:
-            // the theme its borders follow, and the tint that Match tint and the restart notice
-            // depend on (MainPage.Accent.cs).
             UpdateAccentSelection();
         }
 
@@ -590,8 +475,6 @@ namespace Fort.ind_UWP
                 Color parsed;
                 if (!ColorHelper.TryHexToColor(hex, out parsed))
                 {
-                    // Leave the swatch showing its "pick a colour" glyph rather than painting it
-                    // with something arbitrary.
                     Debug.WriteLine($"MainPage: custom swatch colour '{hex}' is not a colour");
                     return;
                 }
@@ -734,16 +617,10 @@ namespace Fort.ind_UWP
                 if (IsUsableTintScope(saved)) _tintScope = saved;
             }
 
-            // Minimum before Value, and from the constant rather than the markup, so the floor has
-            // one source of truth. Assigning Value first would let the control coerce it up to the
-            // old minimum and silently disagree with the field the brushes are painted from.
             var minimum = AppConstants.MinimumAcrylicOpacity * 100.0;
             BodyAcrylicSlider.Minimum = minimum;
             PaneAcrylicSlider.Minimum = minimum;
 
-            // _loadingSettings is set for the whole of LoadAppearanceSettings, so neither of these
-            // reaches its handler - nothing is persisted and nothing is painted twice. The caller
-            // paints once, through ApplyTintColor, after this returns.
             BodyAcrylicSlider.Value = _bodyAcrylicOpacity * 100.0;
             PaneAcrylicSlider.Value = _paneAcrylicOpacity * 100.0;
 
@@ -764,13 +641,6 @@ namespace Fort.ind_UWP
                    || scope == AppConstants.TintScopeBoth;
         }
 
-        /// <remarks>
-        /// Convert.ToDouble rather than a (double) cast, for the reason every other read here uses
-        /// Convert.ToBoolean: the cast throws on anything that is not a boxed double, and this runs
-        /// on the path out of the MainPage constructor. Out-of-range values are clamped rather than
-        /// rejected - TintOpacity is documented as 0 to 1.0 and coerces silently, so a stored 5
-        /// would have shown a slider at 500%.
-        /// </remarks>
         private static double ReadOpacity(ApplicationDataContainer localSettings, string key, double fallback)
         {
             try
@@ -794,11 +664,6 @@ namespace Fort.ind_UWP
 
         private static Windows.Globalization.NumberFormatting.PercentFormatter s_percentFormatter;
 
-        /// <remarks>
-        /// A formatter rather than a "{0}%" resource, for the reason dates go through
-        /// DateTimeFormatter: percent placement and the space before the sign are not universal.
-        /// Built lazily, so nothing activates a WinRT formatter at type load.
-        /// </remarks>
         private static string FormatPercent(double fraction)
         {
             try
@@ -827,23 +692,6 @@ namespace Fort.ind_UWP
             UpdateAcrylicLegibilityWarnings();
         }
 
-        /// <summary>
-        /// Shows the legibility caution naming whichever slider sits below the tint opacity the
-        /// current theme needs.
-        /// </summary>
-        /// <remarks>
-        /// A threshold, not a measurement: acrylic samples the desktop wallpaper, which the app
-        /// cannot see, so ColorHelper.ContrastRatio has nothing to compare against. The two floors
-        /// are the doc dump's (chunk_030, "Legibility considerations"): "In dark mode, tint opacity
-        /// can be 70%, while light mode acrylic will meet contrast ratios at 50%." The floor moves
-        /// with the theme, which is why RepaintThemeDependentChrome calls this as well.
-        ///
-        /// Opacity, never Visibility, and the text stays put when the warning is hidden: this runs
-        /// on every tick of a slider drag, and a collapsing row would change this section's height
-        /// under the cursor - which RepositionThemeTransition would then animate for every section
-        /// below it. AccessibilityView is what actually hides it, so nothing reads text that is
-        /// not on screen.
-        /// </remarks>
         private void UpdateAcrylicLegibilityWarnings()
         {
             try
@@ -855,10 +703,6 @@ namespace Fort.ind_UWP
                 var bodyLow = _bodyAcrylicOpacity < floor;
                 var paneLow = _paneAcrylicOpacity < floor;
 
-                // Set unconditionally, including when neither slider is low: an empty TextBlock
-                // has no height, so leaving it blank would collapse the row this is here to
-                // reserve and reintroduce the jump on the first crossing. The Content wording is
-                // the placeholder - it is invisible and out of the automation tree.
                 string key;
                 if (bodyLow && paneLow) key = "AcrylicLegibilityWarningBothFormat";
                 else if (paneLow) key = "AcrylicLegibilityWarningSidebarFormat";
@@ -866,9 +710,6 @@ namespace Fort.ind_UWP
 
                 var show = bodyLow || paneLow;
 
-                // This runs on every tick of a slider drag, and LocalizedStrings.Get is not
-                // memoized - it opens the resource loader per call - so repainting identical text
-                // hundreds of times per drag is a real cost for no change on screen.
                 if (show == _warningShown
                     && floor == _warningFloor
                     && string.Equals(key, _warningKey, StringComparison.Ordinal))
@@ -883,11 +724,6 @@ namespace Fort.ind_UWP
                 AcrylicWarningText.Text = LocalizedStrings.Format(key, FormatPercent(floor));
                 AcrylicWarning.Opacity = show ? 1 : 0;
 
-                // Set on the TextBlock, not just its parent Grid: AccessibilityView is documented
-                // per element and does not prune a subtree (that is why frameworks that want the
-                // cascading behaviour, like MAUI, ship a separate ExcludedWithChildren). Raw on
-                // the Grid alone left the child TextBlock in the content view, so a screen reader
-                // could still read a warning nobody can see. The FontIcon is already Raw in markup.
                 var view = show ? Windows.UI.Xaml.Automation.Peers.AccessibilityView.Content
                                 : Windows.UI.Xaml.Automation.Peers.AccessibilityView.Raw;
                 Windows.UI.Xaml.Automation.AutomationProperties.SetAccessibilityView(AcrylicWarning, view);
@@ -933,30 +769,12 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Saves both opacities once a drag settles.
-        /// </summary>
-        /// <remarks>
-        /// The brushes are repainted on every ValueChanged - a dependency property set on one
-        /// reused brush, which is cheap - but a drag raises hundreds of them and each write to
-        /// LocalSettings hits disk. One debouncer covers both sliders and its flush writes both
-        /// values: dragging the second slider cancels the first one's pending flush, so a
-        /// per-slider payload would have dropped that value on the floor.
-        /// </remarks>
         private async void QueueAcrylicPersist()
         {
             try
             {
                 var token = _acrylicPersistDebouncer.Restart();
 
-                // The token is deliberately NOT passed to Task.Delay. Handing it over makes the
-                // delay throw TaskCanceledException the moment the next tick calls Restart, and a
-                // single slider drag raises hundreds of ticks - hundreds of first-chance exceptions
-                // in the debugger, for a cancellation that is the normal case rather than a fault.
-                // The check below is what actually stops the stale flush, and it is safe on a token
-                // whose source Restart has already disposed: IsCancellationRequested is one of the
-                // few members that does not throw after Dispose (unlike Token, Cancel, CancelAfter).
-                // The cost is a timer that runs to completion and then does nothing.
                 await Task.Delay(AppConstants.AcrylicPersistDebounceMilliseconds);
                 if (token.IsCancellationRequested) return;
 
@@ -970,16 +788,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        /// <summary>
-        /// Writes both opacities now and drops any pending debounced write.
-        /// </summary>
-        /// <remarks>
-        /// The debounce is right for the middle of a drag and wrong at the end of one. Closing or
-        /// terminating the app inside the 400ms window left the continuation un-run and the value
-        /// lost, which is exactly what this codebase legislates against: state that survives
-        /// termination is written at the moment it changes, not batched. Releasing the thumb and
-        /// leaving the slider are both "the moment it changes", so they write straight through.
-        /// </remarks>
         private void FlushAcrylicPersist()
         {
             try
@@ -996,9 +804,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        // Pointer capture ends a mouse or touch drag; LostFocus covers the keyboard, where arrow
-        // keys change the value and no pointer is involved. Both are cheap enough to run
-        // unconditionally - the write is two values, and Cancel makes the pending one a no-op.
         private void AcrylicSlider_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
         {
             if (_loadingSettings) return;
@@ -1025,7 +830,6 @@ namespace Fort.ind_UWP
 
                 _tintScope = scope;
 
-                // Saved at once, not debounced: this is a discrete choice, not a drag.
                 ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintScope] = scope;
                 ApplySurfaceBrushes(_tintTag);
             }

@@ -7,17 +7,6 @@ namespace Fort.ind_UWP
     {
         private static SearchItem[] s_staticItems;
 
-        /// <summary>
-        /// The app's own screens and settings, as search results. Call from the UI thread.
-        /// </summary>
-        /// <remarks>
-        /// A method rather than the static readonly array this used to be, because every title in
-        /// it is now a resource lookup. A field initializer runs at type load - whenever something
-        /// first touches SearchCatalog, on whatever thread - and LocalizedStrings returns the bare
-        /// key off the UI thread, which would have baked resource names into the search list for
-        /// the life of the process. Hence the memoization being conditional on the loader really
-        /// being there.
-        /// </remarks>
         public static SearchItem[] GetStaticItems()
         {
             var cached = s_staticItems;
@@ -66,16 +55,6 @@ namespace Fort.ind_UWP
             };
         }
 
-        /// <summary>
-        /// The "Profile: name" suggestion for the signed-in user, or null when signed out.
-        /// Must be called on the UI thread.
-        /// </summary>
-        /// <remarks>
-        /// Returns the finished <see cref="SearchItem"/> rather than just its title, because the
-        /// SearchItem constructor resolves its category display name through the resw as well.
-        /// Building it inside <see cref="BuildSuggestions"/> would run that lookup under Task.Run,
-        /// where it would come back as the literal resource key.
-        /// </remarks>
         public static SearchItem BuildProfileResultItem(UserProfile currentUser)
         {
             if (currentUser == null) return null;
@@ -89,9 +68,6 @@ namespace Fort.ind_UWP
                                   AppConstants.NavigationProfile);
         }
 
-        /// <summary>
-        /// Pure query matcher - no resource lookups, so it is safe to run off the UI thread.
-        /// </summary>
         public static List<SearchItem> BuildSuggestions(string query, IReadOnlyList<SearchItem> items, SearchItem profileResult)
         {
             List<SearchItem> filtered = new List<SearchItem>();

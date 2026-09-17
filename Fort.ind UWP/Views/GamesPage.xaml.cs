@@ -27,16 +27,6 @@ namespace Fort.ind_UWP
 
         private readonly GroupCollection _groups = new GroupCollection();
 
-        /// <summary>
-        /// An ObservableCollection whose contents can be swapped with a single Reset.
-        /// </summary>
-        /// <remarks>
-        /// The filter used to Clear() and then Add each group, which is one Reset followed by up to
-        /// 27 Add notifications per debounced keystroke - and the grouped view and both
-        /// SemanticZoom views react to every one of them. The instance is still mutated in place
-        /// rather than replaced, because GamesViewSource.Source and both ItemsSources hold it (see
-        /// EnsureItemsSources).
-        /// </remarks>
         private sealed class GroupCollection : ObservableCollection<GameGroup>
         {
             public void ReplaceAll(IEnumerable<GameGroup> groups)
@@ -60,11 +50,6 @@ namespace Fort.ind_UWP
 
         private IReadOnlyList<SearchItem> _allGames = Array.Empty<SearchItem>();
 
-        /// <summary>
-        /// The shared debouncer, not a hand-rolled CancellationTokenSource field. It already gets
-        /// the ordering right - Cancel nulls the field before disposing, so a late caller can
-        /// never reach a dead source - and MainPage's search box uses the same one.
-        /// </summary>
         private readonly Debouncer _filterDebounce = new Debouncer();
 
         private bool _dataLoaded = false;
@@ -151,8 +136,6 @@ namespace Fort.ind_UWP
 
                 var games = await SitemapService.LoadGameItemsAsync();
 
-                // Stamp the stars on before the list is bound, so no row renders unstarred and
-                // then flips. Idempotent, and cheap enough to repeat on a retry.
                 await FavoritesService.EnsureLoadedAsync();
                 FavoritesService.Apply(games);
 
@@ -185,9 +168,6 @@ namespace Fort.ind_UWP
         {
             try
             {
-                // Untokenized on purpose - see the note on the same call in MainPage.Search.cs.
-                // The token would make every superseded keystroke throw TaskCanceledException;
-                // the check below is what actually stops the stale filter.
                 await Task.Delay(AppConstants.SearchDebounceMilliseconds);
 
                 if (cancellationToken.IsCancellationRequested) return;
@@ -322,20 +302,6 @@ namespace Fort.ind_UWP
             AnnounceState(state);
         }
 
-        /// <summary>
-        /// Speaks whichever state text has just become the live one.
-        /// </summary>
-        /// <remarks>
-        /// The AutomationProperties.LiveSetting values in the markup only declare a politeness
-        /// level - nothing at all is announced until LiveRegionChanged is raised, which is what
-        /// AutomationHelper.AnnounceLiveRegion does. Driven from SetState because that is the one
-        /// point every transition passes through, and each text is written before it runs:
-        /// UpdateCountText precedes it and ApplyFilter sets EmptyText.Text first.
-        ///
-        /// Content announces the count, which is the whole reason CountText carries Polite - a
-        /// debounced filter rewrites it with no focus change and no new element, so it is
-        /// otherwise silent. ErrorPanel has no live region of its own, so Failed says nothing yet.
-        /// </remarks>
         private void AnnounceState(GamesPageState state)
         {
             switch (state)
@@ -377,16 +343,6 @@ namespace Fort.ind_UWP
             SetFavoriteFromToggle(sender, false);
         }
 
-        /// <summary>
-        /// Shared body of the two toggle handlers.
-        /// </summary>
-        /// <remarks>
-        /// The IsChecked binding fires Checked/Unchecked as containers are recycled during
-        /// scrolling, not just when the user clicks - so this no-ops when the model already agrees
-        /// with the requested state. Without that guard every scroll would re-save the file and
-        /// re-announce to a screen reader. FavoritesService.SetFavoriteAsync is idempotent as well,
-        /// but the guard keeps the async churn off the scroll path entirely.
-        /// </remarks>
         private async void SetFavoriteFromToggle(object sender, bool isFavorite)
         {
             try
@@ -401,8 +357,6 @@ namespace Fort.ind_UWP
 
                 await FavoritesService.SetFavoriteAsync(item, isFavorite);
 
-                // Starring changes no text and moves no focus, so it is silent to a screen reader
-                // without an explicit notification.
                 AutomationHelper.AnnounceStatus(
                     toggle,
                     LocalizedStrings.Format(isFavorite ? "FavoriteAddedFormat" : "FavoriteRemovedFormat", item.Title),
