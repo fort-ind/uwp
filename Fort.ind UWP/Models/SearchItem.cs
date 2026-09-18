@@ -17,6 +17,8 @@ namespace Fort.ind_UWP
 
         public string NavigationTag { get; set; }
 
+        public string SettingsSection { get; set; }
+
         public string Url { get; set; }
 
         public string Icon { get; set; }

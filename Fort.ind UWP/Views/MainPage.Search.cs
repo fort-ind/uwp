@@ -113,6 +113,8 @@ namespace Fort.ind_UWP
         {
             try
             {
+                _searchDebounce.Cancel();
+
                 if (args.ChosenSuggestion != null)
                 {
                     var item = args.ChosenSuggestion as SearchItem;
@@ -123,31 +125,43 @@ namespace Fort.ind_UWP
                 }
                 else
                 {
-                    var query = args.QueryText.Trim();
+                    var query = (args.QueryText ?? "").Trim();
                     if (!string.IsNullOrEmpty(query))
                     {
-                        var items = _allSearchItems;
-
-                        SearchItem match = null;
-                        foreach (var i in items)
-                        {
-                            if ((i.Title != null && i.Title.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                                (i.Category != null && i.Category.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0))
-                            {
-                                match = i;
-                                break;
-                            }
-                        }
-                        if (match != null)
-                        {
-                            await NavigateToSearchItemAsync(match);
-                        }
+                        SubmitFreeTextQuery(query);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"MainPage: Search query failed – {ex.Message}");
+            }
+        }
+
+        private void SubmitFreeTextQuery(string query)
+        {
+            SearchItem firstMatch = null;
+            foreach (var item in _allSearchItems)
+            {
+                if (SearchCatalog.Matches(item, query))
+                {
+                    firstMatch = item;
+                    break;
+                }
+            }
+
+            if (firstMatch != null && string.IsNullOrEmpty(firstMatch.Url) && !string.IsNullOrEmpty(firstMatch.NavigationTag))
+            {
+                NavigateToTag(firstMatch.NavigationTag, firstMatch.SettingsSection);
+                return;
+            }
+
+            NavigateToTag(AppConstants.NavigationGames);
+
+            var games = ContentFrame.Content as GamesPage;
+            if (games != null)
+            {
+                games.ShowFiltered(query);
             }
         }
 
@@ -174,7 +188,7 @@ namespace Fort.ind_UWP
             }
             else if (!string.IsNullOrEmpty(item.NavigationTag))
             {
-                NavigateToTag(item.NavigationTag);
+                NavigateToTag(item.NavigationTag, item.SettingsSection);
             }
         }
     }

@@ -157,6 +157,17 @@ namespace Fort.ind_UWP
             }
         }
 
+        internal void ShowFiltered(string query)
+        {
+            _filterDebounce.Cancel();
+            FilterBox.Text = query ?? "";
+
+            if (_dataLoaded)
+            {
+                ApplyFilter(FilterBox.Text);
+            }
+        }
+
         private void FilterBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
@@ -198,7 +209,7 @@ namespace Fort.ind_UWP
                 matches = new List<SearchItem>();
                 foreach (var item in _allGames)
                 {
-                    if (item.Title.IndexOf(trimmed, StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (SearchCatalog.Matches(item, trimmed))
                     {
                         matches.Add(item);
                     }

@@ -320,15 +320,30 @@ namespace Fort.ind_UWP
             }
         }
 
-        internal void NavigateToTag(string tag)
+        internal void NavigateToTag(string tag, string settingsSection = null)
         {
             try
             {
                 if (string.IsNullOrEmpty(tag)) return;
 
+                var revealSection = !string.IsNullOrEmpty(settingsSection);
+
                 SelectNavItemForTag(tag);
-                ShowContent(tag, true);
+                ShowContent(tag, !revealSection);
                 ClosePaneUnlessExpanded();
+
+                if (revealSection)
+                {
+                    var settings = ContentFrame.Content as SettingsPage;
+                    if (settings != null)
+                    {
+                        settings.RevealSection(settingsSection);
+                    }
+                    else
+                    {
+                        FocusContentRegion();
+                    }
+                }
             }
             catch (Exception ex)
             {

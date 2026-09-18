@@ -878,6 +878,31 @@
                                         </StackPanel>
                                     </StackPanel>
 
+                                    <StackPanel Spacing="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Button x:Name="CheckForUpdatesButton"
+                                                    Click="CheckForUpdatesButton_Click"
+                                                    Style="{StaticResource ButtonRevealStyle}">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="&#xE895;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                                                    <TextBlock x:Uid="CheckForUpdatesButtonText"/>
+                                                </StackPanel>
+                                            </Button>
+                                            <HyperlinkButton x:Uid="UpdateDownloadLink" x:Name="UpdateDownloadLink"
+                                                             VerticalAlignment="Center"
+                                                             Visibility="Collapsed"
+                                                             Click="UpdateDownloadLink_Click"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="UpdateStatusText"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                                   Visibility="Collapsed"
+                                                   AutomationProperties.LiveSetting="Polite"/>
+                                        <ToggleSwitch x:Uid="AutoUpdateCheckToggle" x:Name="AutoUpdateCheckToggle"
+                                                      Toggled="AutoUpdateCheckToggle_Toggled"/>
+                                    </StackPanel>
+
                                     <Rectangle Height="1"
                                                Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
                                                Opacity="0.08"/>

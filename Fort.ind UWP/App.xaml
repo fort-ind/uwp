@@ -42,6 +42,8 @@
 
                             <SolidColorBrush x:Key="CardBorderBrush" Color="#14FFFFFF"/>
 
+                            <SolidColorBrush x:Key="MajorUpdateInfoBarBackgroundBrush" Color="#1C3553"/>
+
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackground" TargetTheme="Dark" Color="Transparent" FallbackColor="Transparent"/>
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackgroundSelected" TargetTheme="Dark" Color="Transparent" FallbackColor="Transparent"/>
                             <RevealBorderBrush x:Key="NavigationViewItemBorderBrush" TargetTheme="Dark" Color="Transparent" FallbackColor="Transparent"/>
@@ -85,6 +87,8 @@
 
                             <SolidColorBrush x:Key="CardBorderBrush" Color="#22000000"/>
 
+                            <SolidColorBrush x:Key="MajorUpdateInfoBarBackgroundBrush" Color="#DEECF9"/>
+
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackground" TargetTheme="Light" Color="Transparent" FallbackColor="Transparent"/>
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackgroundSelected" TargetTheme="Light" Color="Transparent" FallbackColor="Transparent"/>
                             <RevealBorderBrush x:Key="NavigationViewItemBorderBrush" TargetTheme="Light" Color="Transparent" FallbackColor="Transparent"/>
@@ -111,6 +115,7 @@
                             <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+                            <SolidColorBrush x:Key="MajorUpdateInfoBarBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
 
                             <SolidColorBrush x:Key="NavigationViewItemBackground" Color="{ThemeResource SystemColorButtonFaceColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{ThemeResource SystemColorHighlightColor}"/>

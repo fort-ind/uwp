@@ -153,6 +153,7 @@
     <Compile Include="Services\ProfileService.cs" />
     <Compile Include="Services\SearchCatalog.cs" />
     <Compile Include="Services\SitemapService.cs" />
+    <Compile Include="Services\UpdateService.cs" />
     <Compile Include="Views\GamesPage.xaml.cs">
       <DependentUpon>GamesPage.xaml</DependentUpon>
     </Compile>
@@ -175,6 +176,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.TitleBar.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainPage.Update.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\IShellContentPage.cs" />

@@ -46,6 +46,8 @@ namespace Fort.ind_UWP
                                               () => LoadSitemapItems());
             ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                           () => UpdateLiveTile());
+            ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
+                                          () => OfferUpdateIfAvailable());
 
             Unloaded += MainPage_Unloaded;
             Loaded += MainPage_Loaded;

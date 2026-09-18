@@ -293,20 +293,10 @@ namespace Fort.ind_UWP
 
             try
             {
-                if (string.IsNullOrWhiteSpace(avatarUrl))
-                {
-                    ProfileImage.Source = null;
-                    ProfileImage.Visibility = Visibility.Collapsed;
-                    ProfileInitials.Visibility = Visibility.Visible;
-                    return true;
-                }
-
                 var avatarUri = WebLauncher.TryCreateWebUri(avatarUrl);
                 if (avatarUri == null)
                 {
-                    ProfileImage.Source = null;
-                    ProfileImage.Visibility = Visibility.Collapsed;
-                    ProfileInitials.Visibility = Visibility.Visible;
+                    ShowAvatarInitials();
                     return true;
                 }
 
@@ -314,20 +304,43 @@ namespace Fort.ind_UWP
                 bitmap.DecodePixelType = DecodePixelType.Logical;
                 bitmap.DecodePixelWidth = 80;
                 bitmap.DecodePixelHeight = 80;
+                bitmap.ImageOpened += AvatarBitmap_ImageOpened;
+                bitmap.ImageFailed += AvatarBitmap_ImageFailed;
                 bitmap.UriSource = avatarUri;
                 ProfileImage.Source = bitmap;
                 ProfileImage.Visibility = Visibility.Visible;
-                ProfileInitials.Visibility = Visibility.Collapsed;
+                ProfileInitials.Visibility = Visibility.Visible;
                 return true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"ProfilePage: Avatar load failed - {ex.Message}");
-                ProfileImage.Source = null;
-                ProfileImage.Visibility = Visibility.Collapsed;
-                ProfileInitials.Visibility = Visibility.Visible;
+                ShowAvatarInitials();
                 return true;
             }
+        }
+
+        private void ShowAvatarInitials()
+        {
+            ProfileImage.Source = null;
+            ProfileImage.Visibility = Visibility.Collapsed;
+            ProfileInitials.Visibility = Visibility.Visible;
+        }
+
+        private void AvatarBitmap_ImageOpened(object sender, RoutedEventArgs e)
+        {
+            if (!ReferenceEquals(sender, ProfileImage.Source)) return;
+
+            ProfileInitials.Visibility = Visibility.Collapsed;
+        }
+
+        private void AvatarBitmap_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            if (!ReferenceEquals(sender, ProfileImage.Source)) return;
+
+            Debug.WriteLine($"ProfilePage: avatar image failed to load - {e.ErrorMessage}");
+            ShowAvatarInitials();
+            _avatarApplied = false;
         }
     }
 }

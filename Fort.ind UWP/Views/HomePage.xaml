@@ -69,6 +69,11 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="ContentPanel.Padding" Value="12"/>
+                        <Setter Target="WhatsNewCard.(Grid.ColumnSpan)" Value="3"/>
+                        <Setter Target="ComingSoonCard.(Grid.Row)" Value="1"/>
+                        <Setter Target="ComingSoonCard.(Grid.Column)" Value="0"/>
+                        <Setter Target="ComingSoonCard.(Grid.ColumnSpan)" Value="3"/>
+                        <Setter Target="ComingSoonCard.Margin" Value="0,16,0,0"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="WideState">
@@ -95,8 +100,13 @@
                         <ColumnDefinition Width="16"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <Grid Grid.Column="0"
+                    <Grid x:Name="WhatsNewCard"
+                          Grid.Column="0"
                           Background="{ThemeResource CardBackgroundBrush}"
                           BorderBrush="{ThemeResource CardBorderBrush}"
                           BorderThickness="1"
@@ -126,7 +136,8 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid Grid.Column="2"
+                    <Grid x:Name="ComingSoonCard"
+                          Grid.Column="2"
                           Background="{ThemeResource CardBackgroundBrush}"
                           BorderBrush="{ThemeResource CardBorderBrush}"
                           BorderThickness="1"

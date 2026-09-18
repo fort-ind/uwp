@@ -1137,9 +1137,6 @@ Open your profile and try again.</value>
   <data name="UsernameText.Text" xml:space="preserve">
     <value>@username@social.fort1nd.com</value>
   </data>
-  <data name="WelcomeDontShowCheckBox.Content" xml:space="preserve">
-    <value>dont show me this again &gt;:(</value>
-  </data>
   <data name="HomeFavoritesHeader.Text" xml:space="preserve">
     <value>Your favorites</value>
   </data>
@@ -1167,5 +1164,53 @@ Open your profile and try again.</value>
   <data name="GamesEmptyFilterFormat" xml:space="preserve">
     <value>No games match '{0}'</value>
     <comment>{0} is the text the user typed into the games filter.</comment>
+  </data>
+  <data name="UpdateInfoBar.Title" xml:space="preserve">
+    <value>Update available!</value>
+  </data>
+  <data name="UpdateAvailableMessageFormat" xml:space="preserve">
+    <value>we have a update for you :) {0} is available</value>
+    <comment>{0} is the new version number, for example 2.3.4.</comment>
+  </data>
+  <data name="UpdateDownloadButton.Content" xml:space="preserve">
+    <value>get it now</value>
+  </data>
+  <data name="CheckForUpdatesButtonText.Text" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="UpdateDownloadLink.Content" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="UpdateStatusChecking" xml:space="preserve">
+    <value>Checking for updates…</value>
+  </data>
+  <data name="UpdateStatusUpToDate" xml:space="preserve">
+    <value>your up to date! :) </value>
+  </data>
+  <data name="UpdateStatusAvailableFormat" xml:space="preserve">
+    <value>Version {0} is ready to download</value>
+    <comment>{0} is the new version number, for example 2.3.4.</comment>
+  </data>
+  <data name="UpdateStatusFailed" xml:space="preserve">
+    <value>Couldn't check for updates. Check your connection and try again.</value>
+  </data>
+  <data name="AutoUpdateCheckToggle.Header" xml:space="preserve">
+    <value>Check for updates automatically</value>
+  </data>
+  <data name="AutoUpdateCheckToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="AutoUpdateCheckToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="SearchItemCheckForUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="UpdateMajorTitle" xml:space="preserve">
+    <value>Major update available!</value>
+  </data>
+  <data name="UpdateMajorMessageFormat" xml:space="preserve">
+    <value>the latest update for fort.desktop version {0}, is here! filled with a bunch of new goodies :3 </value>
+    <comment>{0} is the new version number, for example 3.0.0.</comment>
   </data>
 </root>

@@ -5,6 +5,7 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     KeyboardAcceleratorPlacementMode="Hidden"
     Background="Transparent">
@@ -30,14 +31,41 @@
                            Style="{StaticResource BodyTextBlockStyle}"
                            TextWrapping="Wrap"
                            Opacity="0.9"/>
-
-                <CheckBox x:Uid="WelcomeDontShowCheckBox" x:Name="WelcomeDontShowCheckBox"
-                          Margin="0,4,0,0"/>
             </StackPanel>
         </DataTemplate>
     </Page.Resources>
 
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="UpdateInfoBar.Margin" Value="12,8,12,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="UpdateInfoBar.Margin" Value="24,8,24,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
+            <VisualStateGroup x:Name="UpdateKindStates">
+                <VisualState x:Name="RegularUpdateState"/>
+                <VisualState x:Name="MajorUpdateState">
+                    <VisualState.Setters>
+                        <Setter Target="UpdateInfoBar.Background" Value="{ThemeResource MajorUpdateInfoBarBackgroundBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Grid x:Name="AppTitleBar"
               Height="32"
               VerticalAlignment="Top"
@@ -151,9 +179,27 @@
 
             <Grid x:Name="ContentHost" Background="Transparent"
                   AutomationProperties.LandmarkType="Main">
-                <Frame x:Name="ContentFrame"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <muxc:InfoBar x:Uid="UpdateInfoBar" x:Name="UpdateInfoBar"
+                              Grid.Row="0"
+                              Margin="24,8,24,0"
+                              IsOpen="False"
+                              IsClosable="True"
+                              CloseButtonClick="UpdateInfoBar_CloseButtonClick">
+                    <muxc:InfoBar.ActionButton>
+                        <Button x:Uid="UpdateDownloadButton"
+                                Click="UpdateDownloadButton_Click"/>
+                    </muxc:InfoBar.ActionButton>
+                </muxc:InfoBar>
+
+                <Frame x:Name="ContentFrame" Grid.Row="1"/>
 
                 <ProgressBar x:Uid="SitemapLoadingBar" x:Name="LoadingIndicator"
+                             Grid.Row="1"
                              IsIndeterminate="False"
                              Visibility="Collapsed"
                              VerticalAlignment="Top"

@@ -17,6 +17,10 @@ namespace Fort.ind_UWP
 
         private bool _appearanceHandlerAttached = false;
 
+        private string _pendingRevealSection;
+
+        private bool _updateCheckInProgress = false;
+
         public SettingsPage()
         {
             this.InitializeComponent();
@@ -52,6 +56,8 @@ namespace Fort.ind_UWP
                 }
 
                 UpdateStorageInfo();
+
+                RevealPendingSection();
             }
             catch (Exception ex)
             {
@@ -303,6 +309,86 @@ namespace Fort.ind_UWP
             }
         }
 
+        internal void RevealSection(string section)
+        {
+            _pendingRevealSection = section;
+
+            if (IsLoaded)
+            {
+                RevealPendingSection();
+            }
+        }
+
+        private void RevealPendingSection()
+        {
+            var section = _pendingRevealSection;
+            _pendingRevealSection = null;
+            if (string.IsNullOrEmpty(section)) return;
+
+            try
+            {
+                var row = SettingsRowFor(section);
+                if (row == null)
+                {
+                    Debug.WriteLine($"SettingsPage: no section named '{section}' to reveal");
+                    return;
+                }
+
+                if (row.Content.Visibility == Visibility.Collapsed)
+                {
+                    ToggleSettingsRow(row.Header, row.Content, row.Chevron, row.SettingKey);
+                }
+
+                row.Header.Focus(FocusState.Programmatic);
+
+                BringIntoViewOptions options = new BringIntoViewOptions();
+                options.VerticalAlignmentRatio = 0;
+                options.AnimationDesired = true;
+                row.Header.StartBringIntoView(options);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: Failed to reveal section {section} - {ex.Message}");
+            }
+        }
+
+        private sealed class SettingsRow
+        {
+            public SettingsRow(ExpanderHeaderButton header, StackPanel content, RotateTransform chevron, string settingKey)
+            {
+                Header = header;
+                Content = content;
+                Chevron = chevron;
+                SettingKey = settingKey;
+            }
+
+            public ExpanderHeaderButton Header { get; private set; }
+            public StackPanel Content { get; private set; }
+            public RotateTransform Chevron { get; private set; }
+            public string SettingKey { get; private set; }
+        }
+
+        private SettingsRow SettingsRowFor(string section)
+        {
+            switch (section)
+            {
+                case AppConstants.SettingsSectionAppearance:
+                    return new SettingsRow(AppearanceHeader, AppearanceContent, AppearanceChevronRotation, AppConstants.SettingSettingsAppearanceExpanded);
+                case AppConstants.SettingsSectionTransparency:
+                    return new SettingsRow(TransparencyHeader, TransparencyContent, TransparencyChevronRotation, AppConstants.SettingSettingsTransparencyExpanded);
+                case AppConstants.SettingsSectionStorage:
+                    return new SettingsRow(StorageHeader, StorageContent, StorageChevronRotation, AppConstants.SettingSettingsStorageExpanded);
+                case AppConstants.SettingsSectionTile:
+                    return new SettingsRow(TileHeader, TileContent, TileChevronRotation, AppConstants.SettingSettingsTileExpanded);
+                case AppConstants.SettingsSectionWelcome:
+                    return new SettingsRow(WelcomeHeader, WelcomeContent, WelcomeChevronRotation, AppConstants.SettingSettingsWelcomeExpanded);
+                case AppConstants.SettingsSectionAbout:
+                    return new SettingsRow(AboutHeader, AboutContent, AboutChevronRotation, AppConstants.SettingSettingsAboutExpanded);
+                default:
+                    return null;
+            }
+        }
+
         private void RestoreSettingsPanelStates()
         {
             try
@@ -350,6 +436,72 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"SettingsPage: Failed to restore {settingKey} - {ex.Message}");
             }
+        }
+
+        private async void CheckForUpdatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_updateCheckInProgress) return;
+            _updateCheckInProgress = true;
+
+            try
+            {
+                CheckForUpdatesButton.IsEnabled = false;
+                UpdateDownloadLink.Visibility = Visibility.Collapsed;
+                ShowUpdateStatus(LocalizedStrings.Get("UpdateStatusChecking"));
+
+                var result = await UpdateService.CheckNowAsync();
+
+                switch (result.Outcome)
+                {
+                    case UpdateCheckOutcome.UpdateAvailable:
+                        ShowUpdateStatus(LocalizedStrings.Format("UpdateStatusAvailableFormat",
+                                                                 UpdateService.FormatForDisplay(result.LatestVersion)));
+                        UpdateDownloadLink.Visibility = Visibility.Visible;
+                        break;
+                    case UpdateCheckOutcome.UpToDate:
+                        ShowUpdateStatus(LocalizedStrings.Get("UpdateStatusUpToDate"));
+                        break;
+                    default:
+                        ShowUpdateStatus(LocalizedStrings.Get("UpdateStatusFailed"));
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: update check failed - {ex.Message}");
+                ShowUpdateStatus(LocalizedStrings.Get("UpdateStatusFailed"));
+            }
+            finally
+            {
+                CheckForUpdatesButton.IsEnabled = true;
+                _updateCheckInProgress = false;
+            }
+        }
+
+        private void ShowUpdateStatus(string message)
+        {
+            UpdateStatusText.Text = message;
+            UpdateStatusText.Visibility = Visibility.Visible;
+
+            AutomationHelper.AnnounceLiveRegion(UpdateStatusText);
+        }
+
+        private async void UpdateDownloadLink_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await WebLauncher.LaunchAsync(UpdateService.LatestReleasePageUrl);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: could not open the release page - {ex.Message}");
+            }
+        }
+
+        private void AutoUpdateCheckToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loadingSettings) return;
+            UpdateService.AutomaticChecksEnabled = AutoUpdateCheckToggle.IsOn;
         }
 
         private async void ResetWelcomeButton_Click(object sender, RoutedEventArgs e)

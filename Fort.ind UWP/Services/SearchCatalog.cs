@@ -33,25 +33,34 @@ namespace Fort.ind_UWP
                 new SearchItem(LocalizedStrings.Get("SearchItemYourProfile"), AppConstants.CategoryMenu, AppConstants.NavigationProfile),
                 new SearchItem(LocalizedStrings.Get("SearchItemSocial"), AppConstants.CategoryMenu, AppConstants.NavigationSocial),
                 new SearchItem(LocalizedStrings.Get("SearchItemSettings"), AppConstants.CategoryMenu, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemDataStorage"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemLocalJsonStorage"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemLiveTile"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemRefreshLiveTile"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemClearLiveTile"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemWelcomeDialog"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemShowWelcomeDialogAgain"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemAppearance"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemTheme"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemDarkMode"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemLightMode"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemBackgroundColor"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemBackgroundTint"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemApplyTintTo"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemTransparency"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemCustomBackgroundTint"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
-                new SearchItem(LocalizedStrings.Get("SearchItemAccentColor"), AppConstants.CategorySettings, AppConstants.NavigationSettings),
+                SettingsItem("SearchItemDataStorage", AppConstants.SettingsSectionStorage),
+                SettingsItem("SearchItemLocalJsonStorage", AppConstants.SettingsSectionStorage),
+                SettingsItem("SearchItemLiveTile", AppConstants.SettingsSectionTile),
+                SettingsItem("SearchItemRefreshLiveTile", AppConstants.SettingsSectionTile),
+                SettingsItem("SearchItemClearLiveTile", AppConstants.SettingsSectionTile),
+                SettingsItem("SearchItemWelcomeDialog", AppConstants.SettingsSectionWelcome),
+                SettingsItem("SearchItemShowWelcomeDialogAgain", AppConstants.SettingsSectionWelcome),
+                SettingsItem("SearchItemAppearance", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemTheme", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemDarkMode", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemLightMode", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemBackgroundColor", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemBackgroundTint", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemApplyTintTo", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemTransparency", AppConstants.SettingsSectionTransparency),
+                SettingsItem("SearchItemCustomBackgroundTint", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemAccentColor", AppConstants.SettingsSectionAppearance),
+                SettingsItem("SearchItemCheckForUpdates", AppConstants.SettingsSectionAbout),
                 new SearchItem(LocalizedStrings.Get("SearchItemAccount"), AppConstants.CategoryProfile, AppConstants.NavigationProfile),
                 new SearchItem(LocalizedStrings.Get("SearchItemSignIn"), AppConstants.CategoryProfile, AppConstants.NavigationProfile)
+            };
+        }
+
+        private static SearchItem SettingsItem(string titleKey, string section)
+        {
+            return new SearchItem(LocalizedStrings.Get(titleKey), AppConstants.CategorySettings, AppConstants.NavigationSettings)
+            {
+                SettingsSection = section
             };
         }
 
@@ -93,7 +102,7 @@ namespace Fort.ind_UWP
             return filtered;
         }
 
-        private static bool Matches(SearchItem item, string query)
+        public static bool Matches(SearchItem item, string query)
         {
             if (item == null) return false;
 

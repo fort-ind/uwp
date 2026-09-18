@@ -81,6 +81,19 @@ namespace Fort.ind_UWP
         public const string SettingSettingsAboutExpanded = "SettingsAboutExpanded";
         public const string SettingLastNavTag = "LastNavTag";
 
+        public const string SettingsSectionAppearance = "Appearance";
+        public const string SettingsSectionTransparency = "Transparency";
+        public const string SettingsSectionStorage = "Storage";
+        public const string SettingsSectionTile = "Tile";
+        public const string SettingsSectionWelcome = "Welcome";
+        public const string SettingsSectionAbout = "About";
+
+        public const string SettingCheckForUpdates = "CheckForUpdates";
+        public const string SettingUpdateLastCheckedUtc = "UpdateLastCheckedUtc";
+        public const string SettingUpdateLatestVersion = "UpdateLatestVersion";
+        public const string SettingUpdateDismissedVersion = "UpdateDismissedVersion";
+        public const int UpdateCheckIntervalHours = 24;
+
         public const string JumpArgumentPrefix = "jump:";
 
         public const string SettingJumpListRevision = "JumpListRevision";
