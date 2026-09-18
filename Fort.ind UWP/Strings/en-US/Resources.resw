@@ -271,7 +271,7 @@
     <value>Games</value>
   </data>
   <data name="HeaderBetas" xml:space="preserve">
-    <value>Beta Programs</value>
+    <value>labs+betas</value>
   </data>
   <data name="HeaderProfile" xml:space="preserve">
     <value>Your Profile</value>
