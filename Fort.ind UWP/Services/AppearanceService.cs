@@ -19,7 +19,7 @@ namespace Fort.ind_UWP
         private static readonly Color s_surfaceFallbackLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
 
         private static readonly Color s_paneTintDark = Color.FromArgb(255, 0x1F, 0x1F, 0x1F);
-        private static readonly Color s_paneTintLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
+        private static readonly Color s_paneTintLight = Color.FromArgb(255, 0xE6, 0xE6, 0xE6);
 
         private static readonly string[] s_paneBrushKeys =
         {
@@ -280,6 +280,7 @@ namespace Fort.ind_UWP
                 surface.TintColor = bodyTint;
                 surface.TintOpacity = BodyAcrylicOpacity;
                 surface.FallbackColor = bodyFallback;
+                surface.AlwaysUseFallback = BodyAcrylicOpacity >= 1.0;
 
                 RepaintPaneBrushes(colorTag, tintPane);
             }
@@ -300,6 +301,7 @@ namespace Fort.ind_UWP
                 pair.Value.TintColor = tint;
                 pair.Value.FallbackColor = tint;
                 pair.Value.TintOpacity = PaneAcrylicOpacity;
+                pair.Value.AlwaysUseFallback = PaneAcrylicOpacity >= 1.0;
             }
         }
 

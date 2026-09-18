@@ -71,15 +71,15 @@
 
                             <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground"
                                           BackgroundSource="HostBackdrop"
-                                          TintColor="{ThemeResource SystemChromeMediumLowColor}"
+                                          TintColor="{ThemeResource SystemChromeMediumColor}"
                                           TintOpacity="0.9"
-                                          FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
+                                          FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
                             <AcrylicBrush x:Key="NavigationViewDefaultPaneBackground"
                                           BackgroundSource="Backdrop"
-                                          TintColor="{ThemeResource SystemChromeMediumLowColor}"
+                                          TintColor="{ThemeResource SystemChromeMediumColor}"
                                           TintOpacity="0.9"
-                                          FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
+                                          FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
                             <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemChromeWhiteColor}"/>
 

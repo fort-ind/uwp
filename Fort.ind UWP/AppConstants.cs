@@ -60,8 +60,8 @@ namespace Fort.ind_UWP
         public const string TintScopeDefault = TintScopeContent;
 
         
-        public const double DefaultBodyAcrylicOpacity = 0.8;
-        public const double DefaultPaneAcrylicOpacity = 0.9;
+        public const double DefaultBodyAcrylicOpacity = 0.95;
+        public const double DefaultPaneAcrylicOpacity = 0.75;
 
         public const double MinimumAcrylicOpacity = 0.20;
 
