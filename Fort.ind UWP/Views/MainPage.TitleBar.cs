@@ -55,7 +55,7 @@ namespace Fort.ind_UWP
         {
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
-            var isDark = IsEffectiveThemeDark();
+            var isDark = AppearanceService.IsEffectiveThemeDark();
 
             var fgColor = isDark ? Colors.White : Colors.Black;
 
@@ -86,6 +86,11 @@ namespace Fort.ind_UWP
             titleBar.ButtonHoverForegroundColor = hoverFg;
             titleBar.ButtonPressedForegroundColor = pressedFg;
             titleBar.ButtonInactiveForegroundColor = inactiveFg;
+        }
+
+        internal void RefreshLiveTile()
+        {
+            UpdateLiveTile(true);
         }
 
         private void UpdateLiveTile(bool userRequested = false)

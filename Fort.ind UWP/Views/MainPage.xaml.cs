@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,15 +11,17 @@ namespace Fort.ind_UWP
 {
     public sealed partial class MainPage : Page
     {
-        private IReadOnlyList<SearchItem> _allSearchItems = SearchCatalog.GetStaticItems();
+        internal static MainPage Current { get; private set; }
 
-        private bool _loadingSettings = true;
+        private IReadOnlyList<SearchItem> _allSearchItems = SearchCatalog.GetStaticItems();
 
         private readonly Debouncer _searchDebounce = new Debouncer();
 
         private bool _authHandlerAttached = false;
 
         private bool _themeHandlerAttached = false;
+
+        private bool _appearanceHandlerAttached = false;
 
         private bool _titleBarMetricsHandlerAttached = false;
 
@@ -33,10 +34,13 @@ namespace Fort.ind_UWP
         public MainPage()
         {
             this.InitializeComponent();
-            AboutVersionText.Text = LocalizedStrings.Format("AboutVersionFormat", AppConstants.AppVersionDisplay);
+
+            Current = this;
+
+            ApplySavedAppearance();
+
             SetupTitleBar();
             UpdateProfileNavItem();
-            LoadAppearanceSettings();
 
             var ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                               () => LoadSitemapItems());
@@ -61,6 +65,12 @@ namespace Fort.ind_UWP
                 _themeHandlerAttached = true;
             }
 
+            if (!_appearanceHandlerAttached)
+            {
+                AppearanceService.Changed += OnAppearanceChanged;
+                _appearanceHandlerAttached = true;
+            }
+
             if (!_titleBarMetricsHandlerAttached)
             {
                 var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
@@ -75,8 +85,6 @@ namespace Fort.ind_UWP
                 SystemNavigationManager.GetForCurrentView().BackRequested += OnSystemBackRequested;
                 _systemBackHandlerAttached = true;
             }
-
-            AttachFavoritesHandler();
 
             UpdateProfileNavItem();
         }
@@ -96,13 +104,11 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to load sitemap items – {ex.Message}");
+                Debug.WriteLine($"MainPage: Failed to load sitemap items - {ex.Message}");
             }
             finally
             {
                 SetSitemapLoadingIndicator(false);
-
-                InitializeFavorites();
             }
         }
 
@@ -115,8 +121,6 @@ namespace Fort.ind_UWP
 
         private void MainPage_Unloaded(object sender, RoutedEventArgs e)
         {
-            DetachFavoritesHandler();
-
             if (_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged -= OnAuthStateChanged;
@@ -127,6 +131,12 @@ namespace Fort.ind_UWP
             {
                 ActualThemeChanged -= OnActualThemeChanged;
                 _themeHandlerAttached = false;
+            }
+
+            if (_appearanceHandlerAttached)
+            {
+                AppearanceService.Changed -= OnAppearanceChanged;
+                _appearanceHandlerAttached = false;
             }
 
             if (_titleBarMetricsHandlerAttached)
@@ -156,8 +166,6 @@ namespace Fort.ind_UWP
             }
 
             _searchDebounce.Cancel();
-
-            CancelPendingReveal();
         }
     }
 }

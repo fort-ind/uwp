@@ -1,26 +1,31 @@
 # Page-backed navigation refactor
 
-Branch: `page-backed-navigation`. Started 2026-09-17.
+Branch: `page-backed-navigation`. Started 2026-09-17. **Code complete 2026-09-17; awaiting the F5
+walk-through below.**
+
+The reasoning that outlives this document now lives in `CLAUDE.md` — *Architecture*, *Appearance
+state*, and the Per-file notes for `Views/MainPage.Navigation.cs`, `Services/AppearanceService.cs`
+and `Views/IShellContentPage.cs`. This file is the record of the change itself.
 
 ## Why
 
-Switching to Games or Profile shows the *previously visited* page-backed view for a few frames
-before the real one appears. Measured off a 25fps screen recording: the header, the nav-pane
-selection and the Frame's visibility all flip on one frame, and `ContentFrame` then renders the
-**old page at full opacity for five frames — 200ms** — before the new one lands.
+Switching to Games or Profile showed the *previously visited* page-backed view for a few frames
+before the real one appeared. Measured off a 25fps screen recording: the header, the nav-pane
+selection and the Frame's visibility all flipped on one frame, and `ContentFrame` then rendered the
+**old page at full opacity for five frames — 200ms** — before the new one landed.
 
-Root cause is architectural, not a bug in any one method. `ContentFrame` is shared by two nav
-destinations and is toggled with `Visibility`:
+Root cause was architectural, not a bug in any one method. `ContentFrame` was shared by two nav
+destinations and toggled with `Visibility`:
 
-- `ShowInlinePanel` only *collapses* the Frame. It never clears it, so the Frame keeps whichever
+- `ShowInlinePanel` only *collapsed* the Frame. It never cleared it, so the Frame kept whichever
   page-backed view was last visited.
-- A `Collapsed` element is not measured or arranged, so while the Frame is hidden the new page
-  cannot lay out.
-- Revealing the Frame therefore exposes the stale page and *then* spends several layout passes
+- A `Collapsed` element is not measured or arranged, so while the Frame was hidden the new page
+  could not lay out.
+- Revealing the Frame therefore exposed the stale page and *then* spent several layout passes
   catching up.
 
-It only reproduces with an inline panel in between (Home ▸ Games straight after Games ▸ Profile is
-fine, and the first visit has an empty Frame), which is what made it look intermittent.
+It only reproduced with an inline panel in between (Home ▸ Games straight after Games ▸ Profile was
+fine, and the first visit had an empty Frame), which is what made it look intermittent.
 
 ## Three fixes that did not work — do not retry these
 
@@ -42,76 +47,105 @@ fine, and the first visit has an empty Frame), which is what made it look interm
 The lesson: as long as one `Frame` is hidden and re-shown while holding another destination's page,
 something stale is on screen at reveal time. The fix is to stop hiding the Frame.
 
-## Target architecture
+## What was built
 
-Every nav destination becomes a `Page` in `ContentFrame`. The Frame is created visible and is never
+Every nav destination is a `Page` in `ContentFrame`. The Frame is created visible and is never
 collapsed, never opacity-gated. All transitions are the platform's own `NavigationThemeTransition`.
 
-- No `ContentScrollViewer` / `ContentPanel` inline host.
-- No `ShowInlinePanel`, no `RevealContentFrame`, no reveal gate, no `PlayPanelEnterAnimation`.
-- `ShowContent(tag)` becomes: set the header, remember the tag, `ContentFrame.Navigate(pageType)`,
-  `TrimContentBackStack()`, optionally move focus.
+Gone: `ContentScrollViewer` / `ContentPanel`, `ShowInlinePanel`, `ShowProfilePage`, `ShowGamesPage`,
+`RevealContentFrame`, `OnRevealRendering`, `CompletePendingReveal`, `CancelPendingReveal`,
+`MaxRevealFrames`, `PlayPanelEnterAnimation` and `UpdateContentPadding`.
 
-`MainPage` keeps only what is genuinely shell: `NavigationView`, the custom title bar, the search
-box, theme/tint/acrylic application, the accent resources, the nav avatar, back navigation and the
-live tile push.
+`ShowContent(tag)` is now: set the header, remember the tag, name the Main landmark,
+`ContentFrame.Navigate(PageTypeFor(tag))` unless it is already there, `TrimContentBackStack()`, name
+the content region, optionally move focus.
 
-## Moves
+### New files
 
-| New page | From `MainPage.xaml` | Code-behind to move |
-|---|---|---|
-| `HomePage` | `LatestNewsPanel` (235–333), incl. the favourites section | `MainPage.Favorites.cs` (158) |
-| `BetasPage` | `BetasPanel` (335–339) | none |
-| `SocialPage` | `SocialPanel` (341–345) | none |
-| `SettingsPage` | `SettingsPanel` (347–~1215) | `MainPage.Settings.cs` (294), `MainPage.Accent.cs` (279), and the settings-UI half of `MainPage.Appearance.cs` (854) |
+| File | What |
+|---|---|
+| `Views/HomePage.xaml(.cs)` | the former `LatestNewsPanel`, plus all of `MainPage.Favorites.cs` |
+| `Views/BetasPage.xaml(.cs)` | the former `BetasPanel` |
+| `Views/SocialPage.xaml(.cs)` | the former `SocialPanel` |
+| `Views/SettingsPage.xaml(.cs)` | the former `SettingsPanel`, plus `MainPage.Settings.cs` (bar the welcome dialog) |
+| `Views/SettingsPage.Appearance.cs` | the control half of `MainPage.Appearance.cs` |
+| `Views/SettingsPage.Accent.cs` | all of `MainPage.Accent.cs` |
+| `Views/IShellContentPage.cs` | `ContentRegion` — the element the shell names and focuses |
+| `Services/AppearanceService.cs` | the painting half of `MainPage.Appearance.cs`, plus the state behind it |
 
-`GamesPage` and `ProfilePage` already exist and need no change.
+Deleted: `Views/MainPage.Accent.cs`, `Views/MainPage.Favorites.cs`. `MainPage.xaml` went from 1229
+lines to 167.
 
-### The `MainPage.Appearance.cs` split is the hard part
+### How the `MainPage.Appearance.cs` split was settled
 
-It currently does two different jobs and only one of them moves:
+It was doing two jobs and only one of them belonged to a page. `AppearanceService` (static, like
+every other service) owns the state — theme, tint tag, body/pane acrylic opacity, tint scope — the
+`LocalSettings` keys behind it, and every surface it paints: the one `HostBackdrop` `AcrylicBrush`
+and the two pane brushes in `App.xaml`'s `ThemeDictionaries`. `SettingsPage` owns only the controls.
 
-- **Stays on the shell** — anything that paints: `ApplyTheme`, `ApplyTintColor`,
-  `ApplySurfaceBrushes`, `ApplyPaneBrushes`, `PaneAcrylicBrushes`, `RepaintThemeDependentChrome`,
-  `IsEffectiveThemeDark`, `_themePaintKey`, `_tintTag`, `_bodyAcrylicOpacity`, `_paneAcrylicOpacity`,
-  `_tintScope`. These paint `RootGrid` and the `NavigationView` pane, which live on `MainPage`.
-- **Moves to `SettingsPage`** — the controls that drive them: the swatch grids, the sliders, the
-  scope radios, the legibility warning, `LoadAppearanceSettings`' control-restoring half,
-  `UpdateSwatchChipColors`, `UpdateTintSelection`, `ShowSwatchCheck`, `BaseSwatchName`.
+Two decisions worth knowing:
 
-So `SettingsPage` needs a way to ask the shell to repaint. Simplest is a static event or a small
-`AppearanceService` that owns the current tint/opacity/scope state and raises a change event the
-shell subscribes to. That is a genuine design decision — settle it before moving code, because
-`_loadingSettings` (whose initial `true` is load-bearing, see CLAUDE.md) has to end up on whichever
-side owns the sliders.
+- **The shell does not need a repaint callback for the surface.** It assigns
+  `RootGrid.Background = AppearanceService.SurfaceBrush` once in its constructor; the service mutates
+  that instance's dependency properties thereafter. The `Changed` event exists for the two things
+  that are *not* that brush — the title bar (`ApplicationView`, shell-owned) and Settings' own
+  swatches and legibility warning.
+- **Persistence became a parameter (`SetTint(tag, persist)`) rather than an ambient
+  `_loadingSettings` flag.** The flag could not survive the split: it was a page field the painting
+  code read. It now guards only `SettingsPage`'s own handlers, where its initial `true` is still
+  load-bearing for the `Slider.Minimum` coercion during `InitializeComponent`.
 
-## Gotchas
+### Decisions the plan left open
+
+- **Back navigation.** `TrimContentBackStack` stayed, and `CanGoBackInPlace()` still reports true
+  only for `ContentFrame.Content is LoginPage`. Making every destination page-backed did not change
+  the reasoning — pane destinations are siblings, not a stack — only the number of page types it
+  applies to. The `ContentFrame.Visibility` check in `CanGoBackInPlace` is gone, since the Frame is
+  always visible now.
+- **Padding.** Each content page carries the `WindowWidthStates` `AdaptiveTrigger` pair that
+  `GamesPage` already used (12 under 641epx, 24 above), so the shell pads nothing.
+- **Caching.** `SettingsPage` is `NavigationCacheMode.Required` (heaviest page, always one click
+  away); `HomePage` is `Required` too; Betas and Social are left alone.
+
+## Gotchas that applied
 
 - **The csproj is old-style with explicit item lists.** Adding a file is always a two-part change:
   the file *and* the `<Compile>` / `<Page>` entry, with `<DependentUpon>` for partials.
-- **`x:Uid` values move with their markup and the resw keys do not change.** A mistyped `x:Uid`
-  renders blank with no error — check every moved panel on screen.
-- **Shared fields in `MainPage.xaml.cs`** (`_loadingSettings`, `_allSearchItems`, `_searchDebounce`,
-  the handler-attached flags) are used across partials; work out which side each belongs to.
-- **`ShowContent`'s `default:` case is Home.** Keep an explicit tag → page-type map and keep
-  `HeaderFor` in step.
-- **`AutomationProperties.SetName(ContentHost/ContentScrollViewer, header)`** and the Main landmark
-  must land on whatever the new content host is.
-- **Back navigation**: `CanGoBackInPlace()` currently reports true only for LoginPage → ProfilePage.
-  With every destination in the Frame, `Frame.CanGoBack` becomes meaningful and `TrimContentBackStack`
-  probably has to go — decide deliberately rather than by accident.
-- **Repo is CRLF.** Use the Edit/Write tools, never `sed -i`; `text=auto` hides the damage in the
-  diff. Verify with `file` afterwards.
-- **No comments in code.** Every change means adding/updating a bullet in CLAUDE.md's *Per-file
-  notes*, not a comment.
+- **`x:Uid` values moved with their markup and the resw keys did not change.** The panel markup was
+  extracted by line range and dedented mechanically rather than retyped, so no `x:Uid` could be
+  mistyped — but a mistyped one renders blank with no error, so check every moved panel on screen.
+- **Repo is CRLF.** Every new and modified file was normalised to CRLF after writing.
+- **No comments in code.** CLAUDE.md's *Per-file notes* were restructured in the same change: every
+  moved bullet travelled with its code, the reveal-gate bullets were consolidated into one
+  "do not retry these" note, and `MainPage.Accent.cs` / `MainPage.Favorites.cs` headings became
+  `SettingsPage.Accent.cs` / `HomePage.xaml.cs`.
 - `LangVersion` is 7.3.
 
 ## Verification
 
-Command-line MSBuild cannot confirm any of this — it compiles but does not deploy. Build warning-free
-with the compile-check from CLAUDE.md, then **F5 in Visual Studio** and walk:
-Home → Games → Home → Profile → Home → Games → Settings → Profile.
+Command-line MSBuild cannot confirm any of this — it compiles but does not deploy.
+
+- ✅ `/t:Rebuild` Debug x64 with packaging off: exit 0, **no `CS`, `XLS` or `WMC` lines at all**.
+- ✅ `/t:Build` **Release** x64 (the ILC / .NET Native toolchain CI uses, and the only configuration
+  that emits the *static* `XamlTypeInfo` table for the four new pages): exit 0, clean.
+- ✅ The moved markup was extracted by line range and dedented, never retyped, and diffed back
+  against `HEAD` ignoring whitespace: all four panels and all three `DataTemplate`s are
+  content-identical, so no `x:Uid` or handler name can have been mistyped in the move.
+- ⬜ **F5 in Visual Studio** and walk: Home → Games → Home → Profile → Home → Games → Settings →
+  Profile.
 
 Success is: no frame of any transition shows the previous destination's content. If anything still
 flashes, record a GIF and frame-difference it (`System.Drawing` reads GIF frames; no ffmpeg needed) —
 that is how this was diagnosed and it is faster than reasoning about it.
+
+Worth checking on the same run, because none of it can be verified from a build:
+
+- Every moved panel renders its text (a mistyped `x:Uid` is blank, silently).
+- Settings: theme radios, tint swatches (including the checkmark on Default), the custom tint
+  dialog's live preview, both transparency sliders and their warning, the tint-scope radios, the
+  accent row and its restart notice.
+- The theme switch repaints the title bar caption buttons and Settings' swatches while Settings is
+  on screen.
+- Reset app data → the appearance controls come back to defaults *and* the surfaces match them.
+- Home's favourites: star from Games, come back to Home, the row is there.
+- Keyboard: a nav gesture moves focus into the content region; arrow keys scroll it.

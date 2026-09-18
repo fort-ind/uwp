@@ -1,16 +1,10 @@
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
-using AnimationBuilder = Microsoft.Toolkit.Uwp.UI.Animations.AnimationBuilder;
-using Axis = Microsoft.Toolkit.Uwp.UI.Animations.Axis;
 
 namespace Fort.ind_UWP
 {
@@ -26,8 +20,6 @@ namespace Fort.ind_UWP
                         try
                         {
                             UpdateProfileNavItem();
-
-                            UpdateStorageInfo();
                         }
                         catch (Exception ex)
                         {
@@ -37,7 +29,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Auth state change handler failed – {ex.Message}");
+                Debug.WriteLine($"MainPage: Auth state change handler failed - {ex.Message}");
             }
         }
 
@@ -102,6 +94,7 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"MainPage: nav avatar update failed - {ex.Message}");
             }
         }
+
         private async void NavView_Loaded(object sender, RoutedEventArgs e)
         {
             if (_navViewInitialized) return;
@@ -116,7 +109,6 @@ namespace Fort.ind_UWP
 
                 ClosePaneUnlessExpanded();
 
-                UpdateContentPadding(NavView.DisplayMode);
                 UpdateAppTitleVisibility(NavView.IsPaneOpen);
 
                 AlignPaneToggleButton();
@@ -137,7 +129,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: NavView_Loaded failed – {ex.Message}");
+                Debug.WriteLine($"MainPage: NavView_Loaded failed - {ex.Message}");
             }
         }
 
@@ -168,9 +160,9 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static string HeaderFor(string panelName)
+        private static string HeaderFor(string tag)
         {
-            switch (panelName)
+            switch (tag)
             {
                 case AppConstants.NavigationGames:
                     return LocalizedStrings.Get("HeaderGames");
@@ -187,9 +179,27 @@ namespace Fort.ind_UWP
             }
         }
 
+        private static Type PageTypeFor(string tag)
+        {
+            switch (tag)
+            {
+                case AppConstants.NavigationGames:
+                    return typeof(GamesPage);
+                case AppConstants.NavigationBetas:
+                    return typeof(BetasPage);
+                case AppConstants.NavigationProfile:
+                    return typeof(ProfilePage);
+                case AppConstants.NavigationSocial:
+                    return typeof(SocialPage);
+                case AppConstants.NavigationSettings:
+                    return typeof(SettingsPage);
+                default:
+                    return typeof(HomePage);
+            }
+        }
+
         private void NavView_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
         {
-            UpdateContentPadding(args.DisplayMode);
             UpdateAppTitleVisibility(sender.IsPaneOpen);
         }
 
@@ -208,12 +218,6 @@ namespace Fort.ind_UWP
             AppTitleText.Visibility = isPaneOpen ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void UpdateContentPadding(NavigationViewDisplayMode mode)
-        {
-            double inset = mode == NavigationViewDisplayMode.Minimal ? 12 : 24;
-            ContentPanel.Padding = new Thickness(inset);
-        }
-
         private void ShowContent(string tag, bool moveFocus = false)
         {
             var header = HeaderFor(tag);
@@ -221,30 +225,37 @@ namespace Fort.ind_UWP
             RememberLastNavTag(tag);
 
             Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentHost, header);
-            Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentScrollViewer, header);
 
-            switch (tag)
+            var pageType = PageTypeFor(tag);
+
+            try
             {
-                case AppConstants.NavigationProfile:
-                    ShowProfilePage();
-                    break;
-                case AppConstants.NavigationGames:
-                    ShowGamesPage();
-                    break;
-                case AppConstants.NavigationBetas:
-                    ShowInlinePanel(BetasPanel);
-                    break;
-                case AppConstants.NavigationSocial:
-                    ShowInlinePanel(SocialPanel);
-                    break;
-                case AppConstants.NavigationSettings:
-                    ShowInlinePanel(SettingsPanel);
-                    UpdateStorageInfo();
-                    break;
-                default:
-                    ShowInlinePanel(LatestNewsPanel);
-                    break;
+                if (ContentFrame.CurrentSourcePageType != pageType)
+                {
+                    if (!ContentFrame.Navigate(pageType))
+                    {
+                        Debug.WriteLine($"MainPage: navigation to {pageType.Name} returned false");
+                        FallBackToHome(pageType);
+                        return;
+                    }
+
+                    TrimContentBackStack();
+                }
+                else
+                {
+                    var profile = ContentFrame.Content as ProfilePage;
+                    if (profile != null) profile.RefreshUI();
+                }
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: navigation to {pageType.Name} failed - {ex.GetType().Name}: {ex.Message}"
+                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                FallBackToHome(pageType);
+                return;
+            }
+
+            NameContentRegion(header);
 
             if (moveFocus)
             {
@@ -252,21 +263,36 @@ namespace Fort.ind_UWP
             }
         }
 
+        private void FallBackToHome(Type failedPageType)
+        {
+            if (failedPageType == typeof(HomePage)) return;
+
+            SelectNavItemForTag(AppConstants.NavigationLatestNews);
+            ShowContent(AppConstants.NavigationLatestNews);
+        }
+
+        private void NameContentRegion(string header)
+        {
+            var region = ContentRegionOfCurrentPage();
+            if (region == null) return;
+
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(region, header);
+        }
+
+        private Control ContentRegionOfCurrentPage()
+        {
+            var page = ContentFrame.Content as IShellContentPage;
+            return page == null ? null : page.ContentRegion;
+        }
+
         private void FocusContentRegion()
         {
             try
             {
-                if (ContentScrollViewer.Visibility == Visibility.Visible)
-                {
-                    ContentScrollViewer.Focus(FocusState.Programmatic);
-                    return;
-                }
+                var target = ContentRegionOfCurrentPage() ?? ContentFrame.Content as Control;
+                if (target == null) return;
 
-                var page = ContentFrame.Content as Control;
-                if (page != null)
-                {
-                    page.Focus(FocusState.Programmatic);
-                }
+                target.Focus(FocusState.Programmatic);
             }
             catch (Exception ex)
             {
@@ -395,65 +421,9 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void ShowInlinePanel(UIElement panel)
-        {
-            CancelPendingReveal();
-
-            ContentFrame.Visibility = Visibility.Collapsed;
-            ContentScrollViewer.Visibility = Visibility.Visible;
-
-            LatestNewsPanel.Visibility = panel == LatestNewsPanel ? Visibility.Visible : Visibility.Collapsed;
-            BetasPanel.Visibility = panel == BetasPanel ? Visibility.Visible : Visibility.Collapsed;
-            SocialPanel.Visibility = panel == SocialPanel ? Visibility.Visible : Visibility.Collapsed;
-            SettingsPanel.Visibility = panel == SettingsPanel ? Visibility.Visible : Visibility.Collapsed;
-
-            PlayPanelEnterAnimation(ContentPanel);
-        }
-
-        private static readonly TimeSpan PanelEnterDuration = TimeSpan.FromMilliseconds(300);
-
-        private static AnimationBuilder s_panelEnterAnimation;
-
-        private static Windows.UI.ViewManagement.UISettings s_uiSettings;
-
-        private void PlayPanelEnterAnimation(UIElement target)
-        {
-            try
-            {
-                if (target == null) return;
-
-                if (s_uiSettings == null)
-                {
-                    s_uiSettings = new Windows.UI.ViewManagement.UISettings();
-                }
-                if (!s_uiSettings.AnimationsEnabled)
-                {
-                    target.Opacity = 1;
-                    return;
-                }
-
-                if (s_panelEnterAnimation == null)
-                {
-                    s_panelEnterAnimation = AnimationBuilder.Create()
-                        .Opacity(to: 1, from: 0, duration: PanelEnterDuration,
-                                 easingMode: EasingMode.EaseOut)
-                        .Translation(Axis.Y, to: 0, from: 24, duration: PanelEnterDuration,
-                                     easingMode: EasingMode.EaseOut);
-                }
-
-                s_panelEnterAnimation.Start(target);
-            }
-            catch (Exception ex)
-            {
-                target.Opacity = 1;
-                Debug.WriteLine($"MainPage: Content enter animation failed - {ex.Message}");
-            }
-        }
-
         private bool CanGoBackInPlace()
         {
             if (ContentFrame == null) return false;
-            if (ContentFrame.Visibility != Visibility.Visible) return false;
             if (!ContentFrame.CanGoBack) return false;
 
             return ContentFrame.Content is LoginPage;
@@ -479,129 +449,6 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"MainPage: Back navigation failed - {ex.Message}");
                 return false;
-            }
-        }
-
-        private void ShowProfilePage()
-        {
-            try
-            {
-                if (ContentFrame == null) return;
-
-                if (ContentFrame.Content is ProfilePage)
-                {
-                    ((ProfilePage)ContentFrame.Content).RefreshUI();
-                }
-                else
-                {
-                    ContentFrame.Navigate(typeof(ProfilePage));
-                    TrimContentBackStack();
-                }
-
-                RevealContentFrame();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"MainPage: Profile navigation failed – {ex.Message}");
-                FallBackToHome();
-            }
-        }
-
-        private const int MaxRevealFrames = 15;
-
-        private FrameworkElement _revealTarget;
-        private int _revealFrames;
-        private bool _revealHooked;
-
-        private void RevealContentFrame()
-        {
-            ContentScrollViewer.Visibility = Visibility.Collapsed;
-
-            CancelPendingReveal();
-
-            ContentFrame.Opacity = 0;
-            ContentFrame.Visibility = Visibility.Visible;
-
-            _revealTarget = ContentFrame.Content as FrameworkElement;
-            if (_revealTarget == null)
-            {
-                CompletePendingReveal();
-                return;
-            }
-
-            _revealFrames = 0;
-            CompositionTarget.Rendering += OnRevealRendering;
-            _revealHooked = true;
-        }
-
-        private void OnRevealRendering(object sender, object e)
-        {
-            try
-            {
-                _revealFrames += 1;
-
-                var target = _revealTarget;
-                var presented = target != null
-                                && VisualTreeHelper.GetParent(target) != null
-                                && target.ActualHeight > 0
-                                && target.ActualWidth > 0;
-
-                if (presented || _revealFrames >= MaxRevealFrames)
-                {
-                    Debug.WriteLine($"MainPage: content frame revealed after {_revealFrames} frame(s), presented={presented}");
-                    CompletePendingReveal();
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"MainPage: content reveal tick failed - {ex.Message}");
-                CompletePendingReveal();
-            }
-        }
-
-        private void CompletePendingReveal()
-        {
-            CancelPendingReveal();
-
-            ContentFrame.Opacity = 1;
-        }
-
-        private void CancelPendingReveal()
-        {
-            if (_revealHooked)
-            {
-                CompositionTarget.Rendering -= OnRevealRendering;
-                _revealHooked = false;
-            }
-
-            _revealTarget = null;
-        }
-
-        private void FallBackToHome()
-        {
-            SelectNavItemForTag(AppConstants.NavigationLatestNews);
-            ShowContent(AppConstants.NavigationLatestNews);
-        }
-
-        private void ShowGamesPage()
-        {
-            try
-            {
-                if (ContentFrame == null) return;
-
-                if (!(ContentFrame.Content is GamesPage))
-                {
-                    ContentFrame.Navigate(typeof(GamesPage));
-                    TrimContentBackStack();
-                }
-
-                RevealContentFrame();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"MainPage: Games navigation failed - {ex.GetType().Name}: {ex.Message}"
-                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
-                FallBackToHome();
             }
         }
 

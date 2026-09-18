@@ -11,7 +11,7 @@ using Windows.UI.Xaml.Media;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class MainPage : Page
+    public sealed partial class SettingsPage : Page
     {
         private const string DefaultCustomAccentSeed = "#0078D7";
 
@@ -65,7 +65,7 @@ namespace Fort.ind_UWP
             try
             {
                 var selectedTag = AccentColorService.SavedAccentTag;
-                var isDark = IsEffectiveThemeDark();
+                var isDark = AppearanceService.IsEffectiveThemeDark();
                 var restBrush = isDark ? s_restBrushDark : s_restBrushLight;
 
                 PaintMatchTintSwatch();
@@ -105,7 +105,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: UpdateAccentSelection failed - {ex.Message}");
+                Debug.WriteLine($"SettingsPage: UpdateAccentSelection failed - {ex.Message}");
             }
         }
 
@@ -129,10 +129,8 @@ namespace Fort.ind_UWP
 
         private void PaintMatchTintSwatch()
         {
-            var tint = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
-
             Color accent;
-            var hex = ColorHelper.AccentForTint(tint);
+            var hex = ColorHelper.AccentForTint(AppearanceService.TintTag);
             if (hex != null && ColorHelper.TryHexToColor(hex, out accent))
             {
                 AccentMatchTintButton.Background = new SolidColorBrush(accent);
@@ -176,7 +174,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: AccentColorButton_Click failed - {ex.Message}");
+                Debug.WriteLine($"SettingsPage: AccentColorButton_Click failed - {ex.Message}");
             }
         }
 
@@ -232,7 +230,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Custom accent dialog failed - {ex.Message}");
+                Debug.WriteLine($"SettingsPage: Custom accent dialog failed - {ex.Message}");
             }
         }
 
@@ -272,7 +270,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: AccentRestartButton_Click failed - {ex.Message}");
+                Debug.WriteLine($"SettingsPage: AccentRestartButton_Click failed - {ex.Message}");
             }
         }
     }

@@ -1,0 +1,187 @@
+﻿<Page
+    x:Class="Fort.ind_UWP.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Page.Resources>
+        <DataTemplate x:Key="HomeFavoriteItemTemplate" x:DataType="local:SearchItem">
+            <Grid Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Style="{StaticResource ButtonRevealStyle}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,10"
+                        CornerRadius="0"
+                        Click="HomeFavoriteItem_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="{x:Bind Icon}"
+                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   IsTextScaleFactorEnabled="False"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock Text="{x:Bind Title}"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Button>
+
+                <ToggleButton Grid.Column="1"
+                              Style="{StaticResource ToggleButtonRevealStyle}"
+                              IsChecked="{x:Bind IsFavorite, Mode=OneWay}"
+                              AutomationProperties.Name="{x:Bind FavoriteLabel}"
+                              Width="40" Height="40"
+                              MinWidth="40" MinHeight="40"
+                              Padding="0"
+                              CornerRadius="0"
+                              VerticalAlignment="Center"
+                              Margin="4,0,0,0"
+                              Checked="HomeFavoriteToggle_Checked"
+                              Unchecked="HomeFavoriteToggle_Unchecked">
+                    <FontIcon Glyph="{x:Bind FavoriteGlyph, Mode=OneWay}"
+                              FontFamily="{StaticResource SymbolThemeFontFamily}"
+                              FontSize="16"
+                              IsTextScaleFactorEnabled="False"/>
+                </ToggleButton>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid x:Name="RootGrid">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="24"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer x:Name="PageScrollViewer" IsTabStop="True">
+            <StackPanel x:Name="ContentPanel" Padding="24">
+                <TextBlock x:Uid="MainCheckBackHereFor"
+                           Style="{StaticResource BodyTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           Margin="0,0,0,24"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0"
+                          Background="{ThemeResource CardBackgroundBrush}"
+                          BorderBrush="{ThemeResource CardBorderBrush}"
+                          BorderThickness="1"
+                          Padding="20"
+                          MinHeight="180">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        Opacity="0.6" Margin="0,0,0,8">
+                                <FontIcon Glyph="&#xE789;" FontSize="12" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
+                                <TextBlock x:Uid="MainWelcome"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Uid="MainWelcomeToVersion2"
+                                       Style="{StaticResource SubtitleTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level2"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,12"/>
+                            <TextBlock x:Uid="MainThisUpdateFixesMany"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                                       Margin="0,0,0,12"/>
+                            <TextBlock x:Uid="MainJustNow"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Column="2"
+                          Background="{ThemeResource CardBackgroundBrush}"
+                          BorderBrush="{ThemeResource CardBorderBrush}"
+                          BorderThickness="1"
+                          Padding="20"
+                          MinHeight="180">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        Opacity="0.6" Margin="0,0,0,8">
+                                <FontIcon Glyph="&#xE7FC;" FontSize="12" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
+                                <TextBlock x:Uid="MainSoon3"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Uid="MainSoonSoonSoon"
+                                       Style="{StaticResource SubtitleTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level2"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,12"/>
+                            <TextBlock x:Uid="MainSoonYouWillBe"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                                       Margin="0,0,0,12"/>
+                            <TextBlock x:Uid="MainInTheFutureMaybe"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                <StackPanel x:Name="FavoritesSection" Margin="0,32,0,0">
+                    <TextBlock x:Uid="HomeFavoritesHeader"
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2"
+                               Margin="0,0,0,12"/>
+
+                    <TextBlock x:Uid="HomeFavoritesEmpty"
+                               x:Name="FavoritesEmptyText"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="Wrap"
+                               Visibility="Collapsed"/>
+
+                    <ItemsControl x:Name="FavoritesList"
+                                  ItemTemplate="{StaticResource HomeFavoriteItemTemplate}"
+                                  MaxWidth="700"
+                                  HorizontalAlignment="Stretch"/>
+
+                    <HyperlinkButton x:Uid="HomeFavoritesSeeAll"
+                                     x:Name="FavoritesSeeAllLink"
+                                     Margin="0,8,0,0"
+                                     Visibility="Collapsed"
+                                     Click="FavoritesSeeAll_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
