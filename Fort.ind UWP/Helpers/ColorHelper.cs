@@ -87,15 +87,18 @@ namespace Fort.ind_UWP
 
         private static void ToHsl(Color c, out double h, out double s, out double l)
         {
+            var maxChannel = Math.Max(c.R, Math.Max(c.G, c.B));
+            var minChannel = Math.Min(c.R, Math.Min(c.G, c.B));
+
             var r = c.R / 255.0;
             var g = c.G / 255.0;
             var b = c.B / 255.0;
-            var max = Math.Max(r, Math.Max(g, b));
-            var min = Math.Min(r, Math.Min(g, b));
+            var max = maxChannel / 255.0;
+            var min = minChannel / 255.0;
             var delta = max - min;
 
             l = (max + min) / 2;
-            if (delta == 0)
+            if (maxChannel == minChannel)
             {
                 h = 0;
                 s = 0;
@@ -104,8 +107,8 @@ namespace Fort.ind_UWP
 
             s = delta / (1 - Math.Abs(2 * l - 1));
 
-            if (max == r) h = 60 * (((g - b) / delta) % 6);
-            else if (max == g) h = 60 * ((b - r) / delta + 2);
+            if (maxChannel == c.R) h = 60 * (((g - b) / delta) % 6);
+            else if (maxChannel == c.G) h = 60 * ((b - r) / delta + 2);
             else h = 60 * ((r - g) / delta + 4);
 
             if (h < 0) h += 360;

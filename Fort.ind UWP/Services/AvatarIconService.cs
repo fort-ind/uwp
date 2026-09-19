@@ -261,14 +261,7 @@ namespace Fort.ind_UWP
                     if (coverage >= 1.0) continue;
 
                     int alphaIndex = (y * size + x) * 4 + 3;
-                    if (coverage <= 0.0)
-                    {
-                        bgra[alphaIndex] = 0;
-                    }
-                    else
-                    {
-                        bgra[alphaIndex] = (byte)Math.Round(bgra[alphaIndex] * coverage, MidpointRounding.ToEven);
-                    }
+                    bgra[alphaIndex] = (byte)Math.Round(bgra[alphaIndex] * Math.Max(0.0, coverage), MidpointRounding.ToEven);
                 }
             }
         }

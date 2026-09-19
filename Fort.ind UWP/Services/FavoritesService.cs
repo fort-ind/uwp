@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading;
@@ -18,7 +19,7 @@ namespace Fort.ind_UWP
 
         private static readonly HashSet<string> s_lookup = new HashSet<string>(StringComparer.Ordinal);
 
-        private static bool s_loaded;
+        private static volatile bool s_loaded;
 
         private static readonly SemaphoreSlim s_loadGate = new SemaphoreSlim(1, 1);
 
@@ -43,14 +44,9 @@ namespace Fort.ind_UWP
                     var payload = DeserializeFromJson<FavoritesPayload>(json);
                     if (payload != null && payload.Urls != null)
                     {
-                        foreach (var url in payload.Urls)
-                        {
-                            if (string.IsNullOrEmpty(url)) continue;
-                            if (s_lookup.Add(url))
-                            {
-                                s_order.Add(url);
-                            }
-                        }
+                        s_order.AddRange(payload.Urls.Where(u => !string.IsNullOrEmpty(u))
+                                                     .Distinct(StringComparer.Ordinal));
+                        s_lookup.UnionWith(s_order);
                     }
                 }
 
@@ -106,9 +102,8 @@ namespace Fort.ind_UWP
         {
             if (items == null) return;
 
-            foreach (var item in items)
+            foreach (var item in items.Where(i => i != null))
             {
-                if (item == null) continue;
                 item.IsFavorite = !string.IsNullOrEmpty(item.Url) && s_lookup.Contains(item.Url);
             }
         }
@@ -118,15 +113,9 @@ namespace Fort.ind_UWP
             var results = new List<SearchItem>();
             if (source == null || max <= 0) return results;
 
-            var byUrl = new Dictionary<string, SearchItem>(StringComparer.Ordinal);
-            foreach (var item in source)
-            {
-                if (item == null || string.IsNullOrEmpty(item.Url)) continue;
-                if (!byUrl.ContainsKey(item.Url))
-                {
-                    byUrl.Add(item.Url, item);
-                }
-            }
+            var byUrl = source.Where(i => i != null && !string.IsNullOrEmpty(i.Url))
+                              .GroupBy(i => i.Url, StringComparer.Ordinal)
+                              .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
 
             foreach (var url in s_order)
             {

@@ -81,8 +81,9 @@ namespace Fort.ind_UWP
                     AnnounceSearchResultCount(results.Count);
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
+                Debug.WriteLine("MainPage: search superseded before it started");
             }
             catch (Exception ex)
             {

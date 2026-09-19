@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -186,9 +187,6 @@ namespace Fort.ind_UWP
 
                 ApplyFilter(query);
             }
-            catch (OperationCanceledException)
-            {
-            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"GamesPage: Filter failed - {ex.Message}");
@@ -199,22 +197,9 @@ namespace Fort.ind_UWP
         {
             var trimmed = (query ?? string.Empty).Trim();
 
-            List<SearchItem> matches;
-            if (trimmed.Length == 0)
-            {
-                matches = new List<SearchItem>(_allGames);
-            }
-            else
-            {
-                matches = new List<SearchItem>();
-                foreach (var item in _allGames)
-                {
-                    if (SearchCatalog.Matches(item, trimmed))
-                    {
-                        matches.Add(item);
-                    }
-                }
-            }
+            var matches = trimmed.Length == 0
+                          ? new List<SearchItem>(_allGames)
+                          : _allGames.Where(item => SearchCatalog.Matches(item, trimmed)).ToList();
 
             RebuildGroups(matches);
             UpdateCountText(matches.Count);

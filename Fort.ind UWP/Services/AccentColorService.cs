@@ -94,7 +94,14 @@ namespace Fort.ind_UWP
                 {
                     foreach (var key in s_shadeKeys)
                     {
-                        try { resources.Remove(key); } catch { }
+                        try
+                        {
+                            resources.Remove(key);
+                        }
+                        catch (Exception removeEx)
+                        {
+                            Debug.WriteLine($"AccentColorService: could not roll back {key} - {removeEx.Message}");
+                        }
                     }
                 }
                 s_activeAccentHex = null;

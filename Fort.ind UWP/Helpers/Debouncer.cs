@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Fort.ind_UWP
@@ -29,8 +30,9 @@ namespace Fort.ind_UWP
             {
                 cts.Cancel();
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException ex)
             {
+                Debug.WriteLine($"Debouncer: token source was already disposed - {ex.Message}");
             }
             cts.Dispose();
         }

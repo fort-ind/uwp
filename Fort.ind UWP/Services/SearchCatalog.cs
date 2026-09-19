@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -79,18 +80,9 @@ namespace Fort.ind_UWP
 
         public static List<SearchItem> BuildSuggestions(string query, IReadOnlyList<SearchItem> items, SearchItem profileResult)
         {
-            List<SearchItem> filtered = new List<SearchItem>();
-            foreach (var item in items)
-            {
-                if (Matches(item, query))
-                {
-                    filtered.Add(item);
-                    if (filtered.Count >= AppConstants.SearchSuggestionLimit)
-                    {
-                        break;
-                    }
-                }
-            }
+            var filtered = items.Where(item => Matches(item, query))
+                                .Take(AppConstants.SearchSuggestionLimit)
+                                .ToList();
 
             if (filtered.Count < AppConstants.SearchSuggestionLimit &&
                 profileResult != null &&

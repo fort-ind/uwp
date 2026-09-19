@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
@@ -16,7 +17,7 @@ namespace Fort.ind_UWP
     public sealed partial class SettingsPage : Page
     {
         private string _warningKey;
-        private double _warningFloor = -1;
+        private bool _warningIsDark;
         private bool _warningShown;
 
         private void LoadSettingsControls()
@@ -156,9 +157,9 @@ namespace Fort.ind_UWP
 
         private void HideSwatchChecks()
         {
-            foreach (var check in SwatchChecks.Values)
+            foreach (var check in SwatchChecks.Values.Where(c => c != null))
             {
-                if (check != null) check.Visibility = Visibility.Collapsed;
+                check.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -430,14 +431,14 @@ namespace Fort.ind_UWP
                 var show = bodyLow || paneLow;
 
                 if (show == _warningShown
-                    && floor == _warningFloor
+                    && isDark == _warningIsDark
                     && string.Equals(key, _warningKey, StringComparison.Ordinal))
                 {
                     return;
                 }
 
                 _warningShown = show;
-                _warningFloor = floor;
+                _warningIsDark = isDark;
                 _warningKey = key;
 
                 AcrylicWarningText.Text = LocalizedStrings.Format(key, FormatPercent(floor));

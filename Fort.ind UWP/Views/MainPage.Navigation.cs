@@ -5,11 +5,14 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Navigation;
 
 namespace Fort.ind_UWP
 {
     public sealed partial class MainPage : Page
     {
+        private string _launchNavTag;
+
         private async void OnAuthStateChanged(object sender, bool isLoggedIn)
         {
             try
@@ -93,6 +96,12 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"MainPage: nav avatar update failed - {ex.Message}");
             }
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            _launchNavTag = e.Parameter as string;
         }
 
         private async void NavView_Loaded(object sender, RoutedEventArgs e)
@@ -380,12 +389,11 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static string ResolveStartupNavTag()
+        private string ResolveStartupNavTag()
         {
             try
             {
-                var pending = App.TakePendingLaunchNavTag();
-                if (!string.IsNullOrEmpty(pending)) return pending;
+                if (!string.IsNullOrEmpty(_launchNavTag)) return _launchNavTag;
 
                 if (!App.ResumingFromTermination) return AppConstants.NavigationLatestNews;
 

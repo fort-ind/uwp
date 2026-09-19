@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -9,8 +10,8 @@ namespace Fort.ind_UWP
 {
     public class SitemapService
     {
-        private static IReadOnlyList<SearchItem> s_allItems;
-        private static IReadOnlyList<SearchItem> s_gameItems;
+        private static volatile IReadOnlyList<SearchItem> s_allItems;
+        private static volatile IReadOnlyList<SearchItem> s_gameItems;
 
         private static readonly SemaphoreSlim s_loadGate = new SemaphoreSlim(1, 1);
 
@@ -45,17 +46,10 @@ namespace Fort.ind_UWP
 
             var all = await LoadSearchItemsAsync();
 
-            List<SearchItem> games = new List<SearchItem>();
-            foreach (var item in all)
-            {
-                if (item.CategoryKey != null &&
-                    item.CategoryKey.StartsWith(AppConstants.CategoryGames, StringComparison.Ordinal))
-                {
-                    games.Add(item);
-                }
-            }
-
-            var result = games.AsReadOnly();
+            var result = all.Where(item => item.CategoryKey != null &&
+                                           item.CategoryKey.StartsWith(AppConstants.CategoryGames, StringComparison.Ordinal))
+                            .ToList()
+                            .AsReadOnly();
             if (all.Count > 0)
             {
                 s_gameItems = result;
@@ -148,16 +142,9 @@ namespace Fort.ind_UWP
                 return null;
             }
 
-            List<SitemapEntry> entries = new List<SitemapEntry>(urls.Count);
-            foreach (var url in urls)
-            {
-                var entry = CreateEntryFromUrl(url);
-                if (entry != null)
-                {
-                    entries.Add(entry);
-                }
-            }
-            return entries;
+            return urls.Select(CreateEntryFromUrl)
+                       .Where(entry => entry != null)
+                       .ToList();
         }
 
         private static SitemapEntry CreateEntryFromUrl(string urlValue)

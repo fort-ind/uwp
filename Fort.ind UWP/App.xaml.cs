@@ -20,15 +20,6 @@ namespace Fort.ind_UWP
 
         public static bool ResumingFromTermination { get; private set; }
 
-        private static string s_pendingLaunchNavTag;
-
-        internal static string TakePendingLaunchNavTag()
-        {
-            var tag = s_pendingLaunchNavTag;
-            s_pendingLaunchNavTag = null;
-            return tag;
-        }
-
         protected override async void OnLaunched(Windows.ApplicationModel.Activation.LaunchActivatedEventArgs e)
         {
             bool showStartupErrorDialog = false;
@@ -59,9 +50,7 @@ namespace Fort.ind_UWP
 
                     if (isFirstNavigation)
                     {
-                        s_pendingLaunchNavTag = jumpNavTag;
-
-                        rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                        rootFrame.Navigate(typeof(MainPage), jumpNavTag);
                     }
                     else if (jumpNavTag != null)
                     {
@@ -99,8 +88,9 @@ namespace Fort.ind_UWP
                                                              LocalizedStrings.Get("DialogOk"));
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Debug.WriteLine($"Critical: startup error dialog failed - {ex.Message}");
                 }
             }
         }

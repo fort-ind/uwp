@@ -428,8 +428,9 @@ namespace Fort.ind_UWP
                 var credential = vault.Retrieve(VaultResource, VaultUsernameKey);
                 vault.Remove(credential);
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"MisskeyAuthService: no stored token removed - {ex.Message}");
             }
         }
 
