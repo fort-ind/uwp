@@ -17,10 +17,52 @@
                              Duration="0:0:0.4"
                              EasingFunction="{StaticResource FadeEase}"/>
         </Storyboard>
+        <Storyboard x:Key="BannerFadeIn">
+            <DoubleAnimation Storyboard.TargetName="BannerImagePath"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1"
+                             Duration="0:0:0.4"
+                             EasingFunction="{StaticResource FadeEase}"/>
+        </Storyboard>
     </Page.Resources>
 
     <ScrollViewer HorizontalContentAlignment="Center">
-        <StackPanel Padding="24" MaxWidth="600" HorizontalAlignment="Center">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="24"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="BannerStates">
+                <VisualState x:Name="NoBannerState"/>
+                <VisualState x:Name="BannerState">
+                    <VisualState.Setters>
+                        <Setter Target="BannerHost.Visibility" Value="Visible"/>
+                        <Setter Target="ProfileHeader.Padding" Value="24,0,24,24"/>
+                        <Setter Target="AvatarGrid.Margin" Value="0,-40,0,0"/>
+                        <Setter Target="ProfileTextPanel.(Grid.Row)" Value="1"/>
+                        <Setter Target="ProfileTextPanel.(Grid.Column)" Value="0"/>
+                        <Setter Target="ProfileTextPanel.(Grid.ColumnSpan)" Value="2"/>
+                        <Setter Target="ProfileTextPanel.Margin" Value="0,12,0,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <StackPanel x:Name="ContentPanel" Padding="24" MaxWidth="600" HorizontalAlignment="Center">
             <StackPanel x:Name="NotLoggedInPanel" Visibility="Collapsed">
                 <Grid Background="{ThemeResource CardBackgroundBrush}"
                       BorderBrush="{ThemeResource CardBorderBrush}"
@@ -49,48 +91,72 @@
             <StackPanel x:Name="LoggedInPanel" Spacing="16">
                 <Grid Background="{ThemeResource CardBackgroundBrush}"
                       BorderBrush="{ThemeResource CardBorderBrush}"
-                      BorderThickness="1"
-                      Padding="24">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                      BorderThickness="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <Grid x:Name="AvatarGrid"
-                          Width="80" Height="80"
-                          CornerRadius="40"
-                          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
-                          Opacity="0"
+                    <Grid x:Name="BannerHost"
+                          Visibility="Collapsed"
+                          FlowDirection="LeftToRight"
+                          SizeChanged="BannerHost_SizeChanged"
                           AutomationProperties.AccessibilityView="Raw">
-                        <Image x:Name="ProfileImage"
-                               Stretch="UniformToFill"
-                               Visibility="Collapsed"
-                               AutomationProperties.AccessibilityView="Raw"/>
-                        <TextBlock x:Uid="ProfileInitials" x:Name="ProfileInitials"
-                                   FontSize="32"
-                                   FontWeight="SemiBold"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   AutomationProperties.AccessibilityView="Raw"/>
+                        <Canvas>
+                            <Path x:Name="BannerPlaceholderPath"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                            <Path x:Name="BannerImagePath"
+                                  Opacity="0"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        </Canvas>
                     </Grid>
 
-                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
-                        <TextBlock x:Uid="DisplayNameText" x:Name="DisplayNameText"
-                                   Style="{StaticResource SubtitleTextBlockStyle}"/>
-                        <TextBlock x:Uid="UsernameText" x:Name="UsernameText"
-                                   Style="{StaticResource BodyTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                        <TextBlock x:Uid="MemberSinceText" x:Name="MemberSinceText"
-                                   Style="{StaticResource CaptionTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                                   Margin="0,4,0,0"/>
-                        <TextBlock x:Name="LastLoginText"
-                                   Text=""
-                                   Style="{StaticResource CaptionTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                                   Margin="0,2,0,0"
-                                   Visibility="Collapsed"/>
-                    </StackPanel>
+                    <Grid x:Name="ProfileHeader" Grid.Row="1" Padding="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid x:Name="AvatarGrid"
+                              Width="80" Height="80"
+                              CornerRadius="40"
+                              Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                              Opacity="0"
+                              AutomationProperties.AccessibilityView="Raw">
+                            <Image x:Name="ProfileImage"
+                                   Stretch="UniformToFill"
+                                   Visibility="Collapsed"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="ProfileInitials" x:Name="ProfileInitials"
+                                       FontSize="32"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       AutomationProperties.AccessibilityView="Raw"/>
+                        </Grid>
+
+                        <StackPanel x:Name="ProfileTextPanel" Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Uid="DisplayNameText" x:Name="DisplayNameText"
+                                       Style="{StaticResource SubtitleTextBlockStyle}"/>
+                            <TextBlock x:Uid="UsernameText" x:Name="UsernameText"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <TextBlock x:Uid="MemberSinceText" x:Name="MemberSinceText"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       Margin="0,4,0,0"/>
+                            <TextBlock x:Name="LastLoginText"
+                                       Text=""
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       Margin="0,2,0,0"
+                                       Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
 
                 <Grid Background="{ThemeResource CardBackgroundBrush}"

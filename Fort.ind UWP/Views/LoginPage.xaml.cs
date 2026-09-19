@@ -32,11 +32,11 @@ namespace Fort.ind_UWP
 
         private async void SignInButton_Click(object sender, RoutedEventArgs e)
         {
-            ErrorText.Visibility = Visibility.Collapsed;
-            ShowLoading(true);
-
             try
             {
+                ErrorText.Visibility = Visibility.Collapsed;
+                ShowLoading(true);
+
                 var result = await ProfileService.LoginWithMisskeyAsync();
 
                 if (Frame == null || Frame.Content != this) return;

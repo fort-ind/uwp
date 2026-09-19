@@ -21,6 +21,18 @@ namespace Fort.ind_UWP
 
         private bool _updateCheckInProgress = false;
 
+        private int _footprintGeneration = 0;
+
+        private static readonly string[] s_sizeUnitKeys =
+        {
+            "StorageSizeBytesFormat",
+            "StorageSizeKilobytesFormat",
+            "StorageSizeMegabytesFormat",
+            "StorageSizeGigabytesFormat"
+        };
+
+        private static Windows.Globalization.NumberFormatting.DecimalFormatter s_sizeFormatter;
+
         public SettingsPage()
         {
             this.InitializeComponent();
@@ -120,6 +132,8 @@ namespace Fort.ind_UWP
 
         private void UpdateStorageInfo()
         {
+            RefreshStorageFootprint();
+
             try
             {
                 StoragePathText.Text = LocalizedStrings.Format("StorageLocationFormat", LocalStorageService.DataPath);
@@ -146,6 +160,85 @@ namespace Fort.ind_UWP
                 CacheDescriptionText.Text = "";
                 UserCountText.Text = "";
                 ClearLoginInfoButton.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void RefreshStorageFootprint()
+        {
+            int generation = 0;
+
+            try
+            {
+                generation = ++_footprintGeneration;
+
+                if (string.IsNullOrEmpty(StorageFootprintText.Text))
+                {
+                    StorageFootprintText.Text = LocalizedStrings.Get("StorageFootprintMeasuring");
+                }
+
+                var bytes = await LocalStorageService.MeasureAppFootprintAsync();
+                if (generation != _footprintGeneration) return;
+
+                StorageFootprintText.Text = bytes.HasValue
+                    ? LocalizedStrings.Format("StorageFootprintFormat", FormatByteSize(bytes.Value))
+                    : LocalizedStrings.Get("StorageFootprintUnavailable");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: storage footprint failed - {ex.Message}");
+
+                if (generation == _footprintGeneration)
+                {
+                    StorageFootprintText.Text = LocalizedStrings.Get("StorageFootprintUnavailable");
+                }
+            }
+        }
+
+        private static string FormatByteSize(long bytes)
+        {
+            double value = bytes;
+            int unit = 0;
+
+            while (unit < s_sizeUnitKeys.Length - 1 && RoundForDisplay(value) >= 1024)
+            {
+                value /= 1024;
+                unit++;
+            }
+
+            return LocalizedStrings.Format(s_sizeUnitKeys[unit], FormatSizeNumber(RoundForDisplay(value)));
+        }
+
+        private static double RoundForDisplay(double value)
+        {
+            return value >= 100
+                ? Math.Round(value, MidpointRounding.AwayFromZero)
+                : Math.Round(value, 1, MidpointRounding.AwayFromZero);
+        }
+
+        private static string FormatSizeNumber(double value)
+        {
+            try
+            {
+                if (s_sizeFormatter == null)
+                {
+                    s_sizeFormatter = new Windows.Globalization.NumberFormatting.DecimalFormatter()
+                    {
+                        FractionDigits = 0,
+                        IsGrouped = true,
+                        NumberRounder = new Windows.Globalization.NumberFormatting.IncrementNumberRounder()
+                        {
+                            Increment = 0.1,
+                            RoundingAlgorithm = Windows.Globalization.NumberFormatting.RoundingAlgorithm.RoundHalfUp
+                        }
+                    };
+                }
+
+                return s_sizeFormatter.Format(value);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: size formatting failed - {ex.Message}");
+                return value.ToString(System.Globalization.CultureInfo.CurrentCulture);
             }
         }
 

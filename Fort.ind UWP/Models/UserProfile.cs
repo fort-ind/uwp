@@ -25,6 +25,12 @@ namespace Fort.ind_UWP
         public string AvatarUrl { get; set; }
 
         [DataMember]
+        public string BannerUrl { get; set; }
+
+        [DataMember]
+        public string BannerBlurhash { get; set; }
+
+        [DataMember]
         public DateTime CreatedDate { get; set; }
 
         [DataMember]
@@ -64,6 +70,8 @@ namespace Fort.ind_UWP
                 DisplayName = this.DisplayName,
                 Bio = this.Bio,
                 AvatarUrl = this.AvatarUrl,
+                BannerUrl = this.BannerUrl,
+                BannerBlurhash = this.BannerBlurhash,
                 CreatedDate = this.CreatedDate,
                 LastLoginDate = this.LastLoginDate
             };

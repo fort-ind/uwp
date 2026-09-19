@@ -638,13 +638,16 @@
                                                    Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
                                                    AutomationProperties.HeadingLevel="Level3"/>
                                     </StackPanel>
+                                    <TextBlock x:Name="StorageFootprintText"
+                                               Style="{StaticResource BodyTextBlockStyle}"
+                                               TextWrapping="Wrap"/>
                                     <TextBlock x:Uid="CacheDescriptionText" x:Name="CacheDescriptionText"
                                                Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                Margin="0,0,0,4"/>
                                     <TextBlock x:Name="StoragePathText"
                                                Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
-                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                     <TextBlock x:Name="UserCountText"
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>

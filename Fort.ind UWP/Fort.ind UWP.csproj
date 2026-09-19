@@ -131,6 +131,7 @@
     </Compile>
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
+    <Compile Include="Helpers\Blurhash.cs" />
     <Compile Include="Helpers\ColorHelper.cs" />
     <Compile Include="Helpers\Debouncer.cs" />
     <Compile Include="Helpers\LocalizedStrings.cs" />

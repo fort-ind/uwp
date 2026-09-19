@@ -165,6 +165,33 @@
   <data name="StorageSignedInAsFormat" xml:space="preserve">
     <value>Signed in as @{0}@{1}</value>
   </data>
+  <data name="StorageFootprintFormat" xml:space="preserve">
+    <value>This app is using {0}</value>
+    <comment>Settings, Data Storage. {0} is a formatted size built from one of the StorageSize*Format strings, e.g. "8.9 MB". Counts the installed app plus everything it has stored.</comment>
+  </data>
+  <data name="StorageFootprintMeasuring" xml:space="preserve">
+    <value>Measuring storage…</value>
+    <comment>Shown in place of StorageFootprintFormat until the first measurement finishes.</comment>
+  </data>
+  <data name="StorageFootprintUnavailable" xml:space="preserve">
+    <value>Couldn't measure how much space this app is using.</value>
+  </data>
+  <data name="StorageSizeBytesFormat" xml:space="preserve">
+    <value>{0} bytes</value>
+    <comment>{0} is a whole number below 1024, already formatted for the user's region.</comment>
+  </data>
+  <data name="StorageSizeKilobytesFormat" xml:space="preserve">
+    <value>{0} KB</value>
+    <comment>{0} is a number already formatted for the user's region, with at most one decimal place. 1 KB = 1024 bytes, as in File Explorer.</comment>
+  </data>
+  <data name="StorageSizeMegabytesFormat" xml:space="preserve">
+    <value>{0} MB</value>
+    <comment>{0} is a number already formatted for the user's region, with at most one decimal place. 1 MB = 1024 KB, as in File Explorer.</comment>
+  </data>
+  <data name="StorageSizeGigabytesFormat" xml:space="preserve">
+    <value>{0} GB</value>
+    <comment>{0} is a number already formatted for the user's region, with at most one decimal place. 1 GB = 1024 MB, as in File Explorer.</comment>
+  </data>
   <data name="ClearLoginDialogTitle" xml:space="preserve">
     <value>remove your account</value>
   </data>
@@ -545,10 +572,10 @@ Open your profile and try again.</value>
     <value>fort.desktop</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
-    <value>a version of fort.desktop made for windows 10, using uwp + winui 2.5 :p and works on arm!</value>
+    <value>a version of fort.desktop on uwp!</value>
   </data>
   <data name="ProtocolDisplayName" xml:space="preserve">
-    <value>Fort.ind</value>
+    <value>fort.ind protocol uri</value>
   </data>
   <data name="AboutVersionText.Text" xml:space="preserve">
     <value>Version</value>

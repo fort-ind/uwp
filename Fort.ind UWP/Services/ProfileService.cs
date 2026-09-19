@@ -167,6 +167,8 @@ namespace Fort.ind_UWP
                    && string.Equals(current.DisplayName, fetched.DisplayName, StringComparison.Ordinal)
                    && string.Equals(current.Bio, fetched.Bio, StringComparison.Ordinal)
                    && string.Equals(current.AvatarUrl, fetched.AvatarUrl, StringComparison.Ordinal)
+                   && string.Equals(current.BannerUrl, fetched.BannerUrl, StringComparison.Ordinal)
+                   && string.Equals(current.BannerBlurhash, fetched.BannerBlurhash, StringComparison.Ordinal)
                    && current.CreatedDate.Ticks == fetched.CreatedDate.Ticks;
         }
     }

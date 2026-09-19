@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace Fort.ind_UWP
@@ -134,6 +137,102 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"Error clearing local settings during app reset: {ex.Message}");
             }
+        }
+
+        #endregion
+
+        #region Footprint
+
+        private const string PackageSettingsFolderName = "Settings";
+
+        private const string PackageWebCacheFolderName = "AC";
+
+        public static Task<long?> MeasureAppFootprintAsync()
+        {
+            string installPath;
+            string[] dataFolders;
+
+            try
+            {
+                installPath = Package.Current.InstalledLocation.Path;
+
+                var appData = ApplicationData.Current;
+                var packageDataRoot = Path.GetDirectoryName(appData.LocalFolder.Path);
+                dataFolders = new[]
+                {
+                    appData.LocalFolder.Path,
+                    appData.LocalCacheFolder.Path,
+                    appData.TemporaryFolder.Path,
+                    appData.RoamingFolder.Path,
+                    Path.Combine(packageDataRoot, PackageSettingsFolderName),
+                    Path.Combine(packageDataRoot, PackageWebCacheFolderName)
+                };
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error resolving app folders for the footprint: {ex.Message}");
+                return Task.FromResult<long?>(null);
+            }
+
+            return Task.Run(() =>
+            {
+                var installBytes = MeasureFolder(installPath);
+                if (installBytes == null)
+                {
+                    Debug.WriteLine("Footprint: the install folder could not be read");
+                    return (long?)null;
+                }
+
+                return installBytes + dataFolders.Select(MeasureFolder).Sum(bytes => bytes ?? 0);
+            });
+        }
+
+        private static long? MeasureFolder(string root)
+        {
+            if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) return null;
+
+            var rootFolder = new DirectoryInfo(root);
+            var pending = new Stack<DirectoryInfo>();
+            pending.Push(rootFolder);
+            long total = 0;
+
+            while (pending.Count > 0)
+            {
+                var folder = pending.Pop();
+
+                List<FileSystemInfo> entries;
+                try
+                {
+                    entries = folder.EnumerateFileSystemInfos().ToList();
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is System.Security.SecurityException)
+                {
+                    if (ReferenceEquals(folder, rootFolder)) return null;
+
+                    Debug.WriteLine($"Footprint: skipped {folder.FullName} - {ex.Message}");
+                    continue;
+                }
+
+                foreach (var entry in entries)
+                {
+                    if ((entry.Attributes & System.IO.FileAttributes.ReparsePoint) != 0) continue;
+
+                    var file = entry as FileInfo;
+                    if (file != null)
+                    {
+                        total += file.Length;
+                        continue;
+                    }
+
+                    var subfolder = entry as DirectoryInfo;
+                    if (subfolder != null)
+                    {
+                        pending.Push(subfolder);
+                    }
+                }
+            }
+
+            return total;
         }
 
         #endregion

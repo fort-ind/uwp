@@ -368,6 +368,8 @@ namespace Fort.ind_UWP
             profile.DisplayName = JsonString(obj, "name");
             profile.Bio = JsonString(obj, "description");
             profile.AvatarUrl = JsonString(obj, "avatarUrl");
+            profile.BannerUrl = JsonString(obj, "bannerUrl");
+            profile.BannerBlurhash = JsonString(obj, "bannerBlurhash");
 
             var createdAt = JsonString(obj, "createdAt");
             DateTime parsedDate;
