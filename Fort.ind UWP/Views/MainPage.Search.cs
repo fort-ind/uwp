@@ -128,7 +128,7 @@ namespace Fort.ind_UWP
                     var query = (args.QueryText ?? "").Trim();
                     if (!string.IsNullOrEmpty(query))
                     {
-                        SubmitFreeTextQuery(query);
+                        await SubmitFreeTextQueryAsync(query);
                     }
                 }
             }
@@ -138,22 +138,26 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void SubmitFreeTextQuery(string query)
+        private async Task SubmitFreeTextQueryAsync(string query)
         {
-            SearchItem firstMatch = null;
-            foreach (var item in _allSearchItems)
+            var destinations = SearchCatalog.GetStaticItems();
+
+            var exact = FirstDestination(destinations,
+                                         item => string.Equals(item.Title, query, StringComparison.OrdinalIgnoreCase));
+            if (exact != null)
             {
-                if (SearchCatalog.Matches(item, query))
-                {
-                    firstMatch = item;
-                    break;
-                }
+                NavigateToTag(exact.NavigationTag, exact.SettingsSection);
+                return;
             }
 
-            if (firstMatch != null && string.IsNullOrEmpty(firstMatch.Url) && !string.IsNullOrEmpty(firstMatch.NavigationTag))
+            if (!await AnyGameMatchesAsync(query))
             {
-                NavigateToTag(firstMatch.NavigationTag, firstMatch.SettingsSection);
-                return;
+                var partial = FirstDestination(destinations, item => SearchCatalog.Matches(item, query));
+                if (partial != null)
+                {
+                    NavigateToTag(partial.NavigationTag, partial.SettingsSection);
+                    return;
+                }
             }
 
             NavigateToTag(AppConstants.NavigationGames);
@@ -163,6 +167,33 @@ namespace Fort.ind_UWP
             {
                 games.ShowFiltered(query);
             }
+        }
+
+        private static SearchItem FirstDestination(IEnumerable<SearchItem> destinations, Func<SearchItem, bool> predicate)
+        {
+            foreach (var item in destinations)
+            {
+                if (!string.IsNullOrEmpty(item.NavigationTag) && predicate(item))
+                {
+                    return item;
+                }
+            }
+
+            return null;
+        }
+
+        private static async Task<bool> AnyGameMatchesAsync(string query)
+        {
+            var games = await SitemapService.LoadGameItemsAsync();
+            foreach (var game in games)
+            {
+                if (SearchCatalog.Matches(game, query))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void NavSearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)

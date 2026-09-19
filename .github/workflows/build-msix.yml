@@ -212,30 +212,59 @@ jobs:
           /p:GenerateAppxPackageOnBuild=true `
           /restore
 
-    - name: Copy Install Script and Certificate to Package
+    - name: Stage release files
       shell: pwsh
+      env:
+        PLATFORM: ${{ matrix.platform }}
       run: |
-        $packageDir = Get-ChildItem -Path "Fort.ind UWP\AppPackages" -Directory | Select-Object -First 1
-        if ($packageDir) {
-          Copy-Item "scripts\Install.ps1" -Destination "$($packageDir.FullName)\Install.ps1"
-          Write-Host "Copied Install.ps1 to package directory"
-          
-          if (Test-Path "Fort.ind UWP\Fort.ind_UWP.cer") {
-            Copy-Item "Fort.ind UWP\Fort.ind_UWP.cer" -Destination "$($packageDir.FullName)\Fort.ind_UWP.cer"
-            Write-Host "Copied certificate to package directory"
-          }
+        $package = Get-ChildItem -Path "Fort.ind UWP\AppPackages" -Directory |
+                   ForEach-Object { Get-ChildItem -Path $_.FullName -File } |
+                   Where-Object { $_.Extension -in '.msix', '.appx' } |
+                   Select-Object -First 1
+        if (-not $package) {
+          throw "No .msix or .appx package found under Fort.ind UWP\AppPackages"
+        }
+        $packageDir = $package.Directory.FullName
+
+        $stage = Join-Path $env:GITHUB_WORKSPACE "release-files"
+        New-Item -ItemType Directory -Path $stage -Force | Out-Null
+
+        Copy-Item $package.FullName -Destination $stage
+        Copy-Item "scripts\Install.ps1" -Destination $stage
+
+        $cer = Get-ChildItem -Path $packageDir -Filter "*.cer" -File | Select-Object -First 1
+        if (-not $cer -and (Test-Path "Fort.ind UWP\Fort.ind_UWP.cer")) {
+          $cer = Get-Item "Fort.ind UWP\Fort.ind_UWP.cer"
+        }
+        if ($cer) {
+          Copy-Item $cer.FullName -Destination $stage
+        } else {
+          Write-Warning "No signing certificate to include; the package is unsigned"
+        }
+
+        $dependencyRoot = Join-Path $packageDir "Dependencies"
+        $arch = $env:PLATFORM.ToLowerInvariant()
+        $archSource = Join-Path $dependencyRoot $arch
+        if (-not (Get-ChildItem -Path $archSource -File -ErrorAction SilentlyContinue)) {
+          throw "No framework packages found in $archSource"
+        }
+
+        $archTarget = Join-Path $stage "Dependencies\$arch"
+        New-Item -ItemType Directory -Path $archTarget -Force | Out-Null
+        Copy-Item -Path (Join-Path $archSource "*") -Destination $archTarget
+        Get-ChildItem -Path $dependencyRoot -File | Copy-Item -Destination (Join-Path $stage "Dependencies")
+
+        Write-Host "Release files:"
+        Get-ChildItem -Path $stage -Recurse -File | ForEach-Object {
+          Write-Host ("  {0}  ({1:N1} MB)" -f $_.FullName.Substring($stage.Length + 1), ($_.Length / 1MB))
         }
 
     - name: Upload MSIX Package
       uses: actions/upload-artifact@v7
       with:
-        name: MSIX-${{ matrix.platform }}-${{ matrix.configuration }}-v${{ steps.version.outputs.app_version }}
-        path: |
-          Fort.ind UWP\AppPackages\**\*.msix
-          Fort.ind UWP\AppPackages\**\*.appx
-          Fort.ind UWP\AppPackages\**\*.cer
-          Fort.ind UWP\AppPackages\**\Install.ps1
-        if-no-files-found: warn
+        name: ${{ matrix.platform }}-${{ matrix.configuration }}-v${{ steps.version.outputs.app_version }}
+        path: release-files
+        if-no-files-found: error
 
   release:
     needs: build

@@ -33,6 +33,31 @@ function Write-Section($title) {
     Write-Host ("-" * [Math]::Max(1, 40 - $title.Length)) -ForegroundColor DarkMagenta
 }
 
+function Get-OSArchitecture {
+    try {
+        $kernel32 = Add-Type -Name "Kernel32" -Namespace "FortIndInstaller" -PassThru -MemberDefinition @'
+[DllImport("kernel32.dll", SetLastError = true)]
+public static extern bool IsWow64Process2(IntPtr process, out ushort processMachine, out ushort nativeMachine);
+'@
+        $processMachine = [uint16]0
+        $nativeMachine = [uint16]0
+        $handle = [System.Diagnostics.Process]::GetCurrentProcess().Handle
+        if ($kernel32::IsWow64Process2($handle, [ref]$processMachine, [ref]$nativeMachine)) {
+            switch ($nativeMachine) {
+                0x014c { return "x86" }
+                0x8664 { return "x64" }
+                0xAA64 { return "arm64" }
+                { $_ -in 0x01c0, 0x01c2, 0x01c4 } { return "arm" }
+            }
+        }
+    } catch {
+    }
+
+    if (${env:ProgramFiles(Arm)}) { return "arm64" }
+    if ([Environment]::Is64BitOperatingSystem) { return "x64" }
+    return "x86"
+}
+
 Write-Banner
 
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -94,62 +119,41 @@ if ($devModeEnabled) {
     }
 }
 
-Write-Section "Visual C++ Runtime (VCLibs)"
+Write-Section "Dependencies"
 
-$arch = if ([Environment]::Is64BitOperatingSystem) { "x64" } else { "x86" }
-$vclibsPackage = Get-AppxPackage -Name "Microsoft.VCLibs.140.00" | Where-Object { $_.Architecture -eq $arch }
+$osArch = Get-OSArchitecture
+Write-Status "Windows architecture: $osArch"
 
-if ($vclibsPackage) {
-    Write-Status "VCLibs $($vclibsPackage.Version) ($arch) is installed" "Success"
-} else {
-    Write-Status "VCLibs not found. Downloading and installing..." "Warning"
-
-    $vclibsUrl = if ($arch -eq "x64") {
-        "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-    } else {
-        "https://aka.ms/Microsoft.VCLibs.x86.14.00.Desktop.appx"
-    }
-
-    $vclibsPath = "$env:TEMP\VCLibs.appx"
-
-    try {
-        Write-Status "Downloading VCLibs from Microsoft..."
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Invoke-WebRequest -Uri $vclibsUrl -OutFile $vclibsPath -UseBasicParsing
-
-        Write-Status "Installing VCLibs..."
-        Add-AppxPackage -Path $vclibsPath
-        Write-Status "VCLibs installed successfully" "Success"
-
-        Remove-Item $vclibsPath -Force -ErrorAction SilentlyContinue
-    } catch {
-        Write-Status "Failed to install VCLibs: $($_.Exception.Message)" "Error"
-        Write-Status "You may need to install it manually from the Microsoft Store" "Warning"
+$runnableArchitectures = switch ($osArch) {
+    "x86"   { @("x86") }
+    "x64"   { @("x86", "x64") }
+    "arm"   { @("arm") }
+    "arm64" {
+        if ($osVersion -ge [Version]"10.0.22000") { @("x86", "arm", "arm64", "x64") }
+        else { @("x86", "arm", "arm64") }
     }
 }
 
-Write-Section "Microsoft.UI.Xaml (WinUI)"
-
-$winuiPackage = Get-AppxPackage -Name "Microsoft.UI.Xaml.2.8" -ErrorAction SilentlyContinue
-
-if ($winuiPackage) {
-    Write-Status "Microsoft.UI.Xaml $($winuiPackage.Version) is installed" "Success"
-} else {
-    Write-Status "Microsoft.UI.Xaml 2.8 not found. Will be installed with the app..." "Info"
-
-    $dependencyPath = Join-Path $PSScriptRoot "Dependencies\$arch"
-    if (Test-Path $dependencyPath) {
-        Write-Status "Found bundled dependencies, installing..."
-        Get-ChildItem -Path $dependencyPath -Filter "*.appx" | ForEach-Object {
-            try {
-                Write-Status "Installing dependency: $($_.Name)..."
-                Add-AppxPackage -Path $_.FullName
-                Write-Status "Installed $($_.Name)" "Success"
-            } catch {
-                Write-Status "Note: $($_.Name) may already be installed or will be handled during app install" "Warning"
-            }
-        }
+$dependencyPaths = @()
+$dependencyRoot = Join-Path $PSScriptRoot "Dependencies"
+if (Test-Path $dependencyRoot) {
+    $dependencyFolders = @($dependencyRoot) + @($runnableArchitectures | ForEach-Object { Join-Path $dependencyRoot $_ })
+    foreach ($folder in $dependencyFolders) {
+        if (-not (Test-Path $folder)) { continue }
+        $dependencyPaths += @(Get-ChildItem -Path $folder -File |
+                              Where-Object { $_.Extension -in ".appx", ".msix" } |
+                              ForEach-Object { $_.FullName })
     }
+}
+
+if ($dependencyPaths.Count -gt 0) {
+    Write-Status "Found $($dependencyPaths.Count) bundled framework package(s); any that are missing will be installed with the app" "Success"
+    foreach ($path in $dependencyPaths) {
+        Write-Status (Split-Path $path -Leaf)
+    }
+} else {
+    Write-Status "No bundled dependencies found next to this script (did you extract the whole zip?)" "Warning"
+    Write-Status "The install will fail if a framework the app needs (WinUI 2.5, .NET Native, VCLibs) is missing" "Warning"
 }
 
 Write-Section "Signing Certificate"
@@ -191,16 +195,25 @@ if ($msixFile) {
         Write-Status "Upgrading over version $($existingApp.Version) - your settings and favourites are kept" "Info"
     }
 
+    $installArgs = @{
+        Path = $msixFile.FullName
+        ForceApplicationShutdown = $true
+        ErrorAction = "Stop"
+    }
+    if ($dependencyPaths.Count -gt 0) {
+        $installArgs.DependencyPath = [string[]]$dependencyPaths
+    }
+
     try {
         $installed = $false
         try {
-            Add-AppxPackage -Path $msixFile.FullName -ForceApplicationShutdown -ErrorAction Stop
+            Add-AppxPackage @installArgs
             $installed = $true
         } catch {
             if (-not $existingApp) { throw }
 
             Write-Status "Retrying as a same-or-lower version upgrade..." "Warning"
-            Add-AppxPackage -Path $msixFile.FullName -ForceUpdateFromAnyVersion -ForceApplicationShutdown -ErrorAction Stop
+            Add-AppxPackage @installArgs -ForceUpdateFromAnyVersion
             $installed = $true
         }
 
@@ -227,7 +240,7 @@ if ($msixFile) {
         if ($existingApp) {
             Write-Host ""
             Write-Status "The installed copy was left alone, so nothing was lost." "Info"
-            Write-Status "As a last resort you can uninstall Fort.ind UWP from Settings > Apps" "Info"
+            Write-Status "As a last resort you can uninstall fort.uwp from Settings > Apps" "Info"
             Write-Status "and run this installer again - that WILL erase your app settings." "Warning"
         }
     }

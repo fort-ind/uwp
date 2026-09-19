@@ -101,15 +101,17 @@ namespace Fort.ind_UWP
             var installed = InstalledVersion();
             if (installed == null) return null;
 
-            Version latest;
+            Version latest = null;
             if (IsAutomaticCheckDue())
             {
                 latest = await FetchLatestReleaseVersionAsync();
-                if (latest == null) return null;
-
-                RememberLatest(latest);
+                if (latest != null)
+                {
+                    RememberLatest(latest);
+                }
             }
-            else
+
+            if (latest == null)
             {
                 latest = ReadVersionSetting(AppConstants.SettingUpdateLatestVersion);
             }
