@@ -755,7 +755,7 @@ Open your profile and try again.</value>
     <value>make fort.desktop work for you :3 change it to how you like</value>
   </data>
   <data name="MainManageLocalStorageAnd.Text" xml:space="preserve">
-    <value>view how much space is used and manange your account</value>
+    <value>view how much space is used and manage your account</value>
   </data>
   <data name="MainRefreshLiveTile.Text" xml:space="preserve">
     <value>Refresh Live Tile</value>

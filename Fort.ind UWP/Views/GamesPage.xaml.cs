@@ -112,7 +112,11 @@ namespace Fort.ind_UWP
         {
             EnsureItemsSources();
 
-            if (_dataLoaded) return;
+            if (_dataLoaded)
+            {
+                FavoritesService.Apply(_allGames);
+                return;
+            }
             LoadGames();
         }
 

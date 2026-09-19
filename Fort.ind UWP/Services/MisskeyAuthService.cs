@@ -35,6 +35,8 @@ namespace Fort.ind_UWP
 
         private static readonly TimeSpan SignInTimeout = TimeSpan.FromMinutes(5);
 
+        private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(30);
+
         public static async Task<MisskeyAuthResult> SignInAsync()
         {
             var session = Guid.NewGuid().ToString();
@@ -268,12 +270,13 @@ namespace Fort.ind_UWP
             {
                 Uri checkUri = new Uri($"https://{InstanceHost}/api/miauth/{Uri.EscapeDataString(session)}/check");
                 using (HttpStringContent content = new HttpStringContent("{}", Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"))
+                using (var cts = new CancellationTokenSource(RequestTimeout))
                 {
-                    using (var response = await s_client.Value.PostAsync(checkUri, content))
+                    using (var response = await s_client.Value.PostAsync(checkUri, content).AsTask(cts.Token))
                     {
                         response.EnsureSuccessStatusCode();
 
-                        var body = await response.Content.ReadAsStringAsync();
+                        var body = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
                         var json = JsonObject.Parse(body);
 
                         if (!json.GetNamedBoolean("ok", false))
@@ -318,8 +321,9 @@ namespace Fort.ind_UWP
                 bodyJson.Add("i", JsonValue.CreateStringValue(token));
 
                 using (HttpStringContent content = new HttpStringContent(bodyJson.Stringify(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"))
+                using (var cts = new CancellationTokenSource(RequestTimeout))
                 {
-                    using (var response = await s_client.Value.PostAsync(uri, content))
+                    using (var response = await s_client.Value.PostAsync(uri, content).AsTask(cts.Token))
                     {
                         if (!response.IsSuccessStatusCode)
                         {
@@ -334,7 +338,7 @@ namespace Fort.ind_UWP
                             return MisskeyUserFetchResult.Unavailable();
                         }
 
-                        var body = await response.Content.ReadAsStringAsync();
+                        var body = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
                         var profile = ParseUser(JsonObject.Parse(body));
                         return profile != null
                                ? MisskeyUserFetchResult.Succeeded(profile)

@@ -57,12 +57,13 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"FavoritesService: Failed to load favorites - {ex.Message}");
                 s_order.Clear();
                 s_lookup.Clear();
-                s_loaded = true;
 
                 if (file != null)
                 {
                     s_saveBlocked = !await TryMoveAsideAsync(file);
                 }
+
+                s_loaded = true;
             }
             finally
             {

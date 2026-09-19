@@ -58,6 +58,36 @@ public static extern bool IsWow64Process2(IntPtr process, out ushort processMach
     return "x86"
 }
 
+function Get-PackageIdentity($packagePath) {
+    try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $archive = [System.IO.Compression.ZipFile]::OpenRead($packagePath)
+        try {
+            $entry = $archive.GetEntry("AppxManifest.xml")
+            if (-not $entry) { return $null }
+
+            $reader = New-Object System.IO.StreamReader($entry.Open())
+            try {
+                [xml]$manifest = $reader.ReadToEnd()
+            } finally {
+                $reader.Dispose()
+            }
+
+            $identity = $manifest.DocumentElement.GetElementsByTagName("Identity") | Select-Object -First 1
+            if (-not $identity) { return $null }
+
+            return [PSCustomObject]@{
+                Name      = $identity.GetAttribute("Name")
+                Publisher = $identity.GetAttribute("Publisher")
+            }
+        } finally {
+            $archive.Dispose()
+        }
+    } catch {
+        return $null
+    }
+}
+
 Write-Banner
 
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -181,18 +211,25 @@ if ($certFile) {
     Write-Status "No certificate file found. The package may be unsigned." "Warning"
 }
 
-Write-Section "Installing Fort.ind UWP"
+Write-Section "Installing Fort.uwp"
 $msixFile = Get-ChildItem -Path $PSScriptRoot -Filter "*.msix" | Select-Object -First 1
 if (-not $msixFile) {
     $msixFile = Get-ChildItem -Path $PSScriptRoot -Filter "*.appx" | Select-Object -First 1
 }
 
 if ($msixFile) {
-    Write-Status "Installing Fort.ind UWP..."
+    Write-Status "Installing Fort.uwp..."
 
-    $existingApp = Get-AppxPackage -Name "*Fort.ind*" -ErrorAction SilentlyContinue
+    $existingApp = $null
+    $identity = Get-PackageIdentity $msixFile.FullName
+    if ($identity) {
+        $existingApp = Get-AppxPackage -Name $identity.Name -ErrorAction SilentlyContinue |
+                       Where-Object { $_.Publisher -eq $identity.Publisher }
+    } else {
+        Write-Status "Could not read the package identity; treating this as a fresh install" "Warning"
+    }
     if ($existingApp) {
-        Write-Status "Upgrading over version $($existingApp.Version) - your settings and favourites are kept" "Info"
+        Write-Status "Upgrading over version $($existingApp.Version) - your settings and favourites are being moved over :)" "Info"
     }
 
     $installArgs = @{
@@ -217,9 +254,9 @@ if ($msixFile) {
             $installed = $true
         }
 
-        if (-not $installed) { throw "The package could not be installed." }
+        if (-not $installed) { throw "The package could not be installed. :(" }
 
-        Write-Status "Fort.ind UWP installed successfully!" "Success"
+        Write-Status "Fort.uwp installed successfully!" "Success"
         Write-Host ""
         Write-Host "  +============================================+" -ForegroundColor Magenta
         Write-Host "  |        Installation Complete!  =^..^=       |" -ForegroundColor Magenta
