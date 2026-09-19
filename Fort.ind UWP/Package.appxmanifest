@@ -11,7 +11,7 @@
     Name="fortind.desktopPreview"
     Publisher="CN=fort.ind"
     Version="2.2.0.0" />
-
+<!-- if you are reading this.. the codename for 3.0 is azurite (annd you found the easter egg) -->
   <mp:PhoneIdentity PhoneProductId="842aa337-86c0-43da-82da-a0aa21c2fc6d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
@@ -33,11 +33,10 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="Fort.ind_UWP.App">
       <uap:VisualElements
-        DisplayName="ms-resource:AppDisplayName"
+        DisplayName="fort.desktop"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="ms-resource:AppDescription"
-        BackgroundColor="transparent">
+        BackgroundColor="transparent" Description="a version of fort.desktop on uwp!">
 		  <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\Square310x310Logo.png" ShortName="fort.uwp" Square71x71Logo="Assets\SmallTile.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square310x310Logo"/>
@@ -56,7 +55,7 @@
       <Extensions>
         <uap:Extension Category="windows.protocol">
           <uap:Protocol Name="fortind">
-            <uap:DisplayName>ms-resource:ProtocolDisplayName</uap:DisplayName>
+            <uap:DisplayName>fort.ind protocol uri</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
       </Extensions>
