@@ -361,7 +361,7 @@
     <value>Games</value>
   </data>
   <data name="SearchItemBetaPrograms" xml:space="preserve">
-    <value>Beta Programs</value>
+    <value>labs+betas</value>
   </data>
   <data name="SearchItemYourProfile" xml:space="preserve">
     <value>Your Profile</value>
@@ -674,7 +674,7 @@ Open your profile and try again.</value>
     <value>Restart now</value>
   </data>
   <data name="MainBetaPrograms.Content" xml:space="preserve">
-    <value>Beta Programs</value>
+    <value>labs+betas</value>
   </data>
   <data name="MainBetaPrograms.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
     <value>join the beta</value>
@@ -755,7 +755,7 @@ Open your profile and try again.</value>
     <value>make fort.desktop work for you :3 change it to how you like</value>
   </data>
   <data name="MainManageLocalStorageAnd.Text" xml:space="preserve">
-    <value>Manage local storage and view account data</value>
+    <value>view how much space is used and manange your account</value>
   </data>
   <data name="MainRefreshLiveTile.Text" xml:space="preserve">
     <value>Refresh Live Tile</value>
