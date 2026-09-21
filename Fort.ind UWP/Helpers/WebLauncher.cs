@@ -24,6 +24,20 @@ namespace Fort.ind_UWP
             return uri;
         }
 
+        public static Uri TryCreateFetchUri(string value)
+        {
+            var uri = TryCreateWebUri(value);
+            if (uri == null) return null;
+
+            if (!string.Equals(uri.Scheme, "https", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.WriteLine($"WebLauncher: refused to fetch over a non-TLS scheme - {uri.Scheme}");
+                return null;
+            }
+
+            return uri;
+        }
+
         public static async Task<bool> LaunchAsync(string value)
         {
             var uri = TryCreateWebUri(value);

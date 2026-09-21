@@ -327,7 +327,7 @@ namespace Fort.ind_UWP
 
             try
             {
-                var avatarUri = WebLauncher.TryCreateWebUri(avatarUrl);
+                var avatarUri = WebLauncher.TryCreateFetchUri(avatarUrl);
                 if (avatarUri == null)
                 {
                     ShowAvatarInitials();
@@ -391,7 +391,7 @@ namespace Fort.ind_UWP
 
             try
             {
-                var bannerUri = WebLauncher.TryCreateWebUri(bannerUrl);
+                var bannerUri = WebLauncher.TryCreateFetchUri(bannerUrl);
                 if (bannerUri == null)
                 {
                     HideBanner();

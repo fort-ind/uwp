@@ -1,6 +1,19 @@
 ﻿
 $ErrorActionPreference = "Stop"
 
+$ExpectedPackageName = "fortind.desktopPreview"
+$KnownPublishers = @("CN=koold", "CN=fort.ind")
+
+function Get-CanonicalDn($distinguishedName) {
+    if ([string]::IsNullOrWhiteSpace($distinguishedName)) { return "" }
+    try {
+        $dn = New-Object System.Security.Cryptography.X509Certificates.X500DistinguishedName($distinguishedName)
+        return $dn.Format($false).Trim()
+    } catch {
+        return $distinguishedName.Trim()
+    }
+}
+
 function Write-Status($message, $type = "Info") {
     switch ($type) {
         "Info"    { Write-Host "  [INFO] $message" -ForegroundColor Magenta }
@@ -130,7 +143,18 @@ if ($devModeEnabled) {
 } elseif ($sideloadEnabled) {
     Write-Status "Sideloading is enabled" "Success"
 } else {
-    Write-Status "Sideloading is not enabled. Attempting to enable..." "Warning"
+    Write-Status "Sideloading is turned off on this PC, and fort.uwp cannot install without it." "Warning"
+    Write-Status "Turning it on lets any package signed by a certificate you trust install" "Info"
+    Write-Status "outside the Store, and it stays on afterwards until you turn it off in" "Info"
+    Write-Status "Settings > Privacy & security > For developers." "Info"
+
+    $enableSideloading = Read-Host "Turn sideloading on? (y/N)"
+    if ($enableSideloading -ne "y" -and $enableSideloading -ne "Y") {
+        Write-Status "Left sideloading turned off. Nothing was changed." "Error"
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
+
     try {
         $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
         if (-not (Test-Path $regPath)) {
@@ -186,103 +210,187 @@ if ($dependencyPaths.Count -gt 0) {
     Write-Status "The install will fail if a framework the app needs (WinUI 2.5, .NET Native, VCLibs) is missing" "Warning"
 }
 
-Write-Section "Signing Certificate"
-$certFile = Get-ChildItem -Path $PSScriptRoot -Filter "*.cer" | Select-Object -First 1
-if ($certFile) {
-    Write-Status "Installing signing certificate..."
-    try {
-        $certThumbprint = (Get-PfxCertificate -FilePath $certFile.FullName).Thumbprint
-        $existingCert = Get-ChildItem -Path Cert:\LocalMachine\TrustedPeople | Where-Object { $_.Thumbprint -eq $certThumbprint }
+Write-Section "Package"
 
-        if ($existingCert) {
-            Write-Status "Certificate is already installed" "Success"
-        } else {
-            Import-Certificate -FilePath $certFile.FullName -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null
-            Write-Status "Certificate installed successfully" "Success"
-        }
+$packageCandidates = @(Get-ChildItem -Path $PSScriptRoot -File |
+                       Where-Object { $_.Extension -in ".msix", ".appx" })
+
+if ($packageCandidates.Count -eq 0) {
+    Write-Status "seems like the APPX/MSIX package is missing, (did you extract the zip right?)" "Error"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+if ($packageCandidates.Count -gt 1) {
+    Write-Status "There are $($packageCandidates.Count) packages next to this script:" "Error"
+    foreach ($candidate in $packageCandidates) {
+        Write-Status "  $($candidate.Name)" "Info"
+    }
+    Write-Status "Refusing to guess which one you meant. Extract the release zip into a" "Warning"
+    Write-Status "folder of its own and run the installer from there." "Warning"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+$msixFile = $packageCandidates[0]
+Write-Status "Package: $($msixFile.Name)" "Success"
+
+$identity = Get-PackageIdentity $msixFile.FullName
+if (-not $identity) {
+    Write-Status "Could not read the package identity out of $($msixFile.Name)." "Error"
+    Write-Status "Without it there is no way to tell which certificate should be trusted." "Error"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+if ($identity.Name -ne $ExpectedPackageName) {
+    Write-Status "That package calls itself '$($identity.Name)', not '$ExpectedPackageName'." "Error"
+    Write-Status "This installer only installs fort.uwp." "Error"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+$packagePublisher = Get-CanonicalDn $identity.Publisher
+Write-Status "Publisher: $packagePublisher" "Success"
+
+Write-Section "Signing Certificate"
+
+$certCandidates = @(Get-ChildItem -Path $PSScriptRoot -Filter "*.cer" -File)
+
+if ($certCandidates.Count -gt 1) {
+    Write-Status "There are $($certCandidates.Count) .cer files next to this script:" "Error"
+    foreach ($candidate in $certCandidates) {
+        Write-Status "  $($candidate.Name)" "Info"
+    }
+    Write-Status "Refusing to guess which one to trust on this PC." "Warning"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+if ($certCandidates.Count -eq 0) {
+    Write-Status "No certificate file found. The package may be unsigned." "Warning"
+} else {
+    $certFile = $certCandidates[0]
+
+    $cert = $null
+    try {
+        $cert = Get-PfxCertificate -FilePath $certFile.FullName
     } catch {
-        Write-Status "Failed to install certificate: $($_.Exception.Message)" "Error"
-        $continue = Read-Host "Continue without the app cert? (y/N)"
-        if ($continue -ne "y" -and $continue -ne "Y") {
+        Write-Status "Could not read $($certFile.Name): $($_.Exception.Message)" "Error"
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
+
+    $certSubject = Get-CanonicalDn $cert.Subject
+    Write-Status "Subject:    $certSubject"
+    Write-Status "Thumbprint: $($cert.Thumbprint)"
+
+    if ($certSubject -ne $packagePublisher) {
+        Write-Status "That certificate did not sign this package - its subject is" "Error"
+        Write-Status "'$certSubject' but the package publisher is '$packagePublisher'." "Error"
+        Write-Status "Installing it would trust a certificate unrelated to what you are installing." "Error"
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
+
+    $knownPublisher = $false
+    foreach ($publisher in $KnownPublishers) {
+        if ((Get-CanonicalDn $publisher) -eq $certSubject) { $knownPublisher = $true }
+    }
+
+    if (-not $knownPublisher) {
+        Write-Status "'$certSubject' is not a publisher this installer ships knowing about:" "Warning"
+        foreach ($publisher in $KnownPublishers) {
+            Write-Status "  $publisher" "Info"
+        }
+        Write-Status "Trusting it lets anything signed by it install on this PC. Only continue if" "Warning"
+        Write-Status "you recognise the thumbprint above as one of fort.ind's." "Warning"
+
+        $trustAnyway = Read-Host "Trust this certificate on this PC? (y/N)"
+        if ($trustAnyway -ne "y" -and $trustAnyway -ne "Y") {
+            Write-Status "Certificate not installed, so nothing was changed." "Error"
+            Read-Host "Press Enter to exit"
             exit 1
         }
     }
-} else {
-    Write-Status "No certificate file found. The package may be unsigned." "Warning"
+
+    $existingCert = Get-ChildItem -Path Cert:\LocalMachine\TrustedPeople |
+                    Where-Object { $_.Thumbprint -eq $cert.Thumbprint }
+
+    if ($existingCert) {
+        Write-Status "Certificate is already installed" "Success"
+    } else {
+        try {
+            Import-Certificate -FilePath $certFile.FullName -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null
+            Write-Status "Certificate installed successfully" "Success"
+        } catch {
+            Write-Status "Failed to install certificate: $($_.Exception.Message)" "Error"
+            $continue = Read-Host "Continue without the app cert? (y/N)"
+            if ($continue -ne "y" -and $continue -ne "Y") {
+                exit 1
+            }
+        }
+    }
 }
 
 Write-Section "Installing Fort.uwp"
-$msixFile = Get-ChildItem -Path $PSScriptRoot -Filter "*.msix" | Select-Object -First 1
-if (-not $msixFile) {
-    $msixFile = Get-ChildItem -Path $PSScriptRoot -Filter "*.appx" | Select-Object -First 1
+Write-Status "Installing Fort.uwp..."
+
+$existingApp = Get-AppxPackage -Name $identity.Name -ErrorAction SilentlyContinue |
+               Where-Object { $_.Publisher -eq $identity.Publisher }
+
+if ($existingApp) {
+    Write-Status "Upgrading over version $($existingApp.Version) - your settings and favourites are being moved over :)" "Info"
 }
 
-if ($msixFile) {
-    Write-Status "Installing Fort.uwp..."
+$installArgs = @{
+    Path = $msixFile.FullName
+    ForceApplicationShutdown = $true
+    ErrorAction = "Stop"
+}
+if ($dependencyPaths.Count -gt 0) {
+    $installArgs.DependencyPath = [string[]]$dependencyPaths
+}
 
-    $existingApp = $null
-    $identity = Get-PackageIdentity $msixFile.FullName
-    if ($identity) {
-        $existingApp = Get-AppxPackage -Name $identity.Name -ErrorAction SilentlyContinue |
-                       Where-Object { $_.Publisher -eq $identity.Publisher }
-    } else {
-        Write-Status "Could not read the package identity; treating this as a fresh install" "Warning"
-    }
-    if ($existingApp) {
-        Write-Status "Upgrading over version $($existingApp.Version) - your settings and favourites are being moved over :)" "Info"
-    }
-
-    $installArgs = @{
-        Path = $msixFile.FullName
-        ForceApplicationShutdown = $true
-        ErrorAction = "Stop"
-    }
-    if ($dependencyPaths.Count -gt 0) {
-        $installArgs.DependencyPath = [string[]]$dependencyPaths
-    }
-
+try {
+    $installed = $false
     try {
-        $installed = $false
-        try {
-            Add-AppxPackage @installArgs
-            $installed = $true
-        } catch {
-            if (-not $existingApp) { throw }
-
-            Write-Status "Retrying as a same-or-lower version upgrade..." "Warning"
-            Add-AppxPackage @installArgs -ForceUpdateFromAnyVersion
-            $installed = $true
-        }
-
-        if (-not $installed) { throw "The package could not be installed. :(" }
-
-        Write-Status "Fort.uwp installed successfully!" "Success"
-        Write-Host ""
-        Write-Host "  +============================================+" -ForegroundColor Magenta
-        Write-Host "  |        Installation Complete!  =^..^=       |" -ForegroundColor Magenta
-        Write-Host "  +============================================+" -ForegroundColor Magenta
-        Write-Host ""
-        Write-Host "  Find Fort.uwp in your Start menu!" -ForegroundColor Magenta
-        Write-Host "  If you run into any bugs, please open" -ForegroundColor DarkMagenta
-        Write-Host "  an issue on the github repo at fort-ind/uwp" -ForegroundColor DarkMagenta
-        Write-Host ""
+        Add-AppxPackage @installArgs
+        $installed = $true
     } catch {
-        Write-Status "That's awkward... :( the install failed: $($_.Exception.Message)" "Error"
-        Write-Host ""
-        Write-Status "Troubleshooting tips:" "Warning"
-        Write-Status "1. Make sure Developer Mode is enabled in Windows Settings" "Info"
-        Write-Status "2. Try restarting your computer and running this installer again" "Info"
-        Write-Status "3. Check if Windows Update has pending updates" "Info"
+        if (-not $existingApp) { throw }
 
-        if ($existingApp) {
-            Write-Host ""
-            Write-Status "The installed copy was left alone, so nothing was lost." "Info"
-            Write-Status "As a last resort you can uninstall fort.uwp from Settings > Apps" "Info"
-            Write-Status "and run this installer again - that WILL erase your app settings." "Warning"
-        }
+        Write-Status "Retrying as a same-or-lower version upgrade..." "Warning"
+        Add-AppxPackage @installArgs -ForceUpdateFromAnyVersion
+        $installed = $true
     }
-} else {
-    Write-Status "seems like the APPX/MSIX package is missing, (did you extract the zip right?)" "Error"
+
+    if (-not $installed) { throw "The package could not be installed. :(" }
+
+    Write-Status "Fort.uwp installed successfully!" "Success"
+    Write-Host ""
+    Write-Host "  +============================================+" -ForegroundColor Magenta
+    Write-Host "  |        Installation Complete!  =^..^=       |" -ForegroundColor Magenta
+    Write-Host "  +============================================+" -ForegroundColor Magenta
+    Write-Host ""
+    Write-Host "  Find Fort.uwp in your Start menu!" -ForegroundColor Magenta
+    Write-Host "  If you run into any bugs, please open" -ForegroundColor DarkMagenta
+    Write-Host "  an issue on the github repo at fort-ind/uwp" -ForegroundColor DarkMagenta
+    Write-Host ""
+} catch {
+    Write-Status "That's awkward... :( the install failed: $($_.Exception.Message)" "Error"
+    Write-Host ""
+    Write-Status "Troubleshooting tips:" "Warning"
+    Write-Status "1. Make sure Developer Mode is enabled in Windows Settings" "Info"
+    Write-Status "2. Try restarting your computer and running this installer again" "Info"
+    Write-Status "3. Check if Windows Update has pending updates" "Info"
+
+    if ($existingApp) {
+        Write-Host ""
+        Write-Status "The installed copy was left alone, so nothing was lost." "Info"
+        Write-Status "As a last resort you can uninstall fort.uwp from Settings > Apps" "Info"
+        Write-Status "and run this installer again - that WILL erase your app settings." "Warning"
+    }
 }
 
 Write-Host ""

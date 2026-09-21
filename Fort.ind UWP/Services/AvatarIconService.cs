@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.Web.Http;
@@ -20,7 +22,13 @@ namespace Fort.ind_UWP
         private const string FilePrefix = "navavatar-";
         private const string FileExtension = ".png";
 
+        private const int HashPrefixLength = 16;
+
         private const uint MaxAvatarBytes = 8 * 1024 * 1024;
+
+        private const uint MaxSourcePixelDimension = 8192;
+
+        private const ulong MaxScaledPixels = 4UL * 1024 * 1024;
 
         private static readonly TimeSpan TransientRetryDelay = TimeSpan.FromSeconds(2);
 
@@ -60,7 +68,7 @@ namespace Fort.ind_UWP
 
         public static async Task<Uri> GetCircularAvatarUriAsync(string avatarUrl)
         {
-            var sourceUri = WebLauncher.TryCreateWebUri(avatarUrl);
+            var sourceUri = WebLauncher.TryCreateFetchUri(avatarUrl);
             if (sourceUri == null)
             {
                 return null;
@@ -210,9 +218,21 @@ namespace Fort.ind_UWP
                     return null;
                 }
 
+                if (decoder.PixelWidth > MaxSourcePixelDimension || decoder.PixelHeight > MaxSourcePixelDimension)
+                {
+                    Debug.WriteLine($"AvatarIconService: avatar is {decoder.PixelWidth}x{decoder.PixelHeight}, over the dimension cap");
+                    return null;
+                }
+
                 double scale = (double)IconPixelSize / Math.Min(decoder.PixelWidth, decoder.PixelHeight);
                 uint scaledWidth = (uint)Math.Max(IconPixelSize, Math.Round(decoder.PixelWidth * scale));
                 uint scaledHeight = (uint)Math.Max(IconPixelSize, Math.Round(decoder.PixelHeight * scale));
+
+                if ((ulong)scaledWidth * scaledHeight > MaxScaledPixels)
+                {
+                    Debug.WriteLine($"AvatarIconService: avatar scales to {scaledWidth}x{scaledHeight}, over the intermediate cap");
+                    return null;
+                }
 
                 var transform = new BitmapTransform();
                 transform.InterpolationMode = BitmapInterpolationMode.Fant;
@@ -350,12 +370,9 @@ namespace Fort.ind_UWP
 
         private static string StableHash(string value)
         {
-            uint hash = 2166136261;
-            for (int i = 0; i < value.Length; i++)
-            {
-                hash = (hash ^ value[i]) * 16777619;
-            }
-            return hash.ToString("x8");
+            var source = CryptographicBuffer.ConvertStringToBinary(value, BinaryStringEncoding.Utf8);
+            var digest = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256).HashData(source);
+            return CryptographicBuffer.EncodeToHexString(digest).Substring(0, HashPrefixLength);
         }
     }
 }
