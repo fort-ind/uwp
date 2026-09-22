@@ -47,6 +47,7 @@ namespace Fort.ind_UWP
 
                 TileBadgeToggle.IsOn = LiveTileService.BadgeEnabled;
                 AutoUpdateCheckToggle.IsOn = UpdateService.AutomaticChecksEnabled;
+                LoadProfileRefreshControls();
 
                 RestoreSettingsPanelStates();
             }

@@ -2,9 +2,13 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.Globalization.NumberFormatting;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
@@ -38,6 +42,8 @@ namespace Fort.ind_UWP
         private bool _bannerHasPlaceholder = false;
 
         private BitmapImage _bannerBitmap = null;
+
+        private static DecimalFormatter s_countFormatter;
 
         private string _failedBannerUrl = null;
 
@@ -93,6 +99,8 @@ namespace Fort.ind_UWP
                 _authHandlerAttached = true;
             }
             RefreshUI();
+
+            ProfileService.RefreshOnProfileVisit();
         }
 
         public void RefreshUI()
@@ -142,6 +150,8 @@ namespace Fort.ind_UWP
             ProfileInitials.Text = GetInitials(name);
 
             BioText.Text = string.IsNullOrWhiteSpace(user.Bio) ? LocalizedStrings.Get("ProfileNoBio") : user.Bio;
+
+            UpdateFollowStats(user);
 
             if (UpdateAvatarUI(user.AvatarUrl))
             {
@@ -220,22 +230,127 @@ namespace Fort.ind_UWP
 
         private async void ManageOnFortSocialButton_Click(object sender, RoutedEventArgs e)
         {
-            var user = ProfileService.CurrentUser;
-            if (user == null) return;
-
             try
             {
-                var host = string.IsNullOrWhiteSpace(user.Host) ? MisskeyAuthService.InstanceHost : user.Host;
-                if (Uri.CheckHostName(host) == UriHostNameType.Unknown)
-                {
-                    host = MisskeyAuthService.InstanceHost;
-                }
-
-                await WebLauncher.LaunchAsync($"https://{host}/@{Uri.EscapeDataString(user.Username)}");
+                await OpenProfileOnInstanceAsync("");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"ProfilePage: Failed to open fort.social profile - {ex.Message}");
+            }
+        }
+
+        private async void FollowingLink_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await OpenProfileOnInstanceAsync("/following");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: Failed to open following list - {ex.Message}");
+            }
+        }
+
+        private async void FollowersLink_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await OpenProfileOnInstanceAsync("/followers");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: Failed to open followers list - {ex.Message}");
+            }
+        }
+
+        private static async Task OpenProfileOnInstanceAsync(string pathSuffix)
+        {
+            var user = ProfileService.CurrentUser;
+            if (user == null) return;
+
+            var host = string.IsNullOrWhiteSpace(user.Host) ? MisskeyAuthService.InstanceHost : user.Host;
+            if (Uri.CheckHostName(host) == UriHostNameType.Unknown)
+            {
+                host = MisskeyAuthService.InstanceHost;
+            }
+
+            await WebLauncher.LaunchAsync($"https://{host}/@{Uri.EscapeDataString(user.Username)}{pathSuffix}");
+        }
+
+        private void UpdateFollowStats(UserProfile user)
+        {
+            var following = user.FollowingCount;
+            var followers = user.FollowersCount;
+
+            if (following.HasValue)
+            {
+                SetCountText(FollowingCountText, "ProfileFollowingCountFormat", following.Value);
+            }
+
+            if (followers.HasValue)
+            {
+                SetCountText(FollowersCountText,
+                             followers.Value == 1 ? "ProfileFollowersCountOneFormat" : "ProfileFollowersCountFormat",
+                             followers.Value);
+            }
+
+            FollowingLink.Visibility = following.HasValue ? Visibility.Visible : Visibility.Collapsed;
+            FollowersLink.Visibility = followers.HasValue ? Visibility.Visible : Visibility.Collapsed;
+            FollowStatsPanel.Visibility = following.HasValue || followers.HasValue
+                                          ? Visibility.Visible
+                                          : Visibility.Collapsed;
+        }
+
+        private static void SetCountText(TextBlock target, string formatKey, int count)
+        {
+            var format = LocalizedStrings.Get(formatKey);
+            var number = FormatCount(count);
+
+            target.Inlines.Clear();
+
+            var index = format.IndexOf("{0}", StringComparison.Ordinal);
+            if (index < 0)
+            {
+                target.Inlines.Add(new Run { Text = LocalizedStrings.FormatPattern(format, formatKey, number) });
+                return;
+            }
+
+            var before = format.Substring(0, index);
+            var after = format.Substring(index + 3);
+
+            if (before.Length > 0)
+            {
+                target.Inlines.Add(new Run { Text = before });
+            }
+
+            target.Inlines.Add(new Run { Text = number, FontWeight = FontWeights.SemiBold });
+
+            if (after.Length > 0)
+            {
+                target.Inlines.Add(new Run { Text = after });
+            }
+        }
+
+        private static string FormatCount(int count)
+        {
+            try
+            {
+                if (s_countFormatter == null)
+                {
+                    s_countFormatter = new DecimalFormatter()
+                    {
+                        FractionDigits = 0,
+                        IsGrouped = true
+                    };
+                }
+
+                return s_countFormatter.FormatInt(count);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: count formatting failed - {ex.Message}");
+                return count.ToString(System.Globalization.CultureInfo.CurrentCulture);
             }
         }
 

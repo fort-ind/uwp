@@ -1240,4 +1240,67 @@ Open your profile and try again.</value>
     <value>the latest update for fort.desktop version {0}, is here! filled with a bunch of new goodies :3 </value>
     <comment>{0} is the new version number, for example 3.0.0.</comment>
   </data>
+  <data name="ProfileFollowingCountFormat" xml:space="preserve">
+    <value>{0} following</value>
+    <comment>{0} is the number of accounts the user follows, already formatted (for example 1,204). It is drawn in bold.</comment>
+  </data>
+  <data name="ProfileFollowersCountFormat" xml:space="preserve">
+    <value>{0} followers</value>
+    <comment>{0} is the number of followers, already formatted (for example 1,204). Used for every count except exactly 1. It is drawn in bold.</comment>
+  </data>
+  <data name="ProfileFollowersCountOneFormat" xml:space="preserve">
+    <value>{0} follower</value>
+    <comment>{0} is always 1. It is drawn in bold.</comment>
+  </data>
+  <data name="FollowingLink.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>See who you follow on fort.social</value>
+  </data>
+  <data name="FollowersLink.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>See your followers on fort.social</value>
+  </data>
+  <data name="MainProfileSettings.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="MainProfileSettings.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>choose how often your follower counts refresh</value>
+  </data>
+  <data name="MainProfileSettings2.Text" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="MainProfileSettingsCaption.Text" xml:space="preserve">
+    <value>Keep your follower counts up to date</value>
+  </data>
+  <data name="ProfileAutoRefreshToggle.Header" xml:space="preserve">
+    <value>Refresh follower counts automatically</value>
+  </data>
+  <data name="ProfileAutoRefreshToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="ProfileAutoRefreshToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="ProfileRefreshIntervalCombo.Header" xml:space="preserve">
+    <value>Check for new counts</value>
+  </data>
+  <data name="ProfileRefreshEveryVisit.Content" xml:space="preserve">
+    <value>Every time you open Profile</value>
+  </data>
+  <data name="ProfileRefreshFiveMinutes.Content" xml:space="preserve">
+    <value>At most every 5 minutes</value>
+  </data>
+  <data name="ProfileRefreshFifteenMinutes.Content" xml:space="preserve">
+    <value>At most every 15 minutes</value>
+  </data>
+  <data name="ProfileRefreshHourly.Content" xml:space="preserve">
+    <value>At most once an hour</value>
+  </data>
+  <data name="ProfileAutoRefreshDescription.Text" xml:space="preserve">
+    <value>Counts are fetched from fort.social when you open your profile. When this is off, they update only when the app starts.</value>
+  </data>
+  <data name="SearchItemProfileSettings" xml:space="preserve">
+    <value>Profile settings</value>
+  </data>
+  <data name="SearchItemFollowerCountRefresh" xml:space="preserve">
+    <value>Follower count refresh</value>
+  </data>
 </root>

@@ -155,6 +155,21 @@
                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                        Margin="0,2,0,0"
                                        Visibility="Collapsed"/>
+                            <StackPanel x:Name="FollowStatsPanel"
+                                        Orientation="Horizontal"
+                                        Spacing="16"
+                                        Visibility="Collapsed">
+                                <HyperlinkButton x:Uid="FollowingLink" x:Name="FollowingLink"
+                                                 Click="FollowingLink_Click">
+                                    <TextBlock x:Name="FollowingCountText"
+                                               Style="{StaticResource BodyTextBlockStyle}"/>
+                                </HyperlinkButton>
+                                <HyperlinkButton x:Uid="FollowersLink" x:Name="FollowersLink"
+                                                 Click="FollowersLink_Click">
+                                    <TextBlock x:Name="FollowersCountText"
+                                               Style="{StaticResource BodyTextBlockStyle}"/>
+                                </HyperlinkButton>
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                 </Grid>

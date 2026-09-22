@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace Fort.ind_UWP
 {
@@ -9,6 +10,78 @@ namespace Fort.ind_UWP
         public static UserProfile CurrentUser { get; set; }
 
         public static event EventHandler<bool> AuthStateChanged;
+
+        private static readonly object s_refreshLock = new object();
+
+        private static Task s_refreshInFlight;
+
+        private static string s_refreshInFlightToken;
+
+        private static DateTime? s_lastRefreshUtc;
+
+        private const int MaximumAutoRefreshMinutes = 24 * 60;
+
+        public static bool AutoRefreshEnabled
+        {
+            get
+            {
+                try
+                {
+                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileAutoRefresh];
+                    if (stored == null) return true;
+                    return Convert.ToBoolean(stored);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"ProfileService: AutoRefreshEnabled read failed - {ex.Message}");
+                    return true;
+                }
+            }
+            set
+            {
+                try
+                {
+                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileAutoRefresh] = value;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"ProfileService: AutoRefreshEnabled write failed - {ex.Message}");
+                }
+            }
+        }
+
+        public static int AutoRefreshMinutes
+        {
+            get
+            {
+                try
+                {
+                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileRefreshMinutes];
+                    if (stored == null) return AppConstants.DefaultProfileRefreshMinutes;
+
+                    var minutes = Convert.ToInt32(stored);
+                    return minutes >= 0 && minutes <= MaximumAutoRefreshMinutes
+                           ? minutes
+                           : AppConstants.DefaultProfileRefreshMinutes;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"ProfileService: AutoRefreshMinutes read failed - {ex.Message}");
+                    return AppConstants.DefaultProfileRefreshMinutes;
+                }
+            }
+            set
+            {
+                try
+                {
+                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileRefreshMinutes] = value;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"ProfileService: AutoRefreshMinutes write failed - {ex.Message}");
+                }
+            }
+        }
 
         public static async Task<LoginResult> LoginWithMisskeyAsync()
         {
@@ -26,12 +99,18 @@ namespace Fort.ind_UWP
         {
             if (result == null || !result.Success) return false;
 
+            s_lastRefreshUtc = null;
             CurrentUser = result.Profile;
             await LocalStorageService.SaveProfileAsync(result.Profile);
             AuthStateChanged?.Invoke(null, true);
 
             LiveTileService.SendToast(LocalizedStrings.Get("SignInToastTitle"),
                                       LocalizedStrings.Format("SignInToastBodyFormat", DisplayNameOf(result.Profile)));
+
+            if (!result.Profile.FollowersCount.HasValue || !result.Profile.FollowingCount.HasValue)
+            {
+                RefreshCurrentUserInBackground(result.Token);
+            }
 
             return true;
         }
@@ -45,6 +124,7 @@ namespace Fort.ind_UWP
         {
             var name = CurrentUser != null ? DisplayNameOf(CurrentUser) : "";
             CurrentUser = null;
+            s_lastRefreshUtc = null;
             MisskeyAuthService.ClearToken();
             await LocalStorageService.ClearProfileAsync();
             AuthStateChanged?.Invoke(null, false);
@@ -70,6 +150,7 @@ namespace Fort.ind_UWP
         {
             MisskeyAuthService.ClearToken();
             CurrentUser = null;
+            s_lastRefreshUtc = null;
             LiveTileService.ClearTile();
             LiveTileService.ClearBadge();
             await LocalStorageService.ResetAllAppDataAsync();
@@ -104,6 +185,7 @@ namespace Fort.ind_UWP
                         return false;
                     }
 
+                    s_lastRefreshUtc = DateTime.UtcNow;
                     CurrentUser = fetched.Profile;
                     await LocalStorageService.SaveProfileAsync(fetched.Profile);
                     AuthStateChanged?.Invoke(null, true);
@@ -113,7 +195,7 @@ namespace Fort.ind_UWP
                 CurrentUser = cached;
                 AuthStateChanged?.Invoke(null, true);
 
-                RefreshCurrentUserInBackground(token, cached.LastLoginDate);
+                RefreshCurrentUserInBackground(token);
 
                 return true;
             }
@@ -124,37 +206,86 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async void RefreshCurrentUserInBackground(string token, DateTime lastLoginDate)
+        public static async void RefreshOnProfileVisit()
         {
             try
             {
-                var fetched = await MisskeyAuthService.FetchCurrentUserAsync(token);
+                if (CurrentUser == null || !AutoRefreshEnabled) return;
 
-                if (!string.Equals(await MisskeyAuthService.TryGetTokenAsync(), token, StringComparison.Ordinal))
+                var last = s_lastRefreshUtc;
+                if (last.HasValue && DateTime.UtcNow - last.Value < TimeSpan.FromMinutes(AutoRefreshMinutes))
                 {
                     return;
                 }
 
-                if (fetched.TokenRejected)
-                {
-                    Debug.WriteLine("ProfileService: stored token was rejected; signing out");
-                    await LogoutAsync(true);
-                    return;
-                }
+                var token = await MisskeyAuthService.TryGetTokenAsync();
+                if (string.IsNullOrEmpty(token)) return;
 
-                if (fetched.Profile == null) return;
+                await RefreshCurrentUserAsync(token);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfileService: profile visit refresh failed - {ex.Message}");
+            }
+        }
 
-                if (HasSameAccountDetails(CurrentUser, fetched.Profile)) return;
-
-                fetched.Profile.LastLoginDate = lastLoginDate;
-                CurrentUser = fetched.Profile;
-                await LocalStorageService.SaveProfileAsync(fetched.Profile);
-                AuthStateChanged?.Invoke(null, true);
+        private static async void RefreshCurrentUserInBackground(string token)
+        {
+            try
+            {
+                await RefreshCurrentUserAsync(token);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"RefreshCurrentUserInBackground failed: {ex.Message}");
             }
+        }
+
+        private static Task RefreshCurrentUserAsync(string token)
+        {
+            lock (s_refreshLock)
+            {
+                if (s_refreshInFlight == null
+                    || s_refreshInFlight.IsCompleted
+                    || !string.Equals(s_refreshInFlightToken, token, StringComparison.Ordinal))
+                {
+                    s_refreshInFlightToken = token;
+                    s_refreshInFlight = RefreshCurrentUserCoreAsync(token);
+                }
+
+                return s_refreshInFlight;
+            }
+        }
+
+        private static async Task RefreshCurrentUserCoreAsync(string token)
+        {
+            var fetched = await MisskeyAuthService.FetchCurrentUserAsync(token);
+
+            if (!string.Equals(await MisskeyAuthService.TryGetTokenAsync(), token, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            if (fetched.TokenRejected)
+            {
+                Debug.WriteLine("ProfileService: stored token was rejected; signing out");
+                await LogoutAsync(true);
+                return;
+            }
+
+            if (fetched.Profile == null) return;
+
+            var current = CurrentUser;
+            if (current == null) return;
+
+            s_lastRefreshUtc = DateTime.UtcNow;
+
+            if (HasSameAccountDetails(current, fetched.Profile)) return;
+
+            fetched.Profile.LastLoginDate = current.LastLoginDate;
+            CurrentUser = fetched.Profile;
+            await LocalStorageService.SaveProfileAsync(fetched.Profile);
+            AuthStateChanged?.Invoke(null, true);
         }
 
         private static bool HasSameAccountDetails(UserProfile current, UserProfile fetched)
@@ -169,6 +300,8 @@ namespace Fort.ind_UWP
                    && string.Equals(current.AvatarUrl, fetched.AvatarUrl, StringComparison.Ordinal)
                    && string.Equals(current.BannerUrl, fetched.BannerUrl, StringComparison.Ordinal)
                    && string.Equals(current.BannerBlurhash, fetched.BannerBlurhash, StringComparison.Ordinal)
+                   && current.FollowersCount == fetched.FollowersCount
+                   && current.FollowingCount == fetched.FollowingCount
                    && current.CreatedDate.Ticks == fetched.CreatedDate.Ticks;
         }
     }

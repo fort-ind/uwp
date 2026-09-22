@@ -351,6 +351,64 @@ namespace Fort.ind_UWP
             LiveTileService.BadgeEnabled = TileBadgeToggle.IsOn;
         }
 
+        private void LoadProfileRefreshControls()
+        {
+            var enabled = ProfileService.AutoRefreshEnabled;
+            ProfileAutoRefreshToggle.IsOn = enabled;
+            ProfileRefreshIntervalCombo.IsEnabled = enabled;
+
+            var minutes = ProfileService.AutoRefreshMinutes;
+            ComboBoxItem fallback = null;
+            ComboBoxItem match = null;
+            foreach (var entry in ProfileRefreshIntervalCombo.Items)
+            {
+                var item = entry as ComboBoxItem;
+                var itemMinutes = RefreshMinutesOf(item);
+                if (!itemMinutes.HasValue) continue;
+
+                if (itemMinutes.Value == minutes) match = item;
+                if (itemMinutes.Value == AppConstants.DefaultProfileRefreshMinutes) fallback = item;
+            }
+
+            ProfileRefreshIntervalCombo.SelectedItem = match ?? fallback;
+        }
+
+        private static int? RefreshMinutesOf(ComboBoxItem item)
+        {
+            int minutes;
+            if (item == null || !int.TryParse(item.Tag as string, System.Globalization.NumberStyles.Integer,
+                                              System.Globalization.CultureInfo.InvariantCulture, out minutes))
+            {
+                return null;
+            }
+
+            return minutes;
+        }
+
+        private void ProfileAutoRefreshToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            ProfileRefreshIntervalCombo.IsEnabled = ProfileAutoRefreshToggle.IsOn;
+
+            if (_loadingSettings) return;
+            ProfileService.AutoRefreshEnabled = ProfileAutoRefreshToggle.IsOn;
+        }
+
+        private void ProfileRefreshIntervalCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            var minutes = RefreshMinutesOf(ProfileRefreshIntervalCombo.SelectedItem as ComboBoxItem);
+            if (minutes.HasValue)
+            {
+                ProfileService.AutoRefreshMinutes = minutes.Value;
+            }
+        }
+
+        private void ProfileHeader_Tapped(object sender, RoutedEventArgs e)
+        {
+            ToggleSettingsRow(ProfileHeader, ProfileContent, ProfileChevronRotation, AppConstants.SettingSettingsProfileExpanded);
+        }
+
         private void StorageHeader_Tapped(object sender, RoutedEventArgs e)
         {
             ToggleSettingsRow(StorageHeader, StorageContent, StorageChevronRotation, AppConstants.SettingSettingsStorageExpanded);
@@ -469,6 +527,8 @@ namespace Fort.ind_UWP
                     return new SettingsRow(AppearanceHeader, AppearanceContent, AppearanceChevronRotation, AppConstants.SettingSettingsAppearanceExpanded);
                 case AppConstants.SettingsSectionTransparency:
                     return new SettingsRow(TransparencyHeader, TransparencyContent, TransparencyChevronRotation, AppConstants.SettingSettingsTransparencyExpanded);
+                case AppConstants.SettingsSectionProfile:
+                    return new SettingsRow(ProfileHeader, ProfileContent, ProfileChevronRotation, AppConstants.SettingSettingsProfileExpanded);
                 case AppConstants.SettingsSectionStorage:
                     return new SettingsRow(StorageHeader, StorageContent, StorageChevronRotation, AppConstants.SettingSettingsStorageExpanded);
                 case AppConstants.SettingsSectionTile:
@@ -488,6 +548,7 @@ namespace Fort.ind_UWP
             {
                 RestorePanelState(AppConstants.SettingSettingsAppearanceExpanded, AppearanceHeader, AppearanceContent, AppearanceChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsTransparencyExpanded, TransparencyHeader, TransparencyContent, TransparencyChevronRotation);
+                RestorePanelState(AppConstants.SettingSettingsProfileExpanded, ProfileHeader, ProfileContent, ProfileChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsStorageExpanded, StorageHeader, StorageContent, StorageChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsTileExpanded, TileHeader, TileContent, TileChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsWelcomeExpanded, WelcomeHeader, WelcomeContent, WelcomeChevronRotation);

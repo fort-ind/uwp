@@ -79,10 +79,12 @@ namespace Fort.ind_UWP
         public const string SettingLiveTileCleared = "LiveTileCleared";
         public const string SettingSettingsWelcomeExpanded = "SettingsWelcomeExpanded";
         public const string SettingSettingsAboutExpanded = "SettingsAboutExpanded";
+        public const string SettingSettingsProfileExpanded = "SettingsProfileExpanded";
         public const string SettingLastNavTag = "LastNavTag";
 
         public const string SettingsSectionAppearance = "Appearance";
         public const string SettingsSectionTransparency = "Transparency";
+        public const string SettingsSectionProfile = "Profile";
         public const string SettingsSectionStorage = "Storage";
         public const string SettingsSectionTile = "Tile";
         public const string SettingsSectionWelcome = "Welcome";
@@ -93,6 +95,10 @@ namespace Fort.ind_UWP
         public const string SettingUpdateLatestVersion = "UpdateLatestVersion";
         public const string SettingUpdateDismissedVersion = "UpdateDismissedVersion";
         public const int UpdateCheckIntervalHours = 24;
+
+        public const string SettingProfileAutoRefresh = "ProfileAutoRefresh";
+        public const string SettingProfileRefreshMinutes = "ProfileRefreshMinutes";
+        public const int DefaultProfileRefreshMinutes = 5;
 
         public const string JumpArgumentPrefix = "jump:";
 

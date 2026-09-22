@@ -31,6 +31,12 @@ namespace Fort.ind_UWP
         public string BannerBlurhash { get; set; }
 
         [DataMember]
+        public int? FollowersCount { get; set; }
+
+        [DataMember]
+        public int? FollowingCount { get; set; }
+
+        [DataMember]
         public DateTime CreatedDate { get; set; }
 
         [DataMember]
@@ -72,6 +78,8 @@ namespace Fort.ind_UWP
                 AvatarUrl = this.AvatarUrl,
                 BannerUrl = this.BannerUrl,
                 BannerBlurhash = this.BannerBlurhash,
+                FollowersCount = this.FollowersCount,
+                FollowingCount = this.FollowingCount,
                 CreatedDate = this.CreatedDate,
                 LastLoginDate = this.LastLoginDate
             };

@@ -290,7 +290,7 @@ namespace Fort.ind_UWP
                             return MisskeyAuthResult.Failed("SignInErrorNoToken");
                         }
 
-                        var profile = ParseUser(GetNamedObjectOrNull(json, "user"));
+                        var profile = ParseUser(GetNamedObjectOrNull(json, "user"), false);
                         if (profile == null)
                         {
                             return MisskeyAuthResult.Failed("SignInErrorNoAccount");
@@ -339,7 +339,7 @@ namespace Fort.ind_UWP
                         }
 
                         var body = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
-                        var profile = ParseUser(JsonObject.Parse(body));
+                        var profile = ParseUser(JsonObject.Parse(body), true);
                         return profile != null
                                ? MisskeyUserFetchResult.Succeeded(profile)
                                : MisskeyUserFetchResult.Unavailable();
@@ -353,7 +353,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static UserProfile ParseUser(JsonObject obj)
+        private static UserProfile ParseUser(JsonObject obj, bool viewerIsSelf)
         {
             if (obj == null) return null;
 
@@ -370,6 +370,8 @@ namespace Fort.ind_UWP
             profile.AvatarUrl = JsonString(obj, "avatarUrl");
             profile.BannerUrl = JsonString(obj, "bannerUrl");
             profile.BannerBlurhash = JsonString(obj, "bannerBlurhash");
+            profile.FollowersCount = JsonVisibleCount(obj, "followersCount", "followersVisibility", viewerIsSelf);
+            profile.FollowingCount = JsonVisibleCount(obj, "followingCount", "followingVisibility", viewerIsSelf);
 
             var createdAt = JsonString(obj, "createdAt");
             DateTime parsedDate;
@@ -388,6 +390,22 @@ namespace Fort.ind_UWP
             var v = obj.GetNamedValue(key);
             if (v.ValueType != JsonValueType.String) return null;
             return v.GetString();
+        }
+
+        private static int? JsonVisibleCount(JsonObject obj, string countKey, string visibilityKey, bool viewerIsSelf)
+        {
+            if (!viewerIsSelf && !string.Equals(JsonString(obj, visibilityKey), "public", StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            if (obj == null || !obj.ContainsKey(countKey)) return null;
+            var v = obj.GetNamedValue(countKey);
+            if (v.ValueType != JsonValueType.Number) return null;
+
+            var number = v.GetNumber();
+            if (double.IsNaN(number) || number < 0 || number > int.MaxValue) return null;
+            return (int)number;
         }
 
         private static JsonObject GetNamedObjectOrNull(JsonObject obj, string key)

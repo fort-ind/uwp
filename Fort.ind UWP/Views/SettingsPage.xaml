@@ -583,6 +583,76 @@
                     <Border BorderThickness="0,0,0,1"
                             BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
                         <StackPanel>
+                            <local:ExpanderHeaderButton x:Uid="MainProfileSettings" x:Name="ProfileHeader"
+                                    Style="{StaticResource ButtonRevealStyle}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    MinWidth="0"
+                                    CornerRadius="0"
+                                    Padding="16,12"
+                                    AutomationProperties.HeadingLevel="Level2"
+                                    Click="ProfileHeader_Tapped">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Width="36" Height="36"
+                                          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                        <FontIcon Glyph="&#xE77B;" FontSize="16"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  AutomationProperties.AccessibilityView="Raw"/>
+                                    </Grid>
+                                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock x:Uid="MainProfileSettings2" Style="{StaticResource BaseTextBlockStyle}"/>
+                                        <TextBlock x:Uid="MainProfileSettingsCaption"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </StackPanel>
+                                    <FontIcon x:Name="ProfileChevron" Grid.Column="2" Glyph="&#xE76C;"
+                                              FontSize="12" VerticalAlignment="Center"
+                                              AutomationProperties.AccessibilityView="Raw"
+                                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                              RenderTransformOrigin="0.5,0.5">
+                                        <FontIcon.RenderTransform>
+                                            <RotateTransform x:Name="ProfileChevronRotation" Angle="0"/>
+                                        </FontIcon.RenderTransform>
+                                    </FontIcon>
+                                </Grid>
+                            </local:ExpanderHeaderButton>
+                            <StackPanel x:Name="ProfileContent" Visibility="Collapsed"
+                                        Padding="20,0,20,16">
+                                <StackPanel.ChildrenTransitions>
+                                    <TransitionCollection>
+                                        <EntranceThemeTransition FromVerticalOffset="20"/>
+                                    </TransitionCollection>
+                                </StackPanel.ChildrenTransitions>
+                                <Rectangle Height="1" Margin="0,0,0,14"
+                                           Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                           Opacity="0.08"/>
+                                <StackPanel Spacing="12">
+                                    <ToggleSwitch x:Uid="ProfileAutoRefreshToggle" x:Name="ProfileAutoRefreshToggle"
+                                                  Toggled="ProfileAutoRefreshToggle_Toggled"/>
+                                    <ComboBox x:Uid="ProfileRefreshIntervalCombo" x:Name="ProfileRefreshIntervalCombo"
+                                              MinWidth="200"
+                                              SelectionChanged="ProfileRefreshIntervalCombo_SelectionChanged">
+                                        <ComboBoxItem x:Uid="ProfileRefreshEveryVisit" Tag="0"/>
+                                        <ComboBoxItem x:Uid="ProfileRefreshFiveMinutes" Tag="5"/>
+                                        <ComboBoxItem x:Uid="ProfileRefreshFifteenMinutes" Tag="15"/>
+                                        <ComboBoxItem x:Uid="ProfileRefreshHourly" Tag="60"/>
+                                    </ComboBox>
+                                    <TextBlock x:Uid="ProfileAutoRefreshDescription"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border BorderThickness="0,0,0,1"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+                        <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainDataStorage" x:Name="StorageHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
                                     HorizontalAlignment="Stretch"
