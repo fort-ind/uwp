@@ -280,7 +280,7 @@
     <comment>{0} is the tint opacity below which acrylic stops meeting contrast ratios, as a percentage - 70% in dark theme, 50% in light.</comment>
   </data>
   <data name="AccentRestartFailedDialogTitle" xml:space="preserve">
-    <value>Couldn't restart</value>
+    <value>hmm.. that did not worl</value>
   </data>
   <data name="AccentRestartFailedDialogBody" xml:space="preserve">
     <value>Close and reopen the app to apply your new accent color.</value>
@@ -373,7 +373,7 @@
     <value>Extras</value>
   </data>
   <data name="CategoryLabsAndBetas" xml:space="preserve">
-    <value>Labs &amp; Betas</value>
+    <value>labs+betas</value>
   </data>
   <data name="CategoryFortWebsite" xml:space="preserve">
     <value>fort1nd.com</value>
@@ -698,7 +698,7 @@ Open your profile and try again.</value>
     <value>almost there.. restart the app to apply the new accent color</value>
   </data>
   <data name="AccentRestartButton.Content" xml:space="preserve">
-    <value>Restart now</value>
+    <value>restart now</value>
   </data>
   <data name="MainBetaPrograms.Content" xml:space="preserve">
     <value>labs+betas</value>
@@ -833,7 +833,7 @@ Open your profile and try again.</value>
     <value>The welcome dialog appears the first time you open the app.</value>
   </data>
   <data name="MainThisUpdateFixesMany.Text" xml:space="preserve">
-    <value>your on version 2.2! we have smoothed some edges and made launch a million times faster! check the release notes to learn more</value>
+    <value>Welcome to 3.0! we have added banner support and more appearance changes :) and finally.. AUTOMATIC UPDATES!! </value>
   </data>
   <data name="MainVersionInfoCreditsAnd.Text" xml:space="preserve">
     <value>Version info, credits, and more</value>
@@ -857,7 +857,7 @@ Open your profile and try again.</value>
     <value>Welcome to fort.desktop! the one stop shop for all of- well everything you do on fort.ind on windows :P cutely packaged in this tiny app have fun and enjoy!</value>
   </data>
   <data name="MainWelcomeToVersion2.Text" xml:space="preserve">
-    <value>another update!!! yaay :D</value>
+    <value>3.0 is out :p</value>
   </data>
   <data name="ManageOnFortSocialButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
     <value>Opens your fort.social profile in the browser</value>
@@ -1168,7 +1168,7 @@ Open your profile and try again.</value>
     <value>Your favorites</value>
   </data>
   <data name="HomeFavoritesEmpty.Text" xml:space="preserve">
-    <value>when you star a game it will show here so you can easily get to em</value>
+    <value>when you star a game it will show here so you can easily get to em :D</value>
   </data>
   <data name="HomeFavoritesSeeAll.Content" xml:space="preserve">
     <value>see all your games</value>

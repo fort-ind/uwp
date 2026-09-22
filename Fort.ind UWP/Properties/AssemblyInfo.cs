@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Fort.ind UWP")]
 [assembly: AssemblyDescription("fort.desktop in universial windows platform")]
 [assembly: AssemblyCompany("a fort.ind project")]
-[assembly: AssemblyProduct("Fort.ind UWP")]
+[assembly: AssemblyProduct("fort.uwp")]
 [assembly: AssemblyCopyright("fort.ind © 2026")]
 [assembly: AssemblyTrademark("")]
 
