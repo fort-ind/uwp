@@ -68,16 +68,52 @@ namespace Fort.ind_UWP
         public static void ApplySavedAccent()
         {
             if (s_applied) return;
+            s_applied = true;
 
-            ResourceDictionary resources = null;
             try
             {
-                s_applied = true;
-
                 var hex = ResolveSavedAccentHex();
                 Color accent;
                 if (hex == null || !ColorHelper.TryHexToColor(hex, out accent)) return;
 
+                if (TryWriteShades(accent))
+                {
+                    s_activeAccentHex = hex;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AccentColorService: could not resolve the saved accent - {ex.Message}");
+                s_activeAccentHex = null;
+            }
+        }
+
+        public static void ApplyActiveAccentToCurrentView()
+        {
+            var hex = s_activeAccentHex;
+            Color accent;
+            if (hex == null || !ColorHelper.TryHexToColor(hex, out accent)) return;
+
+            try
+            {
+                object existing;
+                var resources = FindOverrideDictionary(Application.Current.Resources);
+                if (resources.TryGetValue(s_shadeKeys[3], out existing) && existing is Color && (Color)existing == accent) return;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AccentColorService: could not read this view's accent - {ex.Message}");
+                return;
+            }
+
+            TryWriteShades(accent);
+        }
+
+        private static bool TryWriteShades(Color accent)
+        {
+            ResourceDictionary resources = null;
+            try
+            {
                 resources = FindOverrideDictionary(Application.Current.Resources);
 
                 for (var i = 0; i < s_shadeKeys.Length; i++)
@@ -85,11 +121,11 @@ namespace Fort.ind_UWP
                     resources[s_shadeKeys[i]] = ColorHelper.AccentShade(accent, i - 3);
                 }
 
-                s_activeAccentHex = hex;
+                return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AccentColorService: could not apply the saved accent - {ex.Message}");
+                Debug.WriteLine($"AccentColorService: could not apply the accent - {ex.Message}");
                 if (resources != null)
                 {
                     foreach (var key in s_shadeKeys)
@@ -104,7 +140,7 @@ namespace Fort.ind_UWP
                         }
                     }
                 }
-                s_activeAccentHex = null;
+                return false;
             }
         }
 

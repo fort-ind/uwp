@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.ApplicationModel.Core;
-using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -84,51 +83,9 @@ namespace Fort.ind_UWP
 
         private void UpdateTitleBarColors()
         {
-            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
-
-            if (s_accessibilitySettings.HighContrast)
-            {
-                titleBar.ButtonBackgroundColor = null;
-                titleBar.ButtonInactiveBackgroundColor = null;
-                titleBar.ButtonHoverBackgroundColor = null;
-                titleBar.ButtonPressedBackgroundColor = null;
-                titleBar.ButtonForegroundColor = null;
-                titleBar.ButtonHoverForegroundColor = null;
-                titleBar.ButtonPressedForegroundColor = null;
-                titleBar.ButtonInactiveForegroundColor = null;
-                return;
-            }
-
-            var isDark = AppearanceService.IsEffectiveThemeDark();
-
-            var fgColor = isDark ? Colors.White : Colors.Black;
-
-            var inactiveFg = isDark ? Color.FromArgb(255, 0x99, 0x99, 0x99) : Color.FromArgb(255, 0x66, 0x66, 0x66);
-            var hoverBg = isDark ? Color.FromArgb(30, 255, 255, 255) : Color.FromArgb(30, 0, 0, 0);
-            var pressedBg = isDark ? Color.FromArgb(50, 255, 255, 255) : Color.FromArgb(50, 0, 0, 0);
-
-            var hoverFg = fgColor;
-            var pressedFg = fgColor;
-
-            Color accent;
-            if (AccentColorService.ActiveAccentHex != null
-                && ColorHelper.TryHexToColor(AccentColorService.ActiveAccentHex, out accent))
-            {
-                hoverBg = accent;
-                pressedBg = ColorHelper.AccentShade(accent, -1);
-                hoverFg = ColorHelper.ContrastingForeground(hoverBg);
-                pressedFg = ColorHelper.ContrastingForeground(pressedBg);
-            }
-
-            titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-            titleBar.ButtonHoverBackgroundColor = hoverBg;
-            titleBar.ButtonPressedBackgroundColor = pressedBg;
-
-            titleBar.ButtonForegroundColor = fgColor;
-            titleBar.ButtonHoverForegroundColor = hoverFg;
-            titleBar.ButtonPressedForegroundColor = pressedFg;
-            titleBar.ButtonInactiveForegroundColor = inactiveFg;
+            CaptionButtonColors.Apply(ApplicationView.GetForCurrentView().TitleBar,
+                                      s_accessibilitySettings.HighContrast,
+                                      AppearanceService.IsEffectiveThemeDark());
         }
 
         internal void RefreshLiveTile()

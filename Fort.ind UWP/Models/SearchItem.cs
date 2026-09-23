@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 
 namespace Fort.ind_UWP
 {
@@ -42,14 +45,142 @@ namespace Fort.ind_UWP
 
         public string FavoriteLabel { get; private set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private static readonly object s_subscriberLock = new object();
+
+        private static readonly HashSet<SearchItem> s_itemsWithSubscribers = new HashSet<SearchItem>();
+
+        private List<Subscriber> _subscribers;
+
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add
+            {
+                if (value == null) return;
+
+                var subscriber = Subscriber.OnCurrentThread(value);
+                lock (s_subscriberLock)
+                {
+                    if (_subscribers == null) _subscribers = new List<Subscriber>();
+                    _subscribers.Add(subscriber);
+                    s_itemsWithSubscribers.Add(this);
+                }
+            }
+            remove
+            {
+                if (value == null) return;
+
+                lock (s_subscriberLock)
+                {
+                    if (_subscribers == null) return;
+
+                    for (var i = _subscribers.Count - 1; i >= 0; i--)
+                    {
+                        if (_subscribers[i].Handler == value)
+                        {
+                            _subscribers.RemoveAt(i);
+                            break;
+                        }
+                    }
+
+                    if (_subscribers.Count == 0) s_itemsWithSubscribers.Remove(this);
+                }
+            }
+        }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            var handler = PropertyChanged;
-            if (handler != null)
+            Subscriber[] subscribers;
+            lock (s_subscriberLock)
             {
-                handler(this, new PropertyChangedEventArgs(propertyName));
+                if (_subscribers == null || _subscribers.Count == 0) return;
+                subscribers = _subscribers.ToArray();
+            }
+
+            var args = new PropertyChangedEventArgs(propertyName);
+            foreach (var subscriber in subscribers)
+            {
+                if (subscriber.Dispatcher == null || subscriber.Dispatcher.HasThreadAccess)
+                {
+                    subscriber.Handler(this, args);
+                }
+                else
+                {
+                    RaiseOnSubscriberThread(subscriber, args);
+                }
+            }
+        }
+
+        private void RaiseOnSubscriberThread(Subscriber subscriber, PropertyChangedEventArgs args)
+        {
+            try
+            {
+                var ignored = subscriber.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    try
+                    {
+                        subscriber.Handler(this, args);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"SearchItem: a {args.PropertyName} subscriber on view {subscriber.ViewId} threw - {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SearchItem: could not reach view {subscriber.ViewId} - {ex.Message}");
+            }
+        }
+
+        public static void ForgetSubscribersOnView(int viewId)
+        {
+            lock (s_subscriberLock)
+            {
+                var emptied = new List<SearchItem>();
+                foreach (var item in s_itemsWithSubscribers)
+                {
+                    item._subscribers.RemoveAll(s => s.ViewId == viewId);
+                    if (item._subscribers.Count == 0) emptied.Add(item);
+                }
+
+                foreach (var item in emptied)
+                {
+                    s_itemsWithSubscribers.Remove(item);
+                }
+            }
+        }
+
+        private sealed class Subscriber
+        {
+            private Subscriber(PropertyChangedEventHandler handler, CoreDispatcher dispatcher, int viewId)
+            {
+                Handler = handler;
+                Dispatcher = dispatcher;
+                ViewId = viewId;
+            }
+
+            public PropertyChangedEventHandler Handler { get; private set; }
+
+            public CoreDispatcher Dispatcher { get; private set; }
+
+            public int ViewId { get; private set; }
+
+            public static Subscriber OnCurrentThread(PropertyChangedEventHandler handler)
+            {
+                var window = CoreWindow.GetForCurrentThread();
+                if (window == null) return new Subscriber(handler, null, -1);
+
+                var viewId = -1;
+                try
+                {
+                    viewId = ApplicationView.GetApplicationViewIdForWindow(window);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SearchItem: could not identify the subscribing view - {ex.Message}");
+                }
+
+                return new Subscriber(handler, window.Dispatcher, viewId);
             }
         }
 

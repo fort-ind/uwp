@@ -96,6 +96,8 @@ namespace Fort.ind_UWP
         public const string SettingUpdateDismissedVersion = "UpdateDismissedVersion";
         public const int UpdateCheckIntervalHours = 24;
 
+        public const string SettingLabMultipleViews = "LabMultipleViews";
+
         public const string SettingProfileAutoRefresh = "ProfileAutoRefresh";
         public const string SettingProfileRefreshMinutes = "ProfileRefreshMinutes";
         public const int DefaultProfileRefreshMinutes = 5;

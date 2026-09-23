@@ -32,9 +32,66 @@
 
         <ScrollViewer x:Name="PageScrollViewer" IsTabStop="True">
             <StackPanel x:Name="ContentPanel" Padding="24">
-                <TextBlock x:Uid="MainAccessBetaVersionsAnd"
-                           Style="{StaticResource BodyTextBlockStyle}"
-                           TextWrapping="Wrap"/>
+                <StackPanel MaxWidth="700" HorizontalAlignment="Stretch" Spacing="12">
+                    <TextBlock x:Uid="LabsHeading"
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2"/>
+                    <TextBlock x:Uid="LabsIntro"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               TextWrapping="Wrap"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+
+                    <Grid x:Name="MultipleViewsCard"
+                          Background="{ThemeResource CardBackgroundBrush}"
+                          BorderBrush="{ThemeResource CardBorderBrush}"
+                          BorderThickness="1"
+                          Padding="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Width="36" Height="36"
+                              VerticalAlignment="Top"
+                              Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                            <FontIcon Glyph="&#xE8A7;" FontSize="16"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="4">
+                            <TextBlock x:Uid="MultipleViewsTitle"
+                                       Style="{StaticResource BaseTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                            <TextBlock x:Uid="MultipleViewsDescription"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ToggleSwitch x:Uid="MultipleViewsToggle" x:Name="MultipleViewsToggle"
+                                          Margin="0,4,0,0"
+                                          Toggled="MultipleViewsToggle_Toggled"/>
+                            <StackPanel x:Name="LabsRestartNotice" Visibility="Collapsed"
+                                        Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
+                                <TextBlock x:Uid="LabsRestartNoticeText" x:Name="LabsRestartNoticeText"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="260"/>
+                                <Button x:Uid="LabsRestartButton" x:Name="LabsRestartButton"
+                                        Click="LabsRestartButton_Click"
+                                        VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock x:Uid="BetasHeading"
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               AutomationProperties.HeadingLevel="Level2"
+                               Margin="0,12,0,0"/>
+                    <TextBlock x:Uid="MainAccessBetaVersionsAnd"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>

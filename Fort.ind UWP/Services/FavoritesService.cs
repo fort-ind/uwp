@@ -19,6 +19,8 @@ namespace Fort.ind_UWP
 
         private static readonly HashSet<string> s_lookup = new HashSet<string>(StringComparer.Ordinal);
 
+        private static readonly object s_stateLock = new object();
+
         private static volatile bool s_loaded;
 
         private static readonly SemaphoreSlim s_loadGate = new SemaphoreSlim(1, 1);
@@ -44,9 +46,14 @@ namespace Fort.ind_UWP
                     var payload = DeserializeFromJson<FavoritesPayload>(json);
                     if (payload != null && payload.Urls != null)
                     {
-                        s_order.AddRange(payload.Urls.Where(u => !string.IsNullOrEmpty(u))
-                                                     .Distinct(StringComparer.Ordinal));
-                        s_lookup.UnionWith(s_order);
+                        var urls = payload.Urls.Where(u => !string.IsNullOrEmpty(u))
+                                               .Distinct(StringComparer.Ordinal)
+                                               .ToList();
+                        lock (s_stateLock)
+                        {
+                            s_order.AddRange(urls);
+                            s_lookup.UnionWith(urls);
+                        }
                     }
                 }
 
@@ -55,8 +62,11 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"FavoritesService: Failed to load favorites - {ex.Message}");
-                s_order.Clear();
-                s_lookup.Clear();
+                lock (s_stateLock)
+                {
+                    s_order.Clear();
+                    s_lookup.Clear();
+                }
 
                 if (file != null)
                 {
@@ -91,12 +101,21 @@ namespace Fort.ind_UWP
         public static bool IsFavorite(string url)
         {
             if (string.IsNullOrEmpty(url)) return false;
-            return s_lookup.Contains(url);
+            lock (s_stateLock)
+            {
+                return s_lookup.Contains(url);
+            }
         }
 
         public static int Count
         {
-            get { return s_order.Count; }
+            get
+            {
+                lock (s_stateLock)
+                {
+                    return s_order.Count;
+                }
+            }
         }
 
         public static void Apply(IEnumerable<SearchItem> items)
@@ -105,7 +124,7 @@ namespace Fort.ind_UWP
 
             foreach (var item in items.Where(i => i != null))
             {
-                item.IsFavorite = !string.IsNullOrEmpty(item.Url) && s_lookup.Contains(item.Url);
+                item.IsFavorite = IsFavorite(item.Url);
             }
         }
 
@@ -118,7 +137,13 @@ namespace Fort.ind_UWP
                               .GroupBy(i => i.Url, StringComparer.Ordinal)
                               .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
 
-            foreach (var url in s_order)
+            string[] order;
+            lock (s_stateLock)
+            {
+                order = s_order.ToArray();
+            }
+
+            foreach (var url in order)
             {
                 SearchItem match;
                 if (!byUrl.TryGetValue(url, out match)) continue;
@@ -137,20 +162,23 @@ namespace Fort.ind_UWP
             await EnsureLoadedAsync();
 
             bool changed;
-            if (isFavorite)
+            lock (s_stateLock)
             {
-                changed = s_lookup.Add(item.Url);
-                if (changed)
+                if (isFavorite)
                 {
-                    s_order.Insert(0, item.Url);
+                    changed = s_lookup.Add(item.Url);
+                    if (changed)
+                    {
+                        s_order.Insert(0, item.Url);
+                    }
                 }
-            }
-            else
-            {
-                changed = s_lookup.Remove(item.Url);
-                if (changed)
+                else
                 {
-                    s_order.Remove(item.Url);
+                    changed = s_lookup.Remove(item.Url);
+                    if (changed)
+                    {
+                        s_order.Remove(item.Url);
+                    }
                 }
             }
 
@@ -164,8 +192,11 @@ namespace Fort.ind_UWP
 
         public static void ResetForAppDataWipe()
         {
-            s_order.Clear();
-            s_lookup.Clear();
+            lock (s_stateLock)
+            {
+                s_order.Clear();
+                s_lookup.Clear();
+            }
             s_loaded = true;
 
             s_saveBlocked = false;
@@ -184,7 +215,13 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                var payload = new FavoritesPayload { Urls = new List<string>(s_order) };
+                List<string> urls;
+                lock (s_stateLock)
+                {
+                    urls = new List<string>(s_order);
+                }
+
+                var payload = new FavoritesPayload { Urls = urls };
                 var json = SerializeToJson(payload);
 
                 var file = await LocalFolder.CreateFileAsync(

@@ -38,6 +38,7 @@
     <Prefer32Bit>true</Prefer32Bit>
     <DocumentationFile>Fort.ind UWP.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <EnableTypeInfoReflection>false</EnableTypeInfoReflection>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -61,6 +62,7 @@
     <Prefer32Bit>true</Prefer32Bit>
     <DocumentationFile>Fort.ind UWP.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <EnableTypeInfoReflection>false</EnableTypeInfoReflection>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
     <OutputPath>bin\ARM\Release\</OutputPath>
@@ -84,6 +86,7 @@
     <Prefer32Bit>true</Prefer32Bit>
     <DocumentationFile>Fort.ind UWP.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <EnableTypeInfoReflection>false</EnableTypeInfoReflection>
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'">
@@ -108,6 +111,7 @@
     <Prefer32Bit>true</Prefer32Bit>
     <DocumentationFile>Fort.ind UWP.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <EnableTypeInfoReflection>false</EnableTypeInfoReflection>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -132,6 +136,7 @@
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
     <Compile Include="Helpers\Blurhash.cs" />
+    <Compile Include="Helpers\CaptionButtonColors.cs" />
     <Compile Include="Helpers\ColorHelper.cs" />
     <Compile Include="Helpers\Debouncer.cs" />
     <Compile Include="Helpers\LocalizedStrings.cs" />
@@ -148,6 +153,7 @@
     <Compile Include="Services\DialogService.cs" />
     <Compile Include="Services\FavoritesService.cs" />
     <Compile Include="Services\JumpListService.cs" />
+    <Compile Include="Services\LabsService.cs" />
     <Compile Include="Services\LiveTileService.cs" />
     <Compile Include="Services\LocalStorageService.cs" />
     <Compile Include="Services\MisskeyAuthService.cs" />
@@ -155,6 +161,8 @@
     <Compile Include="Services\SearchCatalog.cs" />
     <Compile Include="Services\SitemapService.cs" />
     <Compile Include="Services\UpdateService.cs" />
+    <Compile Include="Services\ViewLifetimeControl.cs" />
+    <Compile Include="Services\WindowManagerService.cs" />
     <Compile Include="Views\GamesPage.xaml.cs">
       <DependentUpon>GamesPage.xaml</DependentUpon>
     </Compile>
@@ -165,6 +173,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Appearance.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainPage.MultipleViews.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Navigation.cs">
@@ -197,6 +208,9 @@
     </Compile>
     <Compile Include="Views\SettingsPage.Appearance.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SecondaryWindowPage.xaml.cs">
+      <DependentUpon>SecondaryWindowPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SocialPage.xaml.cs">
       <DependentUpon>SocialPage.xaml</DependentUpon>
@@ -346,6 +360,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SecondaryWindowPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

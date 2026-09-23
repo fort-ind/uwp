@@ -83,7 +83,25 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void OnFavoritesChanged(object sender, EventArgs e)
+        private async void OnFavoritesChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Dispatcher.HasThreadAccess)
+                {
+                    ReapplyFavorites();
+                    return;
+                }
+
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, ReapplyFavorites);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"HomePage: Favorites change handler failed - {ex.Message}");
+            }
+        }
+
+        private void ReapplyFavorites()
         {
             try
             {
@@ -179,10 +197,16 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void FavoritesSeeAll_Click(object sender, RoutedEventArgs e)
+        private async void FavoritesSeeAll_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                if (WindowManagerService.IsSecondaryView)
+                {
+                    await WindowManagerService.ShowInMainWindowAsync(AppConstants.NavigationGames);
+                    return;
+                }
+
                 var shell = MainPage.Current;
                 if (shell == null) return;
 

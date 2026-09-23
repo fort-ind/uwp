@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -29,6 +30,12 @@ namespace Fort.ind_UWP
         private static List<KeyValuePair<bool, AcrylicBrush>> s_paneBrushes;
 
         private static AcrylicBrush s_surfaceBrush;
+
+        private static volatile SurfacePaint s_surfacePaint;
+
+        private static readonly object s_windowSurfacesLock = new object();
+
+        private static readonly List<WindowSurface> s_windowSurfaces = new List<WindowSurface>();
 
         private static readonly Debouncer s_persistDebouncer = new Debouncer();
 
@@ -262,27 +269,105 @@ namespace Fort.ind_UWP
                 var tintBody = isTinted && TintScope != AppConstants.TintScopeSidebar;
                 var tintPane = isTinted && TintScope != AppConstants.TintScopeContent;
 
-                Color bodyTint;
-                if (tintBody)
-                {
-                    bodyTint = isDark ? ColorHelper.HexToColor(colorTag) : ColorHelper.ForLightTheme(colorTag);
-                }
-                else
-                {
-                    bodyTint = isDark ? s_surfaceTintDark : s_surfaceTintLight;
-                }
+                var paint = new SurfacePaint(
+                    tintBody ? ColorHelper.HexToColor(colorTag) : s_surfaceTintDark,
+                    tintBody ? ColorHelper.ForLightTheme(colorTag) : s_surfaceTintLight,
+                    BodyAcrylicOpacity);
+                s_surfacePaint = paint;
 
-                var surface = SurfaceBrush;
-                surface.TintColor = bodyTint;
-                surface.TintOpacity = BodyAcrylicOpacity;
-                surface.FallbackColor = bodyTint;
-                surface.AlwaysUseFallback = BodyAcrylicOpacity >= 1.0;
+                paint.ApplyTo(SurfaceBrush, isDark);
 
                 RepaintPaneBrushes(colorTag, tintPane);
+
+                RepaintWindowSurfaces();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"AppearanceService: RepaintSurfaces failed - {ex.Message}");
+            }
+        }
+
+        public static AcrylicBrush AttachWindowSurface(FrameworkElement windowRoot)
+        {
+            var surface = new WindowSurface(windowRoot, new AcrylicBrush()
+            {
+                BackgroundSource = AcrylicBackgroundSource.HostBackdrop
+            });
+
+            lock (s_windowSurfacesLock)
+            {
+                s_windowSurfaces.Add(surface);
+            }
+
+            ApplyThemeTo(windowRoot);
+            PaintWindowSurface(surface);
+
+            return surface.Brush;
+        }
+
+        public static void RepaintWindowSurface(FrameworkElement windowRoot)
+        {
+            var surface = FindWindowSurface(windowRoot);
+            if (surface != null) PaintWindowSurface(surface);
+        }
+
+        public static void DetachWindowSurface(FrameworkElement windowRoot)
+        {
+            lock (s_windowSurfacesLock)
+            {
+                s_windowSurfaces.RemoveAll(s => s.Root == windowRoot);
+            }
+        }
+
+        private static WindowSurface FindWindowSurface(FrameworkElement windowRoot)
+        {
+            lock (s_windowSurfacesLock)
+            {
+                return s_windowSurfaces.Find(s => s.Root == windowRoot);
+            }
+        }
+
+        private static WindowSurface[] WindowSurfacesSnapshot()
+        {
+            lock (s_windowSurfacesLock)
+            {
+                return s_windowSurfaces.ToArray();
+            }
+        }
+
+        private static void RepaintWindowSurfaces()
+        {
+            foreach (var surface in WindowSurfacesSnapshot())
+            {
+                var target = surface;
+                RunOnWindow(target, () => PaintWindowSurface(target));
+            }
+        }
+
+        private static void PaintWindowSurface(WindowSurface surface)
+        {
+            try
+            {
+                var paint = s_surfacePaint;
+                if (paint == null) return;
+
+                paint.ApplyTo(surface.Brush, IsEffectiveThemeDark(surface.Root));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AppearanceService: could not paint a secondary window - {ex.Message}");
+            }
+        }
+
+        private static void RunOnWindow(WindowSurface surface, DispatchedHandler action)
+        {
+            try
+            {
+                var ignored = surface.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, action);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AppearanceService: could not reach a secondary window - {ex.Message}");
             }
         }
 
@@ -348,31 +433,60 @@ namespace Fort.ind_UWP
 
         private static void ApplyThemeToRootFrame(string theme)
         {
-            var rootFrame = Window.Current.Content as Frame;
-            if (rootFrame == null) return;
+            ApplyTheme(Window.Current.Content as FrameworkElement, theme);
+
+            foreach (var surface in WindowSurfacesSnapshot())
+            {
+                var target = surface;
+                RunOnWindow(target, () =>
+                {
+                    try
+                    {
+                        ApplyTheme(target.Root, theme);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"AppearanceService: could not theme a secondary window - {ex.Message}");
+                    }
+                });
+            }
+        }
+
+        public static void ApplyThemeTo(FrameworkElement windowRoot)
+        {
+            ApplyTheme(windowRoot, Theme);
+        }
+
+        private static void ApplyTheme(FrameworkElement root, string theme)
+        {
+            if (root == null) return;
 
             switch (theme)
             {
-                case AppConstants.ThemeLight: rootFrame.RequestedTheme = ElementTheme.Light; break;
-                case AppConstants.ThemeDark: rootFrame.RequestedTheme = ElementTheme.Dark; break;
-                default: rootFrame.RequestedTheme = ElementTheme.Default; break;
+                case AppConstants.ThemeLight: root.RequestedTheme = ElementTheme.Light; break;
+                case AppConstants.ThemeDark: root.RequestedTheme = ElementTheme.Dark; break;
+                default: root.RequestedTheme = ElementTheme.Default; break;
             }
         }
 
         public static bool IsEffectiveThemeDark()
         {
-            var rootFrame = Window.Current.Content as Frame;
-            if (rootFrame == null)
+            return IsEffectiveThemeDark(Window.Current.Content as FrameworkElement);
+        }
+
+        public static bool IsEffectiveThemeDark(FrameworkElement windowRoot)
+        {
+            if (windowRoot == null)
             {
                 return Application.Current.RequestedTheme == ApplicationTheme.Dark;
             }
 
-            if (rootFrame.RequestedTheme != ElementTheme.Default)
+            if (windowRoot.RequestedTheme != ElementTheme.Default)
             {
-                return rootFrame.RequestedTheme == ElementTheme.Dark;
+                return windowRoot.RequestedTheme == ElementTheme.Dark;
             }
 
-            return rootFrame.ActualTheme == ElementTheme.Dark;
+            return windowRoot.ActualTheme == ElementTheme.Dark;
         }
 
         public static bool IsUsableTintTag(string colorTag)
@@ -415,6 +529,45 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"AppearanceService: could not read {key} - {ex.Message}");
                 return fallback;
             }
+        }
+
+        private sealed class SurfacePaint
+        {
+            private readonly Color _darkTint;
+            private readonly Color _lightTint;
+            private readonly double _opacity;
+
+            public SurfacePaint(Color darkTint, Color lightTint, double opacity)
+            {
+                _darkTint = darkTint;
+                _lightTint = lightTint;
+                _opacity = opacity;
+            }
+
+            public void ApplyTo(AcrylicBrush brush, bool isDark)
+            {
+                var tint = isDark ? _darkTint : _lightTint;
+                brush.TintColor = tint;
+                brush.TintOpacity = _opacity;
+                brush.FallbackColor = tint;
+                brush.AlwaysUseFallback = _opacity >= 1.0;
+            }
+        }
+
+        private sealed class WindowSurface
+        {
+            public WindowSurface(FrameworkElement root, AcrylicBrush brush)
+            {
+                Root = root;
+                Brush = brush;
+                Dispatcher = root.Dispatcher;
+            }
+
+            public FrameworkElement Root { get; private set; }
+
+            public AcrylicBrush Brush { get; private set; }
+
+            public CoreDispatcher Dispatcher { get; private set; }
         }
     }
 }

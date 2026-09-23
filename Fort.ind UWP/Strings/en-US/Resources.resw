@@ -1309,4 +1309,43 @@ Open your profile and try again.</value>
   <data name="SearchItemFollowerCountRefresh" xml:space="preserve">
     <value>Follower count refresh</value>
   </data>
+  <data name="LabsHeading.Text" xml:space="preserve">
+    <value>labs</value>
+  </data>
+  <data name="LabsIntro.Text" xml:space="preserve">
+    <value>experimental stuff that's still being worked on. it might be rough around the edges or change later, and turning something on or off takes effect after a restart</value>
+  </data>
+  <data name="MultipleViewsTitle.Text" xml:space="preserve">
+    <value>Multiple windows</value>
+  </data>
+  <data name="MultipleViewsDescription.Text" xml:space="preserve">
+    <value>Open a page in a window of its own, next to the main one. Right-click it in the navigation pane (or select it and press Shift+F10) and choose Open in new window. Settings always stays in the main window.</value>
+  </data>
+  <data name="MultipleViewsToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="MultipleViewsToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="MultipleViewsToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Multiple windows</value>
+  </data>
+  <data name="LabsRestartNoticeText.Text" xml:space="preserve">
+    <value>almost there.. restart the app to apply this change</value>
+  </data>
+  <data name="LabsRestartButton.Content" xml:space="preserve">
+    <value>restart now</value>
+  </data>
+  <data name="LabsRestartFailedDialogTitle" xml:space="preserve">
+    <value>hmm.. that didn't work</value>
+  </data>
+  <data name="LabsRestartFailedDialogBody" xml:space="preserve">
+    <value>Close and reopen the app to apply your labs changes.</value>
+  </data>
+  <data name="BetasHeading.Text" xml:space="preserve">
+    <value>betas</value>
+  </data>
+  <data name="OpenInNewWindowMenuItem" xml:space="preserve">
+    <value>Open in new window</value>
+  </data>
 </root>
