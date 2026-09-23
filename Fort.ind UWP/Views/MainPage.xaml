@@ -77,17 +77,28 @@
               Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="TitleBarLeftInset" Width="0"/>
+                <ColumnDefinition x:Name="TitleBarBackButtonSpace" Width="48"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition x:Name="TitleBarRightInset" Width="0"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock x:Uid="AppTitleText" x:Name="AppTitleText"
-                       Grid.Column="1"
+                       Grid.Column="2"
                        VerticalAlignment="Center"
                        Margin="12,0,0,0"
                        Style="{StaticResource CaptionTextBlockStyle}"
                        Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"/>
         </Grid>
+
+        <Button x:Uid="TitleBarBackButton" x:Name="TitleBarBackButton"
+                Style="{StaticResource NavigationBackButtonNormalStyle}"
+                Width="48"
+                Height="32"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Canvas.ZIndex="2"
+                IsEnabled="False"
+                Click="TitleBarBackButton_Click"/>
 
         <NavigationView x:Name="NavView"
                          PaneDisplayMode="Auto"
@@ -200,7 +211,8 @@
                     </muxc:InfoBar.ActionButton>
                 </muxc:InfoBar>
 
-                <Frame x:Name="ContentFrame" Grid.Row="1"/>
+                <Frame x:Name="ContentFrame" Grid.Row="1"
+                       Navigated="ContentFrame_Navigated"/>
 
                 <ProgressBar x:Uid="SitemapLoadingBar" x:Name="LoadingIndicator"
                              Grid.Row="1"

@@ -583,6 +583,12 @@ Open your profile and try again.</value>
   <data name="AppTitleText.Text" xml:space="preserve">
     <value>Fort.ind</value>
   </data>
+  <data name="TitleBarBackButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="TitleBarBackButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Back</value>
+  </data>
   <data name="BioText.Text" xml:space="preserve">
     <value>No bio yet.. go make one! tell people who you are :)</value>
   </data>

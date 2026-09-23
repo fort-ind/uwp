@@ -15,6 +15,11 @@ namespace Fort.ind_UWP
         private static readonly bool s_xamlRootSupported =
             ApiInformation.IsPropertyPresent("Windows.UI.Xaml.UIElement", "XamlRoot");
 
+        public static bool IsDialogOpen
+        {
+            get { return s_gate.CurrentCount == 0; }
+        }
+
         public static void AttachToOwner(ContentDialog dialog, UIElement owner)
         {
             if (s_xamlRootSupported && owner != null)

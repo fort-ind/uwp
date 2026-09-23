@@ -110,6 +110,8 @@ namespace Fort.ind_UWP
         public const int SearchDebounceMilliseconds = 300;
         public const int SearchSuggestionLimit = 15;
 
+        public const int ContentBackStackLimit = 20;
+
         
         public const string LegacySitemapCacheFileName = "sitemap_urls.cache";
         public const string LegacySitemapCacheTimestampKey = "SitemapCacheUnixSeconds";

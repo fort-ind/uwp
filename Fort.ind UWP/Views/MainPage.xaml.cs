@@ -23,11 +23,13 @@ namespace Fort.ind_UWP
 
         private bool _appearanceHandlerAttached = false;
 
-        private bool _titleBarMetricsHandlerAttached = false;
+        private bool _titleBarHandlersAttached = false;
 
         private bool _highContrastHandlerAttached = false;
 
         private bool _systemBackHandlerAttached = false;
+
+        private bool _mouseBackHandlerAttached = false;
 
         private bool _navViewInitialized = false;
 
@@ -38,6 +40,8 @@ namespace Fort.ind_UWP
             this.InitializeComponent();
 
             Current = this;
+
+            AddBackAccelerators();
 
             ApplySavedAppearance();
 
@@ -75,11 +79,12 @@ namespace Fort.ind_UWP
                 _appearanceHandlerAttached = true;
             }
 
-            if (!_titleBarMetricsHandlerAttached)
+            if (!_titleBarHandlersAttached)
             {
                 var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
                 coreTitleBar.LayoutMetricsChanged += OnTitleBarLayoutMetricsChanged;
-                _titleBarMetricsHandlerAttached = true;
+                coreTitleBar.IsVisibleChanged += OnTitleBarIsVisibleChanged;
+                _titleBarHandlersAttached = true;
 
                 ApplyTitleBarLayoutMetrics(coreTitleBar);
             }
@@ -96,6 +101,12 @@ namespace Fort.ind_UWP
             {
                 SystemNavigationManager.GetForCurrentView().BackRequested += OnSystemBackRequested;
                 _systemBackHandlerAttached = true;
+            }
+
+            if (!_mouseBackHandlerAttached)
+            {
+                Window.Current.CoreWindow.PointerPressed += OnCoreWindowPointerPressed;
+                _mouseBackHandlerAttached = true;
             }
 
             UpdateProfileNavItem();
@@ -151,17 +162,19 @@ namespace Fort.ind_UWP
                 _appearanceHandlerAttached = false;
             }
 
-            if (_titleBarMetricsHandlerAttached)
+            if (_titleBarHandlersAttached)
             {
                 try
                 {
-                    CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= OnTitleBarLayoutMetricsChanged;
+                    var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+                    coreTitleBar.LayoutMetricsChanged -= OnTitleBarLayoutMetricsChanged;
+                    coreTitleBar.IsVisibleChanged -= OnTitleBarIsVisibleChanged;
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MainPage: Failed to remove title bar metrics handler - {ex.Message}");
+                    Debug.WriteLine($"MainPage: Failed to remove title bar handlers - {ex.Message}");
                 }
-                _titleBarMetricsHandlerAttached = false;
+                _titleBarHandlersAttached = false;
             }
 
             if (_highContrastHandlerAttached)
@@ -181,6 +194,19 @@ namespace Fort.ind_UWP
                     Debug.WriteLine($"MainPage: Failed to remove system back handler - {ex.Message}");
                 }
                 _systemBackHandlerAttached = false;
+            }
+
+            if (_mouseBackHandlerAttached)
+            {
+                try
+                {
+                    Window.Current.CoreWindow.PointerPressed -= OnCoreWindowPointerPressed;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"MainPage: Failed to remove mouse back handler - {ex.Message}");
+                }
+                _mouseBackHandlerAttached = false;
             }
 
             _searchDebounce.Cancel();

@@ -72,7 +72,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Critical: OnLaunched failed - {ex.Message}");
+                Debug.WriteLine($"Critical: OnLaunched failed - {ex}");
                 showStartupErrorDialog = true;
             }
 

@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using Windows.Storage;
+using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
@@ -161,12 +163,12 @@ namespace Fort.ind_UWP
             ClosePaneUnlessExpanded();
         }
 
-        private void ClosePaneUnlessExpanded()
+        private bool ClosePaneUnlessExpanded()
         {
-            if (NavView.DisplayMode != NavigationViewDisplayMode.Expanded)
-            {
-                NavView.IsPaneOpen = false;
-            }
+            if (NavView.DisplayMode == NavigationViewDisplayMode.Expanded || !NavView.IsPaneOpen) return false;
+
+            NavView.IsPaneOpen = false;
+            return true;
         }
 
         private static string HeaderFor(string tag)
@@ -229,11 +231,7 @@ namespace Fort.ind_UWP
 
         private void ShowContent(string tag, bool moveFocus = false)
         {
-            var header = HeaderFor(tag);
-            NavView.Header = header;
-            RememberLastNavTag(tag);
-
-            Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentHost, header);
+            var header = TitleSection(tag);
 
             var pageType = PageTypeFor(tag);
 
@@ -241,14 +239,12 @@ namespace Fort.ind_UWP
             {
                 if (ContentFrame.CurrentSourcePageType != pageType)
                 {
-                    if (!ContentFrame.Navigate(pageType))
+                    if (!ContentFrame.Navigate(pageType, tag))
                     {
                         Debug.WriteLine($"MainPage: navigation to {pageType.Name} returned false");
                         FallBackToHome(pageType);
                         return;
                     }
-
-                    TrimContentBackStack();
                 }
                 else
                 {
@@ -270,6 +266,17 @@ namespace Fort.ind_UWP
             {
                 FocusContentRegion();
             }
+        }
+
+        private string TitleSection(string tag)
+        {
+            var header = HeaderFor(tag);
+            NavView.Header = header;
+            RememberLastNavTag(tag);
+
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentHost, header);
+
+            return header;
         }
 
         private void FallBackToHome(Type failedPageType)
@@ -444,12 +451,65 @@ namespace Fort.ind_UWP
             }
         }
 
-        private bool CanGoBackInPlace()
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
-            if (ContentFrame == null) return false;
-            if (!ContentFrame.CanGoBack) return false;
+            try
+            {
+                if (e.NavigationMode == NavigationMode.New)
+                {
+                    PruneContentBackStack(e.SourcePageType);
+                }
 
-            return ContentFrame.Content is LoginPage;
+                TitleBarBackButton.IsEnabled = ContentFrame.CanGoBack;
+
+                if (e.NavigationMode == NavigationMode.Back)
+                {
+                    ShowSectionAfterBack(e.Parameter as string);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: content navigation bookkeeping failed - {ex.Message}");
+            }
+        }
+
+        private void PruneContentBackStack(Type currentPageType)
+        {
+            try
+            {
+                var stack = ContentFrame.BackStack;
+
+                for (int i = stack.Count - 1; i >= 0; i--)
+                {
+                    if (stack[i].SourcePageType == typeof(LoginPage))
+                    {
+                        stack.RemoveAt(i);
+                    }
+                }
+
+                if (stack.Count > 0 && stack[stack.Count - 1].SourcePageType == currentPageType)
+                {
+                    stack.RemoveAt(stack.Count - 1);
+                }
+
+                while (stack.Count > AppConstants.ContentBackStackLimit)
+                {
+                    stack.RemoveAt(0);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: Failed to prune content back stack - {ex.Message}");
+            }
+        }
+
+        private void ShowSectionAfterBack(string tag)
+        {
+            if (string.IsNullOrEmpty(tag)) return;
+
+            SelectNavItemForTag(tag);
+            NameContentRegion(TitleSection(tag));
+            FocusContentRegion();
         }
 
         private void OnSystemBackRequested(object sender, BackRequestedEventArgs e)
@@ -458,11 +518,47 @@ namespace Fort.ind_UWP
             e.Handled = TryGoBack();
         }
 
+        private void TitleBarBackButton_Click(object sender, RoutedEventArgs e)
+        {
+            TryGoBack();
+        }
+
+        private void AddBackAccelerators()
+        {
+            AddBackAccelerator(VirtualKey.GoBack, VirtualKeyModifiers.None);
+            AddBackAccelerator(VirtualKey.Left, VirtualKeyModifiers.Menu);
+        }
+
+        private void AddBackAccelerator(VirtualKey key, VirtualKeyModifiers modifiers)
+        {
+            var accelerator = new KeyboardAccelerator();
+            accelerator.Key = key;
+            accelerator.Modifiers = modifiers;
+            accelerator.Invoked += BackAccelerator_Invoked;
+            KeyboardAccelerators.Add(accelerator);
+        }
+
+        private void BackAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            args.Handled = TryGoBack();
+        }
+
+        private void OnCoreWindowPointerPressed(CoreWindow sender, PointerEventArgs e)
+        {
+            if (!e.CurrentPoint.Properties.IsXButton1Pressed) return;
+
+            TryGoBack();
+        }
+
         private bool TryGoBack()
         {
             try
             {
-                if (!CanGoBackInPlace()) return false;
+                if (DialogService.IsDialogOpen) return false;
+
+                if (ClosePaneUnlessExpanded()) return true;
+
+                if (!ContentFrame.CanGoBack) return false;
 
                 ContentFrame.GoBack();
 
@@ -472,22 +568,6 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"MainPage: Back navigation failed - {ex.Message}");
                 return false;
-            }
-        }
-
-        private void TrimContentBackStack()
-        {
-            try
-            {
-                var stack = ContentFrame.BackStack;
-                while (stack.Count > 1)
-                {
-                    stack.RemoveAt(0);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"MainPage: Failed to trim content back stack - {ex.Message}");
             }
         }
     }

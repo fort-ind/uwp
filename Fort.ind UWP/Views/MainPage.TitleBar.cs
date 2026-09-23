@@ -31,10 +31,12 @@ namespace Fort.ind_UWP
             if (coreTitleBar.Height > 0)
             {
                 AppTitleBar.Height = coreTitleBar.Height;
+                TitleBarBackButton.Height = coreTitleBar.Height;
             }
 
             TitleBarLeftInset.Width = new GridLength(coreTitleBar.SystemOverlayLeftInset);
             TitleBarRightInset.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
+            TitleBarBackButton.Margin = new Thickness(coreTitleBar.SystemOverlayLeftInset, 0, 0, 0);
         }
 
         private void OnTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
@@ -46,6 +48,20 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"MainPage: Failed to apply title bar layout metrics - {ex.Message}");
+            }
+        }
+
+        private void OnTitleBarIsVisibleChanged(CoreApplicationViewTitleBar sender, object args)
+        {
+            try
+            {
+                var visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+                AppTitleBar.Visibility = visibility;
+                TitleBarBackButton.Visibility = visibility;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: Failed to follow title bar visibility - {ex.Message}");
             }
         }
 
