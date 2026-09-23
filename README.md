@@ -7,11 +7,13 @@ fort.ind, but on windows! With all the features you want (and profiles!), made w
 Must be at least on Windows 10 version 1809; the dependencies for the app are in the artifacts folder 
 # installing
 If you want a stable experience, get the latest [release](https://github.com/fort-ind/uwp/releases/latest), or if you like seeing what we are cooking and are okay with rough edges, go to the Actions tab and grab it from there (or use our [nightly.link](https://nightly.link/fort-ind/uwp/workflows/build-msix/master))
+> [!IMPORTANT]
+> the powershell script that automates the install for you will be removed in version 4.0 soon. This is to avoid AV vendors flagging fort.desktop as malware
 ### the included PS script (easiest :3)
 Just run as admin, and you're good to go!
 ### installing using the appx and cer 
 first install the .cer file to your local machine (otherwise it won't work 3:) click browse and select **trusted people**, NOT trusted root certificates authorities. Click next and Finish, and after that turn on developer mode in Windows. Then run the APPX file and click Install 
-> [!NOTE]
+> [!TIP]
 > If the script doesnt run (ps crashes right when you open it), right-click install.ps1 > properties > unblock file
 # buliding
 its strongly recommended to build this app on windows 10 21H2, the easiest way is to open the .sln file in visual studio and click "build solution" or just click the green play button to actually see the app 
@@ -19,7 +21,7 @@ OR just run this :) doesn't make the actual app tho; just builds
 ```bash
 msbuild "Fort.ind UWP\Fort.ind UWP.csproj" /r /p:AppxPackageSigningEnabled=false /p:GenerateAppxPackageOnBuild=false
 ```
-for some reason, those flags are needed otherwise, it explodes :( 
+for some reason, those flags are needed otherwise, it explodes :( for more ways to actually build+develop the app [read the docs](https://docs.fort1nd.com/docs/fort.uwp%20docs+dev/building)
 ## Credits to the really cool dependencies we used
 * [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows) 
 * [microsoft ui xaml](https://github.com/microsoft/microsoft-ui-XAML) 
