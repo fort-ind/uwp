@@ -16,12 +16,6 @@
 
                     <ResourceDictionary.ThemeDictionaries>
                         <ResourceDictionary x:Key="Default">
-                            <AcrylicBrush x:Key="AppSurfaceAcrylicBrush"
-                                          BackgroundSource="HostBackdrop"
-                                          TintColor="{ThemeResource SystemChromeMediumLowColor}"
-                                          TintOpacity="0.8"
-                                          FallbackColor="{ThemeResource SystemChromeMediumLowColor}"/>
-
                             <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground"
                                           BackgroundSource="HostBackdrop"
                                           TintColor="{ThemeResource SystemChromeMediumColor}"
@@ -42,7 +36,15 @@
 
                             <SolidColorBrush x:Key="CardBorderBrush" Color="#14FFFFFF"/>
 
+                            <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="CardBackgroundBrush"/>
+                            <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="CardBorderBrush"/>
+                            <Thickness x:Key="InfoBarBorderThickness">1</Thickness>
+
                             <SolidColorBrush x:Key="MajorUpdateInfoBarBackgroundBrush" Color="#1C3553"/>
+
+                            <RevealBackgroundBrush x:Key="SettingsSectionHeaderBackgroundBrush" TargetTheme="Dark" Color="#30FFFFFF" FallbackColor="#33FFFFFF"/>
+
+                            <SolidColorBrush x:Key="HighContrastWindowSurfaceBrush" Color="Transparent"/>
 
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackground" TargetTheme="Dark" Color="Transparent" FallbackColor="Transparent"/>
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackgroundSelected" TargetTheme="Dark" Color="Transparent" FallbackColor="Transparent"/>
@@ -65,12 +67,6 @@
                         </ResourceDictionary>
 
                         <ResourceDictionary x:Key="Light">
-                            <AcrylicBrush x:Key="AppSurfaceAcrylicBrush"
-                                          BackgroundSource="HostBackdrop"
-                                          TintColor="{ThemeResource SystemChromeWhiteColor}"
-                                          TintOpacity="0.8"
-                                          FallbackColor="{ThemeResource SystemChromeLowColor}"/>
-
                             <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground"
                                           BackgroundSource="HostBackdrop"
                                           TintColor="{ThemeResource SystemChromeMediumColor}"
@@ -83,11 +79,23 @@
                                           TintOpacity="0.9"
                                           FallbackColor="{ThemeResource SystemChromeMediumColor}"/>
 
-                            <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemChromeWhiteColor}"/>
+                            <AcrylicBrush x:Key="CardBackgroundBrush"
+                                          BackgroundSource="Backdrop"
+                                          TintColor="{ThemeResource SystemChromeWhiteColor}"
+                                          TintOpacity="0.7"
+                                          FallbackColor="{ThemeResource SystemChromeWhiteColor}"/>
 
                             <SolidColorBrush x:Key="CardBorderBrush" Color="#22000000"/>
 
+                            <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="CardBackgroundBrush"/>
+                            <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="CardBorderBrush"/>
+                            <Thickness x:Key="InfoBarBorderThickness">1</Thickness>
+
                             <SolidColorBrush x:Key="MajorUpdateInfoBarBackgroundBrush" Color="#DEECF9"/>
+
+                            <RevealBackgroundBrush x:Key="SettingsSectionHeaderBackgroundBrush" TargetTheme="Light" Color="Transparent" FallbackColor="Transparent"/>
+
+                            <SolidColorBrush x:Key="HighContrastWindowSurfaceBrush" Color="Transparent"/>
 
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackground" TargetTheme="Light" Color="Transparent" FallbackColor="Transparent"/>
                             <RevealBackgroundBrush x:Key="NavigationViewItemBackgroundSelected" TargetTheme="Light" Color="Transparent" FallbackColor="Transparent"/>
@@ -110,12 +118,16 @@
                         </ResourceDictionary>
 
                         <ResourceDictionary x:Key="HighContrast">
-                            <SolidColorBrush x:Key="AppSurfaceAcrylicBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                             <SolidColorBrush x:Key="CardBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+                            <SolidColorBrush x:Key="InfoBarInformationalSeverityBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+                            <SolidColorBrush x:Key="InfoBarBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+                            <Thickness x:Key="InfoBarBorderThickness">2</Thickness>
                             <SolidColorBrush x:Key="MajorUpdateInfoBarBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+                            <SolidColorBrush x:Key="SettingsSectionHeaderBackgroundBrush" Color="{ThemeResource SystemColorButtonFaceColor}"/>
+                            <SolidColorBrush x:Key="HighContrastWindowSurfaceBrush" Color="{ThemeResource SystemColorWindowColor}"/>
 
                             <SolidColorBrush x:Key="NavigationViewItemBackground" Color="{ThemeResource SystemColorButtonFaceColor}"/>
                             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{ThemeResource SystemColorHighlightColor}"/>

@@ -66,6 +66,10 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
+        <Border x:Name="HighContrastSurface"
+                Background="{ThemeResource HighContrastWindowSurfaceBrush}"
+                IsHitTestVisible="False"/>
+
         <Grid x:Name="AppTitleBar"
               Height="32"
               VerticalAlignment="Top"
@@ -136,7 +140,7 @@
                                     <TextBlock Text="{x:Bind Title}"/>
                                     <TextBlock Text="{x:Bind Category}"
                                                Style="{ThemeResource CaptionTextBlockStyle}"
-                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>

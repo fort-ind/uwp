@@ -27,7 +27,7 @@ namespace Fort.ind_UWP
             welcomeDialog.Content = dialogContent;
             welcomeDialog.CloseButtonText = LocalizedStrings.Get("WelcomeDialogDismiss");
             welcomeDialog.DefaultButton = ContentDialogButton.Close;
-            DialogService.ApplyXamlRoot(welcomeDialog, this);
+            DialogService.AttachToOwner(welcomeDialog, this);
 
             ApplicationData.Current.LocalSettings.Values[AppConstants.SettingHideWelcomeDialog] = true;
 

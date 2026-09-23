@@ -614,7 +614,7 @@ Open your profile and try again.</value>
     <value>search for games :p</value>
   </data>
   <data name="FilterBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Type to narrow the list of games by name</value>
+    <value>type to find a certain game</value>
   </data>
   <data name="FilterBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Filter games</value>
@@ -1203,7 +1203,7 @@ Open your profile and try again.</value>
     <value>get it now</value>
   </data>
   <data name="CheckForUpdatesButtonText.Text" xml:space="preserve">
-    <value>Check for updates</value>
+    <value>check for updates</value>
   </data>
   <data name="UpdateDownloadLink.Content" xml:space="preserve">
     <value>Download</value>

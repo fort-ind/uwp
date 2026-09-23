@@ -211,7 +211,7 @@ namespace Fort.ind_UWP
                         CloseButtonText = LocalizedStrings.Get("DialogCancel"),
                         DefaultButton = ContentDialogButton.Primary
                     };
-                    DialogService.ApplyXamlRoot(dialog, this);
+                    DialogService.AttachToOwner(dialog, this);
 
                     TypedEventHandler<ColorPicker, ColorChangedEventArgs> contrastHandler =
                         (s, args) => UpdateContrastWarning(args.NewColor, warning, warningText, true);

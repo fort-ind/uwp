@@ -72,6 +72,7 @@
                         <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainAppearance" x:Name="AppearanceHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
@@ -466,6 +467,7 @@
                         <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainTransparency" x:Name="TransparencyHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
@@ -585,6 +587,7 @@
                         <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainProfileSettings" x:Name="ProfileHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
@@ -655,6 +658,7 @@
                         <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainDataStorage" x:Name="StorageHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
@@ -742,6 +746,7 @@
                         <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainLiveTile" x:Name="TileHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
@@ -820,6 +825,7 @@
                         <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainWelcomeDialog" x:Name="WelcomeHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
@@ -888,6 +894,7 @@
                         <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainAbout" x:Name="AboutHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"

@@ -25,6 +25,8 @@ namespace Fort.ind_UWP
 
         private bool _titleBarMetricsHandlerAttached = false;
 
+        private bool _highContrastHandlerAttached = false;
+
         private bool _systemBackHandlerAttached = false;
 
         private bool _navViewInitialized = false;
@@ -80,6 +82,14 @@ namespace Fort.ind_UWP
                 _titleBarMetricsHandlerAttached = true;
 
                 ApplyTitleBarLayoutMetrics(coreTitleBar);
+            }
+
+            if (!_highContrastHandlerAttached)
+            {
+                s_accessibilitySettings.HighContrastChanged += OnHighContrastChanged;
+                _highContrastHandlerAttached = true;
+
+                UpdateTitleBarColors();
             }
 
             if (!_systemBackHandlerAttached)
@@ -152,6 +162,12 @@ namespace Fort.ind_UWP
                     Debug.WriteLine($"MainPage: Failed to remove title bar metrics handler - {ex.Message}");
                 }
                 _titleBarMetricsHandlerAttached = false;
+            }
+
+            if (_highContrastHandlerAttached)
+            {
+                s_accessibilitySettings.HighContrastChanged -= OnHighContrastChanged;
+                _highContrastHandlerAttached = false;
             }
 
             if (_systemBackHandlerAttached)

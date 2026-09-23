@@ -102,32 +102,6 @@ namespace Fort.ind_UWP
         private static readonly SolidColorBrush s_selectedBrushDark = new SolidColorBrush(Colors.White);
         private static readonly SolidColorBrush s_selectedBrushLight = new SolidColorBrush(Colors.Black);
 
-        private Dictionary<Button, Brush> _swatchChipsDark;
-        private Dictionary<Button, Brush> _swatchChipsLight;
-
-        private void UpdateSwatchChipColors(bool isDark)
-        {
-            if (_swatchChipsDark == null)
-            {
-                _swatchChipsDark = new Dictionary<Button, Brush>();
-                _swatchChipsLight = new Dictionary<Button, Brush>();
-                foreach (var btn in TintPresetSwatches)
-                {
-                    var tag = btn.Tag?.ToString() ?? "";
-                    var lightHex = ColorHelper.TryGetLightPreset(tag);
-                    if (lightHex == null) continue;
-                    _swatchChipsDark[btn] = btn.Background;
-                    _swatchChipsLight[btn] = new SolidColorBrush(ColorHelper.HexToColor(lightHex));
-                }
-            }
-
-            var chips = isDark ? _swatchChipsDark : _swatchChipsLight;
-            foreach (var pair in chips)
-            {
-                pair.Key.Background = pair.Value;
-            }
-        }
-
         private Dictionary<Button, FontIcon> _swatchChecks;
 
         private Dictionary<Button, FontIcon> SwatchChecks
@@ -188,7 +162,6 @@ namespace Fort.ind_UWP
 
             var isDark = AppearanceService.IsEffectiveThemeDark();
             var restBrush = isDark ? s_restBrushDark : s_restBrushLight;
-            UpdateSwatchChipColors(isDark);
             HideSwatchChecks();
 
             Button sel = null;
@@ -243,8 +216,7 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                var c = AppearanceService.IsEffectiveThemeDark() ? parsed : ColorHelper.LightenForLightTheme(parsed);
-                TintCustomButton.Background = new SolidColorBrush(c);
+                TintCustomButton.Background = new SolidColorBrush(parsed);
                 TintCustomIcon.Visibility = Visibility.Collapsed;
             }
             catch (Exception ex)
@@ -333,7 +305,7 @@ namespace Fort.ind_UWP
                         CloseButtonText = LocalizedStrings.Get("DialogCancel"),
                         DefaultButton = ContentDialogButton.Primary
                     };
-                    DialogService.ApplyXamlRoot(dialog, this);
+                    DialogService.AttachToOwner(dialog, this);
 
                     TypedEventHandler<ColorPicker, ColorChangedEventArgs> previewHandler =
                         (s, args) => AppearanceService.SetTint(ColorHelper.ColorToHex(args.NewColor), false);

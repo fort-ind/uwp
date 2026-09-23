@@ -51,9 +51,37 @@ namespace Fort.ind_UWP
 
         private static readonly AccessibilitySettings s_accessibilitySettings = new AccessibilitySettings();
 
+        private void OnHighContrastChanged(AccessibilitySettings sender, object args)
+        {
+            var ignored = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                try
+                {
+                    UpdateTitleBarColors();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"MainPage: title bar repaint after high contrast change failed - {ex.Message}");
+                }
+            });
+        }
+
         private void UpdateTitleBarColors()
         {
             var titleBar = ApplicationView.GetForCurrentView().TitleBar;
+
+            if (s_accessibilitySettings.HighContrast)
+            {
+                titleBar.ButtonBackgroundColor = null;
+                titleBar.ButtonInactiveBackgroundColor = null;
+                titleBar.ButtonHoverBackgroundColor = null;
+                titleBar.ButtonPressedBackgroundColor = null;
+                titleBar.ButtonForegroundColor = null;
+                titleBar.ButtonHoverForegroundColor = null;
+                titleBar.ButtonPressedForegroundColor = null;
+                titleBar.ButtonInactiveForegroundColor = null;
+                return;
+            }
 
             var isDark = AppearanceService.IsEffectiveThemeDark();
 
@@ -68,7 +96,6 @@ namespace Fort.ind_UWP
 
             Color accent;
             if (AccentColorService.ActiveAccentHex != null
-                && !s_accessibilitySettings.HighContrast
                 && ColorHelper.TryHexToColor(AccentColorService.ActiveAccentHex, out accent))
             {
                 hoverBg = accent;

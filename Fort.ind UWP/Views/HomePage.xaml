@@ -132,7 +132,7 @@
                                        Margin="0,0,0,12"/>
                             <TextBlock x:Uid="MainJustNow"
                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         </StackPanel>
                     </Grid>
 
@@ -163,7 +163,7 @@
                                        Margin="0,0,0,12"/>
                             <TextBlock x:Uid="MainInTheFutureMaybe"
                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         </StackPanel>
                     </Grid>
                 </Grid>

@@ -15,8 +15,7 @@ namespace Fort.ind_UWP
         public static event EventHandler Changed;
 
         private static readonly Color s_surfaceTintDark = Color.FromArgb(255, 0x2B, 0x2B, 0x2B);
-        private static readonly Color s_surfaceTintLight = Colors.White;
-        private static readonly Color s_surfaceFallbackLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
+        private static readonly Color s_surfaceTintLight = Color.FromArgb(255, 0xF2, 0xF2, 0xF2);
 
         private static readonly Color s_paneTintDark = Color.FromArgb(255, 0x1F, 0x1F, 0x1F);
         private static readonly Color s_paneTintLight = Color.FromArgb(255, 0xE6, 0xE6, 0xE6);
@@ -264,22 +263,19 @@ namespace Fort.ind_UWP
                 var tintPane = isTinted && TintScope != AppConstants.TintScopeContent;
 
                 Color bodyTint;
-                Color bodyFallback;
                 if (tintBody)
                 {
                     bodyTint = isDark ? ColorHelper.HexToColor(colorTag) : ColorHelper.ForLightTheme(colorTag);
-                    bodyFallback = bodyTint;
                 }
                 else
                 {
                     bodyTint = isDark ? s_surfaceTintDark : s_surfaceTintLight;
-                    bodyFallback = isDark ? s_surfaceTintDark : s_surfaceFallbackLight;
                 }
 
                 var surface = SurfaceBrush;
                 surface.TintColor = bodyTint;
                 surface.TintOpacity = BodyAcrylicOpacity;
-                surface.FallbackColor = bodyFallback;
+                surface.FallbackColor = bodyTint;
                 surface.AlwaysUseFallback = BodyAcrylicOpacity >= 1.0;
 
                 RepaintPaneBrushes(colorTag, tintPane);

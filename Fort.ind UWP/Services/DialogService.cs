@@ -15,11 +15,17 @@ namespace Fort.ind_UWP
         private static readonly bool s_xamlRootSupported =
             ApiInformation.IsPropertyPresent("Windows.UI.Xaml.UIElement", "XamlRoot");
 
-        public static void ApplyXamlRoot(ContentDialog dialog, UIElement owner)
+        public static void AttachToOwner(ContentDialog dialog, UIElement owner)
         {
             if (s_xamlRootSupported && owner != null)
             {
                 dialog.XamlRoot = owner.XamlRoot;
+            }
+
+            var themed = owner as FrameworkElement ?? Window.Current?.Content as FrameworkElement;
+            if (themed != null)
+            {
+                dialog.RequestedTheme = themed.ActualTheme;
             }
         }
 
@@ -33,7 +39,7 @@ namespace Fort.ind_UWP
                     Content = content,
                     CloseButtonText = closeText
                 };
-                ApplyXamlRoot(dialog, owner);
+                AttachToOwner(dialog, owner);
                 await dialog.ShowAsync();
             });
         }
@@ -70,7 +76,7 @@ namespace Fort.ind_UWP
                 CloseButtonText = closeText,
                 DefaultButton = defaultButton
             };
-            ApplyXamlRoot(dialog, owner);
+            AttachToOwner(dialog, owner);
 
             return await dialog.ShowAsync() == ContentDialogResult.Primary;
         }
@@ -81,7 +87,7 @@ namespace Fort.ind_UWP
 
             await RunExclusiveAsync(async () =>
             {
-                ApplyXamlRoot(dialog, owner);
+                AttachToOwner(dialog, owner);
                 result = await dialog.ShowAsync();
             });
 
