@@ -21,7 +21,7 @@ OR just run this :) doesn't make the actual app tho; just builds
 ```bash
 msbuild "Fort.ind UWP\Fort.ind UWP.csproj" /r /p:AppxPackageSigningEnabled=false /p:GenerateAppxPackageOnBuild=false
 ```
-for some reason, those flags are needed otherwise, it explodes :( 
+for some reason, those flags are needed otherwise, it explodes :( for more ways to actually build+develop the app [read the docs](https://docs.fort1nd.com/docs/fort.uwp%20docs+dev/building)
 ## Credits to the really cool dependencies we used
 * [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows) 
 * [microsoft ui xaml](https://github.com/microsoft/microsoft-ui-XAML) 
