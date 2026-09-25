@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Windows.ApplicationModel.Core;
+using Windows.Graphics.Display;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -20,7 +21,11 @@ namespace Fort.ind_UWP
 
         private FrameworkElement _windowRoot;
 
+        private DisplayInformation _displayInformation;
+
         private bool _handlersAttached = false;
+
+        private bool _backButtonShown = false;
 
         public SecondaryWindowPage()
         {
@@ -73,8 +78,14 @@ namespace Fort.ind_UWP
 
         private void ShowContent()
         {
-            HeaderText.Text = _view.Title;
-            AutomationProperties.SetName(ContentFrame, _view.Title);
+            var title = _view.Title ?? string.Empty;
+            var header = _view.Header ?? title;
+
+            WindowTitleText.Text = title.ToUpperInvariant();
+            AutomationProperties.SetName(WindowTitleText, title);
+
+            HeaderText.Text = header;
+            AutomationProperties.SetName(ContentFrame, header);
 
             ContentFrame.Navigate(_view.PageType, _view.NavTag);
         }
@@ -83,12 +94,19 @@ namespace Fort.ind_UWP
         {
             try
             {
+                if (ContentFrame.CanGoBack && !_backButtonShown)
+                {
+                    _backButtonShown = true;
+                    TitleBarBackButtonSpace.Width = new GridLength(TitleBarBackButton.Width);
+                    UpdateBackButtonVisibility();
+                }
+
                 TitleBarBackButton.IsEnabled = ContentFrame.CanGoBack;
 
                 var page = ContentFrame.Content as IShellContentPage;
                 if (page != null && page.ContentRegion != null && _view != null)
                 {
-                    AutomationProperties.SetName(page.ContentRegion, _view.Title);
+                    AutomationProperties.SetName(page.ContentRegion, _view.Header ?? _view.Title);
                 }
             }
             catch (Exception ex)
@@ -153,6 +171,10 @@ namespace Fort.ind_UWP
 
                 SystemNavigationManager.GetForCurrentView().BackRequested += OnSystemBackRequested;
                 Window.Current.CoreWindow.PointerPressed += OnCoreWindowPointerPressed;
+
+                _displayInformation = DisplayInformation.GetForCurrentView();
+                _displayInformation.DpiChanged += OnDpiChanged;
+                ApplyTitleBarHairline();
             }
             catch (Exception ex)
             {
@@ -176,11 +198,42 @@ namespace Fort.ind_UWP
 
                 SystemNavigationManager.GetForCurrentView().BackRequested -= OnSystemBackRequested;
                 Window.Current.CoreWindow.PointerPressed -= OnCoreWindowPointerPressed;
+
+                if (_displayInformation != null)
+                {
+                    _displayInformation.DpiChanged -= OnDpiChanged;
+                    _displayInformation = null;
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SecondaryWindowPage: could not detach window handlers - {ex.Message}");
             }
+        }
+
+        private void OnDpiChanged(DisplayInformation sender, object args)
+        {
+            try
+            {
+                ApplyTitleBarHairline();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: Failed to follow a DPI change - {ex.Message}");
+            }
+        }
+
+        private void ApplyTitleBarHairline()
+        {
+            var scale = _displayInformation == null ? 1.0 : _displayInformation.LogicalDpi / 96.0;
+            if (scale <= 0) scale = 1.0;
+
+            AppTitleBar.BorderThickness = new Thickness(0, 0, 0, 1.0 / scale);
+        }
+
+        private void UpdateBackButtonVisibility()
+        {
+            TitleBarBackButton.Visibility = _backButtonShown ? AppTitleBar.Visibility : Visibility.Collapsed;
         }
 
         private void OnTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
@@ -199,9 +252,8 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
-                AppTitleBar.Visibility = visibility;
-                TitleBarBackButton.Visibility = visibility;
+                AppTitleBar.Visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+                UpdateBackButtonVisibility();
             }
             catch (Exception ex)
             {

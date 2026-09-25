@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     KeyboardAcceleratorPlacementMode="Hidden"
     Background="Transparent">
@@ -35,6 +36,11 @@
         </DataTemplate>
     </Page.Resources>
 
+    <i:Interaction.Behaviors>
+        <local:WindowActivationStateBehavior ActiveStateName="WindowActiveState"
+                                             InactiveStateName="WindowInactiveState"/>
+    </i:Interaction.Behaviors>
+
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowWidthStates">
@@ -61,6 +67,15 @@
                 <VisualState x:Name="MajorUpdateState">
                     <VisualState.Setters>
                         <Setter Target="UpdateInfoBar.Background" Value="{ThemeResource MajorUpdateInfoBarBackgroundBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
+            <VisualStateGroup x:Name="WindowActivationStates">
+                <VisualState x:Name="WindowActiveState"/>
+                <VisualState x:Name="WindowInactiveState">
+                    <VisualState.Setters>
+                        <Setter Target="AppTitleText.Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

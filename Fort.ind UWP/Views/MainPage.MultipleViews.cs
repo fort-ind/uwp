@@ -45,6 +45,17 @@ namespace Fort.ind_UWP
             }
         }
 
+        private static string WindowTitleFor(string tag)
+        {
+            switch (tag)
+            {
+                case AppConstants.NavigationProfile:
+                    return LocalizedStrings.Get("WindowTitleProfile");
+                default:
+                    return HeaderFor(tag);
+            }
+        }
+
         private MenuFlyout BuildOpenInNewWindowFlyout(string tag)
         {
             var menuItem = new MenuFlyoutItem()
@@ -68,7 +79,7 @@ namespace Fort.ind_UWP
                 var tag = menuItem == null ? null : menuItem.Tag as string;
                 if (!CanOpenInNewWindow(tag)) return;
 
-                var shown = await WindowManagerService.ShowAsync(tag, HeaderFor(tag), PageTypeFor(tag));
+                var shown = await WindowManagerService.ShowAsync(tag, WindowTitleFor(tag), HeaderFor(tag), PageTypeFor(tag));
                 if (!shown)
                 {
                     Debug.WriteLine($"MainPage: the window for {tag} was not shown");

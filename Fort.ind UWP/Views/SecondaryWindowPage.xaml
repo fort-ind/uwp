@@ -5,11 +5,28 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     KeyboardAcceleratorPlacementMode="Hidden"
     Background="Transparent">
 
+    <i:Interaction.Behaviors>
+        <local:WindowActivationStateBehavior ActiveStateName="WindowActiveState"
+                                             InactiveStateName="WindowInactiveState"/>
+    </i:Interaction.Behaviors>
+
     <Grid x:Name="RootGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowActivationStates">
+                <VisualState x:Name="WindowActiveState"/>
+                <VisualState x:Name="WindowInactiveState">
+                    <VisualState.Setters>
+                        <Setter Target="WindowTitleText.Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -23,20 +40,24 @@
 
         <Grid x:Name="AppTitleBar"
               Height="32"
-              Background="Transparent">
+              Background="{ThemeResource SystemControlBackgroundListLowBrush}"
+              BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+              BorderThickness="0,0,0,1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="TitleBarLeftInset" Width="0"/>
-                <ColumnDefinition x:Name="TitleBarBackButtonSpace" Width="48"/>
+                <ColumnDefinition x:Name="TitleBarBackButtonSpace" Width="0"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition x:Name="TitleBarRightInset" Width="0"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Uid="AppTitleText" x:Name="AppTitleText"
+            <TextBlock x:Name="WindowTitleText"
                        Grid.Column="2"
                        VerticalAlignment="Center"
-                       Margin="12,0,0,0"
+                       Margin="16,0,0,0"
                        Style="{StaticResource CaptionTextBlockStyle}"
-                       Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"/>
+                       TextWrapping="NoWrap"
+                       TextTrimming="CharacterEllipsis"
+                       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
         </Grid>
 
         <Button x:Uid="TitleBarBackButton" x:Name="TitleBarBackButton"
@@ -45,6 +66,7 @@
                 Height="32"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
+                Visibility="Collapsed"
                 IsEnabled="False"
                 Click="TitleBarBackButton_Click"/>
 

@@ -133,6 +133,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviors\WindowActivationStateBehavior.cs" />
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
     <Compile Include="Helpers\Blurhash.cs" />
@@ -396,6 +397,9 @@
       <Version>18.7.23</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
+      <Version>3.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

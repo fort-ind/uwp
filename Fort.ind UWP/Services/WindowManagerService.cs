@@ -36,7 +36,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        public static async Task<bool> ShowAsync(string navTag, string title, Type pageType)
+        public static async Task<bool> ShowAsync(string navTag, string title, string header, Type pageType)
         {
             if (string.IsNullOrEmpty(navTag) || pageType == null) return false;
 
@@ -55,7 +55,7 @@ namespace Fort.ind_UWP
 
             try
             {
-                var view = await CreateViewAsync(navTag, title, pageType);
+                var view = await CreateViewAsync(navTag, title, header, pageType);
                 if (view == null) return false;
 
                 s_secondaryViews.Add(view);
@@ -135,7 +135,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<ViewLifetimeControl> CreateViewAsync(string navTag, string title, Type pageType)
+        private static async Task<ViewLifetimeControl> CreateViewAsync(string navTag, string title, string header, Type pageType)
         {
             ViewLifetimeControl view = null;
 
@@ -146,7 +146,7 @@ namespace Fort.ind_UWP
                 {
                     AccentColorService.ApplyActiveAccentToCurrentView();
 
-                    var created = ViewLifetimeControl.CreateForCurrentView(navTag, title, pageType);
+                    var created = ViewLifetimeControl.CreateForCurrentView(navTag, title, header, pageType);
                     created.StartViewInUse();
                     created.Released += OnViewReleased;
 

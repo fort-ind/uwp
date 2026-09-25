@@ -303,6 +303,9 @@
   <data name="HeaderProfile" xml:space="preserve">
     <value>Your Profile</value>
   </data>
+  <data name="WindowTitleProfile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
   <data name="HeaderSocial" xml:space="preserve">
     <value>Social</value>
   </data>

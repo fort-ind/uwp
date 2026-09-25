@@ -17,21 +17,22 @@ namespace Fort.ind_UWP
 
         private EventHandler _releasedHandlers;
 
-        private ViewLifetimeControl(CoreWindow window, string navTag, string title, Type pageType)
+        private ViewLifetimeControl(CoreWindow window, string navTag, string title, string header, Type pageType)
         {
             Dispatcher = window.Dispatcher;
             Id = ApplicationView.GetApplicationViewIdForWindow(window);
             NavTag = navTag;
             Title = title;
+            Header = header;
             PageType = pageType;
 
             _view = ApplicationView.GetForCurrentView();
             _view.Consolidated += OnConsolidated;
         }
 
-        public static ViewLifetimeControl CreateForCurrentView(string navTag, string title, Type pageType)
+        public static ViewLifetimeControl CreateForCurrentView(string navTag, string title, string header, Type pageType)
         {
-            return new ViewLifetimeControl(CoreWindow.GetForCurrentThread(), navTag, title, pageType);
+            return new ViewLifetimeControl(CoreWindow.GetForCurrentThread(), navTag, title, header, pageType);
         }
 
         public CoreDispatcher Dispatcher { get; private set; }
@@ -41,6 +42,8 @@ namespace Fort.ind_UWP
         public string NavTag { get; private set; }
 
         public string Title { get; private set; }
+
+        public string Header { get; private set; }
 
         public Type PageType { get; private set; }
 
