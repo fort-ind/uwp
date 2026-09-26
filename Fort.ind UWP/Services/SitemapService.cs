@@ -235,7 +235,7 @@ namespace Fort.ind_UWP
         {
             var trimmed = path.TrimEnd('/');
             var lastSlash = trimmed.LastIndexOf('/');
-            var slug = lastSlash >= 0 ? trimmed.Substring(lastSlash + 1) : trimmed;
+            var slug = Uri.UnescapeDataString(lastSlash >= 0 ? trimmed.Substring(lastSlash + 1) : trimmed);
 
             if (string.IsNullOrEmpty(slug)) return path;
 
