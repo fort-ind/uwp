@@ -51,16 +51,6 @@ namespace Fort.ind_UWP
             ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLabPinGames] = enabled;
         }
 
-        public static bool ShareGamesEnabled
-        {
-            get { return ReadFlag(AppConstants.SettingLabShareGames); }
-        }
-
-        public static void SaveShareGames(bool enabled)
-        {
-            ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLabShareGames] = enabled;
-        }
-
         private static bool ReadFlag(string key)
         {
             try

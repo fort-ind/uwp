@@ -1369,7 +1369,7 @@ Open your profile and try again.</value>
     <value>Pin games to Start</value>
   </data>
   <data name="PinGamesDescription.Text" xml:space="preserve">
-    <value>Give a game its own tile on Start and open it straight from there. Right-click a game on the Games page or in your favorites (or select it and press Shift+F10) and choose Pin to Start.</value>
+    <value>Pin a game to Start and open it straight from there. Right-click a game on the Games page or in your favorites (or select it and press Shift+F10) and choose Pin to Start.</value>
   </data>
   <data name="PinGamesToggle.OnContent" xml:space="preserve">
     <value>On</value>
@@ -1379,21 +1379,6 @@ Open your profile and try again.</value>
   </data>
   <data name="PinGamesToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Pin games to Start</value>
-  </data>
-  <data name="ShareGamesTitle.Text" xml:space="preserve">
-    <value>Share games</value>
-  </data>
-  <data name="ShareGamesDescription.Text" xml:space="preserve">
-    <value>Send a link to a game with the Windows share window. Right-click a game on the Games page or in your favorites (or select it and press Shift+F10) and choose Share.</value>
-  </data>
-  <data name="ShareGamesToggle.OnContent" xml:space="preserve">
-    <value>On</value>
-  </data>
-  <data name="ShareGamesToggle.OffContent" xml:space="preserve">
-    <value>Off</value>
-  </data>
-  <data name="ShareGamesToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Share games</value>
   </data>
   <data name="GamePinToStartMenuItem" xml:space="preserve">
     <value>Pin to Start</value>
@@ -1411,5 +1396,21 @@ Open your profile and try again.</value>
   <data name="GameUnpinnedFormat" xml:space="preserve">
     <value>Unpinned {0} from Start</value>
     <comment>Screen reader announcement. {0} is the game title.</comment>
+  </data>
+  <data name="MissingPinnedGameDialogTitle" xml:space="preserve">
+    <value>this game isn't here anymore</value>
+  </data>
+  <data name="MissingPinnedGameDialogBody" xml:space="preserve">
+    <value>The game this tile opens has been taken off the games list, so there's nothing for it to open. You can unpin it from Start.</value>
+  </data>
+  <data name="MissingPinnedGameDialogUnpin" xml:space="preserve">
+    <value>Unpin from Start</value>
+  </data>
+  <data name="MissingPinnedGameDialogKeep" xml:space="preserve">
+    <value>Keep it</value>
+  </data>
+  <data name="MissingPinnedGameUnpinnedAnnouncement" xml:space="preserve">
+    <value>Unpinned the tile from Start</value>
+    <comment>Screen reader announcement after the user unpins a tile whose game is no longer available.</comment>
   </data>
 </root>

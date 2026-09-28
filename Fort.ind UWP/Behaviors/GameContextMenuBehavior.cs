@@ -124,7 +124,7 @@ namespace Fort.ind_UWP
                 flyout.Items.Add(pinItem);
             }
 
-            if (LabsService.ShareGamesEnabled && _shareManager != null && WebLauncher.TryCreateWebUri(game.Url) != null)
+            if (_shareManager != null && WebLauncher.TryCreateWebUri(game.Url) != null)
             {
                 var shareItem = new MenuFlyoutItem()
                 {

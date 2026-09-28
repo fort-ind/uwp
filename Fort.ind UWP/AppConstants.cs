@@ -98,7 +98,6 @@ namespace Fort.ind_UWP
 
         public const string SettingLabMultipleViews = "LabMultipleViews";
         public const string SettingLabPinGames = "LabPinGames";
-        public const string SettingLabShareGames = "LabShareGames";
 
         public const double KeepOnTopWindowWidth = 360;
         public const double KeepOnTopWindowHeight = 480;
@@ -111,6 +110,7 @@ namespace Fort.ind_UWP
 
         public const string GameTileArgumentPrefix = "game:";
         public const string GameTileIdPrefix = "game.";
+        public const string SettingGameTileArtRevision = "GameTileArtRevision";
 
         public const string SettingJumpListRevision = "JumpListRevision";
 

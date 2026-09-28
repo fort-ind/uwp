@@ -12,7 +12,7 @@ namespace Fort.ind_UWP
         {
         }
 
-        private const int TaskRevision = 4;
+        private const int TaskRevision = 5;
 
         private static JumpTask[] BuildTasks()
         {

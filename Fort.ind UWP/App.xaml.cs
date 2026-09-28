@@ -77,8 +77,9 @@ namespace Fort.ind_UWP
 
                     if (pinnedGameUrl != null)
                     {
+                        var pinnedTileId = e.TileId;
                         var ignoredLaunch = rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
-                                                                          () => LaunchPinnedGame(pinnedGameUrl));
+                                                                          () => LaunchPinnedGame(pinnedGameUrl, pinnedTileId));
                     }
                 }
             }
@@ -135,6 +136,7 @@ namespace Fort.ind_UWP
                 await ProfileService.TryRestoreSessionAsync();
 
                 await JumpListService.EnsureTasksAsync();
+                await GameTileService.RefreshPinnedTilesAsync();
             }
             catch (Exception ex)
             {
@@ -142,15 +144,42 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async void LaunchPinnedGame(string url)
+        private static async void LaunchPinnedGame(string url, string tileId)
         {
             try
             {
-                await GameTileService.LaunchPinnedGameAsync(url);
+                var game = await GameTileService.FindPinnedGameAsync(url);
+                if (game != null)
+                {
+                    await WebLauncher.LaunchAsync(game.Url);
+                }
+                else if (GameTileService.IsTileFor(tileId, url))
+                {
+                    await OfferToUnpinMissingGameAsync(tileId);
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"App: could not launch the pinned game - {ex.Message}");
+            }
+        }
+
+        private static async Task OfferToUnpinMissingGameAsync(string tileId)
+        {
+            var owner = Window.Current.Content;
+
+            var unpin = await DialogService.ShowActionMessageAsync(owner,
+                                                                   LocalizedStrings.Get("MissingPinnedGameDialogTitle"),
+                                                                   LocalizedStrings.Get("MissingPinnedGameDialogBody"),
+                                                                   LocalizedStrings.Get("MissingPinnedGameDialogUnpin"),
+                                                                   LocalizedStrings.Get("MissingPinnedGameDialogKeep"));
+            if (!unpin) return;
+
+            if (await GameTileService.UnpinTileAsync(tileId))
+            {
+                AutomationHelper.AnnounceStatus(owner,
+                                                LocalizedStrings.Get("MissingPinnedGameUnpinnedAnnouncement"),
+                                                "MissingPinnedGame");
             }
         }
 
@@ -204,6 +233,7 @@ namespace Fort.ind_UWP
                 if (isColdStart)
                 {
                     await JumpListService.EnsureTasksAsync();
+                    await GameTileService.RefreshPinnedTilesAsync();
                 }
 
                 if (signInResult != null && !signInResult.Success)

@@ -91,6 +91,22 @@ namespace Fort.ind_UWP
             });
         }
 
+        public static async Task<bool> ShowActionMessageAsync(UIElement owner,
+                                                              string title,
+                                                              string content,
+                                                              string actionText,
+                                                              string closeText)
+        {
+            bool accepted = false;
+
+            await RunGatedAsync(true, async () =>
+            {
+                accepted = await ShowConfirmCoreAsync(owner, title, content, actionText, closeText, ContentDialogButton.Close);
+            });
+
+            return accepted;
+        }
+
         public static async Task<bool> ShowConfirmAsync(UIElement owner,
                                                         string title,
                                                         string content,

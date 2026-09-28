@@ -184,7 +184,7 @@
                 <NavigationViewItem x:Uid="MainGames" Tag="Games"
                                      AccessKey="G">
                     <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Play"/>
+                        <FontIcon Glyph="&#xE7FC;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem x:Uid="MainBetaPrograms" Tag="Betas"

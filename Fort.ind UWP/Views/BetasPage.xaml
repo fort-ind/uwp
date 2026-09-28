@@ -120,32 +120,6 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid x:Name="ShareGamesCard" Style="{StaticResource LabCardStyle}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid Style="{StaticResource LabIconPlateStyle}">
-                            <FontIcon Glyph="&#xE72D;" FontSize="16"
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      AutomationProperties.AccessibilityView="Raw"/>
-                        </Grid>
-
-                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="4">
-                            <TextBlock x:Uid="ShareGamesTitle"
-                                       Style="{StaticResource BaseTextBlockStyle}"
-                                       AutomationProperties.HeadingLevel="Level3"/>
-                            <TextBlock x:Uid="ShareGamesDescription"
-                                       Style="{StaticResource BodyTextBlockStyle}"
-                                       TextWrapping="Wrap"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                            <ToggleSwitch x:Uid="ShareGamesToggle" x:Name="ShareGamesToggle"
-                                          Margin="0,4,0,0"
-                                          Toggled="ShareGamesToggle_Toggled"/>
-                        </StackPanel>
-                    </Grid>
-
                     <TextBlock x:Uid="BetasHeading"
                                Style="{StaticResource SubtitleTextBlockStyle}"
                                AutomationProperties.HeadingLevel="Level2"

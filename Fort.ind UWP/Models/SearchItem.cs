@@ -223,7 +223,7 @@ namespace Fort.ind_UWP
             if (categoryKey == AppConstants.CategoryMenu) return "\uE700";
             if (categoryKey == AppConstants.CategorySettings) return "\uE713";
             if (categoryKey == AppConstants.CategoryProfile) return "\uE77B";
-            if (categoryKey.StartsWith(AppConstants.CategoryGames, StringComparison.Ordinal)) return "\uE768";
+            if (categoryKey.StartsWith(AppConstants.CategoryGames, StringComparison.Ordinal)) return "\uE7FC";
             if (categoryKey == AppConstants.CategorySocial) return "\uE716";
             if (categoryKey == AppConstants.CategoryEmulators) return "\uE768";
             if (categoryKey.StartsWith(AppConstants.CategoryApps, StringComparison.Ordinal)) return "\uE71D";
