@@ -133,6 +133,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviors\GameContextMenuBehavior.cs" />
     <Compile Include="Behaviors\WindowActivationStateBehavior.cs" />
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Services\AvatarIconService.cs" />
     <Compile Include="Services\DialogService.cs" />
     <Compile Include="Services\FavoritesService.cs" />
+    <Compile Include="Services\GameTileService.cs" />
     <Compile Include="Services\JumpListService.cs" />
     <Compile Include="Services\LabsService.cs" />
     <Compile Include="Services\LiveTileService.cs" />

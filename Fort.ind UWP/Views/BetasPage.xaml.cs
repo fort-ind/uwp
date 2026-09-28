@@ -28,6 +28,8 @@ namespace Fort.ind_UWP
             try
             {
                 MultipleViewsToggle.IsOn = LabsService.MultipleViewsSaved;
+                PinGamesToggle.IsOn = LabsService.PinGamesEnabled;
+                ShareGamesToggle.IsOn = LabsService.ShareGamesEnabled;
                 UpdateRestartNotice(false);
             }
             catch (Exception ex)
@@ -52,6 +54,34 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"BetasPage: could not save the multiple windows lab - {ex.Message}");
+            }
+        }
+
+        private void PinGamesToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loadingLabs) return;
+
+            try
+            {
+                LabsService.SavePinGames(PinGamesToggle.IsOn);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BetasPage: could not save the pin games lab - {ex.Message}");
+            }
+        }
+
+        private void ShareGamesToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loadingLabs) return;
+
+            try
+            {
+                LabsService.SaveShareGames(ShareGamesToggle.IsOn);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BetasPage: could not save the share games lab - {ex.Message}");
             }
         }
 

@@ -47,6 +47,7 @@
                 <ColumnDefinition x:Name="TitleBarLeftInset" Width="0"/>
                 <ColumnDefinition x:Name="TitleBarBackButtonSpace" Width="0"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition x:Name="TitleBarKeepOnTopSpace" Width="0"/>
                 <ColumnDefinition x:Name="TitleBarRightInset" Width="0"/>
             </Grid.ColumnDefinitions>
 
@@ -69,6 +70,16 @@
                 Visibility="Collapsed"
                 IsEnabled="False"
                 Click="TitleBarBackButton_Click"/>
+
+        <Button x:Name="KeepOnTopButton"
+                Style="{StaticResource NavigationBackButtonNormalStyle}"
+                Content="&#xE718;"
+                Width="48"
+                Height="32"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Visibility="Collapsed"
+                Click="KeepOnTopButton_Click"/>
 
         <TextBlock x:Name="HeaderText"
                    Grid.Row="1"

@@ -97,12 +97,20 @@ namespace Fort.ind_UWP
         public const int UpdateCheckIntervalHours = 24;
 
         public const string SettingLabMultipleViews = "LabMultipleViews";
+        public const string SettingLabPinGames = "LabPinGames";
+        public const string SettingLabShareGames = "LabShareGames";
+
+        public const double KeepOnTopWindowWidth = 360;
+        public const double KeepOnTopWindowHeight = 480;
 
         public const string SettingProfileAutoRefresh = "ProfileAutoRefresh";
         public const string SettingProfileRefreshMinutes = "ProfileRefreshMinutes";
         public const int DefaultProfileRefreshMinutes = 5;
 
         public const string JumpArgumentPrefix = "jump:";
+
+        public const string GameTileArgumentPrefix = "game:";
+        public const string GameTileIdPrefix = "game.";
 
         public const string SettingJumpListRevision = "JumpListRevision";
 

@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Windows.UI.Xaml.Data"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     KeyboardAcceleratorPlacementMode="Hidden"
     Background="Transparent">
@@ -179,6 +180,9 @@
                               ItemClick="GamesList_ItemClick"
                               Padding="0,0,16,0"
                               ScrollViewer.IsVerticalScrollChainingEnabled="False">
+                        <i:Interaction.Behaviors>
+                            <local:GameContextMenuBehavior/>
+                        </i:Interaction.Behaviors>
                         <ListView.GroupStyle>
                             <GroupStyle HeaderTemplate="{StaticResource GameGroupHeaderTemplate}"
                                         HidesIfEmpty="True"/>

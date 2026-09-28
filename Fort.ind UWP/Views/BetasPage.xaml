@@ -8,6 +8,22 @@
     mc:Ignorable="d"
     Background="Transparent">
 
+    <Page.Resources>
+        <Style x:Key="LabCardStyle" TargetType="Grid">
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource CardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="20"/>
+        </Style>
+
+        <Style x:Key="LabIconPlateStyle" TargetType="Grid">
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
+        </Style>
+    </Page.Resources>
+
     <Grid x:Name="RootGrid">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowWidthStates">
@@ -41,19 +57,13 @@
                                TextWrapping="Wrap"
                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
 
-                    <Grid x:Name="MultipleViewsCard"
-                          Background="{ThemeResource CardBackgroundBrush}"
-                          BorderBrush="{ThemeResource CardBorderBrush}"
-                          BorderThickness="1"
-                          Padding="20">
+                    <Grid x:Name="MultipleViewsCard" Style="{StaticResource LabCardStyle}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Grid Width="36" Height="36"
-                              VerticalAlignment="Top"
-                              Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                        <Grid Style="{StaticResource LabIconPlateStyle}">
                             <FontIcon Glyph="&#xE8A7;" FontSize="16"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"
                                       AutomationProperties.AccessibilityView="Raw"/>
@@ -81,6 +91,58 @@
                                         Click="LabsRestartButton_Click"
                                         VerticalAlignment="Center"/>
                             </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="PinGamesCard" Style="{StaticResource LabCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Style="{StaticResource LabIconPlateStyle}">
+                            <FontIcon Glyph="&#xE718;" FontSize="16"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="4">
+                            <TextBlock x:Uid="PinGamesTitle"
+                                       Style="{StaticResource BaseTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                            <TextBlock x:Uid="PinGamesDescription"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ToggleSwitch x:Uid="PinGamesToggle" x:Name="PinGamesToggle"
+                                          Margin="0,4,0,0"
+                                          Toggled="PinGamesToggle_Toggled"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="ShareGamesCard" Style="{StaticResource LabCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Style="{StaticResource LabIconPlateStyle}">
+                            <FontIcon Glyph="&#xE72D;" FontSize="16"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="4">
+                            <TextBlock x:Uid="ShareGamesTitle"
+                                       Style="{StaticResource BaseTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                            <TextBlock x:Uid="ShareGamesDescription"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ToggleSwitch x:Uid="ShareGamesToggle" x:Name="ShareGamesToggle"
+                                          Margin="0,4,0,0"
+                                          Toggled="ShareGamesToggle_Toggled"/>
                         </StackPanel>
                     </Grid>
 

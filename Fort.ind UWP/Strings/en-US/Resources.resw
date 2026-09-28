@@ -1316,13 +1316,13 @@ Open your profile and try again.</value>
     <value>labs</value>
   </data>
   <data name="LabsIntro.Text" xml:space="preserve">
-    <value>experimental stuff that's still being worked on. it might be rough around the edges or change later, and turning something on or off takes effect after a restart</value>
+    <value>experimental stuff that's still being worked on. it might be rough around the edges or change later, and some of it only turns on or off after a restart</value>
   </data>
   <data name="MultipleViewsTitle.Text" xml:space="preserve">
     <value>Multiple windows</value>
   </data>
   <data name="MultipleViewsDescription.Text" xml:space="preserve">
-    <value>Open a page in a window of its own, next to the main one. Right-click it in the navigation pane (or select it and press Shift+F10) and choose Open in new window. Settings always stays in the main window.</value>
+    <value>Open a page in a window of its own, next to the main one. Right-click it in the navigation pane (or select it and press Shift+F10) and choose Open in new window. Settings always stays in the main window. Select Keep on top in a new window's title bar to keep it small and above your other windows.</value>
   </data>
   <data name="MultipleViewsToggle.OnContent" xml:space="preserve">
     <value>On</value>
@@ -1350,5 +1350,66 @@ Open your profile and try again.</value>
   </data>
   <data name="OpenInNewWindowMenuItem" xml:space="preserve">
     <value>Open in new window</value>
+  </data>
+  <data name="KeepOnTopEnter" xml:space="preserve">
+    <value>Keep on top</value>
+  </data>
+  <data name="KeepOnTopExit" xml:space="preserve">
+    <value>Back to full view</value>
+  </data>
+  <data name="KeepOnTopEnteredAnnouncement" xml:space="preserve">
+    <value>This window now stays on top of your other windows</value>
+    <comment>Screen reader announcement after the window switches to compact overlay.</comment>
+  </data>
+  <data name="KeepOnTopExitedAnnouncement" xml:space="preserve">
+    <value>This window no longer stays on top</value>
+    <comment>Screen reader announcement after the window leaves compact overlay.</comment>
+  </data>
+  <data name="PinGamesTitle.Text" xml:space="preserve">
+    <value>Pin games to Start</value>
+  </data>
+  <data name="PinGamesDescription.Text" xml:space="preserve">
+    <value>Give a game its own tile on Start and open it straight from there. Right-click a game on the Games page or in your favorites (or select it and press Shift+F10) and choose Pin to Start.</value>
+  </data>
+  <data name="PinGamesToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="PinGamesToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="PinGamesToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Pin games to Start</value>
+  </data>
+  <data name="ShareGamesTitle.Text" xml:space="preserve">
+    <value>Share games</value>
+  </data>
+  <data name="ShareGamesDescription.Text" xml:space="preserve">
+    <value>Send a link to a game with the Windows share window. Right-click a game on the Games page or in your favorites (or select it and press Shift+F10) and choose Share.</value>
+  </data>
+  <data name="ShareGamesToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="ShareGamesToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="ShareGamesToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Share games</value>
+  </data>
+  <data name="GamePinToStartMenuItem" xml:space="preserve">
+    <value>Pin to Start</value>
+  </data>
+  <data name="GameUnpinFromStartMenuItem" xml:space="preserve">
+    <value>Unpin from Start</value>
+  </data>
+  <data name="GameShareMenuItem" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="GamePinnedFormat" xml:space="preserve">
+    <value>Pinned {0} to Start</value>
+    <comment>Screen reader announcement. {0} is the game title.</comment>
+  </data>
+  <data name="GameUnpinnedFormat" xml:space="preserve">
+    <value>Unpinned {0} from Start</value>
+    <comment>Screen reader announcement. {0} is the game title.</comment>
   </data>
 </root>

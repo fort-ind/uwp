@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Windows.ApplicationModel.Core;
+using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.System;
 using Windows.UI.Core;
@@ -15,6 +16,9 @@ namespace Fort.ind_UWP
 {
     public sealed partial class SecondaryWindowPage : Page
     {
+        private const string KeepOnTopGlyph = "";
+        private const string BackToFullViewGlyph = "";
+
         private readonly AccessibilitySettings _accessibilitySettings = new AccessibilitySettings();
 
         private ViewLifetimeControl _view;
@@ -26,6 +30,8 @@ namespace Fort.ind_UWP
         private bool _handlersAttached = false;
 
         private bool _backButtonShown = false;
+
+        private bool _keepOnTopSupported = false;
 
         public SecondaryWindowPage()
         {
@@ -45,6 +51,7 @@ namespace Fort.ind_UWP
 
             ApplyAppearance();
             SetupTitleBar();
+            SetupKeepOnTop();
             AttachHandlers();
 
             ShowContent();
@@ -141,11 +148,100 @@ namespace Fort.ind_UWP
             {
                 AppTitleBar.Height = coreTitleBar.Height;
                 TitleBarBackButton.Height = coreTitleBar.Height;
+                KeepOnTopButton.Height = coreTitleBar.Height;
             }
 
             TitleBarLeftInset.Width = new GridLength(coreTitleBar.SystemOverlayLeftInset);
             TitleBarRightInset.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
             TitleBarBackButton.Margin = new Thickness(coreTitleBar.SystemOverlayLeftInset, 0, 0, 0);
+            KeepOnTopButton.Margin = new Thickness(0, 0, coreTitleBar.SystemOverlayRightInset, 0);
+        }
+
+        private void SetupKeepOnTop()
+        {
+            try
+            {
+                _keepOnTopSupported = ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay);
+                if (!_keepOnTopSupported) return;
+
+                TitleBarKeepOnTopSpace.Width = new GridLength(KeepOnTopButton.Width);
+                UpdateKeepOnTopButton();
+                UpdateKeepOnTopButtonVisibility();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: could not set up keep on top - {ex.Message}");
+            }
+        }
+
+        private static bool IsKeptOnTop()
+        {
+            return ApplicationView.GetForCurrentView().ViewMode == ApplicationViewMode.CompactOverlay;
+        }
+
+        private void UpdateKeepOnTopButton()
+        {
+            var onTop = IsKeptOnTop();
+            var label = LocalizedStrings.Get(onTop ? "KeepOnTopExit" : "KeepOnTopEnter");
+
+            KeepOnTopButton.Content = onTop ? BackToFullViewGlyph : KeepOnTopGlyph;
+            AutomationProperties.SetName(KeepOnTopButton, label);
+            ToolTipService.SetToolTip(KeepOnTopButton, label);
+        }
+
+        private void UpdateKeepOnTopButtonVisibility()
+        {
+            KeepOnTopButton.Visibility = _keepOnTopSupported ? AppTitleBar.Visibility : Visibility.Collapsed;
+        }
+
+        private async void KeepOnTopButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var view = ApplicationView.GetForCurrentView();
+                var enter = view.ViewMode != ApplicationViewMode.CompactOverlay;
+
+                bool changed;
+                if (enter)
+                {
+                    var preferences = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
+                    preferences.ViewSizePreference = ViewSizePreference.Custom;
+                    preferences.CustomSize = new Size(AppConstants.KeepOnTopWindowWidth, AppConstants.KeepOnTopWindowHeight);
+                    changed = await view.TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, preferences);
+                }
+                else
+                {
+                    changed = await view.TryEnterViewModeAsync(ApplicationViewMode.Default);
+                }
+
+                UpdateKeepOnTopButton();
+
+                if (changed)
+                {
+                    AutomationHelper.AnnounceStatus(KeepOnTopButton,
+                                                    LocalizedStrings.Get(enter ? "KeepOnTopEnteredAnnouncement" : "KeepOnTopExitedAnnouncement"),
+                                                    "KeepOnTop");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: switching keep on top failed - {ex.Message}");
+            }
+        }
+
+        private void OnWindowSizeChanged(object sender, WindowSizeChangedEventArgs e)
+        {
+            try
+            {
+                if (_keepOnTopSupported)
+                {
+                    UpdateKeepOnTopButton();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: Failed to follow a window size change - {ex.Message}");
+            }
         }
 
         private void UpdateTitleBarColors()
@@ -171,6 +267,7 @@ namespace Fort.ind_UWP
 
                 SystemNavigationManager.GetForCurrentView().BackRequested += OnSystemBackRequested;
                 Window.Current.CoreWindow.PointerPressed += OnCoreWindowPointerPressed;
+                Window.Current.SizeChanged += OnWindowSizeChanged;
 
                 _displayInformation = DisplayInformation.GetForCurrentView();
                 _displayInformation.DpiChanged += OnDpiChanged;
@@ -198,6 +295,7 @@ namespace Fort.ind_UWP
 
                 SystemNavigationManager.GetForCurrentView().BackRequested -= OnSystemBackRequested;
                 Window.Current.CoreWindow.PointerPressed -= OnCoreWindowPointerPressed;
+                Window.Current.SizeChanged -= OnWindowSizeChanged;
 
                 if (_displayInformation != null)
                 {
@@ -254,6 +352,7 @@ namespace Fort.ind_UWP
             {
                 AppTitleBar.Visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
                 UpdateBackButtonVisibility();
+                UpdateKeepOnTopButtonVisibility();
             }
             catch (Exception ex)
             {

@@ -46,18 +46,24 @@ namespace Fort.ind_UWP
                 {
                     var isFirstNavigation = rootFrame.Content == null;
 
-                    var jumpNavTag = JumpListService.ResolveNavTag(e.Arguments);
+                    var launchNavTag = JumpListService.ResolveNavTag(e.Arguments);
+
+                    var pinnedGameUrl = GameTileService.ResolveGameUrl(e.Arguments);
+                    if (pinnedGameUrl != null)
+                    {
+                        launchNavTag = AppConstants.NavigationGames;
+                    }
 
                     if (isFirstNavigation)
                     {
-                        rootFrame.Navigate(typeof(MainPage), jumpNavTag);
+                        rootFrame.Navigate(typeof(MainPage), launchNavTag);
                     }
-                    else if (jumpNavTag != null)
+                    else if (launchNavTag != null)
                     {
                         var mainPage = rootFrame.Content as MainPage;
                         if (mainPage != null)
                         {
-                            mainPage.NavigateToTag(jumpNavTag);
+                            mainPage.NavigateToTag(launchNavTag);
                         }
                     }
 
@@ -67,6 +73,12 @@ namespace Fort.ind_UWP
                     {
                         var ignored = rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                                                     RestoreSessionInBackground);
+                    }
+
+                    if (pinnedGameUrl != null)
+                    {
+                        var ignoredLaunch = rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
+                                                                          () => LaunchPinnedGame(pinnedGameUrl));
                     }
                 }
             }
@@ -127,6 +139,18 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"App: background session restore failed - {ex.Message}");
+            }
+        }
+
+        private static async void LaunchPinnedGame(string url)
+        {
+            try
+            {
+                await GameTileService.LaunchPinnedGameAsync(url);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: could not launch the pinned game - {ex.Message}");
             }
         }
 
