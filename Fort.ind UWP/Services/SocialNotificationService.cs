@@ -381,8 +381,7 @@ namespace Fort.ind_UWP
 
                 ApplyUnreadCount(count.Value);
 
-                var watermark = ReadWatermark();
-                if (!watermark.HasValue)
+                if (!ReadWatermark().HasValue)
                 {
                     await EstablishBaselineAsync(token, cancellationToken);
                     return;
@@ -396,9 +395,7 @@ namespace Fort.ind_UWP
                 ObservePermission(unread.Status);
                 if (unread.Status != SocialApiStatus.Ok) return;
 
-                var fresh = unread.Value.Where(n => n.CreatedAt > watermark.Value)
-                                        .OrderBy(n => n.CreatedAt)
-                                        .ToList();
+                var fresh = UnclaimedForToast(unread.Value);
                 if (fresh.Count == 0) return;
 
                 if (fresh.Count <= AppConstants.SocialToastIndividualLimit)
@@ -411,7 +408,7 @@ namespace Fort.ind_UWP
                         }
                     }
                 }
-                else if (TryClaimForToast(fresh[fresh.Count - 1]))
+                else if (ClaimForToast(fresh) > 0)
                 {
                     ShowSummaryToast(fresh.Count);
                 }
@@ -504,6 +501,7 @@ namespace Fort.ind_UWP
             {
                 s_countDebounce.Cancel();
                 ApplicationData.Current.LocalSettings.Values.Remove(AppConstants.SettingSocialToastedThrough);
+                ApplicationData.Current.LocalSettings.Values.Remove(AppConstants.SettingSocialToastedIds);
             }
 
             LiveTileService.ClearBadge();
@@ -512,14 +510,105 @@ namespace Fort.ind_UWP
 
         private static bool TryClaimForToast(SocialNotification notification)
         {
+            return ClaimForToast(new[] { notification }) > 0;
+        }
+
+        private static int ClaimForToast(IReadOnlyList<SocialNotification> notifications)
+        {
             lock (s_lock)
             {
-                var watermark = ReadWatermark();
-                if (watermark.HasValue && notification.CreatedAt <= watermark.Value) return false;
+                var floor = ReadWatermark();
+                var toasted = ReadToasted();
 
-                WriteWatermark(notification.CreatedAt);
-                return true;
+                var claimed = notifications.Where(n => IsUnclaimed(n, floor, toasted)).ToList();
+                if (claimed.Count == 0) return 0;
+
+                foreach (var notification in claimed)
+                {
+                    toasted[ToastKeyFor(notification)] = notification.CreatedAt.UtcTicks;
+                }
+
+                var newFloor = floor ?? claimed.Min(n => n.CreatedAt);
+                while (toasted.Count > AppConstants.SocialToastedIdLimit)
+                {
+                    var oldest = toasted.OrderBy(entry => entry.Value).First();
+                    toasted.Remove(oldest.Key);
+
+                    var oldestAt = new DateTimeOffset(oldest.Value, TimeSpan.Zero);
+                    if (oldestAt > newFloor) newFloor = oldestAt;
+                }
+
+                if (newFloor != floor)
+                {
+                    WriteWatermark(newFloor);
+                }
+                WriteToasted(toasted);
+
+                return claimed.Count;
             }
+        }
+
+        private static List<SocialNotification> UnclaimedForToast(IEnumerable<SocialNotification> notifications)
+        {
+            lock (s_lock)
+            {
+                var floor = ReadWatermark();
+                var toasted = ReadToasted();
+
+                return notifications.Where(n => IsUnclaimed(n, floor, toasted))
+                                    .OrderBy(n => n.CreatedAt)
+                                    .ToList();
+            }
+        }
+
+        private static bool IsUnclaimed(SocialNotification notification, DateTimeOffset? floor, Dictionary<string, long> toasted)
+        {
+            if (floor.HasValue && notification.CreatedAt <= floor.Value) return false;
+
+            return !toasted.ContainsKey(ToastKeyFor(notification));
+        }
+
+        private static string ToastKeyFor(SocialNotification notification)
+        {
+            return notification.Id.Length > MaximumToastTagLength
+                   ? notification.Id.Substring(0, MaximumToastTagLength)
+                   : notification.Id;
+        }
+
+        private static Dictionary<string, long> ReadToasted()
+        {
+            var toasted = new Dictionary<string, long>(StringComparer.Ordinal);
+            try
+            {
+                var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialToastedIds] as ApplicationDataCompositeValue;
+                if (stored == null) return toasted;
+
+                foreach (var entry in stored)
+                {
+                    var ticks = Convert.ToInt64(entry.Value, CultureInfo.InvariantCulture);
+                    if (ticks >= 0 && ticks <= DateTimeOffset.MaxValue.UtcTicks)
+                    {
+                        toasted[entry.Key] = ticks;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialNotificationService: could not read the toasted notifications - {ex.Message}");
+            }
+
+            return toasted;
+        }
+
+        private static void WriteToasted(Dictionary<string, long> toasted)
+        {
+            var stored = new ApplicationDataCompositeValue();
+            foreach (var entry in toasted)
+            {
+                stored[entry.Key] = entry.Value;
+            }
+
+            ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialToastedIds] = stored;
         }
 
         private static DateTimeOffset? ReadWatermark()
@@ -562,14 +651,12 @@ namespace Fort.ind_UWP
             LiveTileService.ShowGroupedToast(new GroupedToast
             {
                 Title = item.Title,
-                Body = item.Body,
+                Body = item.IsDirect ? LocalizedStrings.Get("SocialToastDirectNoteBody") : item.Body,
                 Attribution = LocalizedStrings.Get("SocialToastAttribution"),
                 AppLogo = logo,
                 Timestamp = notification.CreatedAt,
                 Group = AppConstants.SocialToastGroup,
-                Tag = notification.Id.Length > MaximumToastTagLength
-                      ? notification.Id.Substring(0, MaximumToastTagLength)
-                      : notification.Id,
+                Tag = ToastKeyFor(notification),
                 ArgumentKey = AppConstants.ToastArgumentOpen,
                 ArgumentValue = AppConstants.ToastOpenNotifications
             });

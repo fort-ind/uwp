@@ -1581,6 +1581,10 @@ Open your profile and try again.</value>
     <value>You have {0} new notifications</value>
     <comment>{0} is a number, always 5 or more.</comment>
   </data>
+  <data name="SocialToastDirectNoteBody" xml:space="preserve">
+    <value>Direct note — open to read it</value>
+    <comment>Shown in a Windows notification in place of the text of a direct (private) note, because notifications can appear on the lock screen.</comment>
+  </data>
   <data name="SocialNotificationsTitle.Text" xml:space="preserve">
     <value>fort.social notifications</value>
   </data>

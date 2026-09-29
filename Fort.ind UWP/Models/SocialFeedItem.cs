@@ -40,6 +40,8 @@ namespace Fort.ind_UWP
 
         public string Body { get; private set; }
 
+        public bool IsDirect { get; private set; }
+
         public string TimeText { get; private set; }
 
         public string ActorName { get; private set; }
@@ -133,6 +135,7 @@ namespace Fort.ind_UWP
                 Glyph = GlyphFor(notification.Type),
                 Title = TitleFor(notification, actor),
                 Body = BodyFor(notification),
+                IsDirect = notification.Type != "app" && IsDirectNote(notification.Note),
                 TimeText = FormatTime(notification.CreatedAt),
                 ActorName = actor,
                 AvatarUri = user == null ? null : WebLauncher.TryCreateFetchUri(user.AvatarUrl),
@@ -156,6 +159,7 @@ namespace Fort.ind_UWP
                 Glyph = "",
                 Title = actor,
                 Body = Excerpt(note),
+                IsDirect = IsDirectNote(note),
                 TimeText = FormatTime(note.CreatedAt),
                 ActorName = actor,
                 AvatarUri = user == null ? null : WebLauncher.TryCreateFetchUri(user.AvatarUrl),
@@ -283,6 +287,13 @@ namespace Fort.ind_UWP
             }
 
             return "";
+        }
+
+        private static bool IsDirectNote(SocialNote note)
+        {
+            if (note == null) return false;
+
+            return note.IsDirect || (note.Renote != null && note.Renote.IsDirect);
         }
 
         private static string ReactionText(string reaction)

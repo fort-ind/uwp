@@ -101,6 +101,8 @@ namespace Fort.ind_UWP
         public const string SettingLabSocialNotifications = "LabSocialNotifications";
 
         public const string SettingSocialToastedThrough = "SocialNotificationsToastedThrough";
+        public const string SettingSocialToastedIds = "SocialNotificationsToastedIds";
+        public const int SocialToastedIdLimit = 32;
         public const string SettingBackgroundAccessVersion = "BackgroundAccessAppVersion";
         public const string SocialCheckTaskName = "SocialNotificationsCheck";
         public const uint SocialCheckIntervalMinutes = 15;

@@ -46,6 +46,8 @@ namespace Fort.ind_UWP
 
     public sealed class SocialNote
     {
+        private const string DirectVisibility = "specified";
+
         private SocialNote()
         {
         }
@@ -57,6 +59,13 @@ namespace Fort.ind_UWP
         public string Text { get; private set; }
 
         public string ContentWarning { get; private set; }
+
+        public string Visibility { get; private set; }
+
+        public bool IsDirect
+        {
+            get { return string.Equals(Visibility, DirectVisibility, StringComparison.Ordinal); }
+        }
 
         public SocialUser User { get; private set; }
 
@@ -80,6 +89,7 @@ namespace Fort.ind_UWP
                 CreatedAt = SocialJson.Date(obj, "createdAt"),
                 Text = SocialJson.String(obj, "text"),
                 ContentWarning = SocialJson.String(obj, "cw"),
+                Visibility = SocialJson.String(obj, "visibility"),
                 User = SocialUser.FromJson(SocialJson.Object(obj, "user")),
                 Renote = readRenote ? FromJson(SocialJson.Object(obj, "renote"), false) : null
             };
