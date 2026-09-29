@@ -133,7 +133,7 @@
     <value>oh dear..</value>
   </data>
   <data name="StartupErrorDialogBody" xml:space="preserve">
-    <value>fort.uwp failed to start this could be for a number of reasons sometimes just restarting the app can fix most issues</value>
+    <value>fort.uwp failed to start. this could be for a number of reasons sometimes just restarting the app can fix most issues</value>
   </data>
   <data name="NavigationErrorDialogTitle" xml:space="preserve">
     <value>Navigation Error</value>
@@ -1319,7 +1319,7 @@ Open your profile and try again.</value>
     <value>Multiple windows</value>
   </data>
   <data name="MultipleViewsDescription.Text" xml:space="preserve">
-    <value>Open a page in a window of its own, next to the main one. Right-click it in the navigation pane (or select it and press Shift+F10) and choose Open in new window. Settings always stays in the main window. Select Keep on top in a new window's title bar to keep it small and above your other windows.</value>
+    <value>Open a page in a window of its own, next to the main one. to use this feature right click a nav item and open it in a new window!</value>
   </data>
   <data name="MultipleViewsToggle.OnContent" xml:space="preserve">
     <value>On</value>
@@ -1366,7 +1366,7 @@ Open your profile and try again.</value>
     <value>Pin games to Start</value>
   </data>
   <data name="PinGamesDescription.Text" xml:space="preserve">
-    <value>Pin a game to Start and open it straight from there. Right-click a game on the Games page or in your favorites (or select it and press Shift+F10) and choose Pin to Start.</value>
+    <value>easily find your games, right at the start menu! this experiment allows you to pin your fav games to start</value>
   </data>
   <data name="PinGamesToggle.OnContent" xml:space="preserve">
     <value>On</value>
@@ -1438,7 +1438,7 @@ Open your profile and try again.</value>
     <value>Refresh (F5)</value>
   </data>
   <data name="SocialGateLabOff" xml:space="preserve">
-    <value>Social features are coming soon. You can already try fort.social notifications: turn them on in Labs &amp; betas.</value>
+    <value>Social features are coming soon. however.. if you want to try the first beta feature for fort.social on desktop go to labs+betas</value>
   </data>
   <data name="SocialGateLabOffButton" xml:space="preserve">
     <value>Open Labs &amp; betas</value>
@@ -1450,7 +1450,7 @@ Open your profile and try again.</value>
     <value>Sign in</value>
   </data>
   <data name="SocialNotificationsEmpty" xml:space="preserve">
-    <value>No notifications yet</value>
+    <value>No notifications yet..</value>
   </data>
   <data name="SocialMentionsEmpty" xml:space="preserve">
     <value>Nobody has mentioned you yet</value>
@@ -1465,7 +1465,7 @@ Open your profile and try again.</value>
     <value>Try again</value>
   </data>
   <data name="SocialNeedsPermission" xml:space="preserve">
-    <value>fort.desktop needs your permission to read notifications. Sign in again and approve it on fort.social.</value>
+    <value>fort.desktop needs your permission to read notifications. please log back in so we can get you up and running</value>
   </data>
   <data name="SocialSignInAgainButton" xml:space="preserve">
     <value>Sign in again</value>
@@ -1534,7 +1534,7 @@ Open your profile and try again.</value>
     <value>A poll has ended</value>
   </data>
   <data name="SocialNotificationAchievement" xml:space="preserve">
-    <value>You earned an achievement</value>
+    <value>You earned an achievement!</value>
   </data>
   <data name="SocialNotificationRoleAssigned" xml:space="preserve">
     <value>You were given a new role</value>
@@ -1547,7 +1547,7 @@ Open your profile and try again.</value>
     <value>There was a new sign-in to your account</value>
   </data>
   <data name="SocialNotificationCreateToken" xml:space="preserve">
-    <value>A new access token was created for your account</value>
+    <value>A new access token was created for your account, if this was not you change your password</value>
   </data>
   <data name="SocialNotificationExportCompleted" xml:space="preserve">
     <value>Your export is ready</value>
@@ -1585,7 +1585,7 @@ Open your profile and try again.</value>
     <value>fort.social notifications</value>
   </data>
   <data name="SocialNotificationsDescription.Text" xml:space="preserve">
-    <value>Get your fort.social notifications as Windows notifications, and see them with your mentions on the Social page. Your unread count shows on the app's tile and taskbar button. While fort.desktop is open they arrive right away; when it's closed it checks about every 15 minutes.</value>
+    <value>Get your fort.social notifications as Windows notifications, and see them with your mentions on the Social page. you can also see how many notifs you have directly from the lockscreen too :) (only on windows 10) </value>
   </data>
   <data name="SocialNotificationsToggle.OnContent" xml:space="preserve">
     <value>On</value>
