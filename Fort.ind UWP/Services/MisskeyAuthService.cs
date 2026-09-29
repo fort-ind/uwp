@@ -12,7 +12,7 @@ namespace Fort.ind_UWP
     {
         public const string InstanceHost = "social.fort1nd.com";
         private const string AppName = "Fort.ind";
-        private const string RequestedPermissions = "read:account";
+        private const string RequestedPermissions = "read:account,read:notifications";
 
         private const string VaultResource = "Fort.ind.Misskey";
         private const string VaultUsernameKey = "token";

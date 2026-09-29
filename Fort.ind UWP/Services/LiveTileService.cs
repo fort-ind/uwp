@@ -267,7 +267,7 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                var clampedCount = Math.Min(count, 99);
+                var clampedCount = Math.Min(count, 100);
                 var badgeXml = $"<badge value=\"{clampedCount}\"/>";
                 XmlDocument badgeDoc = new XmlDocument();
                 badgeDoc.LoadXml(badgeXml);
@@ -337,6 +337,70 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static bool ShowGroupedToast(GroupedToast toast)
+        {
+            if (toast == null) return false;
+
+            try
+            {
+                var notifier = ToastNotificationManager.CreateToastNotifier();
+                if (notifier.Setting != NotificationSetting.Enabled)
+                {
+                    Debug.WriteLine($"LiveTileService: Grouped toast suppressed – NotificationSetting is {notifier.Setting}.");
+                    return false;
+                }
+
+                var builder = new ToastContentBuilder()
+                    .AddArgument(toast.ArgumentKey, toast.ArgumentValue)
+                    .AddText(SanitizeText(toast.Title));
+
+                if (!string.IsNullOrWhiteSpace(toast.Body))
+                {
+                    builder.AddText(SanitizeText(toast.Body));
+                }
+
+                if (!string.IsNullOrWhiteSpace(toast.Attribution))
+                {
+                    builder.AddAttributionText(SanitizeText(toast.Attribution));
+                }
+
+                if (toast.AppLogo != null)
+                {
+                    builder.AddAppLogoOverride(toast.AppLogo, ToastGenericAppLogoCrop.Circle);
+                }
+
+                if (toast.Timestamp != DateTimeOffset.MinValue)
+                {
+                    builder.AddCustomTimeStamp(toast.Timestamp.UtcDateTime);
+                }
+
+                ToastNotification notification = new ToastNotification(builder.GetToastContent().GetXml());
+                notification.Group = toast.Group;
+                notification.Tag = toast.Tag;
+                notifier.Show(notification);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"LiveTileService: ShowGroupedToast failed – {ex.GetType().Name}: {ex.Message}");
+                return false;
+            }
+        }
+
+        public static void RemoveToastGroup(string group)
+        {
+            if (string.IsNullOrEmpty(group)) return;
+
+            try
+            {
+                ToastNotificationManager.History.RemoveGroup(group);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"LiveTileService: RemoveToastGroup failed – {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
         public static void ClearTile()
         {
             try
@@ -393,6 +457,19 @@ namespace Fort.ind_UWP
                     return false;
             }
         }
+    }
+
+    public sealed class GroupedToast
+    {
+        public string Title { get; set; }
+        public string Body { get; set; }
+        public string Attribution { get; set; }
+        public Uri AppLogo { get; set; }
+        public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.MinValue;
+        public string Group { get; set; }
+        public string Tag { get; set; }
+        public string ArgumentKey { get; set; }
+        public string ArgumentValue { get; set; }
     }
 
     public class NewsItem

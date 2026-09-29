@@ -57,6 +57,14 @@ namespace Fort.ind_UWP
 
         private static readonly SemaphoreSlim s_gate = new SemaphoreSlim(1, 1);
 
+        private const int ToastIconPixelSize = 96;
+
+        private const string ToastFolderName = "toast-avatars";
+
+        private static readonly TimeSpan ToastAvatarLifetime = TimeSpan.FromDays(3);
+
+        private static readonly SemaphoreSlim s_toastGate = new SemaphoreSlim(1, 1);
+
         private static string s_cachedUrl;
         private static Uri s_cachedUri;
 
@@ -89,11 +97,11 @@ namespace Fort.ind_UWP
                 var existing = await folder.TryGetItemAsync(fileName);
                 if (existing == null)
                 {
-                    var pixels = await TryRenderCircularIconAsync(sourceUri);
+                    var pixels = await TryRenderCircularIconAsync(sourceUri, IconPixelSize, CancellationToken.None);
                     if (pixels == null)
                     {
                         await Task.Delay(TransientRetryDelay);
-                        pixels = await TryRenderCircularIconAsync(sourceUri);
+                        pixels = await TryRenderCircularIconAsync(sourceUri, IconPixelSize, CancellationToken.None);
                     }
 
                     if (pixels == null)
@@ -101,7 +109,7 @@ namespace Fort.ind_UWP
                         return null;
                     }
 
-                    if (!await WritePngAsync(folder, fileName, pixels))
+                    if (!await WritePngAsync(folder, fileName, pixels, IconPixelSize))
                     {
                         return null;
                     }
@@ -128,11 +136,78 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<byte[]> TryRenderCircularIconAsync(Uri sourceUri)
+        public static async Task<Uri> GetToastAvatarUriAsync(string avatarUrl, CancellationToken cancellationToken)
+        {
+            var sourceUri = WebLauncher.TryCreateFetchUri(avatarUrl);
+            if (sourceUri == null)
+            {
+                return null;
+            }
+
+            await s_toastGate.WaitAsync(cancellationToken);
+            try
+            {
+                var folder = await ApplicationData.Current.LocalFolder
+                    .CreateFolderAsync(ToastFolderName, CreationCollisionOption.OpenIfExists);
+                var fileName = StableHash(avatarUrl) + "-" + ToastIconPixelSize + FileExtension;
+
+                var existing = await folder.TryGetItemAsync(fileName);
+                if (existing == null)
+                {
+                    var pixels = await TryRenderCircularIconAsync(sourceUri, ToastIconPixelSize, cancellationToken);
+                    if (pixels == null || !await WritePngAsync(folder, fileName, pixels, ToastIconPixelSize))
+                    {
+                        return null;
+                    }
+
+                    await PruneExpiredToastAvatarsAsync(folder, fileName);
+                }
+
+                return new Uri("ms-appdata:///local/" + ToastFolderName + "/" + fileName);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AvatarIconService: could not build toast avatar - {ex.Message}");
+                return null;
+            }
+            finally
+            {
+                s_toastGate.Release();
+            }
+        }
+
+        private static async Task PruneExpiredToastAvatarsAsync(StorageFolder folder, string keepFileName)
         {
             try
             {
-                return await RenderCircularIconAsync(sourceUri);
+                var cutoff = DateTimeOffset.Now - ToastAvatarLifetime;
+                var files = await folder.GetFilesAsync();
+                foreach (var file in files)
+                {
+                    if (string.Equals(file.Name, keepFileName, StringComparison.OrdinalIgnoreCase)) continue;
+                    if (file.DateCreated > cutoff && !file.Name.EndsWith(".tmp", StringComparison.OrdinalIgnoreCase)) continue;
+
+                    try
+                    {
+                        await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"AvatarIconService: could not delete toast avatar {file.Name} - {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AvatarIconService: toast avatar prune failed - {ex.Message}");
+            }
+        }
+
+        private static async Task<byte[]> TryRenderCircularIconAsync(Uri sourceUri, int size, CancellationToken cancellationToken)
+        {
+            try
+            {
+                return await RenderCircularIconAsync(sourceUri, size, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -141,12 +216,20 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<InMemoryRandomAccessStream> DownloadCappedAsync(Uri sourceUri)
+        private static async Task<InMemoryRandomAccessStream> DownloadCappedAsync(Uri sourceUri, CancellationToken cancellationToken)
         {
-            using (var cts = new CancellationTokenSource(DownloadTimeout))
+            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            {
+                cts.CancelAfter(DownloadTimeout);
+                return await DownloadCappedCoreAsync(sourceUri, cts.Token);
+            }
+        }
+
+        private static async Task<InMemoryRandomAccessStream> DownloadCappedCoreAsync(Uri sourceUri, CancellationToken cancellationToken)
+        {
             using (var response = await s_client.Value
                 .GetAsync(sourceUri, HttpCompletionOption.ResponseHeadersRead)
-                .AsTask(cts.Token))
+                .AsTask(cancellationToken))
             {
                 response.EnsureSuccessStatusCode();
 
@@ -160,7 +243,7 @@ namespace Fort.ind_UWP
                 var memory = new InMemoryRandomAccessStream();
                 try
                 {
-                    using (var input = await response.Content.ReadAsInputStreamAsync().AsTask(cts.Token))
+                    using (var input = await response.Content.ReadAsInputStreamAsync().AsTask(cancellationToken))
                     {
                         var chunk = new Windows.Storage.Streams.Buffer(64 * 1024);
                         ulong total = 0;
@@ -168,7 +251,7 @@ namespace Fort.ind_UWP
                         while (true)
                         {
                             var read = await input.ReadAsync(chunk, chunk.Capacity, InputStreamOptions.Partial)
-                                                  .AsTask(cts.Token);
+                                                  .AsTask(cancellationToken);
                             if (read.Length == 0) break;
 
                             total += read.Length;
@@ -179,7 +262,7 @@ namespace Fort.ind_UWP
                                 return null;
                             }
 
-                            await memory.WriteAsync(read).AsTask(cts.Token);
+                            await memory.WriteAsync(read).AsTask(cancellationToken);
                         }
 
                         if (total == 0)
@@ -202,9 +285,9 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<byte[]> RenderCircularIconAsync(Uri sourceUri)
+        private static async Task<byte[]> RenderCircularIconAsync(Uri sourceUri, int size, CancellationToken cancellationToken)
         {
-            var downloaded = await DownloadCappedAsync(sourceUri);
+            var downloaded = await DownloadCappedAsync(sourceUri, cancellationToken);
             if (downloaded == null)
             {
                 return null;
@@ -224,9 +307,9 @@ namespace Fort.ind_UWP
                     return null;
                 }
 
-                double scale = (double)IconPixelSize / Math.Min(decoder.PixelWidth, decoder.PixelHeight);
-                uint scaledWidth = (uint)Math.Max(IconPixelSize, Math.Round(decoder.PixelWidth * scale));
-                uint scaledHeight = (uint)Math.Max(IconPixelSize, Math.Round(decoder.PixelHeight * scale));
+                double scale = (double)size / Math.Min(decoder.PixelWidth, decoder.PixelHeight);
+                uint scaledWidth = (uint)Math.Max(size, Math.Round(decoder.PixelWidth * scale));
+                uint scaledHeight = (uint)Math.Max(size, Math.Round(decoder.PixelHeight * scale));
 
                 if ((ulong)scaledWidth * scaledHeight > MaxScaledPixels)
                 {
@@ -240,10 +323,10 @@ namespace Fort.ind_UWP
                 transform.ScaledHeight = scaledHeight;
                 transform.Bounds = new BitmapBounds
                 {
-                    X = (scaledWidth - IconPixelSize) / 2,
-                    Y = (scaledHeight - IconPixelSize) / 2,
-                    Width = IconPixelSize,
-                    Height = IconPixelSize
+                    X = (scaledWidth - (uint)size) / 2,
+                    Y = (scaledHeight - (uint)size) / 2,
+                    Width = (uint)size,
+                    Height = (uint)size
                 };
 
                 var pixelData = await decoder.GetPixelDataAsync(
@@ -254,13 +337,13 @@ namespace Fort.ind_UWP
                     ColorManagementMode.DoNotColorManage);
 
                 var pixels = pixelData.DetachPixelData();
-                if (pixels == null || pixels.Length != IconPixelSize * IconPixelSize * 4)
+                if (pixels == null || pixels.Length != size * size * 4)
                 {
                     Debug.WriteLine($"AvatarIconService: unexpected decode size {pixels?.Length ?? 0} bytes");
                     return null;
                 }
 
-                ApplyCircleMask(pixels, IconPixelSize);
+                ApplyCircleMask(pixels, size);
                 return pixels;
             }
         }
@@ -286,7 +369,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<bool> WritePngAsync(StorageFolder folder, string fileName, byte[] pixels)
+        private static async Task<bool> WritePngAsync(StorageFolder folder, string fileName, byte[] pixels, int size)
         {
             var tempFile = await folder.CreateFileAsync(fileName + ".tmp", CreationCollisionOption.ReplaceExisting);
 
@@ -296,7 +379,7 @@ namespace Fort.ind_UWP
                 {
                     var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, fileStream);
                     encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Straight,
-                                         (uint)IconPixelSize, (uint)IconPixelSize, 96, 96, pixels);
+                                         (uint)size, (uint)size, 96, 96, pixels);
                     await encoder.FlushAsync();
                 }
 

@@ -110,6 +110,8 @@ namespace Fort.ind_UWP
                 _mouseBackHandlerAttached = true;
             }
 
+            AttachSignInAgainHandler();
+
             UpdateProfileNavItem();
         }
 
@@ -209,6 +211,8 @@ namespace Fort.ind_UWP
                 }
                 _mouseBackHandlerAttached = false;
             }
+
+            DetachSignInAgainHandler();
 
             _searchDebounce.Cancel();
         }

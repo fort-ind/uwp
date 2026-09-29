@@ -51,6 +51,16 @@ namespace Fort.ind_UWP
             ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLabPinGames] = enabled;
         }
 
+        public static bool SocialNotificationsEnabled
+        {
+            get { return ReadFlag(AppConstants.SettingLabSocialNotifications); }
+        }
+
+        public static void SaveSocialNotifications(bool enabled)
+        {
+            ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLabSocialNotifications] = enabled;
+        }
+
         private static bool ReadFlag(string key)
         {
             try

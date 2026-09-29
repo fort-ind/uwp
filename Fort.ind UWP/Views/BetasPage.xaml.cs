@@ -29,7 +29,9 @@ namespace Fort.ind_UWP
             {
                 MultipleViewsToggle.IsOn = LabsService.MultipleViewsSaved;
                 PinGamesToggle.IsOn = LabsService.PinGamesEnabled;
+                SocialNotificationsToggle.IsOn = LabsService.SocialNotificationsEnabled;
                 UpdateRestartNotice(false);
+                UpdateBackgroundDeniedNotice(false);
             }
             catch (Exception ex)
             {
@@ -67,6 +69,47 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"BetasPage: could not save the pin games lab - {ex.Message}");
+            }
+        }
+
+        private async void SocialNotificationsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loadingLabs) return;
+
+            try
+            {
+                LabsService.SaveSocialNotifications(SocialNotificationsToggle.IsOn);
+                await SocialNotificationService.ReconcileAsync();
+                UpdateBackgroundDeniedNotice(true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BetasPage: could not apply the fort.social notifications lab - {ex.Message}");
+            }
+        }
+
+        private void UpdateBackgroundDeniedNotice(bool announce)
+        {
+            var denied = SocialNotificationsToggle.IsOn && SocialNotificationService.BackgroundAccessDenied;
+            var wasVisible = SocialNotificationsBackgroundDenied.Visibility == Visibility.Visible;
+
+            SocialNotificationsBackgroundDenied.Visibility = denied ? Visibility.Visible : Visibility.Collapsed;
+
+            if (announce && denied && !wasVisible)
+            {
+                AutomationHelper.AnnounceLiveRegion(SocialNotificationsBackgroundDenied);
+            }
+        }
+
+        private async void SocialNotificationsLockScreenLink_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:lockscreen"));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BetasPage: could not open lock screen settings - {ex.Message}");
             }
         }
 

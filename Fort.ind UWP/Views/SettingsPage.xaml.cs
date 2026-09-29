@@ -349,6 +349,11 @@ namespace Fort.ind_UWP
         {
             if (_loadingSettings) return;
             LiveTileService.BadgeEnabled = TileBadgeToggle.IsOn;
+
+            if (TileBadgeToggle.IsOn)
+            {
+                SocialNotificationService.ReapplyBadge();
+            }
         }
 
         private void LoadProfileRefreshControls()

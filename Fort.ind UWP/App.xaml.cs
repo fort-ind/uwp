@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -134,6 +135,7 @@ namespace Fort.ind_UWP
             {
                 await LocalStorageService.InitializeAsync();
                 await ProfileService.TryRestoreSessionAsync();
+                StartSocialNotifications();
 
                 await JumpListService.EnsureTasksAsync();
                 await GameTileService.RefreshPinnedTilesAsync();
@@ -141,6 +143,47 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"App: background session restore failed - {ex.Message}");
+            }
+        }
+
+        private static void StartSocialNotifications()
+        {
+            SocialNotificationService.Initialize();
+            SocialNotificationService.ReconcileInBackground();
+        }
+
+        protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+
+            try
+            {
+                if (SocialNotificationService.IsBackgroundCheck(args.TaskInstance))
+                {
+                    await SocialNotificationService.RunBackgroundCheckAsync(args.TaskInstance);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: background activation failed - {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        private static bool OpensSocialNotifications(IActivatedEventArgs args)
+        {
+            var toastArgs = args as ToastNotificationActivatedEventArgs;
+            if (toastArgs == null || string.IsNullOrEmpty(toastArgs.Argument)) return false;
+
+            try
+            {
+                string target;
+                return ToastArguments.Parse(toastArgs.Argument).TryGetValue(AppConstants.ToastArgumentOpen, out target)
+                       && string.Equals(target, AppConstants.ToastOpenNotifications, StringComparison.Ordinal);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: could not read the toast arguments - {ex.Message}");
+                return false;
             }
         }
 
@@ -193,6 +236,7 @@ namespace Fort.ind_UWP
 
                 Frame rootFrame = Window.Current.Content as Frame;
                 var isColdStart = rootFrame == null;
+                var openNotifications = OpensSocialNotifications(args);
 
                 if (isColdStart)
                 {
@@ -205,7 +249,15 @@ namespace Fort.ind_UWP
 
                     ApplySavedTheme(rootFrame);
                     Window.Current.Content = rootFrame;
-                    rootFrame.Navigate(typeof(MainPage));
+                    rootFrame.Navigate(typeof(MainPage), openNotifications ? AppConstants.NavigationSocial : null);
+                }
+                else if (openNotifications)
+                {
+                    var mainPage = rootFrame.Content as MainPage;
+                    if (mainPage != null)
+                    {
+                        mainPage.ShowSocialNotifications();
+                    }
                 }
 
                 Window.Current.Activate();
@@ -216,6 +268,7 @@ namespace Fort.ind_UWP
 
                     await LocalStorageService.InitializeAsync();
                     await ProfileService.TryRestoreSessionAsync();
+                    StartSocialNotifications();
                 }
 
                 MisskeyAuthResult signInResult = null;
@@ -291,7 +344,9 @@ namespace Fort.ind_UWP
 
             try
             {
-                if (!LiveTileService.TileCleared)
+                SocialNotificationService.OnSuspending();
+
+                if (!SocialNotificationService.OwnsBadge && !LiveTileService.TileCleared)
                 {
                     LiveTileService.UpdateBadgeGlyph(LiveTileService.NewContentBadgeGlyph);
                 }
@@ -310,7 +365,12 @@ namespace Fort.ind_UWP
         {
             try
             {
-                LiveTileService.ClearBadge();
+                if (!SocialNotificationService.OwnsBadge)
+                {
+                    LiveTileService.ClearBadge();
+                }
+
+                SocialNotificationService.OnResuming();
             }
             catch (Exception ex)
             {

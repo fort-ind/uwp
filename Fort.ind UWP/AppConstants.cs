@@ -98,6 +98,18 @@ namespace Fort.ind_UWP
 
         public const string SettingLabMultipleViews = "LabMultipleViews";
         public const string SettingLabPinGames = "LabPinGames";
+        public const string SettingLabSocialNotifications = "LabSocialNotifications";
+
+        public const string SettingSocialToastedThrough = "SocialNotificationsToastedThrough";
+        public const string SettingBackgroundAccessVersion = "BackgroundAccessAppVersion";
+        public const string SocialCheckTaskName = "SocialNotificationsCheck";
+        public const uint SocialCheckIntervalMinutes = 15;
+        public const string SocialToastGroup = "social";
+        public const int SocialToastIndividualLimit = 4;
+        public const int SocialFeedPageSize = 20;
+
+        public const string ToastArgumentOpen = "open";
+        public const string ToastOpenNotifications = "notifications";
 
         public const double KeepOnTopWindowWidth = 360;
         public const double KeepOnTopWindowHeight = 480;

@@ -820,9 +820,6 @@ Open your profile and try again.</value>
   <data name="MainSocial.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Social</value>
   </data>
-  <data name="MainSocialFeaturesComingSoon.Text" xml:space="preserve">
-    <value>Social features coming soon</value>
-  </data>
   <data name="MainSoon3.Text" xml:space="preserve">
     <value>soon! :3</value>
   </data>
@@ -1412,5 +1409,209 @@ Open your profile and try again.</value>
   <data name="MissingPinnedGameUnpinnedAnnouncement" xml:space="preserve">
     <value>Unpinned the tile from Start</value>
     <comment>Screen reader announcement after the user unpins a tile whose game is no longer available.</comment>
+  </data>
+  <data name="SocialPivot.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>fort.social</value>
+  </data>
+  <data name="SocialNotificationsPivotItem.Header" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="SocialMentionsPivotItem.Header" xml:space="preserve">
+    <value>Mentions</value>
+  </data>
+  <data name="SocialNotificationsList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="SocialMentionsList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Mentions</value>
+  </data>
+  <data name="SocialNotificationsLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading notifications</value>
+  </data>
+  <data name="SocialMentionsLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading mentions</value>
+  </data>
+  <data name="SocialRefreshButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="SocialRefreshButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh (F5)</value>
+  </data>
+  <data name="SocialGateLabOff" xml:space="preserve">
+    <value>Social features are coming soon. You can already try fort.social notifications: turn them on in Labs &amp; betas.</value>
+  </data>
+  <data name="SocialGateLabOffButton" xml:space="preserve">
+    <value>Open Labs &amp; betas</value>
+  </data>
+  <data name="SocialGateSignedOut" xml:space="preserve">
+    <value>Sign in with your fort.social account to see your notifications and mentions here.</value>
+  </data>
+  <data name="SocialGateSignInButton" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="SocialNotificationsEmpty" xml:space="preserve">
+    <value>No notifications yet</value>
+  </data>
+  <data name="SocialMentionsEmpty" xml:space="preserve">
+    <value>Nobody has mentioned you yet</value>
+  </data>
+  <data name="SocialNotificationsFailed" xml:space="preserve">
+    <value>Your notifications couldn't be loaded. Check your connection and try again.</value>
+  </data>
+  <data name="SocialMentionsFailed" xml:space="preserve">
+    <value>Your mentions couldn't be loaded. Check your connection and try again.</value>
+  </data>
+  <data name="SocialRetryButton" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="SocialNeedsPermission" xml:space="preserve">
+    <value>fort.desktop needs your permission to read notifications. Sign in again and approve it on fort.social.</value>
+  </data>
+  <data name="SocialSignInAgainButton" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="SocialUnknownUser" xml:space="preserve">
+    <value>Someone</value>
+    <comment>Stands in for a user whose name fort.social did not send.</comment>
+  </data>
+  <data name="SocialFeedItemContentFormat" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>Screen reader text for one notification. {0} is what happened (for example "ryni followed you"), {1} is the note text.</comment>
+  </data>
+  <data name="SocialFeedItemAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}</value>
+    <comment>Screen reader text for one notification or mention. {0} is its content, {1} is when it happened.</comment>
+  </data>
+  <data name="SocialFeedItemUnreadAutomationFormat" xml:space="preserve">
+    <value>Unread, {0}, {1}</value>
+    <comment>Screen reader text for an unread notification. {0} is its content, {1} is when it happened.</comment>
+  </data>
+  <data name="SocialNotificationFollowFormat" xml:space="preserve">
+    <value>{0} followed you</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationFollowRequestFormat" xml:space="preserve">
+    <value>{0} wants to follow you</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationFollowAcceptedFormat" xml:space="preserve">
+    <value>{0} accepted your follow request</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationMentionFormat" xml:space="preserve">
+    <value>{0} mentioned you</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationReplyFormat" xml:space="preserve">
+    <value>{0} replied to you</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationRenoteFormat" xml:space="preserve">
+    <value>{0} renoted your note</value>
+    <comment>{0} is a display name. A renote is fort.social's word for a repost.</comment>
+  </data>
+  <data name="SocialNotificationQuoteFormat" xml:space="preserve">
+    <value>{0} quoted your note</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationReactionFormat" xml:space="preserve">
+    <value>{0} reacted {1} to your note</value>
+    <comment>{0} is a display name, {1} is the reaction: an emoji or a :custom_emoji: name.</comment>
+  </data>
+  <data name="SocialNotificationNoteFormat" xml:space="preserve">
+    <value>{0} posted a new note</value>
+    <comment>{0} is a display name. Sent when someone the user turned on notifications for posts.</comment>
+  </data>
+  <data name="SocialNotificationEditedFormat" xml:space="preserve">
+    <value>{0} edited a note</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationPollVoteFormat" xml:space="preserve">
+    <value>{0} voted in your poll</value>
+    <comment>{0} is a display name.</comment>
+  </data>
+  <data name="SocialNotificationPollEnded" xml:space="preserve">
+    <value>A poll has ended</value>
+  </data>
+  <data name="SocialNotificationAchievement" xml:space="preserve">
+    <value>You earned an achievement</value>
+  </data>
+  <data name="SocialNotificationRoleAssigned" xml:space="preserve">
+    <value>You were given a new role</value>
+  </data>
+  <data name="SocialNotificationRoleAssignedFormat" xml:space="preserve">
+    <value>You were given the {0} role</value>
+    <comment>{0} is the role name the instance gave.</comment>
+  </data>
+  <data name="SocialNotificationLogin" xml:space="preserve">
+    <value>There was a new sign-in to your account</value>
+  </data>
+  <data name="SocialNotificationCreateToken" xml:space="preserve">
+    <value>A new access token was created for your account</value>
+  </data>
+  <data name="SocialNotificationExportCompleted" xml:space="preserve">
+    <value>Your export is ready</value>
+  </data>
+  <data name="SocialNotificationScheduledNotePosted" xml:space="preserve">
+    <value>Your scheduled note was posted</value>
+  </data>
+  <data name="SocialNotificationScheduledNoteFailed" xml:space="preserve">
+    <value>Your scheduled note couldn't be posted</value>
+  </data>
+  <data name="SocialNotificationChatInvite" xml:space="preserve">
+    <value>You were invited to a chat</value>
+  </data>
+  <data name="SocialNotificationTest" xml:space="preserve">
+    <value>This is a test notification</value>
+  </data>
+  <data name="SocialNotificationApp" xml:space="preserve">
+    <value>A notification from an app</value>
+  </data>
+  <data name="SocialNotificationGeneric" xml:space="preserve">
+    <value>You have a new notification</value>
+  </data>
+  <data name="SocialToastAttribution" xml:space="preserve">
+    <value>fort.social</value>
+    <comment>Shown at the bottom of each Windows notification to say where it came from. A proper name.</comment>
+  </data>
+  <data name="SocialToastSummaryTitle" xml:space="preserve">
+    <value>New on fort.social</value>
+  </data>
+  <data name="SocialToastSummaryBodyFormat" xml:space="preserve">
+    <value>You have {0} new notifications</value>
+    <comment>{0} is a number, always 5 or more.</comment>
+  </data>
+  <data name="SocialNotificationsTitle.Text" xml:space="preserve">
+    <value>fort.social notifications</value>
+  </data>
+  <data name="SocialNotificationsDescription.Text" xml:space="preserve">
+    <value>Get your fort.social notifications as Windows notifications, and see them with your mentions on the Social page. Your unread count shows on the app's tile and taskbar button. While fort.desktop is open they arrive right away; when it's closed it checks about every 15 minutes.</value>
+  </data>
+  <data name="SocialNotificationsToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="SocialNotificationsToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="SocialNotificationsToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>fort.social notifications</value>
+  </data>
+  <data name="SocialNotificationsBackgroundDenied.Text" xml:space="preserve">
+    <value>Windows isn't letting fort.desktop run in the background, so notifications only arrive while it's open. You can allow it in Windows Settings, under background apps.</value>
+  </data>
+  <data name="SocialNotificationsLockScreenHint.Text" xml:space="preserve">
+    <value>To see your unread count on the lock screen, choose fort.desktop in your lock screen settings.</value>
+  </data>
+  <data name="SocialNotificationsLockScreenLink.Content" xml:space="preserve">
+    <value>Open lock screen settings</value>
+  </data>
+  <data name="SocialPermissionInfoBar.Title" xml:space="preserve">
+    <value>Sign in again to get notifications</value>
+  </data>
+  <data name="SocialPermissionInfoBar.Message" xml:space="preserve">
+    <value>fort.social notifications are turned on, but fort.desktop doesn't have permission to read them yet. Sign in again and approve it on fort.social.</value>
+  </data>
+  <data name="SocialPermissionSignInButton.Content" xml:space="preserve">
+    <value>Sign in again</value>
   </data>
 </root>

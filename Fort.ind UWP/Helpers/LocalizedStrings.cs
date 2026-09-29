@@ -9,13 +9,15 @@ namespace Fort.ind_UWP
     {
         private static ResourceLoader s_loader;
 
+        private static ResourceLoader s_viewIndependentLoader;
+
         private static ResourceLoader Loader
         {
             get
             {
                 if (s_loader != null) return s_loader;
 
-                if (CoreWindow.GetForCurrentThread() == null) return null;
+                if (CoreWindow.GetForCurrentThread() == null) return ViewIndependentLoader;
 
                 try
                 {
@@ -27,6 +29,25 @@ namespace Fort.ind_UWP
                 }
 
                 return s_loader;
+            }
+        }
+
+        private static ResourceLoader ViewIndependentLoader
+        {
+            get
+            {
+                if (s_viewIndependentLoader != null) return s_viewIndependentLoader;
+
+                try
+                {
+                    s_viewIndependentLoader = ResourceLoader.GetForViewIndependentUse();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"LocalizedStrings: could not open the view-independent resource loader - {ex.Message}");
+                }
+
+                return s_viewIndependentLoader;
             }
         }
 

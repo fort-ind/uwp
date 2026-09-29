@@ -125,7 +125,10 @@ namespace Fort.ind_UWP
                 AlignPaneToggleButton();
                 MarkNavigationPaneLandmark();
 
-                LiveTileService.ClearBadge();
+                if (!SocialNotificationService.OwnsBadge)
+                {
+                    LiveTileService.ClearBadge();
+                }
 
                 var localSettings = ApplicationData.Current.LocalSettings;
                 bool hideWelcome = false;
@@ -364,6 +367,17 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"MainPage: NavigateToTag failed - {ex.Message}");
+            }
+        }
+
+        internal void ShowSocialNotifications()
+        {
+            NavigateToTag(AppConstants.NavigationSocial);
+
+            var social = ContentFrame.Content as SocialPage;
+            if (social != null)
+            {
+                social.ShowNotifications();
             }
         }
 
