@@ -57,6 +57,159 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static void ShowNewsTile()
+        {
+            UpdateTileWithMultipleNews(new List<NewsItem>
+            {
+                new NewsItem(LocalizedStrings.Get("TileNewsWhatsNewTitle"),
+                             LocalizedStrings.Get("TileNewsWhatsNewBody"),
+                             "welcome"),
+                new NewsItem(LocalizedStrings.Get("TileNewsGetStartedTitle"),
+                             LocalizedStrings.Get("TileNewsGetStartedBody"),
+                             "features")
+            });
+        }
+
+        public static bool ShowPreviewTiles(IReadOnlyList<TilePreview> previews, IReadOnlyList<string> lockLines)
+        {
+            if (previews == null || previews.Count == 0) return false;
+
+            try
+            {
+                var tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
+                tileUpdater.EnableNotificationQueueForSquare150x150(true);
+                tileUpdater.EnableNotificationQueueForWide310x150(true);
+                tileUpdater.EnableNotificationQueueForSquare310x310(false);
+
+                tileUpdater.Clear();
+
+                for (int i = previews.Count - 1; i >= 0; i--)
+                {
+                    TileNotification tileNotification = new TileNotification(CreatePreviewTileXml(previews[i], previews, lockLines));
+                    tileNotification.Tag = PreviewTagPrefix + i.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    tileUpdater.Update(tileNotification);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"LiveTileService: ShowPreviewTiles failed – {ex.GetType().Name}: {ex.Message}");
+                return false;
+            }
+        }
+
+        private const string PreviewTagPrefix = "preview";
+
+        private const int PreviewTitleMaxLines = 2;
+
+        private const int PreviewTitleOnlyMaxLines = 4;
+
+        private const int PreviewBodyMaxLines = 3;
+
+        private const int PreviewListBodyMaxLines = 2;
+
+        private static XmlDocument CreatePreviewTileXml(TilePreview preview, IReadOnlyList<TilePreview> all, IReadOnlyList<string> lockLines)
+        {
+            TileContent content = new TileContent();
+            content.Visual = new TileVisual();
+            content.Visual.DisplayName = LocalizedStrings.Get("TileDisplayName");
+            content.Visual.Branding = TileBranding.Name;
+
+            if (lockLines != null)
+            {
+                if (lockLines.Count > 0) content.Visual.LockDetailedStatus1 = SanitizeText(lockLines[0]);
+                if (lockLines.Count > 1) content.Visual.LockDetailedStatus2 = SanitizeText(lockLines[1]);
+                if (lockLines.Count > 2) content.Visual.LockDetailedStatus3 = SanitizeText(lockLines[2]);
+            }
+
+            content.Visual.TileMedium = new TileBinding();
+            content.Visual.TileMedium.Content = BuildPreviewContent(preview, true);
+
+            content.Visual.TileWide = new TileBinding();
+            content.Visual.TileWide.Content = BuildPreviewContent(preview, false);
+
+            content.Visual.TileLarge = new TileBinding();
+            content.Visual.TileLarge.Content = BuildPreviewList(all);
+
+            return content.GetXml();
+        }
+
+        private static TileBindingContentAdaptive BuildPreviewContent(TilePreview preview, bool wrapTitle)
+        {
+            var body = SanitizeText(preview.Body);
+            var hasBody = !string.IsNullOrWhiteSpace(body);
+
+            AdaptiveText titleText = new AdaptiveText();
+            titleText.Text = SanitizeText(preview.Title);
+            titleText.HintStyle = TitleTextStyle;
+            titleText.HintWrap = wrapTitle || !hasBody;
+            titleText.HintMaxLines = hasBody ? PreviewTitleMaxLines : PreviewTitleOnlyMaxLines;
+
+            TileBindingContentAdaptive result = new TileBindingContentAdaptive();
+            result.Children.Add(titleText);
+
+            if (hasBody)
+            {
+                AdaptiveText bodyText = new AdaptiveText();
+                bodyText.Text = body;
+                bodyText.HintStyle = AdaptiveTextStyle.CaptionSubtle;
+                bodyText.HintWrap = true;
+                bodyText.HintMaxLines = PreviewBodyMaxLines;
+                result.Children.Add(bodyText);
+            }
+
+            if (preview.Avatar != null)
+            {
+                TilePeekImage peek = new TilePeekImage();
+                peek.Source = preview.Avatar.ToString();
+                peek.HintCrop = TilePeekImageCrop.Circle;
+                var alternateText = SanitizeText(preview.ActorName);
+                peek.AlternateText = string.IsNullOrEmpty(alternateText) ? null : alternateText;
+                result.PeekImage = peek;
+            }
+
+            return result;
+        }
+
+        private static TileBindingContentAdaptive BuildPreviewList(IReadOnlyList<TilePreview> previews)
+        {
+            TileBindingContentAdaptive result = new TileBindingContentAdaptive();
+
+            var count = Math.Min(previews.Count, AppConstants.SocialTileListLimit);
+            for (int i = 0; i < count; i++)
+            {
+                if (i > 0)
+                {
+                    result.Children.Add(new AdaptiveText());
+                }
+
+                AdaptiveText titleText = new AdaptiveText();
+                titleText.Text = SanitizeText(previews[i].Title);
+                titleText.HintStyle = TitleTextStyle;
+
+                AdaptiveSubgroup subgroup = new AdaptiveSubgroup();
+                subgroup.Children.Add(titleText);
+
+                var body = SanitizeText(previews[i].Body);
+                if (!string.IsNullOrWhiteSpace(body))
+                {
+                    AdaptiveText bodyText = new AdaptiveText();
+                    bodyText.Text = body;
+                    bodyText.HintStyle = AdaptiveTextStyle.CaptionSubtle;
+                    bodyText.HintWrap = true;
+                    bodyText.HintMaxLines = PreviewListBodyMaxLines;
+                    subgroup.Children.Add(bodyText);
+                }
+
+                AdaptiveGroup group = new AdaptiveGroup();
+                group.Children.Add(subgroup);
+                result.Children.Add(group);
+            }
+
+            return result;
+        }
+
         private const AdaptiveTextStyle TitleTextStyle = AdaptiveTextStyle.Base;
 
         private static XmlDocument CreateTileXml(string title, string message, string branding)
@@ -470,6 +623,14 @@ namespace Fort.ind_UWP
         public string Tag { get; set; }
         public string ArgumentKey { get; set; }
         public string ArgumentValue { get; set; }
+    }
+
+    public sealed class TilePreview
+    {
+        public string Title { get; set; }
+        public string Body { get; set; }
+        public string ActorName { get; set; }
+        public Uri Avatar { get; set; }
     }
 
     public class NewsItem

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Security.Credentials;
+using Windows.UI.ViewManagement;
 using Windows.Web.Http;
 
 namespace Fort.ind_UWP
@@ -25,9 +26,12 @@ namespace Fort.ind_UWP
         private const string PendingSessionIssuedAtSettingKey = "MisskeyAuth.PendingSessionIssuedAtUtc";
         private static readonly TimeSpan PendingSessionExpiry = TimeSpan.FromMinutes(10);
 
+        private const int NoViewId = -1;
+
         private static readonly object s_lock = new object();
         private static string s_pendingSession = null;
         private static TaskCompletionSource<bool> s_pendingCompletion = null;
+        private static int s_pendingViewId = NoViewId;
 
         private static string s_lastHandledSession = null;
 
@@ -50,11 +54,13 @@ namespace Fort.ind_UWP
 
             TaskCompletionSource<bool> completion = new TaskCompletionSource<bool>();
             TaskCompletionSource<bool> superseded;
+            var viewId = CurrentViewId();
             lock (s_lock)
             {
                 superseded = s_pendingCompletion;
                 s_pendingSession = session;
                 s_pendingCompletion = completion;
+                s_pendingViewId = viewId;
             }
             PersistPendingSession(session);
 
@@ -171,6 +177,33 @@ namespace Fort.ind_UWP
             }
             ClearPersistedSession();
             completion?.TrySetResult(false);
+        }
+
+        public static void ForgetView(int viewId)
+        {
+            TaskCompletionSource<bool> completion;
+            lock (s_lock)
+            {
+                if (s_pendingCompletion == null || s_pendingViewId != viewId) return;
+
+                completion = s_pendingCompletion;
+                s_pendingSession = null;
+                s_pendingCompletion = null;
+            }
+            completion.TrySetResult(false);
+        }
+
+        private static int CurrentViewId()
+        {
+            try
+            {
+                return ApplicationView.GetForCurrentView().Id;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MisskeyAuthService: no view on this thread - {ex.Message}");
+                return NoViewId;
+            }
         }
 
         private static void ClearPending(string session)

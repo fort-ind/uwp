@@ -77,6 +77,9 @@ namespace Fort.ind_UWP
         public const string SettingSettingsTileExpanded = "SettingsTileExpanded";
         public const string SettingShowTileBadge = "ShowTileBadge";
         public const string SettingLiveTileCleared = "LiveTileCleared";
+        public const string SettingTileShowsNotifications = "TileShowsNotifications";
+        public const string SettingLockScreenShowsSenders = "LockScreenShowsSenders";
+        public const string SettingSocialTileShown = "SocialTileShown";
         public const string SettingSettingsWelcomeExpanded = "SettingsWelcomeExpanded";
         public const string SettingSettingsAboutExpanded = "SettingsAboutExpanded";
         public const string SettingSettingsProfileExpanded = "SettingsProfileExpanded";
@@ -96,8 +99,6 @@ namespace Fort.ind_UWP
         public const string SettingUpdateDismissedVersion = "UpdateDismissedVersion";
         public const int UpdateCheckIntervalHours = 24;
 
-        public const string SettingLabMultipleViews = "LabMultipleViews";
-        public const string SettingLabPinGames = "LabPinGames";
         public const string SettingLabSocialNotifications = "LabSocialNotifications";
 
         public const string SettingSocialToastedThrough = "SocialNotificationsToastedThrough";
@@ -109,6 +110,8 @@ namespace Fort.ind_UWP
         public const string SocialToastGroup = "social";
         public const int SocialToastIndividualLimit = 4;
         public const int SocialFeedPageSize = 20;
+        public const int SocialTilePreviewLimit = 5;
+        public const int SocialTileListLimit = 3;
 
         public const string ToastArgumentOpen = "open";
         public const string ToastOpenNotifications = "notifications";

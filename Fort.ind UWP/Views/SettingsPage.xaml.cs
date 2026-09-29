@@ -68,6 +68,7 @@ namespace Fort.ind_UWP
                 }
 
                 UpdateStorageInfo();
+                UpdateTileNotificationsVisibility();
 
                 RevealPendingSection();
             }
@@ -341,8 +342,47 @@ namespace Fort.ind_UWP
         private void ClearTileButton_Click(object sender, RoutedEventArgs e)
         {
             LiveTileService.TileCleared = true;
-            LiveTileService.ClearTile();
+            SocialTileService.ClearTile();
             LiveTileService.ClearBadge();
+        }
+
+        private void UpdateTileNotificationsVisibility()
+        {
+            var shown = SocialTileService.StartShowsLiveTiles && LabsService.SocialNotificationsEnabled;
+            TileNotificationsPanel.Visibility = shown ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void LoadTileNotificationControls()
+        {
+            UpdateTileNotificationsVisibility();
+
+            TileNotificationsToggle.IsOn = SocialTileService.PreviewsEnabled;
+            LockScreenSendersToggle.IsOn = SocialTileService.LockScreenShowsSenders;
+            LockScreenSendersToggle.IsEnabled = TileNotificationsToggle.IsOn;
+        }
+
+        private void TileNotificationsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            LockScreenSendersToggle.IsEnabled = TileNotificationsToggle.IsOn;
+
+            if (_loadingSettings) return;
+            SocialTileService.PreviewsEnabled = TileNotificationsToggle.IsOn;
+
+            if (TileNotificationsToggle.IsOn)
+            {
+                SocialNotificationService.RefreshTileInBackground();
+            }
+            else
+            {
+                SocialTileService.Withdraw();
+            }
+        }
+
+        private void LockScreenSendersToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loadingSettings) return;
+            SocialTileService.LockScreenShowsSenders = LockScreenSendersToggle.IsOn;
+            SocialNotificationService.RefreshTileInBackground();
         }
 
         private void TileBadgeToggle_Toggled(object sender, RoutedEventArgs e)

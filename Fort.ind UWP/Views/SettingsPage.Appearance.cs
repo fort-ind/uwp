@@ -46,6 +46,7 @@ namespace Fort.ind_UWP
                 }
 
                 TileBadgeToggle.IsOn = LiveTileService.BadgeEnabled;
+                LoadTileNotificationControls();
                 AutoUpdateCheckToggle.IsOn = UpdateService.AutomaticChecksEnabled;
                 LoadProfileRefreshControls();
 

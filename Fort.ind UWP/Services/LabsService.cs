@@ -6,51 +6,6 @@ namespace Fort.ind_UWP
 {
     public static class LabsService
     {
-        private static readonly object s_lock = new object();
-
-        private static bool? s_multipleViewsActive;
-
-        public static bool MultipleViewsActive
-        {
-            get
-            {
-                lock (s_lock)
-                {
-                    if (!s_multipleViewsActive.HasValue)
-                    {
-                        s_multipleViewsActive = ReadFlag(AppConstants.SettingLabMultipleViews);
-                    }
-                    return s_multipleViewsActive.Value;
-                }
-            }
-        }
-
-        public static bool MultipleViewsSaved
-        {
-            get { return ReadFlag(AppConstants.SettingLabMultipleViews); }
-        }
-
-        public static void SaveMultipleViews(bool enabled)
-        {
-            var ignored = MultipleViewsActive;
-            ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLabMultipleViews] = enabled;
-        }
-
-        public static bool IsRestartPending
-        {
-            get { return MultipleViewsSaved != MultipleViewsActive; }
-        }
-
-        public static bool PinGamesEnabled
-        {
-            get { return ReadFlag(AppConstants.SettingLabPinGames); }
-        }
-
-        public static void SavePinGames(bool enabled)
-        {
-            ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLabPinGames] = enabled;
-        }
-
         public static bool SocialNotificationsEnabled
         {
             get { return ReadFlag(AppConstants.SettingLabSocialNotifications); }

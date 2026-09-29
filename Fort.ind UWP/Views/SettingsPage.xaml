@@ -798,6 +798,18 @@
                                 <TextBlock x:Uid="MainTheSmallCounterThat"
                                            Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <StackPanel x:Name="TileNotificationsPanel" Visibility="Collapsed">
+                                    <ToggleSwitch x:Uid="TileNotificationsToggle" x:Name="TileNotificationsToggle"
+                                                  Toggled="TileNotificationsToggle_Toggled"/>
+                                    <TextBlock x:Uid="TileNotificationsDescription"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    <ToggleSwitch x:Uid="LockScreenSendersToggle" x:Name="LockScreenSendersToggle"
+                                                  Toggled="LockScreenSendersToggle_Toggled"/>
+                                    <TextBlock x:Uid="LockScreenSendersDescription"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </StackPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Button x:Name="RefreshTileButton"
                                             Click="RefreshTileButton_Click"

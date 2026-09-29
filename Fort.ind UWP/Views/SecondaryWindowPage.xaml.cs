@@ -59,6 +59,7 @@ namespace Fort.ind_UWP
 
         internal void Release()
         {
+            ReleaseContent();
             DetachHandlers();
 
             try
@@ -68,6 +69,19 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"SecondaryWindowPage: could not detach the window surface - {ex.Message}");
+            }
+        }
+
+        private void ReleaseContent()
+        {
+            try
+            {
+                var page = ContentFrame.Content as IReleasablePage;
+                if (page != null) page.Release();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: could not release the content page - {ex.Message}");
             }
         }
 

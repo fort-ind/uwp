@@ -9,8 +9,6 @@ namespace Fort.ind_UWP
     {
         private void AttachOpenInNewWindowMenus()
         {
-            if (!LabsService.MultipleViewsActive) return;
-
             try
             {
                 foreach (var item in NavView.MenuItems)

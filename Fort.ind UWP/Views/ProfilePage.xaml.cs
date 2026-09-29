@@ -15,7 +15,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class ProfilePage : Page
+    public sealed partial class ProfilePage : Page, IReleasablePage
     {
         private const double BannerAspectRatio = 3.0;
 
@@ -60,6 +60,11 @@ namespace Fort.ind_UWP
         }
 
         private void ProfilePage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Release();
+        }
+
+        public void Release()
         {
             if (_authHandlerAttached)
             {

@@ -111,7 +111,7 @@ namespace Fort.ind_UWP
         {
             var flyout = new MenuFlyout();
 
-            if (LabsService.PinGamesEnabled && GameTileService.CanPin(game))
+            if (GameTileService.CanPin(game))
             {
                 var pinned = GameTileService.IsPinned(game);
                 var pinItem = new MenuFlyoutItem()

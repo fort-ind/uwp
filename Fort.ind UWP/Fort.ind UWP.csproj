@@ -169,6 +169,7 @@
     <Compile Include="Services\SocialApiService.cs" />
     <Compile Include="Services\SocialNotificationService.cs" />
     <Compile Include="Services\SocialStream.cs" />
+    <Compile Include="Services\SocialTileService.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="Services\ViewLifetimeControl.cs" />
     <Compile Include="Services\WindowManagerService.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Views\MainPage.Update.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\IReleasablePage.cs" />
     <Compile Include="Views\IShellContentPage.cs" />
     <Compile Include="Views\BetasPage.xaml.cs">
       <DependentUpon>BetasPage.xaml</DependentUpon>

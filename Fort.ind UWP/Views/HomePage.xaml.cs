@@ -8,7 +8,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class HomePage : Page, IShellContentPage
+    public sealed partial class HomePage : Page, IShellContentPage, IReleasablePage
     {
         private static readonly SearchItem[] s_noItems = new SearchItem[0];
 
@@ -58,6 +58,11 @@ namespace Fort.ind_UWP
         }
 
         private void HomePage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Release();
+        }
+
+        public void Release()
         {
             if (_favoritesHandlerAttached)
             {

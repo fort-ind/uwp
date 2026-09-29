@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Input;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class GamesPage : Page
+    public sealed partial class GamesPage : Page, IReleasablePage
     {
         private const string DigitGroupKey = "#";
 
@@ -121,6 +121,11 @@ namespace Fort.ind_UWP
         }
 
         private void GamesPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Release();
+        }
+
+        public void Release()
         {
             _filterDebounce.Cancel();
         }

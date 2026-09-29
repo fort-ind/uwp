@@ -541,6 +541,22 @@ Open your profile and try again.</value>
   <data name="TileNewsGetStartedBody" xml:space="preserve">
     <value>Hello! fort.uwp is now ready to use. :3</value>
   </data>
+  <data name="TileLockOneNotification" xml:space="preserve">
+    <value>1 new notification</value>
+    <comment>First line of the lock screen's detailed status when one fort.social notification is unread.</comment>
+  </data>
+  <data name="TileLockNotificationsFormat" xml:space="preserve">
+    <value>{0} new notifications</value>
+    <comment>First line of the lock screen's detailed status. {0} is the unread count, always 2 or more.</comment>
+  </data>
+  <data name="TileLockSource" xml:space="preserve">
+    <value>on fort.social</value>
+    <comment>Second line of the lock screen's detailed status, under the count. fort.social is a proper name.</comment>
+  </data>
+  <data name="TileLockMoreFormat" xml:space="preserve">
+    <value>and {0} more</value>
+    <comment>Last line of the lock screen's detailed status, under the names of who sent the newest notifications. {0} is how many other unread notifications there are.</comment>
+  </data>
   <data name="JumpTaskHomeName" xml:space="preserve">
     <value>home</value>
   </data>
@@ -1023,6 +1039,30 @@ Open your profile and try again.</value>
   <data name="TileBadgeToggle.OffContent" xml:space="preserve">
     <value>Off</value>
   </data>
+  <data name="TileNotificationsToggle.Header" xml:space="preserve">
+    <value>Notifications on the tile</value>
+  </data>
+  <data name="TileNotificationsToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="TileNotificationsToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="TileNotificationsDescription.Text" xml:space="preserve">
+    <value>Your newest unread fort.social notifications take turns on the tile. Once you've read them, it goes back to normal.</value>
+  </data>
+  <data name="LockScreenSendersToggle.Header" xml:space="preserve">
+    <value>Show who they're from on the lock screen</value>
+  </data>
+  <data name="LockScreenSendersToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="LockScreenSendersToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="LockScreenSendersDescription.Text" xml:space="preserve">
+    <value>If fort.desktop shows detailed status on your lock screen, it says how many unread notifications you have. Turn this on to list who they're from instead. What people wrote never appears there.</value>
+  </data>
   <data name="TintBlueButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Navy Blue background tint</value>
   </data>
@@ -1313,34 +1353,7 @@ Open your profile and try again.</value>
     <value>labs</value>
   </data>
   <data name="LabsIntro.Text" xml:space="preserve">
-    <value>experimental stuff that's still being worked on. it might be rough around the edges or change later, and some of it only turns on or off after a restart</value>
-  </data>
-  <data name="MultipleViewsTitle.Text" xml:space="preserve">
-    <value>Multiple windows</value>
-  </data>
-  <data name="MultipleViewsDescription.Text" xml:space="preserve">
-    <value>Open a page in a window of its own, next to the main one. to use this feature right click a nav item and open it in a new window!</value>
-  </data>
-  <data name="MultipleViewsToggle.OnContent" xml:space="preserve">
-    <value>On</value>
-  </data>
-  <data name="MultipleViewsToggle.OffContent" xml:space="preserve">
-    <value>Off</value>
-  </data>
-  <data name="MultipleViewsToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Multiple windows</value>
-  </data>
-  <data name="LabsRestartNoticeText.Text" xml:space="preserve">
-    <value>almost there.. restart the app to apply this change</value>
-  </data>
-  <data name="LabsRestartButton.Content" xml:space="preserve">
-    <value>restart now</value>
-  </data>
-  <data name="LabsRestartFailedDialogTitle" xml:space="preserve">
-    <value>hmm.. that didn't work</value>
-  </data>
-  <data name="LabsRestartFailedDialogBody" xml:space="preserve">
-    <value>Close and reopen the app to apply your labs changes.</value>
+    <value>experimental stuff that's still being worked on. it might be rough around the edges or change later</value>
   </data>
   <data name="BetasHeading.Text" xml:space="preserve">
     <value>betas</value>
@@ -1361,21 +1374,6 @@ Open your profile and try again.</value>
   <data name="KeepOnTopExitedAnnouncement" xml:space="preserve">
     <value>This window no longer stays on top</value>
     <comment>Screen reader announcement after the window leaves compact overlay.</comment>
-  </data>
-  <data name="PinGamesTitle.Text" xml:space="preserve">
-    <value>Pin games to Start</value>
-  </data>
-  <data name="PinGamesDescription.Text" xml:space="preserve">
-    <value>easily find your games, right at the start menu! this experiment allows you to pin your fav games to start</value>
-  </data>
-  <data name="PinGamesToggle.OnContent" xml:space="preserve">
-    <value>On</value>
-  </data>
-  <data name="PinGamesToggle.OffContent" xml:space="preserve">
-    <value>Off</value>
-  </data>
-  <data name="PinGamesToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Pin games to Start</value>
   </data>
   <data name="GamePinToStartMenuItem" xml:space="preserve">
     <value>Pin to Start</value>
@@ -1604,7 +1602,7 @@ Open your profile and try again.</value>
     <value>Windows isn't letting fort.desktop run in the background, so notifications only arrive while it's open. You can allow it in Windows Settings, under background apps.</value>
   </data>
   <data name="SocialNotificationsLockScreenHint.Text" xml:space="preserve">
-    <value>To see your unread count on the lock screen, choose fort.desktop in your lock screen settings.</value>
+    <value>To see your unread count on the lock screen, choose fort.desktop in your lock screen settings. Choose it for detailed status too and the lock screen will also say how many you have, or who they're from (Settings ▸ Live Tile).</value>
   </data>
   <data name="SocialNotificationsLockScreenLink.Content" xml:space="preserve">
     <value>Open lock screen settings</value>

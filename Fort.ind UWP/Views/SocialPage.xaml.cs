@@ -9,7 +9,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class SocialPage : Page
+    public sealed partial class SocialPage : Page, IReleasablePage
     {
         private enum GateKind
         {
@@ -105,6 +105,11 @@ namespace Fort.ind_UWP
         }
 
         private void SocialPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Release();
+        }
+
+        public void Release()
         {
             if (_authHandlerAttached)
             {
@@ -551,6 +556,15 @@ namespace Fort.ind_UWP
         private void OnWindowActivated(object sender, WindowActivatedEventArgs e)
         {
             if (e.WindowActivationState == CoreWindowActivationState.Deactivated) return;
+
+            try
+            {
+                RefreshGate();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialPage: gate refresh on activation failed - {ex.Message}");
+            }
 
             if (IsViewingNotifications())
             {

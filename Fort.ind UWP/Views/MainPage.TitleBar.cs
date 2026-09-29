@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -106,18 +105,12 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                List<NewsItem> newsItems = new List<NewsItem>()
+                SocialTileService.ShowNewsTile(userRequested);
+
+                if (userRequested)
                 {
-                    new NewsItem(LocalizedStrings.Get("TileNewsWhatsNewTitle"),
-                                 LocalizedStrings.Get("TileNewsWhatsNewBody"),
-                                 "welcome"),
-                    new NewsItem(LocalizedStrings.Get("TileNewsGetStartedTitle"),
-                                 LocalizedStrings.Get("TileNewsGetStartedBody"),
-                                 "features")
-                };
-
-                LiveTileService.UpdateTileWithMultipleNews(newsItems);
-
+                    SocialNotificationService.RefreshTileInBackground();
+                }
             }
             catch (Exception ex)
             {

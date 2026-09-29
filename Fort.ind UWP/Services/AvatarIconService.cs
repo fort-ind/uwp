@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,6 +65,12 @@ namespace Fort.ind_UWP
         private static readonly TimeSpan ToastAvatarLifetime = TimeSpan.FromDays(3);
 
         private static readonly SemaphoreSlim s_toastGate = new SemaphoreSlim(1, 1);
+
+        private const int TileIconPixelSize = 300;
+
+        private const string TileFolderName = "tile-avatars";
+
+        private static readonly SemaphoreSlim s_tileGate = new SemaphoreSlim(1, 1);
 
         private static string s_cachedUrl;
         private static Uri s_cachedUri;
@@ -173,6 +180,87 @@ namespace Fort.ind_UWP
             finally
             {
                 s_toastGate.Release();
+            }
+        }
+
+        public static async Task<Uri> GetTileAvatarUriAsync(string avatarUrl, CancellationToken cancellationToken)
+        {
+            var sourceUri = WebLauncher.TryCreateFetchUri(avatarUrl);
+            if (sourceUri == null)
+            {
+                return null;
+            }
+
+            await s_tileGate.WaitAsync(cancellationToken);
+            try
+            {
+                var folder = await ApplicationData.Current.LocalFolder
+                    .CreateFolderAsync(TileFolderName, CreationCollisionOption.OpenIfExists);
+                var fileName = StableHash(avatarUrl) + "-" + TileIconPixelSize + FileExtension;
+
+                var existing = await folder.TryGetItemAsync(fileName);
+                if (existing == null)
+                {
+                    var pixels = await TryRenderCircularIconAsync(sourceUri, TileIconPixelSize, cancellationToken);
+                    if (pixels == null || !await WritePngAsync(folder, fileName, pixels, TileIconPixelSize))
+                    {
+                        return null;
+                    }
+                }
+
+                return new Uri("ms-appdata:///local/" + TileFolderName + "/" + fileName);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AvatarIconService: could not build tile avatar - {ex.Message}");
+                return null;
+            }
+            finally
+            {
+                s_tileGate.Release();
+            }
+        }
+
+        public static async Task RetainTileAvatarsAsync(ICollection<Uri> inUse)
+        {
+            await s_tileGate.WaitAsync();
+            try
+            {
+                var item = await ApplicationData.Current.LocalFolder.TryGetItemAsync(TileFolderName);
+                var folder = item as StorageFolder;
+                if (folder == null) return;
+
+                var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var uri in inUse)
+                {
+                    if (uri != null) keep.Add(System.IO.Path.GetFileName(uri.AbsolutePath));
+                }
+
+                foreach (var file in await folder.GetFilesAsync())
+                {
+                    if (keep.Contains(file.Name)) continue;
+
+                    try
+                    {
+                        await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"AvatarIconService: could not delete tile avatar {file.Name} - {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AvatarIconService: tile avatar prune failed - {ex.Message}");
+            }
+            finally
+            {
+                s_tileGate.Release();
             }
         }
 

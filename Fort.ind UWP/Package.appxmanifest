@@ -46,7 +46,7 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png"
                           BackgroundColor="#2D1B69"
                           uap5:Optional="true" />
-		  <uap:LockScreen BadgeLogo="Assets\BadgeLogo.png" Notification="badge"/>
+		  <uap:LockScreen BadgeLogo="Assets\BadgeLogo.png" Notification="badgeAndTileText"/>
 		  <uap:InitialRotationPreference>
 		  <uap:Rotation Preference="landscape"/>
 		  <uap:Rotation Preference="landscapeFlipped"/>

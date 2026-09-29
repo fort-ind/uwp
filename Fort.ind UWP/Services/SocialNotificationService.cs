@@ -122,6 +122,7 @@ namespace Fort.ind_UWP
                 StopStream();
                 UnregisterBackgroundCheck();
                 SetNeedsSignInAgain(false);
+                SocialTileService.Withdraw();
 
                 if (wasActive || ReadWatermark().HasValue)
                 {
@@ -155,6 +156,23 @@ namespace Fort.ind_UWP
             if (OwnsBadge && count >= 0)
             {
                 LiveTileService.UpdateBadge(count);
+            }
+        }
+
+        public static async void RefreshTileInBackground()
+        {
+            try
+            {
+                if (!s_active) return;
+
+                var token = await MisskeyAuthService.TryGetTokenAsync();
+                if (string.IsNullOrEmpty(token)) return;
+
+                await RefreshTileAsync(token, s_unreadCount, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialNotificationService: tile refresh failed - {ex.GetType().Name}: {ex.Message}");
             }
         }
 
@@ -384,6 +402,7 @@ namespace Fort.ind_UWP
                 if (!ReadWatermark().HasValue)
                 {
                     await EstablishBaselineAsync(token, cancellationToken);
+                    await RefreshTileAsync(token, count.Value, cancellationToken);
                     return;
                 }
 
@@ -395,28 +414,47 @@ namespace Fort.ind_UWP
                 ObservePermission(unread.Status);
                 if (unread.Status != SocialApiStatus.Ok) return;
 
-                var fresh = UnclaimedForToast(unread.Value);
-                if (fresh.Count == 0) return;
-
-                if (fresh.Count <= AppConstants.SocialToastIndividualLimit)
-                {
-                    foreach (var notification in fresh)
-                    {
-                        if (TryClaimForToast(notification))
-                        {
-                            await ShowToastAsync(notification, cancellationToken);
-                        }
-                    }
-                }
-                else if (ClaimForToast(fresh) > 0)
-                {
-                    ShowSummaryToast(fresh.Count);
-                }
+                await ToastUnclaimedAsync(unread.Value, cancellationToken);
+                await SocialTileService.ShowAsync(unread.Value, count.Value, cancellationToken);
             }
             finally
             {
                 s_checkGate.Release();
             }
+        }
+
+        private static async Task ToastUnclaimedAsync(IReadOnlyList<SocialNotification> unread, CancellationToken cancellationToken)
+        {
+            var fresh = UnclaimedForToast(unread);
+            if (fresh.Count == 0) return;
+
+            if (fresh.Count <= AppConstants.SocialToastIndividualLimit)
+            {
+                foreach (var notification in fresh)
+                {
+                    if (TryClaimForToast(notification))
+                    {
+                        await ShowToastAsync(notification, cancellationToken);
+                    }
+                }
+            }
+            else if (ClaimForToast(fresh) > 0)
+            {
+                ShowSummaryToast(fresh.Count);
+            }
+        }
+
+        private static async Task RefreshTileAsync(string token, int count, CancellationToken cancellationToken)
+        {
+            if (count <= 0 || !SocialTileService.WantsPreviews || SocialTileService.IsCurrent(count)) return;
+
+            var newest = await SocialApiService.GetNotificationsAsync(token, null,
+                                                                      Math.Min(count, AppConstants.SocialTilePreviewLimit),
+                                                                      false, cancellationToken);
+            ObservePermission(newest.Status);
+            if (newest.Status != SocialApiStatus.Ok) return;
+
+            await SocialTileService.ShowAsync(newest.Value, count, cancellationToken);
         }
 
         private static async Task EstablishBaselineAsync(string token, CancellationToken cancellationToken)
@@ -447,6 +485,7 @@ namespace Fort.ind_UWP
                 if (count.Status == SocialApiStatus.Ok && s_active)
                 {
                     ApplyUnreadCount(count.Value);
+                    await RefreshTileAsync(token, count.Value, cancellationToken);
                 }
             }
             catch (Exception ex)
@@ -490,6 +529,7 @@ namespace Fort.ind_UWP
             if (count == 0)
             {
                 LiveTileService.RemoveToastGroup(AppConstants.SocialToastGroup);
+                SocialTileService.Withdraw();
             }
         }
 

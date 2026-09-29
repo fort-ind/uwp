@@ -185,6 +185,7 @@ namespace Fort.ind_UWP
 
                 SearchItem.ForgetSubscribersOnView(view.Id);
                 DialogService.ForgetView(view.Id);
+                MisskeyAuthService.ForgetView(view.Id);
 
                 var mainDispatcher = s_mainDispatcher;
                 if (mainDispatcher != null)
