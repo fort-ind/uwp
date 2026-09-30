@@ -275,16 +275,37 @@ namespace Fort.ind_UWP
 
             if (fetched.Profile == null) return;
 
+            await ApplyFetchedProfileAsync(fetched.Profile);
+            SocialNotificationService.OfferUnreadCount(fetched.Profile.UserId, fetched.UnreadNotificationsCount);
+        }
+
+        public static async Task OfferRefreshedProfileAsync(string token, UserProfile fetched)
+        {
+            if (fetched == null || !AutoRefreshEnabled) return;
+
+            var current = CurrentUser;
+            if (current == null || !string.Equals(current.UserId, fetched.UserId, StringComparison.Ordinal)) return;
+
+            if (!string.Equals(await MisskeyAuthService.TryGetTokenAsync(), token, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            await ApplyFetchedProfileAsync(fetched);
+        }
+
+        private static async Task ApplyFetchedProfileAsync(UserProfile fetched)
+        {
             var current = CurrentUser;
             if (current == null) return;
 
             s_lastRefreshUtc = DateTime.UtcNow;
 
-            if (HasSameAccountDetails(current, fetched.Profile)) return;
+            if (HasSameAccountDetails(current, fetched)) return;
 
-            fetched.Profile.LastLoginDate = current.LastLoginDate;
-            CurrentUser = fetched.Profile;
-            await LocalStorageService.SaveProfileAsync(fetched.Profile);
+            fetched.LastLoginDate = current.LastLoginDate;
+            CurrentUser = fetched;
+            await LocalStorageService.SaveProfileAsync(fetched);
             AuthStateChanged?.Invoke(null, true);
         }
 

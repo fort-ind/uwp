@@ -159,7 +159,6 @@
     <Compile Include="Services\FavoritesService.cs" />
     <Compile Include="Services\GameTileService.cs" />
     <Compile Include="Services\JumpListService.cs" />
-    <Compile Include="Services\LabsService.cs" />
     <Compile Include="Services\LiveTileService.cs" />
     <Compile Include="Services\LocalStorageService.cs" />
     <Compile Include="Services\MisskeyAuthService.cs" />

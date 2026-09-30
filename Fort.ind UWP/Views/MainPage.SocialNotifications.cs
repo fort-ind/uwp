@@ -10,8 +10,6 @@ namespace Fort.ind_UWP
     {
         private bool _signInAgainHandlerAttached = false;
 
-        private bool _signInAgainDismissed = false;
-
         private void AttachSignInAgainHandler()
         {
             if (!_signInAgainHandlerAttached)
@@ -56,24 +54,16 @@ namespace Fort.ind_UWP
         private void UpdateSignInAgainInfoBar()
         {
             var needed = SocialNotificationService.NeedsSignInAgain
-                         && LabsService.SocialNotificationsEnabled
-                         && ProfileService.CurrentUser != null;
+                         && SocialNotificationService.Enabled
+                         && ProfileService.CurrentUser != null
+                         && !SocialNotificationService.SignInAgainDismissed;
 
-            if (!needed)
-            {
-                _signInAgainDismissed = false;
-                SocialPermissionInfoBar.IsOpen = false;
-                return;
-            }
-
-            if (_signInAgainDismissed) return;
-
-            SocialPermissionInfoBar.IsOpen = true;
+            SocialPermissionInfoBar.IsOpen = needed;
         }
 
         private void SocialPermissionInfoBar_CloseButtonClick(Microsoft.UI.Xaml.Controls.InfoBar sender, object args)
         {
-            _signInAgainDismissed = true;
+            SocialNotificationService.DismissSignInAgain();
         }
 
         private void SocialPermissionSignInButton_Click(object sender, RoutedEventArgs e)

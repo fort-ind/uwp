@@ -37,6 +37,19 @@ namespace Fort.ind_UWP
         }
     }
 
+    public sealed class SocialMe
+    {
+        public SocialMe(int unreadCount, UserProfile profile)
+        {
+            UnreadCount = unreadCount;
+            Profile = profile;
+        }
+
+        public int UnreadCount { get; }
+
+        public UserProfile Profile { get; }
+    }
+
     public static class SocialApiService
     {
         private const string PermissionDeniedCode = "PERMISSION_DENIED";
@@ -115,29 +128,37 @@ namespace Fort.ind_UWP
                 SocialNote.ListFromJson(response.Value.GetArray()));
         }
 
-        public static async Task<SocialApiResult<int>> GetUnreadCountAsync(string token, CancellationToken cancellationToken)
+        public static async Task<SocialApiResult<SocialMe>> GetMeAsync(string token, CancellationToken cancellationToken)
         {
             var response = await PostAsync("i", token, new JsonObject(), cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
             {
-                return SocialApiResult<int>.Failed(response.Status);
+                return SocialApiResult<SocialMe>.Failed(response.Status);
             }
 
             if (response.Value.ValueType != JsonValueType.Object)
             {
-                return SocialApiResult<int>.Failed(SocialApiStatus.Failed);
+                return SocialApiResult<SocialMe>.Failed(SocialApiStatus.Failed);
             }
 
             var me = response.Value.GetObject();
-            if (!me.ContainsKey("unreadNotificationsCount")) return SocialApiResult<int>.Failed(SocialApiStatus.Failed);
+            var count = ReadUnreadCount(me);
+            if (!count.HasValue) return SocialApiResult<SocialMe>.Failed(SocialApiStatus.Failed);
+
+            return SocialApiResult<SocialMe>.Succeeded(new SocialMe(count.Value, MisskeyAuthService.ParseCurrentUser(me)));
+        }
+
+        public static int? ReadUnreadCount(JsonObject me)
+        {
+            if (me == null || !me.ContainsKey("unreadNotificationsCount")) return null;
 
             var value = me.GetNamedValue("unreadNotificationsCount");
-            if (value.ValueType != JsonValueType.Number) return SocialApiResult<int>.Failed(SocialApiStatus.Failed);
+            if (value.ValueType != JsonValueType.Number) return null;
 
             var number = value.GetNumber();
-            if (double.IsNaN(number) || number < 0) return SocialApiResult<int>.Failed(SocialApiStatus.Failed);
+            if (double.IsNaN(number) || number < 0) return null;
 
-            return SocialApiResult<int>.Succeeded(number > int.MaxValue ? int.MaxValue : (int)number);
+            return number > int.MaxValue ? int.MaxValue : (int)number;
         }
 
         private static async Task<SocialApiResult<IJsonValue>> PostAsync(string endpoint, string token, JsonObject body,

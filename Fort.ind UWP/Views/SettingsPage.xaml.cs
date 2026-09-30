@@ -69,6 +69,7 @@ namespace Fort.ind_UWP
 
                 UpdateStorageInfo();
                 UpdateTileNotificationsVisibility();
+                UpdateBackgroundDeniedNotice(false);
 
                 RevealPendingSection();
             }
@@ -346,9 +347,80 @@ namespace Fort.ind_UWP
             LiveTileService.ClearBadge();
         }
 
+        private void LoadSocialNotificationControls()
+        {
+            SocialNotificationsToggle.IsOn = SocialNotificationService.Enabled;
+            SocialBackgroundCheckToggle.IsOn = SocialNotificationService.BackgroundCheckEnabled;
+            SocialBackgroundCheckToggle.IsEnabled = SocialNotificationsToggle.IsOn;
+            UpdateBackgroundDeniedNotice(false);
+        }
+
+        private async void SocialNotificationsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            SocialBackgroundCheckToggle.IsEnabled = SocialNotificationsToggle.IsOn;
+
+            if (_loadingSettings) return;
+
+            try
+            {
+                SocialNotificationService.Enabled = SocialNotificationsToggle.IsOn;
+                UpdateTileNotificationsVisibility();
+
+                await SocialNotificationService.ReconcileAsync();
+                UpdateBackgroundDeniedNotice(true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: could not apply the notifications setting - {ex.Message}");
+            }
+        }
+
+        private async void SocialBackgroundCheckToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            try
+            {
+                SocialNotificationService.BackgroundCheckEnabled = SocialBackgroundCheckToggle.IsOn;
+
+                await SocialNotificationService.UpdateBackgroundCheckAsync();
+                UpdateBackgroundDeniedNotice(true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: could not apply the background check setting - {ex.Message}");
+            }
+        }
+
+        private void UpdateBackgroundDeniedNotice(bool announce)
+        {
+            var denied = SocialNotificationsToggle.IsOn && SocialBackgroundCheckToggle.IsOn &&
+                         SocialNotificationService.BackgroundAccessDenied;
+            var wasVisible = SocialNotificationsBackgroundDenied.Visibility == Visibility.Visible;
+
+            SocialNotificationsBackgroundDenied.Visibility = denied ? Visibility.Visible : Visibility.Collapsed;
+
+            if (announce && denied && !wasVisible)
+            {
+                AutomationHelper.AnnounceLiveRegion(SocialNotificationsBackgroundDenied);
+            }
+        }
+
+        private async void SocialNotificationsLockScreenLink_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:lockscreen"));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: could not open lock screen settings - {ex.Message}");
+            }
+        }
+
         private void UpdateTileNotificationsVisibility()
         {
-            var shown = SocialTileService.StartShowsLiveTiles && LabsService.SocialNotificationsEnabled;
+            var shown = SocialTileService.StartShowsLiveTiles && SocialNotificationService.Enabled;
             TileNotificationsPanel.Visibility = shown ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -436,6 +508,7 @@ namespace Fort.ind_UWP
 
             if (_loadingSettings) return;
             ProfileService.AutoRefreshEnabled = ProfileAutoRefreshToggle.IsOn;
+            SocialNotificationService.UpdateBackgroundCheckInBackground();
         }
 
         private void ProfileRefreshIntervalCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -446,12 +519,18 @@ namespace Fort.ind_UWP
             if (minutes.HasValue)
             {
                 ProfileService.AutoRefreshMinutes = minutes.Value;
+                SocialNotificationService.UpdateBackgroundCheckInBackground();
             }
         }
 
         private void ProfileHeader_Tapped(object sender, RoutedEventArgs e)
         {
             ToggleSettingsRow(ProfileHeader, ProfileContent, ProfileChevronRotation, AppConstants.SettingSettingsProfileExpanded);
+        }
+
+        private void NotificationsHeader_Tapped(object sender, RoutedEventArgs e)
+        {
+            ToggleSettingsRow(NotificationsHeader, NotificationsContent, NotificationsChevronRotation, AppConstants.SettingSettingsNotificationsExpanded);
         }
 
         private void StorageHeader_Tapped(object sender, RoutedEventArgs e)
@@ -574,6 +653,8 @@ namespace Fort.ind_UWP
                     return new SettingsRow(TransparencyHeader, TransparencyContent, TransparencyChevronRotation, AppConstants.SettingSettingsTransparencyExpanded);
                 case AppConstants.SettingsSectionProfile:
                     return new SettingsRow(ProfileHeader, ProfileContent, ProfileChevronRotation, AppConstants.SettingSettingsProfileExpanded);
+                case AppConstants.SettingsSectionNotifications:
+                    return new SettingsRow(NotificationsHeader, NotificationsContent, NotificationsChevronRotation, AppConstants.SettingSettingsNotificationsExpanded);
                 case AppConstants.SettingsSectionStorage:
                     return new SettingsRow(StorageHeader, StorageContent, StorageChevronRotation, AppConstants.SettingSettingsStorageExpanded);
                 case AppConstants.SettingsSectionTile:
@@ -594,6 +675,7 @@ namespace Fort.ind_UWP
                 RestorePanelState(AppConstants.SettingSettingsAppearanceExpanded, AppearanceHeader, AppearanceContent, AppearanceChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsTransparencyExpanded, TransparencyHeader, TransparencyContent, TransparencyChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsProfileExpanded, ProfileHeader, ProfileContent, ProfileChevronRotation);
+                RestorePanelState(AppConstants.SettingSettingsNotificationsExpanded, NotificationsHeader, NotificationsContent, NotificationsChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsStorageExpanded, StorageHeader, StorageContent, StorageChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsTileExpanded, TileHeader, TileContent, TileChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsWelcomeExpanded, WelcomeHeader, WelcomeContent, WelcomeChevronRotation);

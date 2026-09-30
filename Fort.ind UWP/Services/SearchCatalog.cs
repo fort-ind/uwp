@@ -54,6 +54,10 @@ namespace Fort.ind_UWP
                 SettingsItem("SearchItemCheckForUpdates", AppConstants.SettingsSectionAbout),
                 SettingsItem("SearchItemProfileSettings", AppConstants.SettingsSectionProfile),
                 SettingsItem("SearchItemFollowerCountRefresh", AppConstants.SettingsSectionProfile),
+                SettingsItem("SearchItemNotifications", AppConstants.SettingsSectionNotifications),
+                SettingsItem("SearchItemLockScreen", AppConstants.SettingsSectionNotifications),
+                SettingsItem("SearchItemNotificationBadge", AppConstants.SettingsSectionNotifications),
+                SettingsItem("SearchItemBackgroundCheck", AppConstants.SettingsSectionNotifications),
                 new SearchItem(LocalizedStrings.Get("SearchItemAccount"), AppConstants.CategoryProfile, AppConstants.NavigationProfile),
                 new SearchItem(LocalizedStrings.Get("SearchItemSignIn"), AppConstants.CategoryProfile, AppConstants.NavigationProfile)
             };

@@ -35,8 +35,6 @@ namespace Fort.ind_UWP
 
         private static volatile bool s_active;
 
-        private static string s_activeUserId;
-
         private static volatile bool s_suspended;
 
         private static volatile int s_unreadCount = -1;
@@ -53,11 +51,6 @@ namespace Fort.ind_UWP
 
         public static event EventHandler NeedsSignInAgainChanged;
 
-        public static int UnreadCount
-        {
-            get { return s_unreadCount; }
-        }
-
         public static bool NeedsSignInAgain
         {
             get { return s_needsSignInAgain; }
@@ -65,9 +58,84 @@ namespace Fort.ind_UWP
 
         public static bool BackgroundAccessDenied { get; private set; }
 
+        public static bool Enabled
+        {
+            get
+            {
+                try
+                {
+                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialNotificationsEnabled];
+                    return stored == null || Convert.ToBoolean(stored);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SocialNotificationService: could not read the notifications setting - {ex.Message}");
+                    return true;
+                }
+            }
+            set
+            {
+                try
+                {
+                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialNotificationsEnabled] = value;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SocialNotificationService: could not save the notifications setting - {ex.Message}");
+                }
+            }
+        }
+
+        public static bool BackgroundCheckEnabled
+        {
+            get
+            {
+                try
+                {
+                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialBackgroundCheck];
+                    return stored == null || Convert.ToBoolean(stored);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SocialNotificationService: could not read the background check setting - {ex.Message}");
+                    return true;
+                }
+            }
+            set
+            {
+                try
+                {
+                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialBackgroundCheck] = value;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SocialNotificationService: could not save the background check setting - {ex.Message}");
+                }
+            }
+        }
+
         public static bool OwnsBadge
         {
-            get { return LabsService.SocialNotificationsEnabled; }
+            get { return Enabled && ReadActiveAccount() != null; }
+        }
+
+        public static bool SignInAgainDismissed
+        {
+            get
+            {
+                var user = ProfileService.CurrentUser;
+                return user != null &&
+                       string.Equals(ReadStoredString(AppConstants.SettingSocialSignInAgainDismissed), AccountOf(user),
+                                     StringComparison.Ordinal);
+            }
+        }
+
+        public static void DismissSignInAgain()
+        {
+            var user = ProfileService.CurrentUser;
+            if (user == null) return;
+
+            WriteStoredString(AppConstants.SettingSocialSignInAgainDismissed, AccountOf(user));
         }
 
         public static void Initialize()
@@ -104,20 +172,22 @@ namespace Fort.ind_UWP
             try
             {
                 var user = ProfileService.CurrentUser;
-                var wanted = LabsService.SocialNotificationsEnabled && user != null;
+                var wanted = Enabled && user != null;
                 var wasActive = s_active;
-                var previousUserId = s_activeUserId;
+                var previousAccount = ReadActiveAccount();
                 s_active = wanted;
-                s_activeUserId = wanted ? user.UserId : null;
 
                 if (wanted)
                 {
-                    if (wasActive && !string.Equals(previousUserId, s_activeUserId, StringComparison.Ordinal))
+                    var account = AccountOf(user);
+                    WriteStoredString(AppConstants.SettingSocialNotificationsAccount, account);
+
+                    if (previousAccount != null && !string.Equals(previousAccount, account, StringComparison.Ordinal))
                     {
                         LeaveAccount(true);
                     }
 
-                    await EnsureBackgroundCheckAsync();
+                    await ApplyBackgroundCheckAsync();
 
                     if (!s_suspended)
                     {
@@ -129,12 +199,53 @@ namespace Fort.ind_UWP
                     return;
                 }
 
+                WriteStoredString(AppConstants.SettingSocialNotificationsAccount, null);
                 UnregisterBackgroundCheck();
-                LeaveAccount(wasActive || ReadWatermark().HasValue);
+                LeaveAccount(wasActive || previousAccount != null || ReadWatermark().HasValue);
             }
             finally
             {
                 s_reconcileGate.Release();
+            }
+        }
+
+        public static async Task UpdateBackgroundCheckAsync()
+        {
+            await s_reconcileGate.WaitAsync();
+            try
+            {
+                if (s_active)
+                {
+                    await ApplyBackgroundCheckAsync();
+                }
+            }
+            finally
+            {
+                s_reconcileGate.Release();
+            }
+        }
+
+        public static async void UpdateBackgroundCheckInBackground()
+        {
+            try
+            {
+                await UpdateBackgroundCheckAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialNotificationService: background check update failed - {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        private static async Task ApplyBackgroundCheckAsync()
+        {
+            if (BackgroundCheckEnabled)
+            {
+                await EnsureBackgroundCheckAsync();
+            }
+            else
+            {
+                UnregisterBackgroundCheck();
             }
         }
 
@@ -178,12 +289,13 @@ namespace Fort.ind_UWP
         {
             try
             {
-                if (!s_active) return;
+                var account = ReadActiveAccount();
+                if (!s_active || account == null) return;
 
                 var token = await MisskeyAuthService.TryGetTokenAsync();
                 if (string.IsNullOrEmpty(token)) return;
 
-                await RefreshTileAsync(token, s_unreadCount, CancellationToken.None);
+                await RefreshTileAsync(token, account, s_unreadCount, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -204,6 +316,32 @@ namespace Fort.ind_UWP
             }
 
             return result;
+        }
+
+        public static async Task<int> GetUnreadCountAsync(CancellationToken cancellationToken)
+        {
+            var known = s_unreadCount;
+            if (s_active && known >= 0) return known;
+
+            var token = await MisskeyAuthService.TryGetTokenAsync();
+            var me = await SocialApiService.GetMeAsync(token, cancellationToken);
+            if (me.Status != SocialApiStatus.Ok) return -1;
+
+            await ProfileService.OfferRefreshedProfileAsync(token, me.Value.Profile);
+            return me.Value.UnreadCount;
+        }
+
+        public static void OfferUnreadCount(string accountId, int? count)
+        {
+            if (!count.HasValue || !s_active || !IsActiveAccount(accountId)) return;
+
+            var previous = s_unreadCount;
+            ApplyUnreadCount(count.Value);
+
+            if (count.Value > 0 && count.Value != previous)
+            {
+                RefreshTileInBackground();
+            }
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchMentionsAsync(
@@ -252,6 +390,7 @@ namespace Fort.ind_UWP
             if (notificationsStatus == SocialApiStatus.Ok)
             {
                 SetNeedsSignInAgain(false);
+                WriteStoredString(AppConstants.SettingSocialSignInAgainDismissed, null);
             }
             else if (notificationsStatus == SocialApiStatus.PermissionDenied)
             {
@@ -299,7 +438,7 @@ namespace Fort.ind_UWP
 
                 try
                 {
-                    if (LabsService.SocialNotificationsEnabled)
+                    if (Enabled && BackgroundCheckEnabled && ReadActiveAccount() != null)
                     {
                         await RunCheckAsync(cts.Token);
                     }
@@ -339,14 +478,21 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                if (FindBackgroundCheck() != null) return;
+                var minutes = BackgroundCheckMinutes;
+                if (FindBackgroundCheck() != null)
+                {
+                    if (ReadRegisteredMinutes() == minutes) return;
+                    UnregisterBackgroundCheck();
+                }
 
                 BackgroundTaskBuilder builder = new BackgroundTaskBuilder();
                 builder.Name = AppConstants.SocialCheckTaskName;
                 builder.IsNetworkRequested = true;
-                builder.SetTrigger(new TimeTrigger(AppConstants.SocialCheckIntervalMinutes, false));
+                builder.SetTrigger(new TimeTrigger(minutes, false));
                 builder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
                 builder.Register();
+
+                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialCheckRegisteredMinutes] = minutes;
             }
             catch (Exception ex)
             {
@@ -367,6 +513,31 @@ namespace Fort.ind_UWP
 
             BackgroundExecutionManager.RemoveAccess();
             values[AppConstants.SettingBackgroundAccessVersion] = stamp;
+        }
+
+        private static uint BackgroundCheckMinutes
+        {
+            get
+            {
+                var minutes = ProfileService.AutoRefreshEnabled ? ProfileService.AutoRefreshMinutes : 0;
+                return (uint)Math.Max(AppConstants.SocialCheckMinimumMinutes, minutes);
+            }
+        }
+
+        private static uint ReadRegisteredMinutes()
+        {
+            try
+            {
+                var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialCheckRegisteredMinutes];
+                return stored == null
+                       ? (uint)AppConstants.SocialCheckMinimumMinutes
+                       : Convert.ToUInt32(stored, CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialNotificationService: could not read the check interval - {ex.Message}");
+                return 0;
+            }
         }
 
         private static IBackgroundTaskRegistration FindBackgroundCheck()
@@ -406,31 +577,40 @@ namespace Fort.ind_UWP
 
             try
             {
+                var account = ReadActiveAccount();
+                if (account == null) return;
+
                 var token = await MisskeyAuthService.TryGetTokenAsync();
                 if (string.IsNullOrEmpty(token)) return;
 
-                var count = await SocialApiService.GetUnreadCountAsync(token, cancellationToken);
-                if (count.Status != SocialApiStatus.Ok) return;
+                var me = await SocialApiService.GetMeAsync(token, cancellationToken);
+                if (me.Status != SocialApiStatus.Ok || !IsActiveAccount(account)) return;
 
-                ApplyUnreadCount(count.Value);
+                var count = me.Value.UnreadCount;
+                ApplyUnreadCount(count);
+                await ProfileService.OfferRefreshedProfileAsync(token, me.Value.Profile);
 
                 if (!ReadWatermark().HasValue)
                 {
-                    await EstablishBaselineAsync(token, cancellationToken);
-                    await RefreshTileAsync(token, count.Value, cancellationToken);
+                    await EstablishBaselineAsync(token, account, cancellationToken);
+                    await RefreshTileAsync(token, account, count, cancellationToken);
                     return;
                 }
 
-                if (count.Value == 0) return;
+                if (count == 0) return;
 
                 var unread = await SocialApiService.GetNotificationsAsync(token, null,
-                                                                          Math.Min(count.Value, AppConstants.SocialFeedPageSize),
+                                                                          Math.Min(count, AppConstants.SocialFeedPageSize),
                                                                           false, cancellationToken);
+                if (!IsActiveAccount(account)) return;
+
                 ObservePermission(unread.Status);
                 if (unread.Status != SocialApiStatus.Ok) return;
 
-                await ToastUnclaimedAsync(unread.Value, cancellationToken);
-                await SocialTileService.ShowAsync(unread.Value, count.Value, cancellationToken);
+                await ToastUnclaimedAsync(unread.Value, account, cancellationToken);
+                if (!IsActiveAccount(account)) return;
+
+                await SocialTileService.ShowAsync(unread.Value, count, cancellationToken);
             }
             finally
             {
@@ -438,7 +618,8 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task ToastUnclaimedAsync(IReadOnlyList<SocialNotification> unread, CancellationToken cancellationToken)
+        private static async Task ToastUnclaimedAsync(IReadOnlyList<SocialNotification> unread, string account,
+                                                      CancellationToken cancellationToken)
         {
             var fresh = UnclaimedForToast(unread);
             if (fresh.Count == 0) return;
@@ -447,6 +628,8 @@ namespace Fort.ind_UWP
             {
                 foreach (var notification in fresh)
                 {
+                    if (!IsActiveAccount(account)) return;
+
                     if (TryClaimForToast(notification))
                     {
                         await ShowToastAsync(notification, cancellationToken);
@@ -459,28 +642,32 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task RefreshTileAsync(string token, int count, CancellationToken cancellationToken)
+        private static async Task RefreshTileAsync(string token, string account, int count, CancellationToken cancellationToken)
         {
             if (count <= 0 || !SocialTileService.WantsPreviews) return;
 
             var newest = await SocialApiService.GetNotificationsAsync(token, null,
                                                                       Math.Min(count, AppConstants.SocialTilePreviewLimit),
                                                                       false, cancellationToken);
+            if (!IsActiveAccount(account)) return;
+
             ObservePermission(newest.Status);
             if (newest.Status != SocialApiStatus.Ok) return;
 
             await SocialTileService.ShowAsync(newest.Value, count, cancellationToken);
         }
 
-        private static async Task EstablishBaselineAsync(string token, CancellationToken cancellationToken)
+        private static async Task EstablishBaselineAsync(string token, string account, CancellationToken cancellationToken)
         {
             var newest = await SocialApiService.GetNotificationsAsync(token, null, 1, false, cancellationToken);
+            if (!IsActiveAccount(account)) return;
+
             ObservePermission(newest.Status);
             if (newest.Status != SocialApiStatus.Ok) return;
 
             lock (s_lock)
             {
-                if (ReadWatermark().HasValue) return;
+                if (ReadWatermark().HasValue || !IsActiveAccount(account)) return;
                 WriteWatermark(newest.Value.Count > 0 ? newest.Value[0].CreatedAt : DateTimeOffset.MinValue);
             }
         }
@@ -493,14 +680,18 @@ namespace Fort.ind_UWP
         {
             try
             {
+                var account = ReadActiveAccount();
+                if (account == null) return;
+
                 var token = await MisskeyAuthService.TryGetTokenAsync();
                 if (string.IsNullOrEmpty(token)) return;
 
-                var count = await SocialApiService.GetUnreadCountAsync(token, cancellationToken);
-                if (count.Status == SocialApiStatus.Ok && s_active)
+                var me = await SocialApiService.GetMeAsync(token, cancellationToken);
+                if (me.Status == SocialApiStatus.Ok && s_active && IsActiveAccount(account))
                 {
-                    ApplyUnreadCount(count.Value);
-                    await RefreshTileAsync(token, count.Value, cancellationToken);
+                    ApplyUnreadCount(me.Value.UnreadCount);
+                    await ProfileService.OfferRefreshedProfileAsync(token, me.Value.Profile);
+                    await RefreshTileAsync(token, account, me.Value.UnreadCount, cancellationToken);
                 }
             }
             catch (Exception ex)
@@ -690,6 +881,54 @@ namespace Fort.ind_UWP
         {
             ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialToastedThrough] =
                 value.ToString("o", CultureInfo.InvariantCulture);
+        }
+
+        private static string AccountOf(UserProfile user)
+        {
+            return user.UserId ?? string.Empty;
+        }
+
+        private static string ReadActiveAccount()
+        {
+            return ReadStoredString(AppConstants.SettingSocialNotificationsAccount);
+        }
+
+        private static bool IsActiveAccount(string account)
+        {
+            return account != null && string.Equals(ReadActiveAccount(), account, StringComparison.Ordinal);
+        }
+
+        private static string ReadStoredString(string key)
+        {
+            try
+            {
+                return ApplicationData.Current.LocalSettings.Values[key] as string;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialNotificationService: could not read {key} - {ex.Message}");
+                return null;
+            }
+        }
+
+        private static void WriteStoredString(string key, string value)
+        {
+            try
+            {
+                var values = ApplicationData.Current.LocalSettings.Values;
+                if (value == null)
+                {
+                    values.Remove(key);
+                }
+                else
+                {
+                    values[key] = value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialNotificationService: could not write {key} - {ex.Message}");
+            }
         }
 
         private static async Task ShowToastAsync(SocialNotification notification, CancellationToken cancellationToken)

@@ -83,11 +83,13 @@ namespace Fort.ind_UWP
         public const string SettingSettingsWelcomeExpanded = "SettingsWelcomeExpanded";
         public const string SettingSettingsAboutExpanded = "SettingsAboutExpanded";
         public const string SettingSettingsProfileExpanded = "SettingsProfileExpanded";
+        public const string SettingSettingsNotificationsExpanded = "SettingsNotificationsExpanded";
         public const string SettingLastNavTag = "LastNavTag";
 
         public const string SettingsSectionAppearance = "Appearance";
         public const string SettingsSectionTransparency = "Transparency";
         public const string SettingsSectionProfile = "Profile";
+        public const string SettingsSectionNotifications = "Notifications";
         public const string SettingsSectionStorage = "Storage";
         public const string SettingsSectionTile = "Tile";
         public const string SettingsSectionWelcome = "Welcome";
@@ -99,14 +101,18 @@ namespace Fort.ind_UWP
         public const string SettingUpdateDismissedVersion = "UpdateDismissedVersion";
         public const int UpdateCheckIntervalHours = 24;
 
-        public const string SettingLabSocialNotifications = "LabSocialNotifications";
+        public const string SettingSocialNotificationsEnabled = "SocialNotificationsEnabled";
+        public const string SettingSocialNotificationsAccount = "SocialNotificationsAccount";
+        public const string SettingSocialSignInAgainDismissed = "SocialSignInAgainDismissed";
 
         public const string SettingSocialToastedThrough = "SocialNotificationsToastedThrough";
         public const string SettingSocialToastedIds = "SocialNotificationsToastedIds";
         public const int SocialToastedIdLimit = 32;
         public const string SettingBackgroundAccessVersion = "BackgroundAccessAppVersion";
         public const string SocialCheckTaskName = "SocialNotificationsCheck";
-        public const uint SocialCheckIntervalMinutes = 15;
+        public const int SocialCheckMinimumMinutes = 15;
+        public const string SettingSocialBackgroundCheck = "SocialBackgroundCheck";
+        public const string SettingSocialCheckRegisteredMinutes = "SocialCheckRegisteredMinutes";
         public const string SocialToastGroup = "social";
         public const int SocialToastIndividualLimit = 4;
         public const int SocialFeedPageSize = 20;

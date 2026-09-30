@@ -52,7 +52,7 @@ namespace Fort.ind_UWP
         {
             get
             {
-                return StartShowsLiveTiles && LabsService.SocialNotificationsEnabled && PreviewsEnabled &&
+                return StartShowsLiveTiles && SocialNotificationService.Enabled && PreviewsEnabled &&
                        !LiveTileService.TileCleared;
             }
         }

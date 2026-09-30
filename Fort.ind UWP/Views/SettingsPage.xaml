@@ -656,6 +656,90 @@
                     <Border BorderThickness="0,0,0,1"
                             BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
                         <StackPanel>
+                            <local:ExpanderHeaderButton x:Uid="MainNotifications" x:Name="NotificationsHeader"
+                                    Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    MinWidth="0"
+                                    CornerRadius="0"
+                                    Padding="16,12"
+                                    AutomationProperties.HeadingLevel="Level2"
+                                    Click="NotificationsHeader_Tapped">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Width="36" Height="36"
+                                          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                        <FontIcon Glyph="&#xEA8F;" FontSize="16"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  AutomationProperties.AccessibilityView="Raw"/>
+                                    </Grid>
+                                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock x:Uid="MainNotifications2" Style="{StaticResource BaseTextBlockStyle}"/>
+                                        <TextBlock x:Uid="MainNotificationsCaption"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </StackPanel>
+                                    <FontIcon x:Name="NotificationsChevron" Grid.Column="2" Glyph="&#xE76C;"
+                                              FontSize="12" VerticalAlignment="Center"
+                                              AutomationProperties.AccessibilityView="Raw"
+                                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                              RenderTransformOrigin="0.5,0.5">
+                                        <FontIcon.RenderTransform>
+                                            <RotateTransform x:Name="NotificationsChevronRotation" Angle="0"/>
+                                        </FontIcon.RenderTransform>
+                                    </FontIcon>
+                                </Grid>
+                            </local:ExpanderHeaderButton>
+                            <StackPanel x:Name="NotificationsContent" Visibility="Collapsed"
+                                        Padding="20,0,20,16">
+                                <StackPanel.ChildrenTransitions>
+                                    <TransitionCollection>
+                                        <EntranceThemeTransition FromVerticalOffset="20"/>
+                                    </TransitionCollection>
+                                </StackPanel.ChildrenTransitions>
+                                <Rectangle Height="1" Margin="0,0,0,14"
+                                           Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                           Opacity="0.08"/>
+                                <ToggleSwitch x:Uid="SocialNotificationsToggle" x:Name="SocialNotificationsToggle"
+                                              Toggled="SocialNotificationsToggle_Toggled"/>
+                                <TextBlock x:Uid="SocialNotificationsDescription"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <ToggleSwitch x:Uid="SocialBackgroundCheckToggle" x:Name="SocialBackgroundCheckToggle"
+                                              Margin="0,14,0,0"
+                                              Toggled="SocialBackgroundCheckToggle_Toggled"/>
+                                <TextBlock x:Uid="SocialBackgroundCheckDescription"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock x:Uid="SocialNotificationsBackgroundDenied" x:Name="SocialNotificationsBackgroundDenied"
+                                           Visibility="Collapsed" Margin="0,8,0,0"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           AutomationProperties.LiveSetting="Polite"/>
+                                <ToggleSwitch x:Uid="TileBadgeToggle" x:Name="TileBadgeToggle"
+                                              Margin="0,14,0,0"
+                                              Toggled="TileBadgeToggle_Toggled"/>
+                                <TextBlock x:Uid="MainTheSmallCounterThat"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock x:Uid="SocialNotificationsLockScreenHint"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <HyperlinkButton x:Uid="SocialNotificationsLockScreenLink"
+                                                 Padding="0" Margin="0,4,0,0"
+                                                 Click="SocialNotificationsLockScreenLink_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border BorderThickness="0,0,0,1"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+                        <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainDataStorage" x:Name="StorageHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
                                     Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
@@ -793,11 +877,6 @@
                                 <Rectangle Height="1" Margin="0,0,0,14"
                                            Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
                                            Opacity="0.08"/>
-                                <ToggleSwitch x:Uid="TileBadgeToggle" x:Name="TileBadgeToggle"
-                                              Toggled="TileBadgeToggle_Toggled"/>
-                                <TextBlock x:Uid="MainTheSmallCounterThat"
-                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
-                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                 <StackPanel x:Name="TileNotificationsPanel" Visibility="Collapsed">
                                     <ToggleSwitch x:Uid="TileNotificationsToggle" x:Name="TileNotificationsToggle"
                                                   Toggled="TileNotificationsToggle_Toggled"/>

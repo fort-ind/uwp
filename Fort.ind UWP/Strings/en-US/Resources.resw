@@ -849,7 +849,7 @@ Open your profile and try again.</value>
     <value>Source Code</value>
   </data>
   <data name="MainTheSmallCounterThat.Text" xml:space="preserve">
-    <value>The small counter that appears on the app's tile and taskbar icon when the Live Tile has new content.</value>
+    <value>The small counter on the app's tile and taskbar icon. It shows your unread fort.social notifications while those are on and you're signed in, and otherwise marks new Live Tile content.</value>
   </data>
   <data name="MainTheWelcomeDialogAppears.Text" xml:space="preserve">
     <value>The welcome dialog appears the first time you open the app.</value>
@@ -1308,13 +1308,13 @@ Open your profile and try again.</value>
     <value>Profile</value>
   </data>
   <data name="MainProfileSettings.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>choose how often your follower counts refresh</value>
+    <value>choose how often your profile and notifications are checked</value>
   </data>
   <data name="MainProfileSettings2.Text" xml:space="preserve">
     <value>Profile</value>
   </data>
   <data name="MainProfileSettingsCaption.Text" xml:space="preserve">
-    <value>Keep your follower counts up to date</value>
+    <value>How often your profile and notifications are checked</value>
   </data>
   <data name="ProfileAutoRefreshToggle.Header" xml:space="preserve">
     <value>Refresh follower counts automatically</value>
@@ -1326,7 +1326,7 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="ProfileRefreshIntervalCombo.Header" xml:space="preserve">
-    <value>Check for new counts</value>
+    <value>Check for new notifications</value>
   </data>
   <data name="ProfileRefreshEveryVisit.Content" xml:space="preserve">
     <value>Every time you open Profile</value>
@@ -1341,7 +1341,7 @@ Open your profile and try again.</value>
     <value>At most once an hour</value>
   </data>
   <data name="ProfileAutoRefreshDescription.Text" xml:space="preserve">
-    <value>Counts are fetched from fort.social when you open your profile. When this is off, they update only when the app starts.</value>
+    <value>Your profile is refreshed from fort.social when you open it, and whenever fort.desktop checks for new notifications. While it's closed, it checks for new notifications at this interval, but never more than every 15 minutes. When this is off, your profile only refreshes when the app starts, and new notifications are checked for every 15 minutes.</value>
   </data>
   <data name="SearchItemProfileSettings" xml:space="preserve">
     <value>Profile settings</value>
@@ -1349,11 +1349,38 @@ Open your profile and try again.</value>
   <data name="SearchItemFollowerCountRefresh" xml:space="preserve">
     <value>Follower count refresh</value>
   </data>
+  <data name="SearchItemNotifications" xml:space="preserve">
+    <value>fort.social notifications</value>
+  </data>
+  <data name="SearchItemLockScreen" xml:space="preserve">
+    <value>Lock screen</value>
+  </data>
+  <data name="SearchItemNotificationBadge" xml:space="preserve">
+    <value>Notification badge</value>
+  </data>
+  <data name="SearchItemBackgroundCheck" xml:space="preserve">
+    <value>Check for notifications in the background</value>
+  </data>
+  <data name="MainNotifications.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="MainNotifications.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>turn fort.social notifications and the badge on or off</value>
+  </data>
+  <data name="MainNotifications2.Text" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="MainNotificationsCaption.Text" xml:space="preserve">
+    <value>fort.social notifications and the badge</value>
+  </data>
   <data name="LabsHeading.Text" xml:space="preserve">
     <value>labs</value>
   </data>
   <data name="LabsIntro.Text" xml:space="preserve">
     <value>experimental stuff that's still being worked on. it might be rough around the edges or change later</value>
+  </data>
+  <data name="LabsEmpty.Text" xml:space="preserve">
+    <value>nothing's cooking in labs right now. check back later :)</value>
   </data>
   <data name="BetasHeading.Text" xml:space="preserve">
     <value>betas</value>
@@ -1434,12 +1461,6 @@ Open your profile and try again.</value>
   </data>
   <data name="SocialRefreshButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Refresh (F5)</value>
-  </data>
-  <data name="SocialGateLabOff" xml:space="preserve">
-    <value>Social features are coming soon. however.. if you want to try the first beta feature for fort.social on desktop go to labs+betas</value>
-  </data>
-  <data name="SocialGateLabOffButton" xml:space="preserve">
-    <value>Open Labs &amp; betas</value>
   </data>
   <data name="SocialGateSignedOut" xml:space="preserve">
     <value>Sign in with your fort.social account to see your notifications and mentions here.</value>
@@ -1583,11 +1604,8 @@ Open your profile and try again.</value>
     <value>Direct note — open to read it</value>
     <comment>Shown in a Windows notification in place of the text of a direct (private) note, because notifications can appear on the lock screen.</comment>
   </data>
-  <data name="SocialNotificationsTitle.Text" xml:space="preserve">
+  <data name="SocialNotificationsToggle.Header" xml:space="preserve">
     <value>fort.social notifications</value>
-  </data>
-  <data name="SocialNotificationsDescription.Text" xml:space="preserve">
-    <value>Get your fort.social notifications as Windows notifications, and see them with your mentions on the Social page. you can also see how many notifs you have directly from the lockscreen too :) (only on windows 10) </value>
   </data>
   <data name="SocialNotificationsToggle.OnContent" xml:space="preserve">
     <value>On</value>
@@ -1595,8 +1613,20 @@ Open your profile and try again.</value>
   <data name="SocialNotificationsToggle.OffContent" xml:space="preserve">
     <value>Off</value>
   </data>
-  <data name="SocialNotificationsToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>fort.social notifications</value>
+  <data name="SocialNotificationsDescription.Text" xml:space="preserve">
+    <value>While you're signed in, fort.desktop shows your fort.social notifications as Windows notifications and puts your unread count on its tile, taskbar button and lock screen. The Social page works either way.</value>
+  </data>
+  <data name="SocialBackgroundCheckToggle.Header" xml:space="preserve">
+    <value>Check while fort.desktop is closed</value>
+  </data>
+  <data name="SocialBackgroundCheckToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="SocialBackgroundCheckToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="SocialBackgroundCheckDescription.Text" xml:space="preserve">
+    <value>Checks fort.social in the background as often as Profile ▸ Check for new notifications is set to, but never more than every 15 minutes, which is as often as Windows allows. Turn this off and notifications, the badge and the tile only update while fort.desktop is open.</value>
   </data>
   <data name="SocialNotificationsBackgroundDenied.Text" xml:space="preserve">
     <value>Windows isn't letting fort.desktop run in the background, so notifications only arrive while it's open. You can allow it in Windows Settings, under background apps.</value>

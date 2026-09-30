@@ -14,7 +14,6 @@ namespace Fort.ind_UWP
         private enum GateKind
         {
             None,
-            LabOff,
             SignedOut
         }
 
@@ -147,13 +146,9 @@ namespace Fort.ind_UWP
                 ResetFeeds();
             }
 
-            if (!LabsService.SocialNotificationsEnabled)
+            if (user == null)
             {
-                ShowGate(GateKind.LabOff);
-            }
-            else if (user == null)
-            {
-                ShowGate(GateKind.SignedOut);
+                ShowSignedOutGate();
             }
             else
             {
@@ -161,22 +156,14 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void ShowGate(GateKind gate)
+        private void ShowSignedOutGate()
         {
-            _gate = gate;
+            _gate = GateKind.SignedOut;
             SocialPivot.Visibility = Visibility.Collapsed;
             GateScrollViewer.Visibility = Visibility.Visible;
 
-            if (gate == GateKind.LabOff)
-            {
-                GateText.Text = LocalizedStrings.Get("SocialGateLabOff");
-                GateButton.Content = LocalizedStrings.Get("SocialGateLabOffButton");
-            }
-            else
-            {
-                GateText.Text = LocalizedStrings.Get("SocialGateSignedOut");
-                GateButton.Content = LocalizedStrings.Get("SocialGateSignInButton");
-            }
+            GateText.Text = LocalizedStrings.Get("SocialGateSignedOut");
+            GateButton.Content = LocalizedStrings.Get("SocialGateSignInButton");
         }
 
         private void ShowFeeds()
@@ -240,7 +227,9 @@ namespace Fort.ind_UWP
 
             try
             {
-                var unreadAtOpen = SocialNotificationService.UnreadCount;
+                var unreadAtOpen = await SocialNotificationService.GetUnreadCountAsync(CancellationToken.None);
+                if (version != _notificationsVersion) return;
+
                 var result = await SocialNotificationService.FetchNotificationsAsync(null, true, CancellationToken.None);
                 if (version != _notificationsVersion) return;
 
@@ -425,32 +414,9 @@ namespace Fort.ind_UWP
             }
         }
 
-        private async void GateButton_Click(object sender, RoutedEventArgs e)
+        private void GateButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (_gate == GateKind.SignedOut)
-                {
-                    OpenSignIn();
-                    return;
-                }
-
-                if (WindowManagerService.IsSecondaryView)
-                {
-                    await WindowManagerService.ShowInMainWindowAsync(AppConstants.NavigationBetas);
-                    return;
-                }
-
-                var shell = MainPage.Current;
-                if (shell != null)
-                {
-                    shell.NavigateToTag(AppConstants.NavigationBetas);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"SocialPage: gate action failed - {ex.Message}");
-            }
+            OpenSignIn();
         }
 
         private void OpenSignIn()
@@ -556,15 +522,6 @@ namespace Fort.ind_UWP
         private void OnWindowActivated(object sender, WindowActivatedEventArgs e)
         {
             if (e.WindowActivationState == CoreWindowActivationState.Deactivated) return;
-
-            try
-            {
-                RefreshGate();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"SocialPage: gate refresh on activation failed - {ex.Message}");
-            }
 
             if (IsViewingNotifications())
             {

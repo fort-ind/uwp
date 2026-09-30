@@ -45,6 +45,7 @@ namespace Fort.ind_UWP
                     ShowCustomSwatchColor(rememberedCustom);
                 }
 
+                LoadSocialNotificationControls();
                 TileBadgeToggle.IsOn = LiveTileService.BadgeEnabled;
                 LoadTileNotificationControls();
                 AutoUpdateCheckToggle.IsOn = UpdateService.AutomaticChecksEnabled;

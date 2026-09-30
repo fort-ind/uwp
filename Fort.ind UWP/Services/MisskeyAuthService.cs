@@ -372,9 +372,10 @@ namespace Fort.ind_UWP
                         }
 
                         var body = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
-                        var profile = ParseUser(JsonObject.Parse(body), true);
+                        var me = JsonObject.Parse(body);
+                        var profile = ParseUser(me, true);
                         return profile != null
-                               ? MisskeyUserFetchResult.Succeeded(profile)
+                               ? MisskeyUserFetchResult.Succeeded(profile, SocialApiService.ReadUnreadCount(me))
                                : MisskeyUserFetchResult.Unavailable();
                     }
                 }
@@ -384,6 +385,11 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"MisskeyAuthService: /api/i failed - {ex.Message}");
                 return MisskeyUserFetchResult.Unavailable();
             }
+        }
+
+        public static UserProfile ParseCurrentUser(JsonObject me)
+        {
+            return ParseUser(me, true);
         }
 
         private static UserProfile ParseUser(JsonObject obj, bool viewerIsSelf)
@@ -529,13 +535,15 @@ namespace Fort.ind_UWP
 
         public bool TokenRejected { get; set; }
 
+        public int? UnreadNotificationsCount { get; set; }
+
         private MisskeyUserFetchResult()
         {
         }
 
-        public static MisskeyUserFetchResult Succeeded(UserProfile profile)
+        public static MisskeyUserFetchResult Succeeded(UserProfile profile, int? unreadNotificationsCount)
         {
-            return new MisskeyUserFetchResult { Profile = profile };
+            return new MisskeyUserFetchResult { Profile = profile, UnreadNotificationsCount = unreadNotificationsCount };
         }
 
         public static MisskeyUserFetchResult Rejected()
