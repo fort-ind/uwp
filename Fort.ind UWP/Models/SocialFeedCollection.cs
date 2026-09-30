@@ -16,6 +16,8 @@ namespace Fort.ind_UWP
 
         private bool _loading;
 
+        private int _generation;
+
         public SocialFeedCollection(Func<string, CancellationToken, Task<IReadOnlyList<SocialFeedItem>>> loadPageAfter)
         {
             _loadPageAfter = loadPageAfter;
@@ -25,6 +27,9 @@ namespace Fort.ind_UWP
 
         public void ReplaceAll(IReadOnlyList<SocialFeedItem> items, bool hasMore)
         {
+            _generation++;
+            _loading = false;
+
             ClearItems();
             foreach (var item in items)
             {
@@ -42,10 +47,13 @@ namespace Fort.ind_UWP
         {
             if (_loading || !HasMoreItems || Count == 0) return new LoadMoreItemsResult { Count = 0 };
 
+            var generation = _generation;
             _loading = true;
             try
             {
                 var page = await _loadPageAfter(this[Count - 1].Id, cancellationToken);
+                if (generation != _generation) return new LoadMoreItemsResult { Count = 0 };
+
                 if (page == null || page.Count == 0)
                 {
                     HasMoreItems = false;
@@ -60,15 +68,20 @@ namespace Fort.ind_UWP
                 HasMoreItems = page.Count >= AppConstants.SocialFeedPageSize;
                 return new LoadMoreItemsResult { Count = (uint)page.Count };
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                Debug.WriteLine("SocialFeedCollection: the list cancelled a load");
+                return new LoadMoreItemsResult { Count = 0 };
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialFeedCollection: could not load more - {ex.Message}");
-                HasMoreItems = false;
+                if (generation == _generation) HasMoreItems = false;
                 return new LoadMoreItemsResult { Count = 0 };
             }
             finally
             {
-                _loading = false;
+                if (generation == _generation) _loading = false;
             }
         }
     }

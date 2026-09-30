@@ -57,13 +57,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        public static bool IsCurrent(int count)
-        {
-            var shown = ReadShown();
-            return shown != null &&
-                   shown.StartsWith(SignaturePrefix(count, LockScreenShowsSenders), StringComparison.Ordinal);
-        }
-
         public static void ShowNewsTile(bool replacePreviews)
         {
             lock (s_lock)

@@ -35,6 +35,8 @@ namespace Fort.ind_UWP
 
         private static volatile bool s_active;
 
+        private static string s_activeUserId;
+
         private static volatile bool s_suspended;
 
         private static volatile int s_unreadCount = -1;
@@ -101,12 +103,20 @@ namespace Fort.ind_UWP
             await s_reconcileGate.WaitAsync();
             try
             {
-                var wanted = LabsService.SocialNotificationsEnabled && ProfileService.CurrentUser != null;
+                var user = ProfileService.CurrentUser;
+                var wanted = LabsService.SocialNotificationsEnabled && user != null;
                 var wasActive = s_active;
+                var previousUserId = s_activeUserId;
                 s_active = wanted;
+                s_activeUserId = wanted ? user.UserId : null;
 
                 if (wanted)
                 {
+                    if (wasActive && !string.Equals(previousUserId, s_activeUserId, StringComparison.Ordinal))
+                    {
+                        LeaveAccount(true);
+                    }
+
                     await EnsureBackgroundCheckAsync();
 
                     if (!s_suspended)
@@ -119,19 +129,24 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                StopStream();
                 UnregisterBackgroundCheck();
-                SetNeedsSignInAgain(false);
-                SocialTileService.Withdraw();
-
-                if (wasActive || ReadWatermark().HasValue)
-                {
-                    ClearState();
-                }
+                LeaveAccount(wasActive || ReadWatermark().HasValue);
             }
             finally
             {
                 s_reconcileGate.Release();
+            }
+        }
+
+        private static void LeaveAccount(bool clearState)
+        {
+            StopStream();
+            SetNeedsSignInAgain(false);
+            SocialTileService.Withdraw();
+
+            if (clearState)
+            {
+                ClearState();
             }
         }
 
@@ -446,7 +461,7 @@ namespace Fort.ind_UWP
 
         private static async Task RefreshTileAsync(string token, int count, CancellationToken cancellationToken)
         {
-            if (count <= 0 || !SocialTileService.WantsPreviews || SocialTileService.IsCurrent(count)) return;
+            if (count <= 0 || !SocialTileService.WantsPreviews) return;
 
             var newest = await SocialApiService.GetNotificationsAsync(token, null,
                                                                       Math.Min(count, AppConstants.SocialTilePreviewLimit),

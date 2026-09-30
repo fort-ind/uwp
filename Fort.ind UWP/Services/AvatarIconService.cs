@@ -297,6 +297,10 @@ namespace Fort.ind_UWP
             {
                 return await RenderCircularIconAsync(sourceUri, size, cancellationToken);
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"AvatarIconService: avatar fetch/decode failed - {ex.Message}");
