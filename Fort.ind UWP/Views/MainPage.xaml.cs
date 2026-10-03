@@ -55,6 +55,8 @@ namespace Fort.ind_UWP
                                           () => UpdateLiveTile());
             ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                           () => OfferUpdateIfAvailable());
+            ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
+                                          () => MediaCacheService.TrimIfOverLimitInBackground());
 
             Unloaded += MainPage_Unloaded;
             Loaded += MainPage_Loaded;
@@ -111,6 +113,7 @@ namespace Fort.ind_UWP
             }
 
             AttachSignInAgainHandler();
+            AttachMemoryHandler();
 
             UpdateProfileNavItem();
         }
@@ -213,6 +216,7 @@ namespace Fort.ind_UWP
             }
 
             DetachSignInAgainHandler();
+            DetachMemoryHandler();
 
             _searchDebounce.Cancel();
         }

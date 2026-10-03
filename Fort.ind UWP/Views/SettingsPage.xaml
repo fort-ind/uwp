@@ -5,6 +5,7 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Background="Transparent">
 
@@ -126,7 +127,7 @@
                                             <TextBlock x:Uid="MainAppTheme" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
                                                        AutomationProperties.HeadingLevel="Level3"/>
                                         </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Spacing="16">
+                                        <muxc:RadioButtons x:Uid="ThemeRadioGroup" MaxColumns="3">
                                             <RadioButton x:Uid="ThemeSystemRadio" x:Name="ThemeSystemRadio"
                                                          GroupName="AppTheme" Tag="Default"
                                                          Checked="ThemeRadio_Checked"/>
@@ -136,7 +137,7 @@
                                             <RadioButton x:Uid="ThemeDarkRadio" x:Name="ThemeDarkRadio"
                                                          GroupName="AppTheme" Tag="Dark"
                                                          Checked="ThemeRadio_Checked"/>
-                                        </StackPanel>
+                                        </muxc:RadioButtons>
                                     </StackPanel>
                                     <StackPanel Spacing="8">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
@@ -144,7 +145,11 @@
                                             <TextBlock x:Uid="MainBackgroundTint" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
                                                        AutomationProperties.HeadingLevel="Level3"/>
                                         </StackPanel>
-                                        <StackPanel Spacing="8">
+                                        <StackPanel x:Name="TintSwatchGroup" Spacing="8"
+                                                    TabFocusNavigation="Once"
+                                                    XYFocusKeyboardNavigation="Enabled"
+                                                    GettingFocus="SwatchGroup_GettingFocus"
+                                                    KeyDown="SwatchGroup_KeyDown">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <Button x:Uid="TintDefaultButton" x:Name="TintDefaultButton" Tag="Default"
                                                         Click="TintColorButton_Click"
@@ -285,7 +290,7 @@
                                             <TextBlock x:Uid="MainApplyTintTo"
                                                        Style="{StaticResource CaptionTextBlockStyle}"
                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                                            <StackPanel Orientation="Horizontal" Spacing="16">
+                                            <muxc:RadioButtons x:Uid="TintScopeRadioGroup" MaxColumns="3">
                                                 <RadioButton x:Uid="TintScopeContentRadio" x:Name="TintScopeContentRadio"
                                                              GroupName="AppTintScope" Tag="Content"
                                                              Checked="TintScopeRadio_Checked"/>
@@ -295,7 +300,7 @@
                                                 <RadioButton x:Uid="TintScopeBothRadio" x:Name="TintScopeBothRadio"
                                                              GroupName="AppTintScope" Tag="Both"
                                                              Checked="TintScopeRadio_Checked"/>
-                                            </StackPanel>
+                                            </muxc:RadioButtons>
                                         </StackPanel>
                                     </StackPanel>
 
@@ -305,7 +310,11 @@
                                             <TextBlock x:Uid="MainAccentColor" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
                                                        AutomationProperties.HeadingLevel="Level3"/>
                                         </StackPanel>
-                                        <StackPanel Spacing="8">
+                                        <StackPanel x:Name="AccentSwatchGroup" Spacing="8"
+                                                    TabFocusNavigation="Once"
+                                                    XYFocusKeyboardNavigation="Enabled"
+                                                    GettingFocus="SwatchGroup_GettingFocus"
+                                                    KeyDown="SwatchGroup_KeyDown">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <Button x:Uid="AccentSystemButton" x:Name="AccentSystemButton" Tag="Default"
                                                         Click="AccentColorButton_Click"
@@ -648,6 +657,12 @@
                                     <TextBlock x:Uid="ProfileAutoRefreshDescription"
                                                Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    <ToggleSwitch x:Uid="RemoteListNoticeToggle" x:Name="RemoteListNoticeToggle"
+                                                  Margin="0,8,0,0"
+                                                  Toggled="RemoteListNoticeToggle_Toggled"/>
+                                    <TextBlock x:Uid="RemoteListNoticeDescription"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
@@ -731,7 +746,9 @@
                                            Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                 <HyperlinkButton x:Uid="SocialNotificationsLockScreenLink"
-                                                 Padding="0" Margin="0,4,0,0"
+                                                 Padding="0" Margin="0,-6,0,0"
+                                                 MinHeight="40"
+                                                 VerticalContentAlignment="Center"
                                                  Click="SocialNotificationsLockScreenLink_Click"/>
                             </StackPanel>
                         </StackPanel>
@@ -820,6 +837,45 @@
                                                        Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"/>
                                         </Button>
                                     </StackPanel>
+                                </StackPanel>
+
+                                <Rectangle Height="1" Margin="0,16,0,12"
+                                           Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                           Opacity="0.08"/>
+
+                                <StackPanel Spacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE91B;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                                        <TextBlock x:Uid="MediaCacheHeading"
+                                                   Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                                   AutomationProperties.HeadingLevel="Level3"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="MediaCacheSizeText"
+                                               Style="{StaticResource BodyTextBlockStyle}"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock x:Uid="MediaCacheDescription"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    <Button x:Uid="ClearMediaCacheButton" x:Name="ClearMediaCacheButton"
+                                            Margin="0,4,0,0"
+                                            Click="ClearMediaCacheButton_Click"/>
+                                    <TextBlock x:Name="MediaCacheStatusText"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                               Visibility="Collapsed"
+                                               AutomationProperties.LiveSetting="Polite"/>
+                                    <ComboBox x:Uid="MediaCacheLimitCombo" x:Name="MediaCacheLimitCombo"
+                                              Margin="0,8,0,0"
+                                              MinWidth="200"
+                                              SelectionChanged="MediaCacheLimitCombo_SelectionChanged">
+                                        <ComboBoxItem x:Uid="MediaCacheLimitOff" Tag="0"/>
+                                        <ComboBoxItem x:Uid="MediaCacheLimit250" Tag="250"/>
+                                        <ComboBoxItem x:Uid="MediaCacheLimit500" Tag="500"/>
+                                        <ComboBoxItem x:Uid="MediaCacheLimit1024" Tag="1024"/>
+                                    </ComboBox>
+                                    <TextBlock x:Uid="MediaCacheLimitDescription"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
@@ -1078,28 +1134,35 @@
                                                Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
                                                Opacity="0.08"/>
 
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <HyperlinkButton NavigateUri="https://fort1nd.com"
-                                                         Padding="8,4" Margin="0">
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <FontIcon Glyph="&#xE774;" FontSize="12" AutomationProperties.AccessibilityView="Raw"/>
-                                                <TextBlock x:Uid="MainWebsite" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="24">
+                                        <HyperlinkButton x:Uid="WebsiteLink"
+                                                         NavigateUri="https://fort1nd.com"
+                                                         Padding="0" MinHeight="40"
+                                                         VerticalContentAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE774;" FontSize="16" AutomationProperties.AccessibilityView="Raw"/>
+                                                <TextBlock x:Uid="MainWebsite" Style="{StaticResource BodyTextBlockStyle}"
+                                                           TextDecorations="Underline"/>
                                             </StackPanel>
                                         </HyperlinkButton>
-                                        <HyperlinkButton x:Name="GitHubLink"
+                                        <HyperlinkButton x:Uid="GitHubLink" x:Name="GitHubLink"
                                                          NavigateUri="https://github.com/fort-ind/uwp"
-                                                         Padding="8,4" Margin="0">
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <FontIcon Glyph="&#xE943;" FontSize="12" AutomationProperties.AccessibilityView="Raw"/>
-                                                <TextBlock x:Uid="MainSourceCode" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                         Padding="0" MinHeight="40"
+                                                         VerticalContentAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE943;" FontSize="16" AutomationProperties.AccessibilityView="Raw"/>
+                                                <TextBlock x:Uid="MainSourceCode" Style="{StaticResource BodyTextBlockStyle}"
+                                                           TextDecorations="Underline"/>
                                             </StackPanel>
                                         </HyperlinkButton>
-                                        <HyperlinkButton x:Name="IssuesLink"
+                                        <HyperlinkButton x:Uid="IssuesLink" x:Name="IssuesLink"
                                                          NavigateUri="https://github.com/fort-ind/uwp/issues"
-                                                         Padding="8,4" Margin="0">
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <FontIcon Glyph="&#xE946;" FontSize="12" AutomationProperties.AccessibilityView="Raw"/>
-                                                <TextBlock x:Uid="MainReportABug" Style="{StaticResource CaptionTextBlockStyle}"/>
+                                                         Padding="0" MinHeight="40"
+                                                         VerticalContentAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE946;" FontSize="16" AutomationProperties.AccessibilityView="Raw"/>
+                                                <TextBlock x:Uid="MainReportABug" Style="{StaticResource BodyTextBlockStyle}"
+                                                           TextDecorations="Underline"/>
                                             </StackPanel>
                                         </HyperlinkButton>
                                     </StackPanel>

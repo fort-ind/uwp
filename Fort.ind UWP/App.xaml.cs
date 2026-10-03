@@ -17,6 +17,20 @@ namespace Fort.ind_UWP
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.Resuming += OnResuming;
+            this.EnteredBackground += OnEnteredBackground;
+            MemoryService.Initialize();
+        }
+
+        private void OnEnteredBackground(object sender, EnteredBackgroundEventArgs e)
+        {
+            try
+            {
+                MemoryService.OnEnteredBackground();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: background memory trim failed - {ex.Message}");
+            }
         }
 
         public static bool ResumingFromTermination { get; private set; }
@@ -27,6 +41,7 @@ namespace Fort.ind_UWP
             try
             {
                 AccentColorService.ApplySavedAccent();
+                AccentColorService.ApplyActiveAccentToCurrentView();
 
                 Frame rootFrame = Window.Current.Content as Frame;
 
@@ -48,6 +63,7 @@ namespace Fort.ind_UWP
                     var isFirstNavigation = rootFrame.Content == null;
 
                     var launchNavTag = JumpListService.ResolveNavTag(e.Arguments);
+                    var composeRequested = JumpListService.IsComposeRequest(e.Arguments);
 
                     var pinnedGameUrl = GameTileService.ResolveGameUrl(e.Arguments);
                     if (pinnedGameUrl != null)
@@ -72,8 +88,14 @@ namespace Fort.ind_UWP
 
                     if (isFirstNavigation)
                     {
+                        s_composeAfterRestore = composeRequested;
                         var ignored = rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                                                     RestoreSessionInBackground);
+                    }
+                    else if (composeRequested)
+                    {
+                        var ignoredCompose = rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
+                                                                           OpenComposeFromLaunch);
                     }
 
                     if (pinnedGameUrl != null)
@@ -137,6 +159,12 @@ namespace Fort.ind_UWP
                 await ProfileService.TryRestoreSessionAsync();
                 StartSocialNotifications();
 
+                if (s_composeAfterRestore)
+                {
+                    s_composeAfterRestore = false;
+                    OpenComposeFromLaunch();
+                }
+
                 await JumpListService.EnsureTasksAsync();
                 await GameTileService.RefreshPinnedTilesAsync();
             }
@@ -146,8 +174,27 @@ namespace Fort.ind_UWP
             }
         }
 
+        private static bool s_composeAfterRestore;
+
+        private static async void OpenComposeFromLaunch()
+        {
+            try
+            {
+                var owner = Window.Current.Content;
+                if (owner != null) await SocialWindows.ShowComposeAsync(owner, SocialComposeMode.New, null);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: could not open the composer from the jump list - {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
         private static void StartSocialNotifications()
         {
+            SocialContentService.Initialize();
+            SocialFollowService.Initialize();
+            SocialNoteService.Initialize();
+            SocialNoteCapture.Initialize();
             SocialNotificationService.Initialize();
             SocialNotificationService.ReconcileInBackground();
         }
@@ -162,6 +209,10 @@ namespace Fort.ind_UWP
                 {
                     await SocialNotificationService.RunBackgroundCheckAsync(args.TaskInstance);
                 }
+                else if (SocialToastActions.IsToastAction(args.TaskInstance))
+                {
+                    await SocialToastActions.RunAsync(args.TaskInstance);
+                }
             }
             catch (Exception ex)
             {
@@ -169,21 +220,115 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static bool OpensSocialNotifications(IActivatedEventArgs args)
+        protected override void OnShareTargetActivated(ShareTargetActivatedEventArgs args)
+        {
+            try
+            {
+                AccentColorService.ApplySavedAccent();
+                AccentColorService.ApplyActiveAccentToCurrentView();
+                AppearanceService.EnsureLoaded();
+
+                var frame = new Frame();
+                frame.NavigationFailed += OnNavigationFailed;
+                AppearanceService.ApplyThemeTo(frame);
+                Window.Current.Content = frame;
+
+                frame.Navigate(typeof(SocialSharePage), args.ShareOperation);
+                Window.Current.Activate();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: share activation failed - {ex}");
+            }
+        }
+
+        private sealed class ToastTarget
+        {
+            public ToastTarget(string open, string noteId, string account, bool restore)
+            {
+                Open = open;
+                NoteId = noteId;
+                Account = account;
+                Restore = restore;
+            }
+
+            public string Open { get; private set; }
+
+            public string NoteId { get; private set; }
+
+            public string Account { get; private set; }
+
+            public bool Restore { get; private set; }
+
+            public bool OpensNotifications
+            {
+                get { return string.Equals(Open, AppConstants.ToastOpenNotifications, StringComparison.Ordinal); }
+            }
+
+            public bool OpensNote
+            {
+                get { return string.Equals(Open, AppConstants.ToastOpenNote, StringComparison.Ordinal) && !string.IsNullOrEmpty(NoteId); }
+            }
+        }
+
+        private static ToastTarget ReadToastTarget(IActivatedEventArgs args)
         {
             var toastArgs = args as ToastNotificationActivatedEventArgs;
-            if (toastArgs == null || string.IsNullOrEmpty(toastArgs.Argument)) return false;
+            if (toastArgs == null || string.IsNullOrEmpty(toastArgs.Argument)) return null;
 
             try
             {
-                string target;
-                return ToastArguments.Parse(toastArgs.Argument).TryGetValue(AppConstants.ToastArgumentOpen, out target)
-                       && string.Equals(target, AppConstants.ToastOpenNotifications, StringComparison.Ordinal);
+                var parsed = ToastArguments.Parse(toastArgs.Argument);
+                string open;
+                if (!parsed.TryGetValue(AppConstants.ToastArgumentOpen, out open)) return null;
+
+                string noteId;
+                string account;
+                string restore;
+                parsed.TryGetValue(AppConstants.ToastArgumentNote, out noteId);
+                parsed.TryGetValue(AppConstants.ToastArgumentAccount, out account);
+                parsed.TryGetValue(AppConstants.ToastArgumentRestore, out restore);
+
+                var target = new ToastTarget(open, noteId, account, !string.IsNullOrEmpty(restore));
+                return target.OpensNotifications || target.OpensNote ? target : null;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"App: could not read the toast arguments - {ex.Message}");
-                return false;
+                return null;
+            }
+        }
+
+        private static void ShowToastTarget(MainPage mainPage, ToastTarget target)
+        {
+            if (mainPage == null || target == null) return;
+
+            try
+            {
+                if (target.OpensNotifications || !SocialContentService.IsCurrentAccount(target.Account))
+                {
+                    mainPage.ShowSocialNotifications();
+                    return;
+                }
+
+                var restored = false;
+                if (target.Restore)
+                {
+                    var text = SocialToastActions.TakeFailedReply(target.Account, target.NoteId);
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        SocialDraftService.SaveReplyDraft(target.Account, target.NoteId,
+                                                          SocialComposeDraft.Create(text, null, null, false, null, null, null, null,
+                                                                                    null, target.NoteId, null));
+                        restored = true;
+                    }
+                }
+
+                mainPage.ShowSocialThread(target.NoteId, restored);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"App: could not open the toast's note - {ex.GetType().Name}: {ex.Message}");
             }
         }
 
@@ -236,11 +381,12 @@ namespace Fort.ind_UWP
 
                 Frame rootFrame = Window.Current.Content as Frame;
                 var isColdStart = rootFrame == null;
-                var openNotifications = OpensSocialNotifications(args);
+                var toastTarget = ReadToastTarget(args);
 
                 if (isColdStart)
                 {
                     AccentColorService.ApplySavedAccent();
+                    AccentColorService.ApplyActiveAccentToCurrentView();
 
                     rootFrame = new Frame();
                     rootFrame.NavigationFailed += OnNavigationFailed;
@@ -249,15 +395,11 @@ namespace Fort.ind_UWP
 
                     ApplySavedTheme(rootFrame);
                     Window.Current.Content = rootFrame;
-                    rootFrame.Navigate(typeof(MainPage), openNotifications ? AppConstants.NavigationSocial : null);
+                    rootFrame.Navigate(typeof(MainPage), toastTarget != null ? AppConstants.NavigationSocial : null);
                 }
-                else if (openNotifications)
+                else if (toastTarget != null)
                 {
-                    var mainPage = rootFrame.Content as MainPage;
-                    if (mainPage != null)
-                    {
-                        mainPage.ShowSocialNotifications();
-                    }
+                    ShowToastTarget(rootFrame.Content as MainPage, toastTarget);
                 }
 
                 Window.Current.Activate();
@@ -269,6 +411,11 @@ namespace Fort.ind_UWP
                     await LocalStorageService.InitializeAsync();
                     await ProfileService.TryRestoreSessionAsync();
                     StartSocialNotifications();
+
+                    if (toastTarget != null && toastTarget.OpensNote)
+                    {
+                        ShowToastTarget(rootFrame.Content as MainPage, toastTarget);
+                    }
                 }
 
                 MisskeyAuthResult signInResult = null;
@@ -345,6 +492,7 @@ namespace Fort.ind_UWP
             try
             {
                 SocialNotificationService.OnSuspending();
+                SocialNoteCapture.OnSuspending();
 
                 if (!SocialNotificationService.OwnsBadge && !LiveTileService.TileCleared)
                 {
@@ -371,6 +519,7 @@ namespace Fort.ind_UWP
                 }
 
                 SocialNotificationService.OnResuming();
+                SocialNoteCapture.OnResuming();
             }
             catch (Exception ex)
             {

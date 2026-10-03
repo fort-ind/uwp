@@ -17,35 +17,41 @@ namespace Fort.ind_UWP
 
         private EventHandler _releasedHandlers;
 
-        private ViewLifetimeControl(CoreWindow window, string navTag, string title, string header, Type pageType)
+        private ViewLifetimeControl(CoreWindow window, WindowRequest request)
         {
             Dispatcher = window.Dispatcher;
             Id = ApplicationView.GetApplicationViewIdForWindow(window);
-            NavTag = navTag;
-            Title = title;
-            Header = header;
-            PageType = pageType;
+            Key = request.Key;
+            Title = request.Title;
+            Header = request.Header;
+            PageType = request.PageType;
+            Parameter = request.Parameter;
+            AccountScoped = request.AccountScoped;
 
             _view = ApplicationView.GetForCurrentView();
             _view.Consolidated += OnConsolidated;
         }
 
-        public static ViewLifetimeControl CreateForCurrentView(string navTag, string title, string header, Type pageType)
+        public static ViewLifetimeControl CreateForCurrentView(WindowRequest request)
         {
-            return new ViewLifetimeControl(CoreWindow.GetForCurrentThread(), navTag, title, header, pageType);
+            return new ViewLifetimeControl(CoreWindow.GetForCurrentThread(), request);
         }
 
         public CoreDispatcher Dispatcher { get; private set; }
 
         public int Id { get; private set; }
 
-        public string NavTag { get; private set; }
+        public string Key { get; private set; }
 
         public string Title { get; private set; }
 
         public string Header { get; private set; }
 
         public Type PageType { get; private set; }
+
+        public object Parameter { get; private set; }
+
+        public bool AccountScoped { get; private set; }
 
         public event EventHandler Released
         {

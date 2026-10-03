@@ -23,6 +23,10 @@ namespace Fort.ind_UWP
 
         private int _footprintGeneration = 0;
 
+        private int _mediaCacheGeneration = 0;
+
+        private bool _mediaCacheClearInProgress = false;
+
         private static readonly string[] s_sizeUnitKeys =
         {
             "StorageSizeBytesFormat",
@@ -135,6 +139,7 @@ namespace Fort.ind_UWP
         private void UpdateStorageInfo()
         {
             RefreshStorageFootprint();
+            RefreshMediaCacheSize();
 
             try
             {
@@ -193,6 +198,113 @@ namespace Fort.ind_UWP
                 {
                     StorageFootprintText.Text = LocalizedStrings.Get("StorageFootprintUnavailable");
                 }
+            }
+        }
+
+        private async void RefreshMediaCacheSize()
+        {
+            int generation = 0;
+
+            try
+            {
+                generation = ++_mediaCacheGeneration;
+
+                if (string.IsNullOrEmpty(MediaCacheSizeText.Text))
+                {
+                    MediaCacheSizeText.Text = LocalizedStrings.Get("MediaCacheMeasuring");
+                }
+
+                var bytes = await MediaCacheService.MeasureAsync();
+                if (generation != _mediaCacheGeneration) return;
+
+                MediaCacheSizeText.Text = bytes.HasValue
+                    ? LocalizedStrings.Format("MediaCacheSizeFormat", FormatByteSize(bytes.Value))
+                    : LocalizedStrings.Get("MediaCacheUnavailable");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: media cache size failed - {ex.Message}");
+
+                if (generation == _mediaCacheGeneration)
+                {
+                    MediaCacheSizeText.Text = LocalizedStrings.Get("MediaCacheUnavailable");
+                }
+            }
+        }
+
+        private async void ClearMediaCacheButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_mediaCacheClearInProgress) return;
+            _mediaCacheClearInProgress = true;
+
+            try
+            {
+                ClearMediaCacheButton.IsEnabled = false;
+                ShowMediaCacheStatus(LocalizedStrings.Get("MediaCacheClearing"));
+
+                var freed = await MediaCacheService.ClearAsync();
+
+                if (!freed.HasValue)
+                {
+                    ShowMediaCacheStatus(LocalizedStrings.Get("MediaCacheClearFailed"));
+                }
+                else if (freed.Value <= 0)
+                {
+                    ShowMediaCacheStatus(LocalizedStrings.Get("MediaCacheClearedNothing"));
+                }
+                else
+                {
+                    ShowMediaCacheStatus(LocalizedStrings.Format("MediaCacheClearedFormat", FormatByteSize(freed.Value)));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: media cache clear failed - {ex.Message}");
+                ShowMediaCacheStatus(LocalizedStrings.Get("MediaCacheClearFailed"));
+            }
+            finally
+            {
+                ClearMediaCacheButton.IsEnabled = true;
+                _mediaCacheClearInProgress = false;
+                RefreshMediaCacheSize();
+                RefreshStorageFootprint();
+            }
+        }
+
+        private void ShowMediaCacheStatus(string message)
+        {
+            MediaCacheStatusText.Text = message;
+            MediaCacheStatusText.Visibility = Visibility.Visible;
+
+            AutomationHelper.AnnounceLiveRegion(MediaCacheStatusText);
+        }
+
+        private void LoadMediaCacheControls()
+        {
+            var limit = MediaCacheService.LimitMegabytes;
+            ComboBoxItem fallback = null;
+            ComboBoxItem match = null;
+            foreach (var entry in MediaCacheLimitCombo.Items)
+            {
+                var item = entry as ComboBoxItem;
+                var itemLimit = IntTagOf(item);
+                if (!itemLimit.HasValue) continue;
+
+                if (itemLimit.Value == limit) match = item;
+                if (itemLimit.Value == AppConstants.DefaultMediaCacheLimitMegabytes) fallback = item;
+            }
+
+            MediaCacheLimitCombo.SelectedItem = match ?? fallback;
+        }
+
+        private void MediaCacheLimitCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            var limit = IntTagOf(MediaCacheLimitCombo.SelectedItem as ComboBoxItem);
+            if (limit.HasValue)
+            {
+                MediaCacheService.LimitMegabytes = limit.Value;
             }
         }
 
@@ -480,7 +592,7 @@ namespace Fort.ind_UWP
             foreach (var entry in ProfileRefreshIntervalCombo.Items)
             {
                 var item = entry as ComboBoxItem;
-                var itemMinutes = RefreshMinutesOf(item);
+                var itemMinutes = IntTagOf(item);
                 if (!itemMinutes.HasValue) continue;
 
                 if (itemMinutes.Value == minutes) match = item;
@@ -488,18 +600,26 @@ namespace Fort.ind_UWP
             }
 
             ProfileRefreshIntervalCombo.SelectedItem = match ?? fallback;
+
+            RemoteListNoticeToggle.IsOn = SocialFollowService.ShowRemoteListNotice;
         }
 
-        private static int? RefreshMinutesOf(ComboBoxItem item)
+        private void RemoteListNoticeToggle_Toggled(object sender, RoutedEventArgs e)
         {
-            int minutes;
+            if (_loadingSettings) return;
+            SocialFollowService.ShowRemoteListNotice = RemoteListNoticeToggle.IsOn;
+        }
+
+        private static int? IntTagOf(ComboBoxItem item)
+        {
+            int value;
             if (item == null || !int.TryParse(item.Tag as string, System.Globalization.NumberStyles.Integer,
-                                              System.Globalization.CultureInfo.InvariantCulture, out minutes))
+                                              System.Globalization.CultureInfo.InvariantCulture, out value))
             {
                 return null;
             }
 
-            return minutes;
+            return value;
         }
 
         private void ProfileAutoRefreshToggle_Toggled(object sender, RoutedEventArgs e)
@@ -515,7 +635,7 @@ namespace Fort.ind_UWP
         {
             if (_loadingSettings) return;
 
-            var minutes = RefreshMinutesOf(ProfileRefreshIntervalCombo.SelectedItem as ComboBoxItem);
+            var minutes = IntTagOf(ProfileRefreshIntervalCombo.SelectedItem as ComboBoxItem);
             if (minutes.HasValue)
             {
                 ProfileService.AutoRefreshMinutes = minutes.Value;

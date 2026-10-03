@@ -12,7 +12,7 @@ namespace Fort.ind_UWP
         {
         }
 
-        private const int TaskRevision = 5;
+        private const int TaskRevision = 6;
 
         private static JumpTask[] BuildTasks()
         {
@@ -27,6 +27,9 @@ namespace Fort.ind_UWP
                 new JumpTask(AppConstants.NavigationSocial,
                              LocalizedStrings.Get("JumpTaskSocialName"),
                              LocalizedStrings.Get("JumpTaskSocialDescription"), "Social"),
+                new JumpTask(AppConstants.JumpTaskCompose,
+                             LocalizedStrings.Get("JumpTaskComposeName"),
+                             LocalizedStrings.Get("JumpTaskComposeDescription"), "Compose"),
                 new JumpTask(AppConstants.NavigationProfile,
                              LocalizedStrings.Get("JumpTaskProfileName"),
                              LocalizedStrings.Get("JumpTaskProfileDescription"), "Profile"),
@@ -106,6 +109,11 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static bool IsComposeRequest(string arguments)
+        {
+            return string.Equals(arguments, AppConstants.JumpArgumentPrefix + AppConstants.JumpTaskCompose, StringComparison.Ordinal);
+        }
+
         public static string ResolveNavTag(string arguments)
         {
             if (string.IsNullOrEmpty(arguments)) return null;
@@ -114,6 +122,8 @@ namespace Fort.ind_UWP
             var tag = arguments.Substring(AppConstants.JumpArgumentPrefix.Length);
             switch (tag)
             {
+                case AppConstants.JumpTaskCompose:
+                    return AppConstants.NavigationSocial;
                 case AppConstants.NavigationLatestNews:
                 case AppConstants.NavigationGames:
                 case AppConstants.NavigationBetas:

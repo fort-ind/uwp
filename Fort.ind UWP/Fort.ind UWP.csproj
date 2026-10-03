@@ -134,22 +134,100 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behaviors\GameContextMenuBehavior.cs" />
+    <Compile Include="Behaviors\SocialContextMenuBehavior.cs" />
+    <Compile Include="Behaviors\SocialNoteShortcutsBehavior.cs" />
     <Compile Include="Behaviors\WindowActivationStateBehavior.cs" />
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
+    <Compile Include="Controls\SocialCharacterRing.xaml.cs">
+      <DependentUpon>SocialCharacterRing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialComposer.xaml.cs">
+      <DependentUpon>SocialComposer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialComposer.Attachments.cs">
+      <DependentUpon>SocialComposer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialComposer.Autocomplete.cs">
+      <DependentUpon>SocialComposer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialComposer.Poll.cs">
+      <DependentUpon>SocialComposer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialRecipientBox.xaml.cs">
+      <DependentUpon>SocialRecipientBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialEmojiPicker.xaml.cs">
+      <DependentUpon>SocialEmojiPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialInlineVideo.cs" />
+    <Compile Include="Controls\SocialMediaLightbox.xaml.cs">
+      <DependentUpon>SocialMediaLightbox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialNoteView.xaml.cs">
+      <DependentUpon>SocialNoteView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialNoteView.Actions.cs">
+      <DependentUpon>SocialNoteView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialNoteView.Poll.cs">
+      <DependentUpon>SocialNoteView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialNoteView.Reactions.cs">
+      <DependentUpon>SocialNoteView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialProfileDetails.xaml.cs">
+      <DependentUpon>SocialProfileDetails.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialProfileView.xaml.cs">
+      <DependentUpon>SocialProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialProfileView.Header.cs">
+      <DependentUpon>SocialProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialProfileView.Actions.cs">
+      <DependentUpon>SocialProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialReactionChip.cs" />
+    <Compile Include="Controls\SocialReactionChipPanel.cs" />
+    <Compile Include="Controls\SocialTabStrip.cs" />
+    <Compile Include="Controls\SocialUserRow.xaml.cs">
+      <DependentUpon>SocialUserRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TagWrapPanel.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
     <Compile Include="Helpers\Blurhash.cs" />
+    <Compile Include="Helpers\BlurhashImage.cs" />
     <Compile Include="Helpers\CaptionButtonColors.cs" />
     <Compile Include="Helpers\ColorHelper.cs" />
+    <Compile Include="Helpers\CountText.cs" />
     <Compile Include="Helpers\Debouncer.cs" />
     <Compile Include="Helpers\LocalizedStrings.cs" />
+    <Compile Include="Helpers\MfmInlineBuilder.cs" />
+    <Compile Include="Helpers\MfmText.cs" />
+    <Compile Include="Helpers\RelativeTime.cs" />
+    <Compile Include="Helpers\SocialLinks.cs" />
+    <Compile Include="Helpers\SocialMenus.cs" />
+    <Compile Include="Helpers\SocialReactions.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Helpers\VisualTreeSearch.cs" />
     <Compile Include="Helpers\WebLauncher.cs" />
     <Compile Include="Models\GameGroup.cs" />
     <Compile Include="Models\SearchItem.cs" />
+    <Compile Include="Models\SocialAttachmentItem.cs" />
+    <Compile Include="Models\SocialComposeDraft.cs" />
+    <Compile Include="Models\SocialDriveFile.cs" />
+    <Compile Include="Models\SocialEmojiItem.cs" />
     <Compile Include="Models\SocialFeedCollection.cs" />
     <Compile Include="Models\SocialFeedItem.cs" />
+    <Compile Include="Models\SocialLinkPreview.cs" />
+    <Compile Include="Models\SocialNoteItem.cs" />
+    <Compile Include="Models\SocialNoteParts.cs" />
+    <Compile Include="Models\SocialNotePersonItem.cs" />
     <Compile Include="Models\SocialNotification.cs" />
+    <Compile Include="Models\SocialProfileFeeds.cs" />
+    <Compile Include="Models\SocialUserDetail.cs" />
+    <Compile Include="Models\SocialUserItem.cs" />
+    <Compile Include="Models\SocialWindowArgs.cs" />
     <Compile Include="Models\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AccentColorService.cs" />
@@ -161,17 +239,31 @@
     <Compile Include="Services\JumpListService.cs" />
     <Compile Include="Services\LiveTileService.cs" />
     <Compile Include="Services\LocalStorageService.cs" />
+    <Compile Include="Services\MediaCacheService.cs" />
+    <Compile Include="Services\MemoryService.cs" />
     <Compile Include="Services\MisskeyAuthService.cs" />
     <Compile Include="Services\ProfileService.cs" />
     <Compile Include="Services\SearchCatalog.cs" />
     <Compile Include="Services\SitemapService.cs" />
     <Compile Include="Services\SocialApiService.cs" />
+    <Compile Include="Services\SocialContentService.cs" />
+    <Compile Include="Services\SocialDraftService.cs" />
+    <Compile Include="Services\SocialEmojiService.cs" />
+    <Compile Include="Services\SocialFollowService.cs" />
+    <Compile Include="Services\SocialNoteActionService.cs" />
+    <Compile Include="Services\SocialNoteCapture.cs" />
+    <Compile Include="Services\SocialNoteHub.cs" />
+    <Compile Include="Services\SocialNoteService.cs" />
     <Compile Include="Services\SocialNotificationService.cs" />
+    <Compile Include="Services\SocialPermissions.cs" />
+    <Compile Include="Services\SocialPostService.cs" />
     <Compile Include="Services\SocialStream.cs" />
     <Compile Include="Services\SocialTileService.cs" />
+    <Compile Include="Services\SocialToastActions.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="Services\ViewLifetimeControl.cs" />
     <Compile Include="Services\WindowManagerService.cs" />
+    <Compile Include="Services\WindowRequest.cs" />
     <Compile Include="Views\GamesPage.xaml.cs">
       <DependentUpon>GamesPage.xaml</DependentUpon>
     </Compile>
@@ -185,6 +277,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.MultipleViews.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainPage.Memory.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Navigation.cs">
@@ -205,8 +300,11 @@
     <Compile Include="Views\MainPage.Update.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\IImmersiveWindowPage.cs" />
     <Compile Include="Views\IReleasablePage.cs" />
+    <Compile Include="Views\IReopenablePage.cs" />
     <Compile Include="Views\IShellContentPage.cs" />
+    <Compile Include="Views\ITrimmablePage.cs" />
     <Compile Include="Views\BetasPage.xaml.cs">
       <DependentUpon>BetasPage.xaml</DependentUpon>
     </Compile>
@@ -225,6 +323,23 @@
     <Compile Include="Views\SecondaryWindowPage.xaml.cs">
       <DependentUpon>SecondaryWindowPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SocialUserPage.xaml.cs">
+      <DependentUpon>SocialUserPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialUserListPage.xaml.cs">
+      <DependentUpon>SocialUserListPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialComposePage.xaml.cs">
+      <DependentUpon>SocialComposePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialSharePage.xaml.cs">
+      <DependentUpon>SocialSharePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialNotePage.xaml.cs">
+      <DependentUpon>SocialNotePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialThreads.cs" />
+    <Compile Include="Views\SocialWindows.cs" />
     <Compile Include="Views\SocialPage.xaml.cs">
       <DependentUpon>SocialPage.xaml</DependentUpon>
     </Compile>
@@ -243,6 +358,22 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Emoji\unicode-emoji.txt" />
+    <Content Include="Assets\JumpList\Compose.scale-100.png" />
+    <Content Include="Assets\JumpList\Compose.scale-200.png" />
+    <Content Include="Assets\JumpList\Compose.scale-400.png" />
+    <Content Include="Assets\JumpList\Compose.altform-unplated_scale-100.png" />
+    <Content Include="Assets\JumpList\Compose.altform-unplated_scale-200.png" />
+    <Content Include="Assets\JumpList\Compose.altform-unplated_scale-400.png" />
+    <Content Include="Assets\JumpList\Compose.altform-lightunplated_scale-100.png" />
+    <Content Include="Assets\JumpList\Compose.altform-lightunplated_scale-200.png" />
+    <Content Include="Assets\JumpList\Compose.altform-lightunplated_scale-400.png" />
+    <Content Include="Assets\Toast\Send.scale-100.png" />
+    <Content Include="Assets\Toast\Send.scale-200.png" />
+    <Content Include="Assets\Toast\Send.scale-400.png" />
+    <Content Include="Assets\Toast\Send.contrast-white_scale-100.png" />
+    <Content Include="Assets\Toast\Send.contrast-white_scale-200.png" />
+    <Content Include="Assets\Toast\Send.contrast-white_scale-400.png" />
     <Content Include="Assets\JumpList\Home.scale-100.png" />
     <Content Include="Assets\JumpList\Home.scale-200.png" />
     <Content Include="Assets\JumpList\Home.scale-400.png" />
@@ -400,7 +531,63 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\SocialComposePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialSharePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialNotePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\SocialPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialUserPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialUserListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialCharacterRing.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialComposer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialRecipientBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialEmojiPicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialMediaLightbox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialNoteView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialProfileDetails.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialProfileView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialUserRow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -432,6 +619,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
       <Version>3.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Win2D.uwp">
+      <Version>1.28.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

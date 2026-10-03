@@ -1,0 +1,255 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialEmojiPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Width="344"
+    Height="432">
+
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="EmojiViewSource" IsSourceGrouped="True"/>
+
+        <Style x:Key="EmojiGridItemStyle" TargetType="GridViewItem" BasedOn="{StaticResource GridViewItemRevealStyle}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="MinWidth" Value="40"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GridViewItem">
+                        <ListViewItemPresenter x:Name="Root"
+                                               ContentTransitions="{TemplateBinding ContentTransitions}"
+                                               Control.IsTemplateFocusTarget="True"
+                                               FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
+                                               SelectionCheckMarkVisualEnabled="{ThemeResource GridViewItemSelectionCheckMarkVisualEnabled}"
+                                               CheckBrush="{ThemeResource GridViewItemCheckBrush}"
+                                               CheckBoxBrush="{ThemeResource GridViewItemCheckBoxBrush}"
+                                               DragBackground="{ThemeResource GridViewItemDragBackground}"
+                                               DragForeground="{ThemeResource GridViewItemDragForeground}"
+                                               FocusBorderBrush="{ThemeResource GridViewItemFocusBorderBrush}"
+                                               FocusSecondaryBorderBrush="{ThemeResource GridViewItemFocusSecondaryBorderBrush}"
+                                               PlaceholderBackground="{ThemeResource GridViewItemPlaceholderBackground}"
+                                               PointerOverBackground="{ThemeResource GridViewItemBackgroundPointerOver}"
+                                               PointerOverForeground="{ThemeResource GridViewItemForegroundPointerOver}"
+                                               SelectedBackground="{ThemeResource GridViewItemBackgroundSelected}"
+                                               SelectedForeground="{ThemeResource GridViewItemForegroundSelected}"
+                                               SelectedPointerOverBackground="{ThemeResource GridViewItemBackgroundSelectedPointerOver}"
+                                               PressedBackground="{ThemeResource GridViewItemBackgroundPressed}"
+                                               SelectedPressedBackground="{ThemeResource GridViewItemBackgroundSelectedPressed}"
+                                               DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
+                                               DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
+                                               ReorderHintOffset="{ThemeResource GridViewItemReorderHintThemeOffset}"
+                                               HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                               ContentMargin="{TemplateBinding Padding}"
+                                               CheckMode="{ThemeResource GridViewItemCheckMode}"
+                                               RevealBackground="{ThemeResource GridViewItemRevealBackground}"
+                                               RevealBorderThickness="{ThemeResource ButtonRevealBorderThemeThickness}"
+                                               RevealBorderBrush="{ThemeResource ButtonRevealBorderBrush}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="Selected"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
+                                            <Setter Target="Root.RevealBackground" Value="{ThemeResource ButtonRevealBackgroundPointerOver}"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPointerOver}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOverSelected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
+                                            <Setter Target="Root.RevealBackground" Value="{ThemeResource ButtonRevealBackgroundPointerOver}"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPointerOver}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOverPressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="Root.RevealBackground" Value="{ThemeResource ButtonRevealBackgroundPressed}"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPressed}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="Root.RevealBackground" Value="{ThemeResource ButtonRevealBackgroundPressed}"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPressed}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PressedSelected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="Root.RevealBackground" Value="{ThemeResource ButtonRevealBackgroundPressed}"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ButtonRevealBorderBrushPressed}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="DisabledStates">
+                                    <VisualState x:Name="Enabled"/>
+                                    <VisualState x:Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.RevealBorderThickness" Value="0"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ListViewItemPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PickerSquareButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <DataTemplate x:Key="EmojiItemTemplate" x:DataType="local:SocialEmojiItem">
+            <Grid Width="40" Height="40"
+                  AutomationProperties.Name="{x:Bind AutomationName}"
+                  ToolTipService.ToolTip="{x:Bind AutomationName}">
+                <TextBlock Text="{x:Bind Text}"
+                           Visibility="{x:Bind TextVisibility}"
+                           FontFamily="Segoe UI Emoji"
+                           FontSize="22"
+                           IsTextScaleFactorEnabled="False"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                <Image Source="{x:Bind Image}"
+                       Visibility="{x:Bind ImageVisibility}"
+                       Width="28" Height="28"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EmojiGroupHeaderTemplate" x:DataType="local:SocialEmojiGroup">
+            <TextBlock Text="{x:Bind Title}"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                       TextWrapping="NoWrap"
+                       TextTrimming="CharacterEllipsis"/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="ReactionRow" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="LikeButton"
+                    HorizontalAlignment="Stretch"
+                    Click="LikeButton_Click">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xEB51;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    <TextBlock x:Uid="SocialEmojiPickerLike"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="RemoveButton"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Click="RemoveButton_Click">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE711;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    <TextBlock x:Uid="SocialEmojiPickerRemove"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <Grid x:Name="SearchRow" Grid.Row="1" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Uid="SocialEmojiPickerSearch"
+                     x:Name="SearchBox"
+                     IsSpellCheckEnabled="False"
+                     TextChanged="SearchBox_TextChanged"
+                     KeyDown="SearchBox_KeyDown"/>
+
+            <DropDownButton x:Uid="SocialEmojiPickerSkinTone"
+                            x:Name="ToneButton"
+                            Grid.Column="1"
+                            Padding="8,4,8,4">
+                <TextBlock x:Name="ToneText"
+                           FontFamily="Segoe UI Emoji"
+                           FontSize="16"
+                           IsTextScaleFactorEnabled="False"
+                           AutomationProperties.AccessibilityView="Raw"/>
+                <DropDownButton.Flyout>
+                    <Flyout x:Name="ToneFlyout">
+                        <StackPanel x:Name="TonePanel" Orientation="Horizontal" Spacing="4"/>
+                    </Flyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+        </Grid>
+
+        <GridView x:Uid="SocialEmojiPickerGrid"
+                  x:Name="EmojiGrid"
+                  Grid.Row="2"
+                  ItemTemplate="{StaticResource EmojiItemTemplate}"
+                  ItemContainerStyle="{StaticResource EmojiGridItemStyle}"
+                  SelectionMode="None"
+                  IsItemClickEnabled="True"
+                  ItemClick="EmojiGrid_ItemClick"
+                  ScrollViewer.IsVerticalScrollChainingEnabled="False">
+            <GridView.GroupStyle>
+                <GroupStyle HeaderTemplate="{StaticResource EmojiGroupHeaderTemplate}" HidesIfEmpty="True"/>
+            </GridView.GroupStyle>
+        </GridView>
+
+        <ProgressRing x:Name="LoadingRing"
+                      Grid.Row="2"
+                      Width="32" Height="32"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"/>
+
+        <TextBlock x:Name="MessageText"
+                   Grid.Row="2"
+                   Style="{StaticResource BodyTextBlockStyle}"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                   TextWrapping="Wrap"
+                   TextAlignment="Center"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Margin="24,0,24,0"
+                   Visibility="Collapsed"/>
+
+        <ScrollViewer x:Name="StripScroller"
+                      Grid.Row="3"
+                      HorizontalScrollMode="Enabled"
+                      HorizontalScrollBarVisibility="Hidden"
+                      VerticalScrollMode="Disabled"
+                      VerticalScrollBarVisibility="Disabled"
+                      IsHorizontalScrollChainingEnabled="False">
+            <StackPanel x:Uid="SocialEmojiPickerCategories"
+                        x:Name="CategoryStrip"
+                        Orientation="Horizontal"
+                        Spacing="2"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

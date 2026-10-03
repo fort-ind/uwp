@@ -205,7 +205,7 @@
     <value>reset the app?</value>
   </data>
   <data name="ResetExplainDialogBody" xml:space="preserve">
-    <value>This signs you out and deletes everything the app has saved locally - your cached profile, the sitemap cache, and all preferences (theme, tint color, panel states). It resets the app to a fresh install. This does not affect your fort.social account.</value>
+    <value>This signs you out and deletes everything the app has saved locally - your cached profile, cached fort.social pictures and videos, and all preferences (theme, tint color, panel states). It resets the app to a fresh install. This does not affect your fort.social account.</value>
   </data>
   <data name="ResetExplainDialogConfirm" xml:space="preserve">
     <value>Continue</value>
@@ -312,18 +312,6 @@
   <data name="HeaderSettings" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="ProfileHandleFormat" xml:space="preserve">
-    <value>@{0}@{1}</value>
-  </data>
-  <data name="ProfileMemberSinceFormat" xml:space="preserve">
-    <value>Member since {0}</value>
-  </data>
-  <data name="ProfileLastSignedInFormat" xml:space="preserve">
-    <value>Last signed in: {0}</value>
-  </data>
-  <data name="ProfileNoBio" xml:space="preserve">
-    <value>No bio set</value>
-  </data>
   <data name="GamesCountOne" xml:space="preserve">
     <value>1 game</value>
   </data>
@@ -406,7 +394,10 @@
     <value>Data Storage</value>
   </data>
   <data name="SearchItemLocalJsonStorage" xml:space="preserve">
-    <value>Local JSON Storage</value>
+    <value>local storage</value>
+  </data>
+  <data name="SearchItemClearMediaCache" xml:space="preserve">
+    <value>Clear media cache</value>
   </data>
   <data name="SearchItemLiveTile" xml:space="preserve">
     <value>Live Tile</value>
@@ -521,7 +512,7 @@ Open your profile and try again.</value>
     <value>You've been signed out</value>
   </data>
   <data name="SessionExpiredToastBody" xml:space="preserve">
-    <value>Your fort.social session ended. Open your profile to sign in again.</value>
+    <value>seems like your session expired.. log back in so we can get you going</value>
   </data>
   <data name="TileDisplayName" xml:space="preserve">
     <value>Fort.ind</value>
@@ -533,7 +524,7 @@ Open your profile and try again.</value>
     <value>What's new?</value>
   </data>
   <data name="TileNewsWhatsNewBody" xml:space="preserve">
-    <value>2026.8 has been released for web go to fort1nd.com to see whats new</value>
+    <value>2026.10 has been released for web go to fort1nd.com to see whats new</value>
   </data>
   <data name="TileNewsGetStartedTitle" xml:space="preserve">
     <value>Get Started</value>
@@ -608,14 +599,11 @@ Open your profile and try again.</value>
   <data name="TitleBarBackButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Back</value>
   </data>
-  <data name="BioText.Text" xml:space="preserve">
-    <value>No bio yet.. go make one! tell people who you are :)</value>
-  </data>
   <data name="CacheDescriptionText.Text" xml:space="preserve">
     <value>you arent logged in :(</value>
   </data>
   <data name="CancelSignInButton.Content" xml:space="preserve">
-    <value>cancel</value>
+    <value>Cancel</value>
   </data>
   <data name="CancelSignInButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Cancel sign-in</value>
@@ -628,9 +616,6 @@ Open your profile and try again.</value>
   </data>
   <data name="ClearLoginInfoButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Clear login info button</value>
-  </data>
-  <data name="DisplayNameText.Text" xml:space="preserve">
-    <value>Display Name</value>
   </data>
   <data name="EmptyText.Text" xml:space="preserve">
     <value>no games were found :( ouch</value>
@@ -682,12 +667,6 @@ Open your profile and try again.</value>
   </data>
   <data name="LoginYouLlBeTaken.Text" xml:space="preserve">
     <value>You'll be taken to fort.social to login to your account you will be taken back here after signing in!</value>
-  </data>
-  <data name="LogoutButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Sign out of your account</value>
-  </data>
-  <data name="LogoutButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Sign out button</value>
   </data>
   <data name="MainAbout.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
     <value>Version info, credits, and more</value>
@@ -828,7 +807,7 @@ Open your profile and try again.</value>
     <value>Social</value>
   </data>
   <data name="MainSocial.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>connect with users on fort.social</value>
+    <value>connect with users on fort.social!</value>
   </data>
   <data name="MainSocial.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Social</value>
@@ -881,29 +860,11 @@ Open your profile and try again.</value>
   <data name="MainWelcomeToVersion2.Text" xml:space="preserve">
     <value>3.0 is out :p</value>
   </data>
-  <data name="ManageOnFortSocialButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Opens your fort.social profile in the browser</value>
-  </data>
-  <data name="ManageOnFortSocialButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Manage on fort.social button</value>
-  </data>
-  <data name="MemberSinceText.Text" xml:space="preserve">
-    <value>Member since...</value>
-  </data>
   <data name="NavSearchBox.PlaceholderText" xml:space="preserve">
     <value>Search for games, pages, and more...</value>
   </data>
   <data name="NavSearchBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Search for games, pages and more</value>
-  </data>
-  <data name="ProfileAbout.Text" xml:space="preserve">
-    <value>About</value>
-  </data>
-  <data name="ProfileInitials.Text" xml:space="preserve">
-    <value>?</value>
-  </data>
-  <data name="ProfileManageOnFortSocial.Text" xml:space="preserve">
-    <value>Manage on fort.social</value>
   </data>
   <data name="ProfileNavItem.Content" xml:space="preserve">
     <value>Your Profile</value>
@@ -923,18 +884,12 @@ Open your profile and try again.</value>
   <data name="ProfileSignInWithYour.Text" xml:space="preserve">
     <value>Sign in with your fort.social account to see your profile here</value>
   </data>
-  <data name="ProfileSignOut.Text" xml:space="preserve">
-    <value>Sign Out</value>
-  </data>
-  <data name="ProfileYourProfileIsManaged.Text" xml:space="preserve">
-    <value>Your profile is managed on fort.social. Edit your display name, bio, avatar, or account there.</value>
-  </data>
   <data name="ResetAppButtonText.Text" xml:space="preserve">
     <value>Reset app</value>
     <comment>Label inside the Reset app button. On the TextBlock rather than the Button's Content so the error colour survives the pointer-over state.</comment>
   </data>
   <data name="ResetAppButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Signs you out and deletes all cached data and saved settings, resetting the app to a fresh install</value>
+    <value>Signs you out and deletes all cached data, cached fort.social media and saved settings, resetting the app to a fresh install</value>
   </data>
   <data name="ResetAppButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Reset app button</value>
@@ -1207,9 +1162,6 @@ Open your profile and try again.</value>
   <data name="AccentCustomButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Custom color…</value>
   </data>
-  <data name="UsernameText.Text" xml:space="preserve">
-    <value>@username@social.fort1nd.com</value>
-  </data>
   <data name="HomeFavoritesHeader.Text" xml:space="preserve">
     <value>Your favorites</value>
   </data>
@@ -1298,23 +1250,17 @@ Open your profile and try again.</value>
     <value>{0} follower</value>
     <comment>{0} is always 1. It is drawn in bold.</comment>
   </data>
-  <data name="FollowingLink.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>See who you follow on fort.social</value>
-  </data>
-  <data name="FollowersLink.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>See your followers on fort.social</value>
-  </data>
   <data name="MainProfileSettings.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Profile</value>
   </data>
   <data name="MainProfileSettings.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>choose how often your profile and notifications are checked</value>
+    <value>choose how often your profile and notifications are updated</value>
   </data>
   <data name="MainProfileSettings2.Text" xml:space="preserve">
     <value>Profile</value>
   </data>
   <data name="MainProfileSettingsCaption.Text" xml:space="preserve">
-    <value>How often your profile and notifications are checked</value>
+    <value>How often your profile and notifications are updated</value>
   </data>
   <data name="ProfileAutoRefreshToggle.Header" xml:space="preserve">
     <value>Refresh follower counts automatically</value>
@@ -1420,7 +1366,7 @@ Open your profile and try again.</value>
     <comment>Screen reader announcement. {0} is the game title.</comment>
   </data>
   <data name="MissingPinnedGameDialogTitle" xml:space="preserve">
-    <value>this game isn't here anymore</value>
+    <value>this game isn't here anymore :(</value>
   </data>
   <data name="MissingPinnedGameDialogBody" xml:space="preserve">
     <value>The game this tile opens has been taken off the games list, so there's nothing for it to open. You can unpin it from Start.</value>
@@ -1614,7 +1560,7 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="SocialNotificationsDescription.Text" xml:space="preserve">
-    <value>While you're signed in, fort.desktop shows your fort.social notifications as Windows notifications and puts your unread count on its tile, taskbar button and lock screen. The Social page works either way.</value>
+    <value>While you're signed in, fort.desktop shows your fort.social notifications as Windows notifications and puts your unread count on its tile, taskbar button and lock screen, so you can quickly see them</value>
   </data>
   <data name="SocialBackgroundCheckToggle.Header" xml:space="preserve">
     <value>Check while fort.desktop is closed</value>
@@ -1626,7 +1572,7 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="SocialBackgroundCheckDescription.Text" xml:space="preserve">
-    <value>Checks fort.social in the background as often as Profile ▸ Check for new notifications is set to, but never more than every 15 minutes, which is as often as Windows allows. Turn this off and notifications, the badge and the tile only update while fort.desktop is open.</value>
+    <value>Checks fort.social in the background around the same time you set for profile to reset</value>
   </data>
   <data name="SocialNotificationsBackgroundDenied.Text" xml:space="preserve">
     <value>Windows isn't letting fort.desktop run in the background, so notifications only arrive while it's open. You can allow it in Windows Settings, under background apps.</value>
@@ -1645,5 +1591,1556 @@ Open your profile and try again.</value>
   </data>
   <data name="SocialPermissionSignInButton.Content" xml:space="preserve">
     <value>Sign in again</value>
+  </data>
+  <data name="RelativeTimeNow" xml:space="preserve">
+    <value>now</value>
+    <comment>A note's age when it is under a minute old. Shown in a narrow column beside the author's name.</comment>
+  </data>
+  <data name="RelativeTimeMinutesFormat" xml:space="preserve">
+    <value>{0}m</value>
+    <comment>A note's age in minutes, abbreviated. {0} is the number of minutes (1–59).</comment>
+  </data>
+  <data name="RelativeTimeHoursFormat" xml:space="preserve">
+    <value>{0}h</value>
+    <comment>A note's age in hours, abbreviated. {0} is the number of hours (1–23).</comment>
+  </data>
+  <data name="RelativeTimeDaysFormat" xml:space="preserve">
+    <value>{0}d</value>
+    <comment>A note's age in days, abbreviated. {0} is the number of days (1–6). Older notes show their date.</comment>
+  </data>
+  <data name="SocialTimeFullFormat" xml:space="preserve">
+    <value>{0} {1}</value>
+    <comment>The exact time of a note or notification, in its tooltip and for screen readers. {0} is the short date, {1} is the short time.</comment>
+  </data>
+  <data name="SocialMenuViewUserFormat" xml:space="preserve">
+    <value>View {0}</value>
+    <comment>Menu item and button name that opens someone's fort.social profile in a new window. {0} is their handle, such as @name@example.social.</comment>
+  </data>
+  <data name="SocialForYouPivotItem.Header" xml:space="preserve">
+    <value>For you</value>
+    <comment>Social tab showing the signed-in user's fort.social home timeline: notes from the people they follow.</comment>
+  </data>
+  <data name="SocialForYouList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>For you</value>
+  </data>
+  <data name="SocialForYouLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading your timeline</value>
+  </data>
+  <data name="SocialForYouEmpty" xml:space="preserve">
+    <value>Nothing here yet. Notes from people you follow show up here.</value>
+  </data>
+  <data name="SocialForYouFailed" xml:space="preserve">
+    <value>Couldn't load your timeline.</value>
+  </data>
+  <data name="SocialRenotedByFormat" xml:space="preserve">
+    <value>Renoted by {0}</value>
+    <comment>Line above a note someone renoted (shared). {0} is that person's display name.</comment>
+  </data>
+  <data name="SocialReplyingToFormat" xml:space="preserve">
+    <value>Replying to {0}</value>
+    <comment>Line above a note that is a reply. {0} is the handle of the person replied to.</comment>
+  </data>
+  <data name="SocialReplyingToNote" xml:space="preserve">
+    <value>Replying to a note</value>
+    <comment>Line above a reply whose original note is not available.</comment>
+  </data>
+  <data name="SocialPinnedNoteLine.Text" xml:space="preserve">
+    <value>Pinned</value>
+    <comment>Line above a note the profile's owner pinned to the top of their profile.</comment>
+  </data>
+  <data name="SocialHiddenNote" xml:space="preserve">
+    <value>This note isn't visible to you.</value>
+    <comment>Shown in place of a followers-only or direct note the signed-in user cannot read.</comment>
+  </data>
+  <data name="SocialHiddenNoteLine.Text" xml:space="preserve">
+    <value>This note isn't visible to you.</value>
+  </data>
+  <data name="SocialShowContent" xml:space="preserve">
+    <value>Show content</value>
+    <comment>Button under a content warning that reveals the note behind it.</comment>
+  </data>
+  <data name="SocialHideContent" xml:space="preserve">
+    <value>Hide content</value>
+  </data>
+  <data name="SocialMediaGifBadge" xml:space="preserve">
+    <value>GIF</value>
+    <comment>Small badge on an animated image's thumbnail.</comment>
+  </data>
+  <data name="SocialMediaMoreFormat" xml:space="preserve">
+    <value>+{0}</value>
+    <comment>Overlay on the last visible attachment. {0} is how many more attachments the note has.</comment>
+  </data>
+  <data name="SocialSensitiveMedia" xml:space="preserve">
+    <value>Sensitive content</value>
+    <comment>Shown over an attachment its author marked sensitive, which stays blurred until selected.</comment>
+  </data>
+  <data name="SocialSensitiveMediaHint" xml:space="preserve">
+    <value>Select to show</value>
+  </data>
+  <data name="SocialQuoteAttachmentsOne" xml:space="preserve">
+    <value>1 attachment</value>
+  </data>
+  <data name="SocialQuoteAttachmentsFormat" xml:space="preserve">
+    <value>{0} attachments</value>
+    <comment>Under a quoted note. {0} is the number of attachments it has.</comment>
+  </data>
+  <data name="SocialNoteMoreButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialNoteMoreButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialVisibilityHome" xml:space="preserve">
+    <value>Home only</value>
+    <comment>Tooltip for a note's visibility icon: posted to followers' home timelines, not to public ones.</comment>
+  </data>
+  <data name="SocialVisibilityFollowers" xml:space="preserve">
+    <value>Followers only</value>
+  </data>
+  <data name="SocialVisibilityDirect" xml:space="preserve">
+    <value>Direct</value>
+    <comment>Tooltip for a note's visibility icon: sent only to the people it mentions.</comment>
+  </data>
+  <data name="SocialNoteAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}. {2}</value>
+    <comment>Screen reader text for a note. {0} is the author's name and handle, {1} is when it was posted, {2} is its text.</comment>
+  </data>
+  <data name="SocialNoteContentWarningAutomationFormat" xml:space="preserve">
+    <value>Content warning: {0}. Content hidden</value>
+    <comment>Screen reader text for a note behind a content warning. {0} is the warning.</comment>
+  </data>
+  <data name="SocialNoteAttachmentsAutomationFormat" xml:space="preserve">
+    <value>{0} attachments</value>
+  </data>
+  <data name="SocialNoteAttachmentsOneAutomationFormat" xml:space="preserve">
+    <value>{0} attachment</value>
+  </data>
+  <data name="SocialNoteCountsAutomationFormat" xml:space="preserve">
+    <value>{0} replies, {1} renotes, {2} reactions</value>
+  </data>
+  <data name="SocialQuoteAutomationFormat" xml:space="preserve">
+    <value>Quoted note from {0}: {1}</value>
+    <comment>{0} is the quoted author's handle, {1} is the quoted text.</comment>
+  </data>
+  <data name="SocialLinkCardAutomationFormat" xml:space="preserve">
+    <value>Link: {0}, {1}</value>
+    <comment>Screen reader text for a link preview. {0} is the page title, {1} is the site's name.</comment>
+  </data>
+  <data name="SocialMediaImageAutomation" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="SocialMediaVideoAutomation" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="SocialMediaGifAutomation" xml:space="preserve">
+    <value>Animated image</value>
+  </data>
+  <data name="SocialMediaFileAutomation" xml:space="preserve">
+    <value>Attachment</value>
+  </data>
+  <data name="SocialMediaTileAutomationFormat" xml:space="preserve">
+    <value>{0}, {1} of {2}</value>
+    <comment>Screen reader name for an attachment. {0} is its kind (Image, Video…), {1} its position, {2} the number of attachments.</comment>
+  </data>
+  <data name="SocialMediaTileAltAutomationFormat" xml:space="preserve">
+    <value>{0}, {1} of {2}: {3}</value>
+    <comment>As SocialMediaTileAutomationFormat, plus {3}, the attachment's description (alt text).</comment>
+  </data>
+  <data name="SocialMediaSensitiveAutomationFormat" xml:space="preserve">
+    <value>{0}, sensitive content, select to show</value>
+    <comment>{0} is the attachment's kind (Image, Video…).</comment>
+  </data>
+  <data name="SocialMenuOpenOnFortSocial" xml:space="preserve">
+    <value>Open on fort.social</value>
+  </data>
+  <data name="SocialMenuCopyLink" xml:space="preserve">
+    <value>Copy link</value>
+  </data>
+  <data name="SocialMenuShare" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="SocialLinkCopiedAnnouncement" xml:space="preserve">
+    <value>Link copied</value>
+  </data>
+  <data name="SocialShareNoteTitleFormat" xml:space="preserve">
+    <value>Note by {0}</value>
+    <comment>Title of a shared note in the Windows share sheet. {0} is the author's display name.</comment>
+  </data>
+  <data name="SocialProfileOpenOnFortSocialButton" xml:space="preserve">
+    <value>Open on fort.social</value>
+  </data>
+  <data name="SocialProfileFollowsYou.Text" xml:space="preserve">
+    <value>Follows you</value>
+  </data>
+  <data name="SocialProfileBot.Text" xml:space="preserve">
+    <value>Bot</value>
+  </data>
+  <data name="SocialProfileLocked.Text" xml:space="preserve">
+    <value>Locked</value>
+    <comment>Tag on a profile that approves each new follower.</comment>
+  </data>
+  <data name="SocialProfileNotesTab.Text" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="SocialProfileRepliesTab.Text" xml:space="preserve">
+    <value>Notes &amp; replies</value>
+  </data>
+  <data name="SocialProfileMediaTab.Text" xml:space="preserve">
+    <value>Media</value>
+  </data>
+  <data name="SocialProfileTabs.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Profile sections</value>
+  </data>
+  <data name="SocialProfileLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading profile</value>
+  </data>
+  <data name="SocialProfileJoinedFormat" xml:space="preserve">
+    <value>Joined {0}</value>
+    <comment>{0} is the date the account was created.</comment>
+  </data>
+  <data name="SocialProfileBirthdayFormat" xml:space="preserve">
+    <value>Birthday {0}</value>
+    <comment>{0} is the month and day.</comment>
+  </data>
+  <data name="SocialProfileNotesCountFormat" xml:space="preserve">
+    <value>{0} notes</value>
+  </data>
+  <data name="SocialProfileNotesCountOneFormat" xml:space="preserve">
+    <value>{0} note</value>
+  </data>
+  <data name="SocialProfileCountSeparator" xml:space="preserve">
+    <value> · </value>
+    <comment>Between the note, following and follower counts on a profile.</comment>
+  </data>
+  <data name="SocialProfileNotesEmpty" xml:space="preserve">
+    <value>No notes yet.</value>
+  </data>
+  <data name="SocialProfileMediaEmpty" xml:space="preserve">
+    <value>No media yet.</value>
+  </data>
+  <data name="SocialProfileNotesFailed" xml:space="preserve">
+    <value>Couldn't load notes.</value>
+  </data>
+  <data name="SocialProfileFailed" xml:space="preserve">
+    <value>Couldn't load this profile.</value>
+  </data>
+  <data name="SocialProfileSuspended" xml:space="preserve">
+    <value>This account is suspended.</value>
+  </data>
+  <data name="SocialProfileMoved" xml:space="preserve">
+    <value>This account has moved.</value>
+  </data>
+  <data name="SocialLightboxFlipView.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="SocialLightboxCloseButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="SocialLightboxCloseButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="SocialLightboxImageFailed" xml:space="preserve">
+    <value>This image can't be shown here.</value>
+  </data>
+  <data name="SocialInlineVideoFailed" xml:space="preserve">
+    <value>This video can't be played here.</value>
+  </data>
+  <data name="SocialMediaOpenInBrowser" xml:space="preserve">
+    <value>Open in browser</value>
+  </data>
+  <data name="SocialLightboxPositionFormat" xml:space="preserve">
+    <value>{0} of {1}</value>
+    <comment>{0} is the image being shown, {1} the number of images in the note.</comment>
+  </data>
+  <data name="SocialMediaItemAutomationFormat" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>{0} is the attachment's kind, {1} its description (alt text).</comment>
+  </data>
+  <data name="SocialProfileMoreButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialProfileMoreButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialFollowButton" xml:space="preserve">
+    <value>Follow</value>
+  </data>
+  <data name="SocialFollowBackButton" xml:space="preserve">
+    <value>Follow back</value>
+    <comment>Follow button on someone who already follows the signed-in user.</comment>
+  </data>
+  <data name="SocialRequestToFollowButton" xml:space="preserve">
+    <value>Request to follow</value>
+    <comment>Follow button on a locked account, whose owner approves each follower.</comment>
+  </data>
+  <data name="SocialFollowingButton" xml:space="preserve">
+    <value>Following</value>
+    <comment>Follow button state: the signed-in user follows this person. Clicking it offers to unfollow.</comment>
+  </data>
+  <data name="SocialRequestedButton" xml:space="preserve">
+    <value>Requested</value>
+    <comment>Follow button state: a follow request is waiting for approval. Clicking it offers to withdraw the request.</comment>
+  </data>
+  <data name="SocialSignInToFollowButton" xml:space="preserve">
+    <value>Sign in again to follow</value>
+    <comment>Follow button when the signed-in token predates the follow permission.</comment>
+  </data>
+  <data name="SocialUnfollowDialogTitleFormat" xml:space="preserve">
+    <value>Unfollow {0}?</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialUnfollowDialogBody" xml:space="preserve">
+    <value>Their notes will stop showing up in your timeline.</value>
+  </data>
+  <data name="SocialUnfollowDialogConfirm" xml:space="preserve">
+    <value>Unfollow</value>
+  </data>
+  <data name="SocialWithdrawRequestDialogTitle" xml:space="preserve">
+    <value>Withdraw your follow request?</value>
+  </data>
+  <data name="SocialWithdrawRequestDialogBodyFormat" xml:space="preserve">
+    <value>{0} hasn't approved it yet. You can ask again later.</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialWithdrawRequestDialogConfirm" xml:space="preserve">
+    <value>Withdraw</value>
+  </data>
+  <data name="SocialFollowFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't follow {0}</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialUnfollowFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't unfollow {0}</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialWithdrawFailedTitle" xml:space="preserve">
+    <value>Couldn't withdraw your request</value>
+  </data>
+  <data name="SocialFollowFailedBody" xml:space="preserve">
+    <value>fort.social didn't accept the change. Check your connection and try again.</value>
+  </data>
+  <data name="SocialFollowBlockedFormat" xml:space="preserve">
+    <value>{0} has blocked you.</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialFollowBlockingFormat" xml:space="preserve">
+    <value>You've blocked {0}. Unblock them on fort.social first.</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialNowFollowingAnnouncementFormat" xml:space="preserve">
+    <value>You're now following {0}</value>
+    <comment>Screen reader announcement. {0} is the person's display name.</comment>
+  </data>
+  <data name="SocialRequestSentAnnouncementFormat" xml:space="preserve">
+    <value>Follow request sent to {0}</value>
+    <comment>Screen reader announcement. {0} is the person's display name.</comment>
+  </data>
+  <data name="SocialRequestWithdrawnAnnouncementFormat" xml:space="preserve">
+    <value>Follow request to {0} withdrawn</value>
+    <comment>Screen reader announcement. {0} is the person's display name.</comment>
+  </data>
+  <data name="SocialNoLongerFollowingAnnouncementFormat" xml:space="preserve">
+    <value>You're no longer following {0}</value>
+    <comment>Screen reader announcement. {0} is the person's display name.</comment>
+  </data>
+  <data name="SocialUserRowAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}</value>
+    <comment>A person in a following/followers list. {0} is their display name, {1} their handle.</comment>
+  </data>
+  <data name="SocialUserRowRelationAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}, {2}</value>
+    <comment>A person in a following/followers list. {0} is their display name, {1} their handle, {2} the follow button's label.</comment>
+  </data>
+  <data name="SocialUserRowFollowButtonFormat" xml:space="preserve">
+    <value>{0} {1}</value>
+    <comment>Follow button in a list row. {0} is the button's label (Follow, Following...), {1} the person's display name.</comment>
+  </data>
+  <data name="SocialFollowListTabs.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Follow lists</value>
+  </data>
+  <data name="SocialFollowListFollowingTab.Text" xml:space="preserve">
+    <value>Following</value>
+  </data>
+  <data name="SocialFollowListFollowersTab.Text" xml:space="preserve">
+    <value>Followers</value>
+  </data>
+  <data name="SocialFollowListLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading list</value>
+  </data>
+  <data name="SocialFollowingEmpty" xml:space="preserve">
+    <value>Not following anyone yet.</value>
+  </data>
+  <data name="SocialFollowersEmpty" xml:space="preserve">
+    <value>No followers yet.</value>
+  </data>
+  <data name="SocialFollowListPrivate" xml:space="preserve">
+    <value>This list is private.</value>
+  </data>
+  <data name="SocialFollowListFailed" xml:space="preserve">
+    <value>Couldn't load this list.</value>
+  </data>
+  <data name="SocialRemoteFollowingNoticeFormat" xml:space="preserve">
+    <value>{0} is on another server, so we may not know everyone they follow.</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialRemoteFollowersNoticeFormat" xml:space="preserve">
+    <value>{0} is on another server, so we may not know all of their followers.</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialRemoteListLinkFormat" xml:space="preserve">
+    <value>See the full list on {0}</value>
+    <comment>{0} is the other server's host name.</comment>
+  </data>
+  <data name="SocialFollowingListNameFormat" xml:space="preserve">
+    <value>People {0} follows</value>
+    <comment>Screen reader name of the list. {0} is the person's display name.</comment>
+  </data>
+  <data name="SocialFollowersListNameFormat" xml:space="preserve">
+    <value>{0}'s followers</value>
+    <comment>Screen reader name of the list. {0} is the person's display name.</comment>
+  </data>
+  <data name="RemoteListNoticeToggle.Header" xml:space="preserve">
+    <value>Note on other servers' follow lists</value>
+  </data>
+  <data name="RemoteListNoticeToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="RemoteListNoticeToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="RemoteListNoticeDescription.Text" xml:space="preserve">
+    <value>Shows a note at the top of the following and followers lists of people on other servers, since fort.social may only know part of those lists.</value>
+  </data>
+  <data name="SocialProfileManageButton.Content" xml:space="preserve">
+    <value>Manage on fort.social</value>
+  </data>
+  <data name="SocialProfileManageButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>Opens your profile settings on fort.social in the browser</value>
+  </data>
+  <data name="SocialProfileManageButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Edit your profile on fort.social</value>
+  </data>
+  <data name="SocialProfileSignOutMenuItem" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="SocialProfileRefreshButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="SocialProfileRefreshButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh (F5)</value>
+  </data>
+  <data name="ProfileJoinedWithAgeFormat" xml:space="preserve">
+    <value>Joined {0} · {1} on fort.social</value>
+  </data>
+  <data name="ProfileAgeYearOne" xml:space="preserve">
+    <value>1 year</value>
+  </data>
+  <data name="ProfileAgeYearsFormat" xml:space="preserve">
+    <value>{0} years</value>
+  </data>
+  <data name="ProfileAgeMonthOne" xml:space="preserve">
+    <value>1 month</value>
+  </data>
+  <data name="ProfileAgeMonthsFormat" xml:space="preserve">
+    <value>{0} months</value>
+  </data>
+  <data name="ProfileAgeDayOne" xml:space="preserve">
+    <value>1 day</value>
+  </data>
+  <data name="ProfileAgeDaysFormat" xml:space="preserve">
+    <value>{0} days</value>
+  </data>
+  <data name="ThemeRadioGroup.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>App theme</value>
+  </data>
+  <data name="TintScopeRadioGroup.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Apply tint to</value>
+  </data>
+  <data name="WebsiteLink.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>fort1nd.com</value>
+  </data>
+  <data name="GitHubLink.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>github.com/fort-ind/uwp</value>
+  </data>
+  <data name="IssuesLink.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>github.com/fort-ind/uwp/issues</value>
+  </data>
+  <data name="MediaCacheHeading.Text" xml:space="preserve">
+    <value>fort.social cache</value>
+  </data>
+  <data name="MediaCacheSizeFormat" xml:space="preserve">
+    <value>Pictures, avatars and videos: {0}</value>
+  </data>
+  <data name="MediaCacheMeasuring" xml:space="preserve">
+    <value>Measuring media…</value>
+  </data>
+  <data name="MediaCacheUnavailable" xml:space="preserve">
+    <value>Couldn't measure the media cache.</value>
+  </data>
+  <data name="MediaCacheDescription.Text" xml:space="preserve">
+    <value>Pictures, avatars, emoji and videos from fort.social are kept so they load faster next time. if your low on storage or if there is a fuckton of cache you can clear it here</value>
+  </data>
+  <data name="ClearMediaCacheButton.Content" xml:space="preserve">
+    <value>Clear media cache</value>
+  </data>
+  <data name="MediaCacheClearing" xml:space="preserve">
+    <value>Clearing…</value>
+  </data>
+  <data name="MediaCacheClearedFormat" xml:space="preserve">
+    <value>Freed {0}.</value>
+  </data>
+  <data name="MediaCacheClearedNothing" xml:space="preserve">
+    <value>There was nothing to clear.</value>
+  </data>
+  <data name="MediaCacheClearFailed" xml:space="preserve">
+    <value>Couldn't clear the media cache. Try again in a moment.</value>
+  </data>
+  <data name="MediaCacheLimitCombo.Header" xml:space="preserve">
+    <value>Clear automatically when it's bigger than</value>
+  </data>
+  <data name="MediaCacheLimitOff.Content" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="MediaCacheLimit250.Content" xml:space="preserve">
+    <value>250 MB</value>
+  </data>
+  <data name="MediaCacheLimit500.Content" xml:space="preserve">
+    <value>500 MB</value>
+  </data>
+  <data name="MediaCacheLimit1024.Content" xml:space="preserve">
+    <value>1 GB</value>
+  </data>
+  <data name="MediaCacheLimitDescription.Text" xml:space="preserve">
+    <value>Checked a few seconds after fort.desktop starts.</value>
+  </data>
+  <data name="SocialNoteDeleted" xml:space="preserve">
+    <value>This note was deleted.</value>
+    <comment>Shown in place of a note's content once it has been deleted while on screen; also its spoken name.</comment>
+  </data>
+  <data name="SocialNoteEditedAutomation" xml:space="preserve">
+    <value>Edited</value>
+    <comment>Added to a note's spoken summary when the author edited it after posting.</comment>
+  </data>
+  <data name="SocialNoteEditedMarker.Text" xml:space="preserve">
+    <value>· edited</value>
+    <comment>Shown after a note's time when its author edited it after posting.</comment>
+  </data>
+  <data name="SocialNoteEditedTooltipFormat" xml:space="preserve">
+    <value>Edited {0}</value>
+    <comment>Tooltip on a note's "edited" marker. {0} is the date and time of the latest edit.</comment>
+  </data>
+  <data name="SocialNoteFocusedEditedDateFormat" xml:space="preserve">
+    <value>{0} · edited {1}</value>
+    <comment>The date line under the note a thread is about, when it was edited. {0} is when it was posted, {1} when it was last edited.</comment>
+  </data>
+  <data name="SocialNoteDeletedLine.Text" xml:space="preserve">
+    <value>This note was deleted.</value>
+    <comment>Shown in place of a note's content once it has been deleted while on screen.</comment>
+  </data>
+  <data name="SocialReactionsOverflowFormat" xml:space="preserve">
+    <value>+{0}</value>
+    <comment>The last chip in a note's row of reactions when not all of them fit. {0} is how many more kinds of reaction there are.</comment>
+  </data>
+  <data name="SocialReactionsOverflowAutomationFormat" xml:space="preserve">
+    <value>{0} more reactions. Opens the note's reactions</value>
+    <comment>Spoken name and tooltip of the "+N" reaction chip. {0} is how many more kinds of reaction there are.</comment>
+  </data>
+  <data name="SocialReactionChipAutomationFormat" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>Spoken name of one reaction chip. {0} is the emoji or :name:, {1} is how many people reacted with it.</comment>
+  </data>
+  <data name="SocialReactionChipMineAutomationFormat" xml:space="preserve">
+    <value>{0}: {1}, including yours</value>
+    <comment>Spoken name of the reaction chip the signed-in user reacted with. {0} is the emoji or :name:, {1} is how many people reacted with it.</comment>
+  </data>
+  <data name="RelativeTimeEnded" xml:space="preserve">
+    <value>Ended</value>
+    <comment>A poll that has closed.</comment>
+  </data>
+  <data name="RelativeTimeMinutesLeftFormat" xml:space="preserve">
+    <value>{0}m left</value>
+    <comment>Time until a poll closes, abbreviated. {0} is the number of minutes.</comment>
+  </data>
+  <data name="RelativeTimeHoursLeftFormat" xml:space="preserve">
+    <value>{0}h left</value>
+    <comment>Time until a poll closes, abbreviated. {0} is the number of hours.</comment>
+  </data>
+  <data name="RelativeTimeDaysLeftFormat" xml:space="preserve">
+    <value>{0}d left</value>
+    <comment>Time until a poll closes, abbreviated. {0} is the number of days.</comment>
+  </data>
+  <data name="RelativeTimeEndsOnFormat" xml:space="preserve">
+    <value>Ends {0}</value>
+    <comment>When a poll closes more than a week from now. {0} is the short date.</comment>
+  </data>
+  <data name="SocialPollPercentFormat" xml:space="preserve">
+    <value>{0}%</value>
+    <comment>One poll choice's share of the votes. {0} is a whole number from 0 to 100.</comment>
+  </data>
+  <data name="SocialPollChoiceResultAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}%, {2} votes</value>
+    <comment>Spoken name of a poll choice with its result. {0} is the choice, {1} its percentage, {2} its number of votes.</comment>
+  </data>
+  <data name="SocialPollChoiceVotedAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}%, {2} votes, your vote</value>
+    <comment>Spoken name of the poll choice the signed-in user voted for. {0} is the choice, {1} its percentage, {2} its number of votes.</comment>
+  </data>
+  <data name="SocialPollVoteOne" xml:space="preserve">
+    <value>1 vote</value>
+    <comment>Under a poll with exactly one vote.</comment>
+  </data>
+  <data name="SocialPollVotesFormat" xml:space="preserve">
+    <value>{0} votes</value>
+    <comment>Under a poll. {0} is the total number of votes.</comment>
+  </data>
+  <data name="SocialPollFooterFormat" xml:space="preserve">
+    <value>{0} · {1}</value>
+    <comment>The line under a poll. {0} is the vote count ("12 votes"), {1} when it closes ("2d left", "Ended").</comment>
+  </data>
+  <data name="SocialPollShowResults" xml:space="preserve">
+    <value>Show results</value>
+    <comment>Link under a poll the user has not voted in, revealing the percentages early.</comment>
+  </data>
+  <data name="SocialThreadMoreReplyOne" xml:space="preserve">
+    <value>1 more reply ›</value>
+    <comment>Under a reply in a thread whose own reply isn't shown. Opens that reply's thread.</comment>
+  </data>
+  <data name="SocialThreadMoreRepliesFormat" xml:space="preserve">
+    <value>{0} more replies ›</value>
+    <comment>Under a reply in a thread whose own replies aren't all shown. {0} is how many more. Opens that reply's thread.</comment>
+  </data>
+  <data name="SocialThreadContinue" xml:space="preserve">
+    <value>Continue thread ›</value>
+    <comment>Under the deepest reply a thread shows when it has replies of its own. Opens that reply's thread.</comment>
+  </data>
+  <data name="HeaderNote" xml:space="preserve">
+    <value>Note</value>
+    <comment>The main window's header while a note and its thread are showing.</comment>
+  </data>
+  <data name="WindowTitleNote" xml:space="preserve">
+    <value>Note</value>
+    <comment>A popped-out window's title while it shows a note and its thread.</comment>
+  </data>
+  <data name="SocialThreadAncestorsList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Earlier in the conversation</value>
+  </data>
+  <data name="SocialThreadLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading the note</value>
+  </data>
+  <data name="SocialThreadTabLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="SocialThreadTabs.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Replies, renotes and reactions</value>
+  </data>
+  <data name="SocialThreadRepliesTab.Text" xml:space="preserve">
+    <value>Replies</value>
+  </data>
+  <data name="SocialThreadRenotesTab.Text" xml:space="preserve">
+    <value>Renotes</value>
+  </data>
+  <data name="SocialThreadReactionsTab.Text" xml:space="preserve">
+    <value>Reactions</value>
+  </data>
+  <data name="SocialThreadRepliesTabName" xml:space="preserve">
+    <value>Replies, {0}</value>
+    <comment>Spoken name of the Replies tab under a note. {0} is the number of replies.</comment>
+  </data>
+  <data name="SocialThreadRenotesTabName" xml:space="preserve">
+    <value>Renotes, {0}</value>
+    <comment>Spoken name of the Renotes tab under a note. {0} is the number of renotes.</comment>
+  </data>
+  <data name="SocialThreadReactionsTabName" xml:space="preserve">
+    <value>Reactions, {0}</value>
+    <comment>Spoken name of the Reactions tab under a note. {0} is the number of reactions.</comment>
+  </data>
+  <data name="SocialThreadRefreshButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="SocialThreadRefreshButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh (F5)</value>
+  </data>
+  <data name="SocialThreadNotFound" xml:space="preserve">
+    <value>This note isn't available. It may have been deleted, or you may not be able to see it.</value>
+  </data>
+  <data name="SocialThreadFailed" xml:space="preserve">
+    <value>Couldn't load this note.</value>
+  </data>
+  <data name="SocialThreadTabFailed" xml:space="preserve">
+    <value>Couldn't load this list.</value>
+  </data>
+  <data name="SocialThreadRepliesEmpty" xml:space="preserve">
+    <value>No replies yet.</value>
+  </data>
+  <data name="SocialThreadRenotesEmpty" xml:space="preserve">
+    <value>No renotes yet.</value>
+  </data>
+  <data name="SocialThreadReactionsEmpty" xml:space="preserve">
+    <value>No reactions yet.</value>
+  </data>
+  <data name="SocialThreadRepliesListName" xml:space="preserve">
+    <value>Replies</value>
+    <comment>Spoken name of the list under a note while the Replies tab is selected.</comment>
+  </data>
+  <data name="SocialThreadRenotesListName" xml:space="preserve">
+    <value>People who renoted</value>
+    <comment>Spoken name of the list under a note while the Renotes tab is selected.</comment>
+  </data>
+  <data name="SocialThreadReactionsListName" xml:space="preserve">
+    <value>People who reacted</value>
+    <comment>Spoken name of the list under a note while the Reactions tab is selected.</comment>
+  </data>
+  <data name="SocialThreadReactionFilterFormat" xml:space="preserve">
+    <value>{0}, {1} reactions</value>
+    <comment>Spoken name of one emoji filter above the list of people who reacted. {0} is the emoji or :name:, {1} how many people used it.</comment>
+  </data>
+  <data name="SocialThreadRenoterAutomationFormat" xml:space="preserve">
+    <value>{0} renoted, {1}</value>
+    <comment>Spoken name of a row in a note's Renotes tab. {0} is the person's name and handle, {1} the date and time.</comment>
+  </data>
+  <data name="SocialThreadReactorAutomationFormat" xml:space="preserve">
+    <value>{0} reacted with {1}, {2}</value>
+    <comment>Spoken name of a row in a note's Reactions tab. {0} is the person's name and handle, {1} the emoji or :name:, {2} the date and time.</comment>
+  </data>
+  <data name="SocialSignInPromptFollowTitle" xml:space="preserve">
+    <value>Sign in again to follow people</value>
+  </data>
+  <data name="SocialSignInPromptReactTitle" xml:space="preserve">
+    <value>Sign in again to react</value>
+  </data>
+  <data name="SocialSignInPromptRenoteTitle" xml:space="preserve">
+    <value>Sign in again to renote</value>
+  </data>
+  <data name="SocialSignInPromptVoteTitle" xml:space="preserve">
+    <value>Sign in again to vote</value>
+  </data>
+  <data name="SocialSignInPromptFavoriteTitle" xml:space="preserve">
+    <value>Sign in again to use favorites</value>
+  </data>
+  <data name="SocialSignInPromptPinTitle" xml:space="preserve">
+    <value>Sign in again to pin notes</value>
+  </data>
+  <data name="SocialSignInPromptMuteTitle" xml:space="preserve">
+    <value>Sign in again to mute threads</value>
+  </data>
+  <data name="SocialSignInPromptDeleteTitle" xml:space="preserve">
+    <value>Sign in again to delete notes</value>
+  </data>
+  <data name="SocialSignInPromptReportTitle" xml:space="preserve">
+    <value>Sign in again to report</value>
+  </data>
+  <data name="SocialSignInPromptBody" xml:space="preserve">
+    <value>fort.desktop needs a permission your current sign-in doesn't have. Sign in again and fort.social will ask you to allow it. You only need to do this once.</value>
+  </data>
+  <data name="SocialSignInPromptConfirm" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="SocialWritePermissionInfoBar.Title" xml:space="preserve">
+    <value>Sign in again to react, renote and vote</value>
+  </data>
+  <data name="SocialWritePermissionInfoBar.Message" xml:space="preserve">
+    <value>fort.desktop can now like, react, renote, vote and more without leaving the app! Sign in again once so fort.social can allow it.</value>
+  </data>
+  <data name="SocialWritePermissionSignInButton.Content" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="SocialActionErrorNoSuchNote" xml:space="preserve">
+    <value>This note isn't on fort.social anymore. It may have been deleted.</value>
+  </data>
+  <data name="SocialActionErrorBlockedFormat" xml:space="preserve">
+    <value>{0} has blocked you.</value>
+    <comment>{0} is the author's display name.</comment>
+  </data>
+  <data name="SocialActionErrorRenoteVisibility" xml:space="preserve">
+    <value>This note's visibility doesn't allow renoting.</value>
+  </data>
+  <data name="SocialActionErrorPinLimit" xml:space="preserve">
+    <value>You've pinned as many notes as fort.social allows. Unpin one first.</value>
+  </data>
+  <data name="SocialActionErrorPollEnded" xml:space="preserve">
+    <value>This poll has ended.</value>
+  </data>
+  <data name="SocialActionErrorCannotReport" xml:space="preserve">
+    <value>fort.social doesn't let you report this account.</value>
+  </data>
+  <data name="SocialActionErrorGeneric" xml:space="preserve">
+    <value>seens like we ran into a issue, you might not be connected to the internet OR fort.social is offline</value>
+  </data>
+  <data name="SocialActionLikedAnnouncement" xml:space="preserve">
+    <value>Liked</value>
+  </data>
+  <data name="SocialActionReactedAnnouncementFormat" xml:space="preserve">
+    <value>Reacted with {0}</value>
+    <comment>{0} is the emoji, or :name: for a custom emoji.</comment>
+  </data>
+  <data name="SocialActionUnreactedAnnouncement" xml:space="preserve">
+    <value>Reaction removed</value>
+  </data>
+  <data name="SocialActionRenotedAnnouncement" xml:space="preserve">
+    <value>Renoted</value>
+  </data>
+  <data name="SocialActionUnrenotedAnnouncement" xml:space="preserve">
+    <value>Renote removed</value>
+  </data>
+  <data name="SocialActionFavoritedAnnouncement" xml:space="preserve">
+    <value>Added to favorites</value>
+  </data>
+  <data name="SocialActionUnfavoritedAnnouncement" xml:space="preserve">
+    <value>Removed from favorites</value>
+  </data>
+  <data name="SocialActionMutedAnnouncement" xml:space="preserve">
+    <value>Thread muted</value>
+  </data>
+  <data name="SocialActionUnmutedAnnouncement" xml:space="preserve">
+    <value>Thread unmuted</value>
+  </data>
+  <data name="SocialActionPinnedAnnouncement" xml:space="preserve">
+    <value>Pinned to your profile</value>
+  </data>
+  <data name="SocialActionUnpinnedAnnouncement" xml:space="preserve">
+    <value>Unpinned from your profile</value>
+  </data>
+  <data name="SocialActionDeletedAnnouncement" xml:space="preserve">
+    <value>Note deleted</value>
+  </data>
+  <data name="SocialActionVotedAnnouncement" xml:space="preserve">
+    <value>Vote sent</value>
+  </data>
+  <data name="SocialActionReactFailedTitle" xml:space="preserve">
+    <value>Couldn't react</value>
+  </data>
+  <data name="SocialActionUnreactFailedTitle" xml:space="preserve">
+    <value>Couldn't remove your reaction</value>
+  </data>
+  <data name="SocialActionRenoteFailedTitle" xml:space="preserve">
+    <value>Couldn't renote</value>
+  </data>
+  <data name="SocialActionUnrenoteFailedTitle" xml:space="preserve">
+    <value>Couldn't undo the renote</value>
+  </data>
+  <data name="SocialActionFavoriteFailedTitle" xml:space="preserve">
+    <value>Couldn't add to favorites</value>
+  </data>
+  <data name="SocialActionUnfavoriteFailedTitle" xml:space="preserve">
+    <value>Couldn't remove from favorites</value>
+  </data>
+  <data name="SocialActionMuteFailedTitle" xml:space="preserve">
+    <value>Couldn't mute the thread</value>
+  </data>
+  <data name="SocialActionUnmuteFailedTitle" xml:space="preserve">
+    <value>Couldn't unmute the thread</value>
+  </data>
+  <data name="SocialActionPinFailedTitle" xml:space="preserve">
+    <value>Couldn't pin the note</value>
+  </data>
+  <data name="SocialActionUnpinFailedTitle" xml:space="preserve">
+    <value>Couldn't unpin the note</value>
+  </data>
+  <data name="SocialActionDeleteFailedTitle" xml:space="preserve">
+    <value>Couldn't delete the note</value>
+  </data>
+  <data name="SocialActionVoteFailedTitle" xml:space="preserve">
+    <value>Couldn't vote</value>
+  </data>
+  <data name="SocialActionReportFailedTitle" xml:space="preserve">
+    <value>Couldn't send the report</value>
+  </data>
+  <data name="SocialDeleteDialogTitle" xml:space="preserve">
+    <value>Delete this note?</value>
+  </data>
+  <data name="SocialDeleteDialogBody" xml:space="preserve">
+    <value>It will be removed from fort.social for everyone, with its reactions and renotes. You can't undo this.</value>
+  </data>
+  <data name="SocialDeleteDialogConfirm" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialVoteDialogTitle" xml:space="preserve">
+    <value>Send your vote?</value>
+  </data>
+  <data name="SocialVoteDialogBodyFormat" xml:space="preserve">
+    <value>You're voting for "{0}". Votes can't be changed later.</value>
+    <comment>{0} is the poll choice's text.</comment>
+  </data>
+  <data name="SocialVoteDialogBodyMultipleFormat" xml:space="preserve">
+    <value>Votes can't be changed later. You're voting for:{0}</value>
+    <comment>{0} is a list of the chosen choices, each on its own line starting with a bullet.</comment>
+  </data>
+  <data name="SocialVoteDialogConfirm" xml:space="preserve">
+    <value>Vote</value>
+  </data>
+  <data name="SocialReportDialogTitleFormat" xml:space="preserve">
+    <value>Report {0}</value>
+    <comment>{0} is the author's handle, like @name or @name@host.</comment>
+  </data>
+  <data name="SocialReportDialogBody" xml:space="preserve">
+    <value>tell us whats wrong with this note, we will look into it and contact you if needed </value>
+  </data>
+  <data name="SocialReportDialogPlaceholder" xml:space="preserve">
+    <value>What's the problem?</value>
+  </data>
+  <data name="SocialReportDialogBoxName" xml:space="preserve">
+    <value>Report details</value>
+  </data>
+  <data name="SocialReportDialogConfirm" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="SocialReportSentTitle" xml:space="preserve">
+    <value>Report sent!</value>
+  </data>
+  <data name="SocialReportSentBody" xml:space="preserve">
+    <value>Thanks! we will take a look at it soon :) - no one will know you made this report </value>
+  </data>
+  <data name="SocialEmojiPickerLike.Text" xml:space="preserve">
+    <value>Like</value>
+  </data>
+  <data name="SocialEmojiPickerRemove.Text" xml:space="preserve">
+    <value>Remove reaction</value>
+  </data>
+  <data name="SocialEmojiPickerSearch.PlaceholderText" xml:space="preserve">
+    <value>Search emoji</value>
+  </data>
+  <data name="SocialEmojiPickerSearch.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Search emoji</value>
+  </data>
+  <data name="SocialEmojiPickerSkinTone.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Skin tone</value>
+  </data>
+  <data name="SocialEmojiPickerGrid.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
+  <data name="SocialEmojiPickerCategories.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Emoji categories</value>
+  </data>
+  <data name="SocialEmojiPickerLikeOnly" xml:space="preserve">
+    <value>This note only accepts likes.</value>
+  </data>
+  <data name="SocialEmojiPickerFailed" xml:space="preserve">
+    <value>Couldn't load the emoji. Try again in a moment.</value>
+  </data>
+  <data name="SocialEmojiPickerNoResults" xml:space="preserve">
+    <value>No emoji found</value>
+  </data>
+  <data name="SocialEmojiPickerResultsFormat" xml:space="preserve">
+    <value>{0} emoji found</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialEmojiPickerSkinToneFormat" xml:space="preserve">
+    <value>Skin tone: {0}</value>
+    <comment>{0} is the tone's name, like Medium.</comment>
+  </data>
+  <data name="SocialEmojiGroupRecent" xml:space="preserve">
+    <value>Recently used</value>
+  </data>
+  <data name="SocialEmojiGroupResults" xml:space="preserve">
+    <value>Search results</value>
+  </data>
+  <data name="SocialEmojiGroupOther" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="SocialEmojiGroupSmileysEmotion" xml:space="preserve">
+    <value>Smileys &amp; emotion</value>
+  </data>
+  <data name="SocialEmojiGroupPeopleBody" xml:space="preserve">
+    <value>People &amp; body</value>
+  </data>
+  <data name="SocialEmojiGroupAnimalsNature" xml:space="preserve">
+    <value>Animals &amp; nature</value>
+  </data>
+  <data name="SocialEmojiGroupFoodDrink" xml:space="preserve">
+    <value>Food &amp; drink</value>
+  </data>
+  <data name="SocialEmojiGroupTravelPlaces" xml:space="preserve">
+    <value>Travel &amp; places</value>
+  </data>
+  <data name="SocialEmojiGroupActivities" xml:space="preserve">
+    <value>Activities</value>
+  </data>
+  <data name="SocialEmojiGroupObjects" xml:space="preserve">
+    <value>Objects</value>
+  </data>
+  <data name="SocialEmojiGroupSymbols" xml:space="preserve">
+    <value>Symbols</value>
+  </data>
+  <data name="SocialEmojiGroupFlags" xml:space="preserve">
+    <value>Flags</value>
+  </data>
+  <data name="SocialEmojiSkinTone0" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="SocialEmojiSkinTone1" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="SocialEmojiSkinTone2" xml:space="preserve">
+    <value>Medium-light</value>
+  </data>
+  <data name="SocialEmojiSkinTone3" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="SocialEmojiSkinTone4" xml:space="preserve">
+    <value>Medium-dark</value>
+  </data>
+  <data name="SocialEmojiSkinTone5" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="SocialActionReplyAutomationFormat" xml:space="preserve">
+    <value>Reply, {0} replies</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialActionReplyTooltip" xml:space="preserve">
+    <value>Reply (R)</value>
+  </data>
+  <data name="SocialActionRenoteAutomationFormat" xml:space="preserve">
+    <value>Renote, {0} renotes</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialActionRenotedAutomationFormat" xml:space="preserve">
+    <value>Renote, you renoted this, {0} renotes</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialActionRenoteTooltip" xml:space="preserve">
+    <value>Renote (N)</value>
+  </data>
+  <data name="SocialActionLikeAutomationFormat" xml:space="preserve">
+    <value>Like, {0} reactions</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialActionLikedAutomationFormat" xml:space="preserve">
+    <value>Like, liked, {0} reactions</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialActionReactedAutomationFormat" xml:space="preserve">
+    <value>Like, you reacted with {0}, {1} reactions</value>
+    <comment>{0} is the emoji or :name:, {1} a number.</comment>
+  </data>
+  <data name="SocialActionLikeTooltip" xml:space="preserve">
+    <value>Like (L). More reactions (E)</value>
+  </data>
+  <data name="SocialActionUnlikeTooltip" xml:space="preserve">
+    <value>Remove your reaction (L). Change it (E)</value>
+  </data>
+  <data name="SocialReactionChipRemoteTooltipFormat" xml:space="preserve">
+    <value>{0} · from another server</value>
+    <comment>{0} is the custom emoji's :name:.</comment>
+  </data>
+  <data name="SocialPollVoteForAutomationFormat" xml:space="preserve">
+    <value>Vote for {0}</value>
+    <comment>{0} is the choice and, once results show, its share of the votes.</comment>
+  </data>
+  <data name="SocialPollVoteButton" xml:space="preserve">
+    <value>Vote</value>
+  </data>
+  <data name="SocialRenoteMenuRenote" xml:space="preserve">
+    <value>Renote</value>
+  </data>
+  <data name="SocialRenoteMenuPublic" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="SocialRenoteMenuHome" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="SocialRenoteMenuFollowers" xml:space="preserve">
+    <value>Followers</value>
+  </data>
+  <data name="SocialRenoteMenuUndo" xml:space="preserve">
+    <value>Undo renote</value>
+  </data>
+  <data name="SocialMenuFavorite" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="SocialMenuUnfavorite" xml:space="preserve">
+    <value>Remove from favorites</value>
+  </data>
+  <data name="SocialMenuMuteThread" xml:space="preserve">
+    <value>Mute thread</value>
+  </data>
+  <data name="SocialMenuUnmuteThread" xml:space="preserve">
+    <value>Unmute thread</value>
+  </data>
+  <data name="SocialMenuReport" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="SocialMenuPin" xml:space="preserve">
+    <value>Pin to profile</value>
+  </data>
+  <data name="SocialMenuUnpin" xml:space="preserve">
+    <value>Unpin from profile</value>
+  </data>
+  <data name="SocialMenuDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialProfileFavoritesTab.Text" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="SocialProfileFavoritesEmpty" xml:space="preserve">
+    <value>No favorites yet. Choose Favorite in a note's menu to keep it here.</value>
+  </data>
+  <data name="SocialProfileFavoritesNeedsSignIn" xml:space="preserve">
+    <value>Sign in again to see your favorites here.</value>
+  </data>
+  <data name="SocialSignInPromptPostTitle" xml:space="preserve">
+    <value>Sign in again to post</value>
+  </data>
+  <data name="SocialPostErrorTooLong" xml:space="preserve">
+    <value>The note is longer than fort.social allows.</value>
+  </data>
+  <data name="SocialPostErrorWarningTooLong" xml:space="preserve">
+    <value>The content warning is longer than fort.social allows.</value>
+  </data>
+  <data name="SocialPostErrorProhibitedWords" xml:space="preserve">
+    <value>fort.social doesn't allow some of the words in this note.</value>
+  </data>
+  <data name="SocialPostErrorTooManyMentions" xml:space="preserve">
+    <value>This note mentions more people than fort.social allows.</value>
+  </data>
+  <data name="SocialPostErrorBlocked" xml:space="preserve">
+    <value>The person you're replying to or quoting has blocked you.</value>
+  </data>
+  <data name="SocialPostErrorReplyGone" xml:space="preserve">
+    <value>The note you're replying to isn't available anymore.</value>
+  </data>
+  <data name="SocialPostErrorQuoteGone" xml:space="preserve">
+    <value>The note you're quoting isn't available anymore.</value>
+  </data>
+  <data name="SocialPostErrorQuoteDisabled" xml:space="preserve">
+    <value>fort.social doesn't let you quote notes right now.</value>
+  </data>
+  <data name="SocialPostErrorPollEnded" xml:space="preserve">
+    <value>The poll's end time has already passed. Pick a later time.</value>
+  </data>
+  <data name="SocialPostErrorFileGone" xml:space="preserve">
+    <value>One of the attachments isn't in your fort.social drive anymore. Remove it and attach it again.</value>
+  </data>
+  <data name="SocialPostErrorNotAuthor" xml:space="preserve">
+    <value>You can only edit your own notes.</value>
+  </data>
+  <data name="SocialPostErrorReplyVisibility" xml:space="preserve">
+    <value>A reply to a direct note has to be direct too.</value>
+  </data>
+  <data name="SocialPostErrorGeneric" xml:space="preserve">
+    <value>fort.social didn't accept the note. Check your connection and try again; your draft is kept.</value>
+  </data>
+  <data name="SocialPostFailedTitle" xml:space="preserve">
+    <value>Couldn't post</value>
+  </data>
+  <data name="SocialPostReplyFailedTitle" xml:space="preserve">
+    <value>Couldn't send the reply</value>
+  </data>
+  <data name="SocialPostEditFailedTitle" xml:space="preserve">
+    <value>Couldn't save the edit</value>
+  </data>
+  <data name="SocialComposeRemainingFormat" xml:space="preserve">
+    <value>{0} characters left</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialComposeOverLimitFormat" xml:space="preserve">
+    <value>{0} characters over the limit</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialAttachmentAutomationFormat" xml:space="preserve">
+    <value>{0}, no description</value>
+    <comment>{0} is the file name.</comment>
+  </data>
+  <data name="SocialAttachmentDescribedAutomationFormat" xml:space="preserve">
+    <value>{0}, described as {1}</value>
+    <comment>{0} is the file name, {1} its description.</comment>
+  </data>
+  <data name="SocialAttachmentUploadingAutomationFormat" xml:space="preserve">
+    <value>{0}, uploading</value>
+    <comment>{0} is the file name.</comment>
+  </data>
+  <data name="SocialAttachmentFailedAutomationFormat" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>{0} is the file name, {1} what went wrong.</comment>
+  </data>
+  <data name="SocialRecipientHeader.Text" xml:space="preserve">
+    <value>Visible only to</value>
+  </data>
+  <data name="SocialRecipientList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Recipients</value>
+  </data>
+  <data name="SocialRecipientSearch.PlaceholderText" xml:space="preserve">
+    <value>Add a person</value>
+  </data>
+  <data name="SocialRecipientSearch.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Add a recipient</value>
+  </data>
+  <data name="SocialRecipientRemoveFormat" xml:space="preserve">
+    <value>Remove {0}</value>
+    <comment>{0} is the person's name.</comment>
+  </data>
+  <data name="SocialComposeVisibilityButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Who can see this</value>
+  </data>
+  <data name="SocialComposeVisibilityPublic.Text" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="SocialComposeVisibilityHome.Text" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="SocialComposeVisibilityFollowers.Text" xml:space="preserve">
+    <value>Followers</value>
+  </data>
+  <data name="SocialComposeVisibilityDirect.Text" xml:space="preserve">
+    <value>Direct</value>
+  </data>
+  <data name="SocialComposeLocalOnly.Text" xml:space="preserve">
+    <value>Don't federate</value>
+  </data>
+  <data name="SocialComposeWarningBox.PlaceholderText" xml:space="preserve">
+    <value>Content warning</value>
+  </data>
+  <data name="SocialComposeWarningBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Content warning</value>
+  </data>
+  <data name="SocialComposeEditor.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="SocialComposePreviewHeader.Text" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="SocialComposeRemoveQuote.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Remove the quote</value>
+  </data>
+  <data name="SocialComposeRemoveQuote.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove the quote</value>
+  </data>
+  <data name="SocialComposeAttachments.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Attachments</value>
+  </data>
+  <data name="SocialComposeAltBadge.Text" xml:space="preserve">
+    <value>ALT</value>
+  </data>
+  <data name="SocialComposeRemoveAttachment.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SocialComposeRemoveAttachment.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SocialComposePollHeader.Text" xml:space="preserve">
+    <value>Poll</value>
+  </data>
+  <data name="SocialComposePollAddChoice.Content" xml:space="preserve">
+    <value>Add a choice</value>
+  </data>
+  <data name="SocialComposePollMultiple.Content" xml:space="preserve">
+    <value>Allow more than one choice</value>
+  </data>
+  <data name="SocialComposePollEnds.Header" xml:space="preserve">
+    <value>Ends</value>
+  </data>
+  <data name="SocialComposePollEndDate.Header" xml:space="preserve">
+    <value>End date</value>
+  </data>
+  <data name="SocialComposePollEndTime.Header" xml:space="preserve">
+    <value>End time</value>
+  </data>
+  <data name="SocialComposePollResetWarning.Text" xml:space="preserve">
+    <value>Changing the poll resets its votes.</value>
+  </data>
+  <data name="SocialComposeEmojiButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
+  <data name="SocialComposeEmojiButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
+  <data name="SocialComposeWarningButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Content warning</value>
+  </data>
+  <data name="SocialComposeWarningButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Content warning</value>
+  </data>
+  <data name="SocialComposeAttachButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Attach files</value>
+  </data>
+  <data name="SocialComposeAttachButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Attach files (or paste or drop them)</value>
+  </data>
+  <data name="SocialComposePollButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Poll</value>
+  </data>
+  <data name="SocialComposePollButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Poll</value>
+  </data>
+  <data name="SocialComposePreviewButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="SocialComposePreviewButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="SocialComposeMoreButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialComposeMoreButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialComposeReactionsMenu.Text" xml:space="preserve">
+    <value>Reactions</value>
+  </data>
+  <data name="SocialComposeReactionsAll.Text" xml:space="preserve">
+    <value>Allow all reactions</value>
+  </data>
+  <data name="SocialComposeReactionsLikeOnly.Text" xml:space="preserve">
+    <value>Likes only</value>
+  </data>
+  <data name="SocialComposeReactionsLikeOnlyRemote.Text" xml:space="preserve">
+    <value>Likes only from other servers</value>
+  </data>
+  <data name="SocialComposeReactionsNonSensitive.Text" xml:space="preserve">
+    <value>No sensitive emoji</value>
+  </data>
+  <data name="SocialComposeReactionsNonSensitiveLikeRemote.Text" xml:space="preserve">
+    <value>No sensitive emoji, likes only from other servers</value>
+  </data>
+  <data name="SocialComposeDiscard.Text" xml:space="preserve">
+    <value>Discard draft</value>
+  </data>
+  <data name="SocialComposeSuggestions.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Suggestions</value>
+  </data>
+  <data name="SocialComposePostButton" xml:space="preserve">
+    <value>Post</value>
+  </data>
+  <data name="SocialComposeSaveButton" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SocialComposeReplyButton" xml:space="preserve">
+    <value>Reply</value>
+  </data>
+  <data name="SocialComposePlaceholder" xml:space="preserve">
+    <value>What's on your mind?</value>
+  </data>
+  <data name="SocialComposeQuotePlaceholder" xml:space="preserve">
+    <value>Add a comment</value>
+  </data>
+  <data name="SocialComposeReplyPlaceholderFormat" xml:space="preserve">
+    <value>Reply to {0}…</value>
+    <comment>{0} is the handle of the person being replied to.</comment>
+  </data>
+  <data name="SocialComposeAltDialogTitle" xml:space="preserve">
+    <value>Add descriptions?</value>
+  </data>
+  <data name="SocialComposeAltDialogBody" xml:space="preserve">
+    <value>Some attachments have no description. add one! </value>
+  </data>
+  <data name="SocialComposeAltDialogPost" xml:space="preserve">
+    <value>Post anyway</value>
+  </data>
+  <data name="SocialComposeAltDialogDescribe" xml:space="preserve">
+    <value>Add descriptions</value>
+  </data>
+  <data name="SocialComposeLocalOnlyLabelFormat" xml:space="preserve">
+    <value>{0} · Don't federate</value>
+    <comment>{0} is the visibility, like Public.</comment>
+  </data>
+  <data name="SocialComposeVisibilityAutomationFormat" xml:space="preserve">
+    <value>Visibility: {0}</value>
+    <comment>{0} is the visibility, like Public.</comment>
+  </data>
+  <data name="SocialComposeVisibilityPublicName" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="SocialComposeVisibilityHomeName" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="SocialComposeVisibilityFollowersName" xml:space="preserve">
+    <value>Followers</value>
+  </data>
+  <data name="SocialComposeVisibilityDirectName" xml:space="preserve">
+    <value>Direct</value>
+  </data>
+  <data name="SocialComposeQuotingFormat" xml:space="preserve">
+    <value>Quoting {0}</value>
+    <comment>{0} is the quoted note's author handle.</comment>
+  </data>
+  <data name="SocialComposeDiscardDialogTitle" xml:space="preserve">
+    <value>Discard this draft?</value>
+  </data>
+  <data name="SocialComposeDiscardDialogBody" xml:space="preserve">
+    <value>What you wrote and attached will be cleared. You can't undo this.</value>
+  </data>
+  <data name="SocialComposeDiscardDialogConfirm" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="SocialComposeDropCaption" xml:space="preserve">
+    <value>Attach</value>
+  </data>
+  <data name="SocialAttachmentTooLarge" xml:space="preserve">
+    <value>It's larger than fort.social allows.</value>
+  </data>
+  <data name="SocialAttachmentDriveFull" xml:space="preserve">
+    <value>Your fort.social drive is full. so we cant upload this file</value>
+  </data>
+  <data name="SocialAttachmentRefused" xml:space="preserve">
+    <value>fort.social didn't accept this file.</value>
+  </data>
+  <data name="SocialAttachmentBadName" xml:space="preserve">
+    <value>fort.social didn't accept the file's name. (rename it maybe??)</value>
+  </data>
+  <data name="SocialAttachmentFailed" xml:space="preserve">
+    <value>The upload didn't finish. Select it to try again.</value>
+  </data>
+  <data name="SocialAttachmentNeedsSignIn" xml:space="preserve">
+    <value>Sign in again to upload files.</value>
+  </data>
+  <data name="SocialAttachmentLimitFormat" xml:space="preserve">
+    <value>You can attach up to {0} files.</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialAttachmentTooLargeFormat" xml:space="preserve">
+    <value>Files can be up to {0} MB.</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialAttachmentRemovedFormat" xml:space="preserve">
+    <value>{0} removed</value>
+    <comment>{0} is the file name.</comment>
+  </data>
+  <data name="SocialAttachmentDescriptionHeader" xml:space="preserve">
+    <value>Description (alt text)</value>
+  </data>
+  <data name="SocialAttachmentDescriptionPlaceholder" xml:space="preserve">
+    <value>Describe it for people who can't see it</value>
+  </data>
+  <data name="SocialAttachmentSensitiveHeader" xml:space="preserve">
+    <value>Mark as sensitive</value>
+  </data>
+  <data name="SocialAttachmentSaveButton" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SocialAttachmentDescriptionSaved" xml:space="preserve">
+    <value>Description saved</value>
+  </data>
+  <data name="SocialAttachmentDescriptionFailedTitle" xml:space="preserve">
+    <value>Couldn't save the description</value>
+  </data>
+  <data name="SocialComposePollExpiryNever" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="SocialComposePollExpiryFiveMinutes" xml:space="preserve">
+    <value>5 minutes</value>
+  </data>
+  <data name="SocialComposePollExpiryOneHour" xml:space="preserve">
+    <value>1 hour</value>
+  </data>
+  <data name="SocialComposePollExpiryOneDay" xml:space="preserve">
+    <value>1 day</value>
+  </data>
+  <data name="SocialComposePollExpiryThreeDays" xml:space="preserve">
+    <value>3 days</value>
+  </data>
+  <data name="SocialComposePollExpiryOneWeek" xml:space="preserve">
+    <value>1 week</value>
+  </data>
+  <data name="SocialComposePollExpiryCustom" xml:space="preserve">
+    <value>Custom…</value>
+  </data>
+  <data name="SocialComposePollChoiceFormat" xml:space="preserve">
+    <value>Choice {0}</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialComposePollRemoveChoiceFormat" xml:space="preserve">
+    <value>Remove choice {0}</value>
+    <comment>{0} is a number.</comment>
+  </data>
+  <data name="SocialComposePollResetDialogTitle" xml:space="preserve">
+    <value>Reset the poll's votes?</value>
+  </data>
+  <data name="SocialComposePollResetDialogBody" xml:space="preserve">
+    <value>You changed the poll, so its votes start again from zero.</value>
+  </data>
+  <data name="SocialComposePollResetDialogConfirm" xml:space="preserve">
+    <value>Save anyway</value>
+  </data>
+  <data name="WindowTitleNewNote" xml:space="preserve">
+    <value>New note</value>
+  </data>
+  <data name="WindowTitleQuote" xml:space="preserve">
+    <value>Quote</value>
+  </data>
+  <data name="WindowTitleEditNote" xml:space="preserve">
+    <value>Edit note</value>
+  </data>
+  <data name="SocialMenuEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="SocialMenuRedraft" xml:space="preserve">
+    <value>Delete and redraft</value>
+  </data>
+  <data name="SocialRenoteMenuQuote" xml:space="preserve">
+    <value>Quote…</value>
+  </data>
+  <data name="SocialRedraftDialogTitle" xml:space="preserve">
+    <value>Delete and redraft this note?</value>
+  </data>
+  <data name="SocialRedraftDialogBody" xml:space="preserve">
+    <value>It's deleted now, with its reactions and renotes, and opens as a new note so you can post it again.</value>
+  </data>
+  <data name="SocialRedraftDialogConfirm" xml:space="preserve">
+    <value>Delete and redraft</value>
+  </data>
+  <data name="SocialNewNoteButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>New note</value>
+  </data>
+  <data name="SocialNewNoteButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>New note (Ctrl+N)</value>
+  </data>
+  <data name="SocialNewNoteLabel.Text" xml:space="preserve">
+    <value>New note</value>
+  </data>
+  <data name="JumpTaskComposeName" xml:space="preserve">
+    <value>new note</value>
+  </data>
+  <data name="JumpTaskComposeDescription" xml:space="preserve">
+    <value>Write a new note on fort.social</value>
+  </data>
+  <data name="SocialToastReplyButton" xml:space="preserve">
+    <value>Reply</value>
+  </data>
+  <data name="SocialToastLikeButton" xml:space="preserve">
+    <value>Like</value>
+  </data>
+  <data name="SocialToastReplyFailedTitle" xml:space="preserve">
+    <value>Your reply wasn't sent</value>
+  </data>
+  <data name="SocialToastReplyFailedBodyFormat" xml:space="preserve">
+    <value>{0} Select this to finish it in fort.desktop.</value>
+  </data>
+  <data name="SocialToastLikeFailedTitle" xml:space="preserve">
+    <value>Couldn't like that note</value>
+  </data>
+  <data name="SocialToastFailedTimeout" xml:space="preserve">
+    <value>fort.social took too long to answer.</value>
+  </data>
+  <data name="SocialToastFailedAccount" xml:space="preserve">
+    <value>You're signed in to a different fort.social account now.</value>
+  </data>
+  <data name="SocialToastFailedSignedOut" xml:space="preserve">
+    <value>You're signed out of fort.social.</value>
+  </data>
+  <data name="SocialToastFailedPermission" xml:space="preserve">
+    <value>Sign in again in fort.desktop to do this from a notification.</value>
+  </data>
+  <data name="SocialShareLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="SocialShareCloseButton.Content" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="SocialShareSignedOutTitle" xml:space="preserve">
+    <value>Sign in to share</value>
+  </data>
+  <data name="SocialShareSignedOutBody" xml:space="preserve">
+    <value>Open fort.desktop, sign in to fort.social from Profile, then share again.</value>
+  </data>
+  <data name="SocialShareSignInAgainTitle" xml:space="preserve">
+    <value>Sign in again to share</value>
+  </data>
+  <data name="SocialShareSignInAgainBody" xml:space="preserve">
+    <value>fort.desktop needs your permission to post. Open fort.desktop, sign in, then share again.</value>
+  </data>
+  <data name="SocialShareFailedTitle" xml:space="preserve">
+    <value>Couldn't open what you shared</value>
+  </data>
+  <data name="SocialShareFailedBody" xml:space="preserve">
+    <value>Something went wrong reading it. Try sharing again.</value>
   </data>
 </root>

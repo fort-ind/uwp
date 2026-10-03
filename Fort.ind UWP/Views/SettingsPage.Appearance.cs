@@ -50,6 +50,7 @@ namespace Fort.ind_UWP
                 LoadTileNotificationControls();
                 AutoUpdateCheckToggle.IsOn = UpdateService.AutomaticChecksEnabled;
                 LoadProfileRefreshControls();
+                LoadMediaCacheControls();
 
                 RestoreSettingsPanelStates();
             }
@@ -83,6 +84,7 @@ namespace Fort.ind_UWP
         }
 
         private Button[] _tintPresetSwatches;
+        private Button _selectedTintSwatch;
 
         private Button[] TintPresetSwatches
         {
@@ -195,6 +197,7 @@ namespace Fort.ind_UWP
                 }
             }
 
+            _selectedTintSwatch = sel;
             if (sel != null)
             {
                 sel.BorderBrush = isDark ? s_selectedBrushDark : s_selectedBrushLight;
@@ -205,6 +208,48 @@ namespace Fort.ind_UWP
             }
 
             UpdateAccentSelection();
+        }
+
+        private void SwatchGroup_GettingFocus(UIElement sender, GettingFocusEventArgs args)
+        {
+            try
+            {
+                if (args.FocusState != FocusState.Keyboard || args.Cancel) return;
+                if (VisualTreeSearch.IsDescendantOf(args.OldFocusedElement, sender)) return;
+
+                var selected = sender == AccentSwatchGroup ? _selectedAccentSwatch : _selectedTintSwatch;
+                if (selected == null || selected == args.NewFocusedElement) return;
+                if (!selected.IsEnabled || selected.Visibility != Visibility.Visible) return;
+
+                args.TrySetNewFocusedElement(selected);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: SwatchGroup_GettingFocus failed - {ex.Message}");
+            }
+        }
+
+        private void SwatchGroup_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            try
+            {
+                if (e.Key != Windows.System.VirtualKey.Home && e.Key != Windows.System.VirtualKey.End) return;
+
+                var group = sender as DependencyObject;
+                var target = e.Key == Windows.System.VirtualKey.Home
+                    ? FocusManager.FindFirstFocusableElement(group)
+                    : FocusManager.FindLastFocusableElement(group);
+
+                var control = target as Control;
+                if (control != null && control.Focus(FocusState.Keyboard))
+                {
+                    e.Handled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: SwatchGroup_KeyDown failed - {ex.Message}");
+            }
         }
 
         private void ShowCustomSwatchColor(string hex)

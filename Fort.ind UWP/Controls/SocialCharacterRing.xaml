@@ -1,0 +1,51 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialCharacterRing"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    VerticalAlignment="Center">
+
+    <StackPanel x:Name="RootPanel" Orientation="Horizontal" Spacing="6">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="LimitStates">
+                <VisualState x:Name="UnderLimit"/>
+                <VisualState x:Name="OverLimit">
+                    <VisualState.Setters>
+                        <Setter Target="CountText.Foreground" Value="{ThemeResource SystemControlErrorTextForegroundBrush}"/>
+                        <Setter Target="RingArc.Stroke" Value="{ThemeResource SystemControlErrorTextForegroundBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <TextBlock x:Name="CountText"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                   VerticalAlignment="Center"
+                   Visibility="Collapsed"
+                   AutomationProperties.AccessibilityView="Raw"/>
+
+        <Grid Width="20" Height="20"
+              VerticalAlignment="Center"
+              AutomationProperties.AccessibilityView="Raw">
+            <Ellipse Stroke="{ThemeResource SystemControlForegroundBaseLowBrush}" StrokeThickness="2.5"/>
+            <Path x:Name="RingArc"
+                  Stroke="{ThemeResource SystemControlForegroundAccentBrush}"
+                  StrokeThickness="2.5"
+                  StrokeStartLineCap="Round"
+                  StrokeEndLineCap="Round"
+                  Visibility="Collapsed">
+                <Path.Data>
+                    <PathGeometry>
+                        <PathFigure StartPoint="10,1.25" IsClosed="False">
+                            <ArcSegment x:Name="RingSegment" Size="8.75,8.75" SweepDirection="Clockwise"/>
+                        </PathFigure>
+                    </PathGeometry>
+                </Path.Data>
+            </Path>
+        </Grid>
+    </StackPanel>
+</UserControl>

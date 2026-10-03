@@ -1,0 +1,39 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialRecipientBox"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="6">
+        <TextBlock x:Uid="SocialRecipientHeader"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+
+        <local:TagWrapPanel x:Uid="SocialRecipientList"
+                            x:Name="Chips"
+                            HorizontalSpacing="6"
+                            VerticalSpacing="6"/>
+
+        <AutoSuggestBox x:Uid="SocialRecipientSearch"
+                        x:Name="SearchBox"
+                        QueryIcon="Find"
+                        UpdateTextOnSelect="False"
+                        TextChanged="SearchBox_TextChanged"
+                        QuerySubmitted="SearchBox_QuerySubmitted">
+            <AutoSuggestBox.ItemTemplate>
+                <DataTemplate x:DataType="local:SocialRecipientSuggestion">
+                    <StackPanel Padding="0,4,0,4" AutomationProperties.Name="{x:Bind AutomationName}">
+                        <TextBlock Text="{x:Bind Title}" Style="{StaticResource BaseTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{x:Bind Handle}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </DataTemplate>
+            </AutoSuggestBox.ItemTemplate>
+        </AutoSuggestBox>
+    </StackPanel>
+</UserControl>

@@ -13,7 +13,9 @@ namespace Fort.ind_UWP
     {
         public const string InstanceHost = "social.fort1nd.com";
         private const string AppName = "Fort.ind";
-        private const string RequestedPermissions = "read:account,read:notifications";
+        private const string RequestedPermissions = SocialPermissions.Requested;
+
+        private const string GrantedPermissionsSettingKey = "MisskeyAuth.GrantedPermissions";
 
         private const string VaultResource = "Fort.ind.Misskey";
         private const string VaultUsernameKey = "token";
@@ -329,8 +331,6 @@ namespace Fort.ind_UWP
                             return MisskeyAuthResult.Failed("SignInErrorNoAccount");
                         }
 
-                        profile.LastLoginDate = DateTime.Now;
-
                         SaveToken(token);
                         return MisskeyAuthResult.Succeeded(token, profile);
                     }
@@ -420,6 +420,8 @@ namespace Fort.ind_UWP
                 profile.CreatedDate = parsedDate;
             }
 
+            if (viewerIsSelf) profile.DetailJson = SocialUserDetail.ToCacheJson(obj);
+
             return profile;
         }
 
@@ -461,6 +463,68 @@ namespace Fort.ind_UWP
             ClearToken();
             PasswordVault vault = new PasswordVault();
             vault.Add(new PasswordCredential(VaultResource, VaultUsernameKey, token));
+            WriteGrantedPermissions(RequestedPermissions);
+        }
+
+        public static bool HasGrantedPermission(string permission)
+        {
+            try
+            {
+                object stamp;
+                if (!Windows.Storage.ApplicationData.Current.LocalSettings.Values.TryGetValue(GrantedPermissionsSettingKey, out stamp))
+                {
+                    return false;
+                }
+
+                var granted = stamp as string;
+                if (string.IsNullOrEmpty(granted)) return false;
+
+                foreach (var part in granted.Split(','))
+                {
+                    if (string.Equals(part.Trim(), permission, StringComparison.Ordinal)) return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MisskeyAuthService: could not read the granted permissions - {ex.Message}");
+                return false;
+            }
+        }
+
+        public static void ForgetGrantedPermission(string permission)
+        {
+            try
+            {
+                object stamp;
+                var values = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
+                if (!values.TryGetValue(GrantedPermissionsSettingKey, out stamp)) return;
+
+                var kept = new System.Collections.Generic.List<string>();
+                foreach (var part in ((stamp as string) ?? "").Split(','))
+                {
+                    var trimmed = part.Trim();
+                    if (trimmed.Length > 0 && !string.Equals(trimmed, permission, StringComparison.Ordinal)) kept.Add(trimmed);
+                }
+
+                WriteGrantedPermissions(string.Join(",", kept));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MisskeyAuthService: could not update the granted permissions - {ex.Message}");
+            }
+        }
+
+        private static void WriteGrantedPermissions(string permissions)
+        {
+            try
+            {
+                Windows.Storage.ApplicationData.Current.LocalSettings.Values[GrantedPermissionsSettingKey] = permissions;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MisskeyAuthService: could not record the granted permissions - {ex.Message}");
+            }
         }
 
         public static string TryGetToken()
@@ -485,6 +549,15 @@ namespace Fort.ind_UWP
 
         public static void ClearToken()
         {
+            try
+            {
+                Windows.Storage.ApplicationData.Current.LocalSettings.Values.Remove(GrantedPermissionsSettingKey);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MisskeyAuthService: could not forget the granted permissions - {ex.Message}");
+            }
+
             try
             {
                 PasswordVault vault = new PasswordVault();

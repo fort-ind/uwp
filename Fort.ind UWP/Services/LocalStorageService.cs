@@ -145,7 +145,7 @@ namespace Fort.ind_UWP
 
         private const string PackageSettingsFolderName = "Settings";
 
-        private const string PackageWebCacheFolderName = "AC";
+        internal const string PackageWebCacheFolderName = "AC";
 
         public static Task<long?> MeasureAppFootprintAsync()
         {
@@ -187,7 +187,7 @@ namespace Fort.ind_UWP
             });
         }
 
-        private static long? MeasureFolder(string root)
+        internal static long? MeasureFolder(string root)
         {
             if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) return null;
 

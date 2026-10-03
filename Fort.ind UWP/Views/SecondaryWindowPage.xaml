@@ -25,6 +25,17 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+            <VisualStateGroup x:Name="TitleBarStates">
+                <VisualState x:Name="TitleBarBandState"/>
+                <VisualState x:Name="TitleBarImmersiveState">
+                    <VisualState.Setters>
+                        <Setter Target="AppTitleBar.Background" Value="Transparent"/>
+                        <Setter Target="AppTitleBar.BorderBrush" Value="Transparent"/>
+                        <Setter Target="ContentFrame.(Grid.Row)" Value="0"/>
+                        <Setter Target="ContentFrame.(Grid.RowSpan)" Value="3"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
         <Grid.RowDefinitions>
@@ -39,6 +50,7 @@
                 IsHitTestVisible="False"/>
 
         <Grid x:Name="AppTitleBar"
+              Canvas.ZIndex="1"
               Height="32"
               Background="{ThemeResource SystemControlBackgroundListLowBrush}"
               BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
@@ -62,6 +74,7 @@
         </Grid>
 
         <Button x:Uid="TitleBarBackButton" x:Name="TitleBarBackButton"
+                Canvas.ZIndex="1"
                 Style="{StaticResource NavigationBackButtonNormalStyle}"
                 Width="48"
                 Height="32"
@@ -72,6 +85,7 @@
                 Click="TitleBarBackButton_Click"/>
 
         <Button x:Name="KeepOnTopButton"
+                Canvas.ZIndex="1"
                 Style="{StaticResource NavigationBackButtonNormalStyle}"
                 Content="&#xE718;"
                 Width="48"

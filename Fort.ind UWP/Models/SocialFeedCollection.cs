@@ -10,22 +10,39 @@ using Windows.UI.Xaml.Data;
 
 namespace Fort.ind_UWP
 {
-    public sealed class SocialFeedCollection : ObservableCollection<SocialFeedItem>, ISupportIncrementalLoading
+    public interface ISocialFeedEntry
     {
-        private readonly Func<string, CancellationToken, Task<IReadOnlyList<SocialFeedItem>>> _loadPageAfter;
+        string PagingId { get; }
+    }
+
+    public enum SocialFeedPaging
+    {
+        FullPage,
+        NonEmpty
+    }
+
+    public sealed class SocialFeedCollection<T> : ObservableCollection<T>, ISupportIncrementalLoading
+        where T : class, ISocialFeedEntry
+    {
+        private readonly Func<string, CancellationToken, Task<IReadOnlyList<T>>> _loadPageAfter;
+
+        private readonly SocialFeedPaging _paging;
 
         private bool _loading;
 
         private int _generation;
 
-        public SocialFeedCollection(Func<string, CancellationToken, Task<IReadOnlyList<SocialFeedItem>>> loadPageAfter)
+        private int _firstPageCount;
+
+        public SocialFeedCollection(Func<string, CancellationToken, Task<IReadOnlyList<T>>> loadPageAfter, SocialFeedPaging paging)
         {
             _loadPageAfter = loadPageAfter;
+            _paging = paging;
         }
 
         public bool HasMoreItems { get; private set; }
 
-        public void ReplaceAll(IReadOnlyList<SocialFeedItem> items, bool hasMore)
+        public void ReplaceAll(IReadOnlyList<T> items, bool hasMore)
         {
             _generation++;
             _loading = false;
@@ -36,6 +53,36 @@ namespace Fort.ind_UWP
                 Add(item);
             }
             HasMoreItems = hasMore;
+            _firstPageCount = items.Count;
+        }
+
+        public int RemoveWhere(Func<T, bool> predicate)
+        {
+            var removed = 0;
+            for (var i = Count - 1; i >= 0; i--)
+            {
+                if (!predicate(this[i])) continue;
+
+                RemoveAt(i);
+                if (i < _firstPageCount) _firstPageCount--;
+                removed++;
+            }
+
+            return removed;
+        }
+
+        public bool TrimToFirstPage()
+        {
+            if (Count <= _firstPageCount) return false;
+
+            var kept = new List<T>(_firstPageCount);
+            for (int i = 0; i < _firstPageCount; i++)
+            {
+                kept.Add(this[i]);
+            }
+
+            ReplaceAll(kept, true);
+            return true;
         }
 
         public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
@@ -51,7 +98,7 @@ namespace Fort.ind_UWP
             _loading = true;
             try
             {
-                var page = await _loadPageAfter(this[Count - 1].Id, cancellationToken);
+                var page = await _loadPageAfter(this[Count - 1].PagingId, cancellationToken);
                 if (generation != _generation) return new LoadMoreItemsResult { Count = 0 };
 
                 if (page == null || page.Count == 0)
@@ -65,7 +112,7 @@ namespace Fort.ind_UWP
                     Add(item);
                 }
 
-                HasMoreItems = page.Count >= AppConstants.SocialFeedPageSize;
+                HasMoreItems = _paging == SocialFeedPaging.NonEmpty || page.Count >= AppConstants.SocialFeedPageSize;
                 return new LoadMoreItemsResult { Count = (uint)page.Count };
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

@@ -1,0 +1,270 @@
+﻿<UserControl
+    x:Class="Fort.ind_UWP.SocialProfileView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    mc:Ignorable="d"
+    Loaded="View_Loaded"
+    Unloaded="View_Unloaded"
+    SizeChanged="View_SizeChanged">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="SocialNoteItemTemplate" x:DataType="local:SocialNoteItem">
+            <local:SocialNoteView Item="{x:Bind}"
+                                  AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"/>
+        </DataTemplate>
+
+        <Style x:Key="SocialNoteContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <Style x:Key="SubtitleRichTextBlockStyle" TargetType="RichTextBlock" BasedOn="{StaticResource BaseRichTextBlockStyle}">
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+
+        <Style x:Key="FollowAccentButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}"/>
+
+    </UserControl.Resources>
+
+    <ListView x:Name="NotesList"
+              MaxWidth="680"
+              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+              ItemContainerStyle="{StaticResource SocialNoteContainerStyle}"
+              SelectionMode="None"
+              IsItemClickEnabled="True"
+              ItemClick="NotesList_ItemClick"
+              Loaded="NotesList_Loaded"
+              SizeChanged="NotesList_SizeChanged">
+        <i:Interaction.Behaviors>
+            <local:SocialContextMenuBehavior/>
+            <local:SocialNoteShortcutsBehavior/>
+        </i:Interaction.Behaviors>
+
+        <ListView.Header>
+            <Grid x:Name="HeaderRoot" SizeChanged="CollapseMetrics_SizeChanged">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel x:Name="DetailsPanel" Grid.Row="3" Padding="12,0,12,12" Visibility="Collapsed">
+                    <local:SocialProfileDetails x:Name="Details"/>
+                </StackPanel>
+
+                <Grid x:Name="BannerHost"
+                      Canvas.ZIndex="1"
+                      FlowDirection="LeftToRight"
+                      SizeChanged="BannerHost_SizeChanged"
+                      AutomationProperties.AccessibilityView="Raw">
+                    <Rectangle x:Name="BannerBand"
+                               Fill="{ThemeResource SystemControlBackgroundListLowBrush}"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                    <Rectangle x:Name="BannerPlaceholder"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                    <Rectangle x:Name="BannerImage"
+                               Opacity="0"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                    <Rectangle x:Name="BannerVeil"
+                               Fill="{ThemeResource CardBackgroundBrush}"
+                               Visibility="Collapsed"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                </Grid>
+
+                <Grid x:Name="CompactBar"
+                      Canvas.ZIndex="2"
+                      VerticalAlignment="Bottom"
+                      MinHeight="56"
+                      Padding="64,8,12,8"
+                      ColumnSpacing="12"
+                      IsHitTestVisible="False"
+                      Visibility="Collapsed"
+                      SizeChanged="CollapseMetrics_SizeChanged"
+                      AutomationProperties.AccessibilityView="Raw">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.ColumnSpan="2"
+                            Margin="-64,-8,-12,-8"
+                            Background="Transparent"
+                            Tapped="CompactBar_Tapped"
+                            AutomationProperties.AccessibilityView="Raw"/>
+
+                    <StackPanel x:Name="CompactTextPanel" VerticalAlignment="Center" IsHitTestVisible="False">
+                        <RichTextBlock x:Name="CompactNameText"
+                                       Style="{StaticResource BaseRichTextBlockStyle}"
+                                       IsTextSelectionEnabled="False"
+                                       TextWrapping="NoWrap"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxLines="1"
+                                       AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Name="CompactHandleText"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxLines="1"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                    </StackPanel>
+
+                    <Button x:Name="CompactFollowButton"
+                            Grid.Column="1"
+                            MinWidth="96"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ButtonRevealStyle}"
+                            IsTabStop="False"
+                            Visibility="Collapsed"
+                            AutomationProperties.AccessibilityView="Raw"
+                            Click="FollowButton_Click">
+                        <TextBlock x:Name="CompactFollowText"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                    </Button>
+                </Grid>
+
+                <StackPanel x:Name="ActionsPanel"
+                            Grid.Row="1"
+                            Canvas.ZIndex="3"
+                            Margin="12,12,12,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                    <Button x:Name="FollowButton"
+                            MinWidth="96"
+                            Style="{StaticResource FollowAccentButtonStyle}"
+                            Visibility="Collapsed"
+                            Click="FollowButton_Click">
+                        <TextBlock x:Name="FollowText"/>
+                    </Button>
+                    <Button x:Uid="SocialProfileMoreButton" x:Name="MoreButton"
+                            VerticalAlignment="Stretch"
+                            Click="MoreButton_Click">
+                        <FontIcon Glyph="&#xE712;"
+                                  FontSize="16"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel x:Name="IdentityPanel"
+                            Grid.Row="2"
+                            Canvas.ZIndex="3"
+                            Padding="12,10,12,12"
+                            Spacing="2">
+                    <RichTextBlock x:Name="NameText"
+                                   Style="{StaticResource SubtitleRichTextBlockStyle}"
+                                   IsTextSelectionEnabled="False"
+                                   AutomationProperties.HeadingLevel="Level1"/>
+                    <TextBlock x:Name="HandleText"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                               IsTextSelectionEnabled="True"/>
+                </StackPanel>
+
+                <PersonPicture x:Name="AvatarPicture"
+                               Grid.Row="1"
+                               Canvas.ZIndex="4"
+                               Width="96" Height="96"
+                               Margin="12,-48,0,0"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               IsHitTestVisible="False"
+                               AutomationProperties.AccessibilityView="Raw"/>
+
+                <Grid x:Name="TabBar"
+                      Grid.Row="4"
+                      Canvas.ZIndex="5"
+                      Background="{ThemeResource CardBackgroundBrush}"
+                      BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                      BorderThickness="0,0,0,1"
+                      Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <local:SocialTabStrip x:Uid="SocialProfileTabs"
+                                          x:Name="TabStrip">
+                        <local:SocialTabButton x:Name="NotesTab"
+                                               GroupName="SocialProfileTabs"
+                                               Style="{StaticResource SocialTabButtonStyle}"
+                                               Checked="Tab_Checked">
+                            <TextBlock x:Uid="SocialProfileNotesTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                        </local:SocialTabButton>
+                        <local:SocialTabButton x:Name="RepliesTab"
+                                               GroupName="SocialProfileTabs"
+                                               Style="{StaticResource SocialTabButtonStyle}"
+                                               Checked="Tab_Checked">
+                            <TextBlock x:Uid="SocialProfileRepliesTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                        </local:SocialTabButton>
+                        <local:SocialTabButton x:Name="MediaTab"
+                                               GroupName="SocialProfileTabs"
+                                               Style="{StaticResource SocialTabButtonStyle}"
+                                               Checked="Tab_Checked">
+                            <TextBlock x:Uid="SocialProfileMediaTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                        </local:SocialTabButton>
+                    </local:SocialTabStrip>
+
+                    <Button x:Uid="SocialProfileRefreshButton" x:Name="RefreshButton"
+                            Grid.Column="1"
+                            Style="{StaticResource ButtonRevealStyle}"
+                            Background="Transparent"
+                            Width="40" Height="40"
+                            MinWidth="40" MinHeight="40"
+                            Padding="0"
+                            CornerRadius="0"
+                            VerticalAlignment="Center"
+                            KeyboardAcceleratorPlacementMode="Hidden"
+                            Click="RefreshButton_Click">
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="F5"/>
+                        </Button.KeyboardAccelerators>
+                        <FontIcon Glyph="&#xE72C;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    </Button>
+                </Grid>
+            </Grid>
+        </ListView.Header>
+
+        <ListView.Footer>
+            <Grid x:Name="FooterHost" MinHeight="160" Padding="12,24,12,24">
+                <ProgressRing x:Uid="SocialProfileLoading"
+                              x:Name="LoadingRing"
+                              Width="32" Height="32"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Top"/>
+
+                <StackPanel x:Name="StatePanel"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            MaxWidth="360"
+                            Spacing="12"
+                            Visibility="Collapsed">
+                    <FontIcon x:Name="StateGlyph"
+                              FontSize="32"
+                              HorizontalAlignment="Center"
+                              Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                              AutomationProperties.AccessibilityView="Raw"/>
+                    <TextBlock x:Name="StateText"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               AutomationProperties.LiveSetting="Polite"/>
+                    <Button x:Name="StateButton"
+                            HorizontalAlignment="Center"
+                            Click="StateButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </ListView.Footer>
+    </ListView>
+</UserControl>

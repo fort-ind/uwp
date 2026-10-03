@@ -1,0 +1,1907 @@
+unicode-emoji	16.0
+smileys-emotion	😀	1.0	grinning face		
+smileys-emotion	😃	0.6	grinning face with big eyes		
+smileys-emotion	😄	0.6	grinning face with smiling eyes		
+smileys-emotion	😁	0.6	beaming face with smiling eyes		
+smileys-emotion	😆	0.6	grinning squinting face		
+smileys-emotion	😅	0.6	grinning face with sweat		
+smileys-emotion	🤣	3.0	rolling on the floor laughing		
+smileys-emotion	😂	0.6	face with tears of joy		
+smileys-emotion	🙂	1.0	slightly smiling face		
+smileys-emotion	🙃	1.0	upside-down face		
+smileys-emotion	🫠	14.0	melting face		
+smileys-emotion	😉	0.6	winking face		
+smileys-emotion	😊	0.6	smiling face with smiling eyes		
+smileys-emotion	😇	1.0	smiling face with halo		
+smileys-emotion	🥰	11.0	smiling face with hearts		
+smileys-emotion	😍	0.6	smiling face with heart-eyes		
+smileys-emotion	🤩	5.0	star-struck		
+smileys-emotion	😘	0.6	face blowing a kiss		
+smileys-emotion	😗	1.0	kissing face		
+smileys-emotion	☺️	0.6	smiling face		
+smileys-emotion	😚	0.6	kissing face with closed eyes		
+smileys-emotion	😙	1.0	kissing face with smiling eyes		
+smileys-emotion	🥲	13.0	smiling face with tear		
+smileys-emotion	😋	0.6	face savoring food		
+smileys-emotion	😛	1.0	face with tongue		
+smileys-emotion	😜	0.6	winking face with tongue		
+smileys-emotion	🤪	5.0	zany face		
+smileys-emotion	😝	0.6	squinting face with tongue		
+smileys-emotion	🤑	1.0	money-mouth face		
+smileys-emotion	🤗	1.0	smiling face with open hands		
+smileys-emotion	🤭	5.0	face with hand over mouth		
+smileys-emotion	🫢	14.0	face with open eyes and hand over mouth		
+smileys-emotion	🫣	14.0	face with peeking eye		
+smileys-emotion	🤫	5.0	shushing face		
+smileys-emotion	🤔	1.0	thinking face		
+smileys-emotion	🫡	14.0	saluting face		
+smileys-emotion	🤐	1.0	zipper-mouth face		
+smileys-emotion	🤨	5.0	face with raised eyebrow		
+smileys-emotion	😐	0.7	neutral face		
+smileys-emotion	😑	1.0	expressionless face		
+smileys-emotion	😶	1.0	face without mouth		
+smileys-emotion	🫥	14.0	dotted line face		
+smileys-emotion	😶‍🌫️	13.1	face in clouds		
+smileys-emotion	😏	0.6	smirking face		
+smileys-emotion	😒	0.6	unamused face		
+smileys-emotion	🙄	1.0	face with rolling eyes		
+smileys-emotion	😬	1.0	grimacing face		
+smileys-emotion	😮‍💨	13.1	face exhaling		
+smileys-emotion	🤥	3.0	lying face		
+smileys-emotion	🫨	15.0	shaking face		
+smileys-emotion	🙂‍↔️	15.1	head shaking horizontally		
+smileys-emotion	🙂‍↕️	15.1	head shaking vertically		
+smileys-emotion	😌	0.6	relieved face		
+smileys-emotion	😔	0.6	pensive face		
+smileys-emotion	😪	0.6	sleepy face		
+smileys-emotion	🤤	3.0	drooling face		
+smileys-emotion	😴	1.0	sleeping face		
+smileys-emotion	🫩	16.0	face with bags under eyes		
+smileys-emotion	😷	0.6	face with medical mask		
+smileys-emotion	🤒	1.0	face with thermometer		
+smileys-emotion	🤕	1.0	face with head-bandage		
+smileys-emotion	🤢	3.0	nauseated face		
+smileys-emotion	🤮	5.0	face vomiting		
+smileys-emotion	🤧	3.0	sneezing face		
+smileys-emotion	🥵	11.0	hot face		
+smileys-emotion	🥶	11.0	cold face		
+smileys-emotion	🥴	11.0	woozy face		
+smileys-emotion	😵	0.6	face with crossed-out eyes		
+smileys-emotion	😵‍💫	13.1	face with spiral eyes		
+smileys-emotion	🤯	5.0	exploding head		
+smileys-emotion	🤠	3.0	cowboy hat face		
+smileys-emotion	🥳	11.0	partying face		
+smileys-emotion	🥸	13.0	disguised face		
+smileys-emotion	😎	1.0	smiling face with sunglasses		
+smileys-emotion	🤓	1.0	nerd face		
+smileys-emotion	🧐	5.0	face with monocle		
+smileys-emotion	😕	1.0	confused face		
+smileys-emotion	🫤	14.0	face with diagonal mouth		
+smileys-emotion	😟	1.0	worried face		
+smileys-emotion	🙁	1.0	slightly frowning face		
+smileys-emotion	☹️	0.7	frowning face		
+smileys-emotion	😮	1.0	face with open mouth		
+smileys-emotion	😯	1.0	hushed face		
+smileys-emotion	😲	0.6	astonished face		
+smileys-emotion	😳	0.6	flushed face		
+smileys-emotion	🥺	11.0	pleading face		
+smileys-emotion	🥹	14.0	face holding back tears		
+smileys-emotion	😦	1.0	frowning face with open mouth		
+smileys-emotion	😧	1.0	anguished face		
+smileys-emotion	😨	0.6	fearful face		
+smileys-emotion	😰	0.6	anxious face with sweat		
+smileys-emotion	😥	0.6	sad but relieved face		
+smileys-emotion	😢	0.6	crying face		
+smileys-emotion	😭	0.6	loudly crying face		
+smileys-emotion	😱	0.6	face screaming in fear		
+smileys-emotion	😖	0.6	confounded face		
+smileys-emotion	😣	0.6	persevering face		
+smileys-emotion	😞	0.6	disappointed face		
+smileys-emotion	😓	0.6	downcast face with sweat		
+smileys-emotion	😩	0.6	weary face		
+smileys-emotion	😫	0.6	tired face		
+smileys-emotion	🥱	12.0	yawning face		
+smileys-emotion	😤	0.6	face with steam from nose		
+smileys-emotion	😡	0.6	enraged face		
+smileys-emotion	😠	0.6	angry face		
+smileys-emotion	🤬	5.0	face with symbols on mouth		
+smileys-emotion	😈	1.0	smiling face with horns		
+smileys-emotion	👿	0.6	angry face with horns		
+smileys-emotion	💀	0.6	skull		
+smileys-emotion	☠️	1.0	skull and crossbones		
+smileys-emotion	💩	0.6	pile of poo		
+smileys-emotion	🤡	3.0	clown face		
+smileys-emotion	👹	0.6	ogre		
+smileys-emotion	👺	0.6	goblin		
+smileys-emotion	👻	0.6	ghost		
+smileys-emotion	👽	0.6	alien		
+smileys-emotion	👾	0.6	alien monster		
+smileys-emotion	🤖	1.0	robot		
+smileys-emotion	😺	0.6	grinning cat		
+smileys-emotion	😸	0.6	grinning cat with smiling eyes		
+smileys-emotion	😹	0.6	cat with tears of joy		
+smileys-emotion	😻	0.6	smiling cat with heart-eyes		
+smileys-emotion	😼	0.6	cat with wry smile		
+smileys-emotion	😽	0.6	kissing cat		
+smileys-emotion	🙀	0.6	weary cat		
+smileys-emotion	😿	0.6	crying cat		
+smileys-emotion	😾	0.6	pouting cat		
+smileys-emotion	🙈	0.6	see-no-evil monkey		
+smileys-emotion	🙉	0.6	hear-no-evil monkey		
+smileys-emotion	🙊	0.6	speak-no-evil monkey		
+smileys-emotion	💌	0.6	love letter		
+smileys-emotion	💘	0.6	heart with arrow		
+smileys-emotion	💝	0.6	heart with ribbon		
+smileys-emotion	💖	0.6	sparkling heart		
+smileys-emotion	💗	0.6	growing heart		
+smileys-emotion	💓	0.6	beating heart		
+smileys-emotion	💞	0.6	revolving hearts		
+smileys-emotion	💕	0.6	two hearts		
+smileys-emotion	💟	0.6	heart decoration		
+smileys-emotion	❣️	1.0	heart exclamation		
+smileys-emotion	💔	0.6	broken heart		
+smileys-emotion	❤️‍🔥	13.1	heart on fire		
+smileys-emotion	❤️‍🩹	13.1	mending heart		
+smileys-emotion	❤️	0.6	red heart		
+smileys-emotion	🩷	15.0	pink heart		
+smileys-emotion	🧡	5.0	orange heart		
+smileys-emotion	💛	0.6	yellow heart		
+smileys-emotion	💚	0.6	green heart		
+smileys-emotion	💙	0.6	blue heart		
+smileys-emotion	🩵	15.0	light blue heart		
+smileys-emotion	💜	0.6	purple heart		
+smileys-emotion	🤎	12.0	brown heart		
+smileys-emotion	🖤	3.0	black heart		
+smileys-emotion	🩶	15.0	grey heart		
+smileys-emotion	🤍	12.0	white heart		
+smileys-emotion	💋	0.6	kiss mark		
+smileys-emotion	💯	0.6	hundred points		
+smileys-emotion	💢	0.6	anger symbol		
+smileys-emotion	💥	0.6	collision		
+smileys-emotion	💫	0.6	dizzy		
+smileys-emotion	💦	0.6	sweat droplets		
+smileys-emotion	💨	0.6	dashing away		
+smileys-emotion	🕳️	0.7	hole		
+smileys-emotion	💬	0.6	speech balloon		
+smileys-emotion	👁️‍🗨️	2.0	eye in speech bubble		
+smileys-emotion	🗨️	2.0	left speech bubble		
+smileys-emotion	🗯️	0.7	right anger bubble		
+smileys-emotion	💭	1.0	thought balloon		
+smileys-emotion	💤	0.6	ZZZ		
+people-body	👋	0.6	waving hand	👋🏻 👋🏼 👋🏽 👋🏾 👋🏿	1.0
+people-body	🤚	3.0	raised back of hand	🤚🏻 🤚🏼 🤚🏽 🤚🏾 🤚🏿	3.0
+people-body	🖐️	0.7	hand with fingers splayed	🖐🏻 🖐🏼 🖐🏽 🖐🏾 🖐🏿	1.0
+people-body	✋	0.6	raised hand	✋🏻 ✋🏼 ✋🏽 ✋🏾 ✋🏿	1.0
+people-body	🖖	1.0	vulcan salute	🖖🏻 🖖🏼 🖖🏽 🖖🏾 🖖🏿	1.0
+people-body	🫱	14.0	rightwards hand	🫱🏻 🫱🏼 🫱🏽 🫱🏾 🫱🏿	14.0
+people-body	🫲	14.0	leftwards hand	🫲🏻 🫲🏼 🫲🏽 🫲🏾 🫲🏿	14.0
+people-body	🫳	14.0	palm down hand	🫳🏻 🫳🏼 🫳🏽 🫳🏾 🫳🏿	14.0
+people-body	🫴	14.0	palm up hand	🫴🏻 🫴🏼 🫴🏽 🫴🏾 🫴🏿	14.0
+people-body	🫷	15.0	leftwards pushing hand	🫷🏻 🫷🏼 🫷🏽 🫷🏾 🫷🏿	15.0
+people-body	🫸	15.0	rightwards pushing hand	🫸🏻 🫸🏼 🫸🏽 🫸🏾 🫸🏿	15.0
+people-body	👌	0.6	OK hand	👌🏻 👌🏼 👌🏽 👌🏾 👌🏿	1.0
+people-body	🤌	13.0	pinched fingers	🤌🏻 🤌🏼 🤌🏽 🤌🏾 🤌🏿	13.0
+people-body	🤏	12.0	pinching hand	🤏🏻 🤏🏼 🤏🏽 🤏🏾 🤏🏿	12.0
+people-body	✌️	0.6	victory hand	✌🏻 ✌🏼 ✌🏽 ✌🏾 ✌🏿	1.0
+people-body	🤞	3.0	crossed fingers	🤞🏻 🤞🏼 🤞🏽 🤞🏾 🤞🏿	3.0
+people-body	🫰	14.0	hand with index finger and thumb crossed	🫰🏻 🫰🏼 🫰🏽 🫰🏾 🫰🏿	14.0
+people-body	🤟	5.0	love-you gesture	🤟🏻 🤟🏼 🤟🏽 🤟🏾 🤟🏿	5.0
+people-body	🤘	1.0	sign of the horns	🤘🏻 🤘🏼 🤘🏽 🤘🏾 🤘🏿	1.0
+people-body	🤙	3.0	call me hand	🤙🏻 🤙🏼 🤙🏽 🤙🏾 🤙🏿	3.0
+people-body	👈	0.6	backhand index pointing left	👈🏻 👈🏼 👈🏽 👈🏾 👈🏿	1.0
+people-body	👉	0.6	backhand index pointing right	👉🏻 👉🏼 👉🏽 👉🏾 👉🏿	1.0
+people-body	👆	0.6	backhand index pointing up	👆🏻 👆🏼 👆🏽 👆🏾 👆🏿	1.0
+people-body	🖕	1.0	middle finger	🖕🏻 🖕🏼 🖕🏽 🖕🏾 🖕🏿	1.0
+people-body	👇	0.6	backhand index pointing down	👇🏻 👇🏼 👇🏽 👇🏾 👇🏿	1.0
+people-body	☝️	0.6	index pointing up	☝🏻 ☝🏼 ☝🏽 ☝🏾 ☝🏿	1.0
+people-body	🫵	14.0	index pointing at the viewer	🫵🏻 🫵🏼 🫵🏽 🫵🏾 🫵🏿	14.0
+people-body	👍	0.6	thumbs up	👍🏻 👍🏼 👍🏽 👍🏾 👍🏿	1.0
+people-body	👎	0.6	thumbs down	👎🏻 👎🏼 👎🏽 👎🏾 👎🏿	1.0
+people-body	✊	0.6	raised fist	✊🏻 ✊🏼 ✊🏽 ✊🏾 ✊🏿	1.0
+people-body	👊	0.6	oncoming fist	👊🏻 👊🏼 👊🏽 👊🏾 👊🏿	1.0
+people-body	🤛	3.0	left-facing fist	🤛🏻 🤛🏼 🤛🏽 🤛🏾 🤛🏿	3.0
+people-body	🤜	3.0	right-facing fist	🤜🏻 🤜🏼 🤜🏽 🤜🏾 🤜🏿	3.0
+people-body	👏	0.6	clapping hands	👏🏻 👏🏼 👏🏽 👏🏾 👏🏿	1.0
+people-body	🙌	0.6	raising hands	🙌🏻 🙌🏼 🙌🏽 🙌🏾 🙌🏿	1.0
+people-body	🫶	14.0	heart hands	🫶🏻 🫶🏼 🫶🏽 🫶🏾 🫶🏿	14.0
+people-body	👐	0.6	open hands	👐🏻 👐🏼 👐🏽 👐🏾 👐🏿	1.0
+people-body	🤲	5.0	palms up together	🤲🏻 🤲🏼 🤲🏽 🤲🏾 🤲🏿	5.0
+people-body	🤝	3.0	handshake	🤝🏻 🤝🏼 🤝🏽 🤝🏾 🤝🏿	14.0
+people-body	🙏	0.6	folded hands	🙏🏻 🙏🏼 🙏🏽 🙏🏾 🙏🏿	1.0
+people-body	✍️	0.7	writing hand	✍🏻 ✍🏼 ✍🏽 ✍🏾 ✍🏿	1.0
+people-body	💅	0.6	nail polish	💅🏻 💅🏼 💅🏽 💅🏾 💅🏿	1.0
+people-body	🤳	3.0	selfie	🤳🏻 🤳🏼 🤳🏽 🤳🏾 🤳🏿	3.0
+people-body	💪	0.6	flexed biceps	💪🏻 💪🏼 💪🏽 💪🏾 💪🏿	1.0
+people-body	🦾	12.0	mechanical arm		
+people-body	🦿	12.0	mechanical leg		
+people-body	🦵	11.0	leg	🦵🏻 🦵🏼 🦵🏽 🦵🏾 🦵🏿	11.0
+people-body	🦶	11.0	foot	🦶🏻 🦶🏼 🦶🏽 🦶🏾 🦶🏿	11.0
+people-body	👂	0.6	ear	👂🏻 👂🏼 👂🏽 👂🏾 👂🏿	1.0
+people-body	🦻	12.0	ear with hearing aid	🦻🏻 🦻🏼 🦻🏽 🦻🏾 🦻🏿	12.0
+people-body	👃	0.6	nose	👃🏻 👃🏼 👃🏽 👃🏾 👃🏿	1.0
+people-body	🧠	5.0	brain		
+people-body	🫀	13.0	anatomical heart		
+people-body	🫁	13.0	lungs		
+people-body	🦷	11.0	tooth		
+people-body	🦴	11.0	bone		
+people-body	👀	0.6	eyes		
+people-body	👁️	0.7	eye		
+people-body	👅	0.6	tongue		
+people-body	👄	0.6	mouth		
+people-body	🫦	14.0	biting lip		
+people-body	👶	0.6	baby	👶🏻 👶🏼 👶🏽 👶🏾 👶🏿	1.0
+people-body	🧒	5.0	child	🧒🏻 🧒🏼 🧒🏽 🧒🏾 🧒🏿	5.0
+people-body	👦	0.6	boy	👦🏻 👦🏼 👦🏽 👦🏾 👦🏿	1.0
+people-body	👧	0.6	girl	👧🏻 👧🏼 👧🏽 👧🏾 👧🏿	1.0
+people-body	🧑	5.0	person	🧑🏻 🧑🏼 🧑🏽 🧑🏾 🧑🏿	5.0
+people-body	👱	0.6	person: blond hair	👱🏻 👱🏼 👱🏽 👱🏾 👱🏿	1.0
+people-body	👨	0.6	man	👨🏻 👨🏼 👨🏽 👨🏾 👨🏿	1.0
+people-body	🧔	5.0	person: beard	🧔🏻 🧔🏼 🧔🏽 🧔🏾 🧔🏿	5.0
+people-body	🧔‍♂️	13.1	man: beard	🧔🏻‍♂️ 🧔🏼‍♂️ 🧔🏽‍♂️ 🧔🏾‍♂️ 🧔🏿‍♂️	13.1
+people-body	🧔‍♀️	13.1	woman: beard	🧔🏻‍♀️ 🧔🏼‍♀️ 🧔🏽‍♀️ 🧔🏾‍♀️ 🧔🏿‍♀️	13.1
+people-body	👨‍🦰	11.0	man: red hair	👨🏻‍🦰 👨🏼‍🦰 👨🏽‍🦰 👨🏾‍🦰 👨🏿‍🦰	11.0
+people-body	👨‍🦱	11.0	man: curly hair	👨🏻‍🦱 👨🏼‍🦱 👨🏽‍🦱 👨🏾‍🦱 👨🏿‍🦱	11.0
+people-body	👨‍🦳	11.0	man: white hair	👨🏻‍🦳 👨🏼‍🦳 👨🏽‍🦳 👨🏾‍🦳 👨🏿‍🦳	11.0
+people-body	👨‍🦲	11.0	man: bald	👨🏻‍🦲 👨🏼‍🦲 👨🏽‍🦲 👨🏾‍🦲 👨🏿‍🦲	11.0
+people-body	👩	0.6	woman	👩🏻 👩🏼 👩🏽 👩🏾 👩🏿	1.0
+people-body	👩‍🦰	11.0	woman: red hair	👩🏻‍🦰 👩🏼‍🦰 👩🏽‍🦰 👩🏾‍🦰 👩🏿‍🦰	11.0
+people-body	🧑‍🦰	12.1	person: red hair	🧑🏻‍🦰 🧑🏼‍🦰 🧑🏽‍🦰 🧑🏾‍🦰 🧑🏿‍🦰	12.1
+people-body	👩‍🦱	11.0	woman: curly hair	👩🏻‍🦱 👩🏼‍🦱 👩🏽‍🦱 👩🏾‍🦱 👩🏿‍🦱	11.0
+people-body	🧑‍🦱	12.1	person: curly hair	🧑🏻‍🦱 🧑🏼‍🦱 🧑🏽‍🦱 🧑🏾‍🦱 🧑🏿‍🦱	12.1
+people-body	👩‍🦳	11.0	woman: white hair	👩🏻‍🦳 👩🏼‍🦳 👩🏽‍🦳 👩🏾‍🦳 👩🏿‍🦳	11.0
+people-body	🧑‍🦳	12.1	person: white hair	🧑🏻‍🦳 🧑🏼‍🦳 🧑🏽‍🦳 🧑🏾‍🦳 🧑🏿‍🦳	12.1
+people-body	👩‍🦲	11.0	woman: bald	👩🏻‍🦲 👩🏼‍🦲 👩🏽‍🦲 👩🏾‍🦲 👩🏿‍🦲	11.0
+people-body	🧑‍🦲	12.1	person: bald	🧑🏻‍🦲 🧑🏼‍🦲 🧑🏽‍🦲 🧑🏾‍🦲 🧑🏿‍🦲	12.1
+people-body	👱‍♀️	4.0	woman: blond hair	👱🏻‍♀️ 👱🏼‍♀️ 👱🏽‍♀️ 👱🏾‍♀️ 👱🏿‍♀️	4.0
+people-body	👱‍♂️	4.0	man: blond hair	👱🏻‍♂️ 👱🏼‍♂️ 👱🏽‍♂️ 👱🏾‍♂️ 👱🏿‍♂️	4.0
+people-body	🧓	5.0	older person	🧓🏻 🧓🏼 🧓🏽 🧓🏾 🧓🏿	5.0
+people-body	👴	0.6	old man	👴🏻 👴🏼 👴🏽 👴🏾 👴🏿	1.0
+people-body	👵	0.6	old woman	👵🏻 👵🏼 👵🏽 👵🏾 👵🏿	1.0
+people-body	🙍	0.6	person frowning	🙍🏻 🙍🏼 🙍🏽 🙍🏾 🙍🏿	1.0
+people-body	🙍‍♂️	4.0	man frowning	🙍🏻‍♂️ 🙍🏼‍♂️ 🙍🏽‍♂️ 🙍🏾‍♂️ 🙍🏿‍♂️	4.0
+people-body	🙍‍♀️	4.0	woman frowning	🙍🏻‍♀️ 🙍🏼‍♀️ 🙍🏽‍♀️ 🙍🏾‍♀️ 🙍🏿‍♀️	4.0
+people-body	🙎	0.6	person pouting	🙎🏻 🙎🏼 🙎🏽 🙎🏾 🙎🏿	1.0
+people-body	🙎‍♂️	4.0	man pouting	🙎🏻‍♂️ 🙎🏼‍♂️ 🙎🏽‍♂️ 🙎🏾‍♂️ 🙎🏿‍♂️	4.0
+people-body	🙎‍♀️	4.0	woman pouting	🙎🏻‍♀️ 🙎🏼‍♀️ 🙎🏽‍♀️ 🙎🏾‍♀️ 🙎🏿‍♀️	4.0
+people-body	🙅	0.6	person gesturing NO	🙅🏻 🙅🏼 🙅🏽 🙅🏾 🙅🏿	1.0
+people-body	🙅‍♂️	4.0	man gesturing NO	🙅🏻‍♂️ 🙅🏼‍♂️ 🙅🏽‍♂️ 🙅🏾‍♂️ 🙅🏿‍♂️	4.0
+people-body	🙅‍♀️	4.0	woman gesturing NO	🙅🏻‍♀️ 🙅🏼‍♀️ 🙅🏽‍♀️ 🙅🏾‍♀️ 🙅🏿‍♀️	4.0
+people-body	🙆	0.6	person gesturing OK	🙆🏻 🙆🏼 🙆🏽 🙆🏾 🙆🏿	1.0
+people-body	🙆‍♂️	4.0	man gesturing OK	🙆🏻‍♂️ 🙆🏼‍♂️ 🙆🏽‍♂️ 🙆🏾‍♂️ 🙆🏿‍♂️	4.0
+people-body	🙆‍♀️	4.0	woman gesturing OK	🙆🏻‍♀️ 🙆🏼‍♀️ 🙆🏽‍♀️ 🙆🏾‍♀️ 🙆🏿‍♀️	4.0
+people-body	💁	0.6	person tipping hand	💁🏻 💁🏼 💁🏽 💁🏾 💁🏿	1.0
+people-body	💁‍♂️	4.0	man tipping hand	💁🏻‍♂️ 💁🏼‍♂️ 💁🏽‍♂️ 💁🏾‍♂️ 💁🏿‍♂️	4.0
+people-body	💁‍♀️	4.0	woman tipping hand	💁🏻‍♀️ 💁🏼‍♀️ 💁🏽‍♀️ 💁🏾‍♀️ 💁🏿‍♀️	4.0
+people-body	🙋	0.6	person raising hand	🙋🏻 🙋🏼 🙋🏽 🙋🏾 🙋🏿	1.0
+people-body	🙋‍♂️	4.0	man raising hand	🙋🏻‍♂️ 🙋🏼‍♂️ 🙋🏽‍♂️ 🙋🏾‍♂️ 🙋🏿‍♂️	4.0
+people-body	🙋‍♀️	4.0	woman raising hand	🙋🏻‍♀️ 🙋🏼‍♀️ 🙋🏽‍♀️ 🙋🏾‍♀️ 🙋🏿‍♀️	4.0
+people-body	🧏	12.0	deaf person	🧏🏻 🧏🏼 🧏🏽 🧏🏾 🧏🏿	12.0
+people-body	🧏‍♂️	12.0	deaf man	🧏🏻‍♂️ 🧏🏼‍♂️ 🧏🏽‍♂️ 🧏🏾‍♂️ 🧏🏿‍♂️	12.0
+people-body	🧏‍♀️	12.0	deaf woman	🧏🏻‍♀️ 🧏🏼‍♀️ 🧏🏽‍♀️ 🧏🏾‍♀️ 🧏🏿‍♀️	12.0
+people-body	🙇	0.6	person bowing	🙇🏻 🙇🏼 🙇🏽 🙇🏾 🙇🏿	1.0
+people-body	🙇‍♂️	4.0	man bowing	🙇🏻‍♂️ 🙇🏼‍♂️ 🙇🏽‍♂️ 🙇🏾‍♂️ 🙇🏿‍♂️	4.0
+people-body	🙇‍♀️	4.0	woman bowing	🙇🏻‍♀️ 🙇🏼‍♀️ 🙇🏽‍♀️ 🙇🏾‍♀️ 🙇🏿‍♀️	4.0
+people-body	🤦	3.0	person facepalming	🤦🏻 🤦🏼 🤦🏽 🤦🏾 🤦🏿	3.0
+people-body	🤦‍♂️	4.0	man facepalming	🤦🏻‍♂️ 🤦🏼‍♂️ 🤦🏽‍♂️ 🤦🏾‍♂️ 🤦🏿‍♂️	4.0
+people-body	🤦‍♀️	4.0	woman facepalming	🤦🏻‍♀️ 🤦🏼‍♀️ 🤦🏽‍♀️ 🤦🏾‍♀️ 🤦🏿‍♀️	4.0
+people-body	🤷	3.0	person shrugging	🤷🏻 🤷🏼 🤷🏽 🤷🏾 🤷🏿	3.0
+people-body	🤷‍♂️	4.0	man shrugging	🤷🏻‍♂️ 🤷🏼‍♂️ 🤷🏽‍♂️ 🤷🏾‍♂️ 🤷🏿‍♂️	4.0
+people-body	🤷‍♀️	4.0	woman shrugging	🤷🏻‍♀️ 🤷🏼‍♀️ 🤷🏽‍♀️ 🤷🏾‍♀️ 🤷🏿‍♀️	4.0
+people-body	🧑‍⚕️	12.1	health worker	🧑🏻‍⚕️ 🧑🏼‍⚕️ 🧑🏽‍⚕️ 🧑🏾‍⚕️ 🧑🏿‍⚕️	12.1
+people-body	👨‍⚕️	4.0	man health worker	👨🏻‍⚕️ 👨🏼‍⚕️ 👨🏽‍⚕️ 👨🏾‍⚕️ 👨🏿‍⚕️	4.0
+people-body	👩‍⚕️	4.0	woman health worker	👩🏻‍⚕️ 👩🏼‍⚕️ 👩🏽‍⚕️ 👩🏾‍⚕️ 👩🏿‍⚕️	4.0
+people-body	🧑‍🎓	12.1	student	🧑🏻‍🎓 🧑🏼‍🎓 🧑🏽‍🎓 🧑🏾‍🎓 🧑🏿‍🎓	12.1
+people-body	👨‍🎓	4.0	man student	👨🏻‍🎓 👨🏼‍🎓 👨🏽‍🎓 👨🏾‍🎓 👨🏿‍🎓	4.0
+people-body	👩‍🎓	4.0	woman student	👩🏻‍🎓 👩🏼‍🎓 👩🏽‍🎓 👩🏾‍🎓 👩🏿‍🎓	4.0
+people-body	🧑‍🏫	12.1	teacher	🧑🏻‍🏫 🧑🏼‍🏫 🧑🏽‍🏫 🧑🏾‍🏫 🧑🏿‍🏫	12.1
+people-body	👨‍🏫	4.0	man teacher	👨🏻‍🏫 👨🏼‍🏫 👨🏽‍🏫 👨🏾‍🏫 👨🏿‍🏫	4.0
+people-body	👩‍🏫	4.0	woman teacher	👩🏻‍🏫 👩🏼‍🏫 👩🏽‍🏫 👩🏾‍🏫 👩🏿‍🏫	4.0
+people-body	🧑‍⚖️	12.1	judge	🧑🏻‍⚖️ 🧑🏼‍⚖️ 🧑🏽‍⚖️ 🧑🏾‍⚖️ 🧑🏿‍⚖️	12.1
+people-body	👨‍⚖️	4.0	man judge	👨🏻‍⚖️ 👨🏼‍⚖️ 👨🏽‍⚖️ 👨🏾‍⚖️ 👨🏿‍⚖️	4.0
+people-body	👩‍⚖️	4.0	woman judge	👩🏻‍⚖️ 👩🏼‍⚖️ 👩🏽‍⚖️ 👩🏾‍⚖️ 👩🏿‍⚖️	4.0
+people-body	🧑‍🌾	12.1	farmer	🧑🏻‍🌾 🧑🏼‍🌾 🧑🏽‍🌾 🧑🏾‍🌾 🧑🏿‍🌾	12.1
+people-body	👨‍🌾	4.0	man farmer	👨🏻‍🌾 👨🏼‍🌾 👨🏽‍🌾 👨🏾‍🌾 👨🏿‍🌾	4.0
+people-body	👩‍🌾	4.0	woman farmer	👩🏻‍🌾 👩🏼‍🌾 👩🏽‍🌾 👩🏾‍🌾 👩🏿‍🌾	4.0
+people-body	🧑‍🍳	12.1	cook	🧑🏻‍🍳 🧑🏼‍🍳 🧑🏽‍🍳 🧑🏾‍🍳 🧑🏿‍🍳	12.1
+people-body	👨‍🍳	4.0	man cook	👨🏻‍🍳 👨🏼‍🍳 👨🏽‍🍳 👨🏾‍🍳 👨🏿‍🍳	4.0
+people-body	👩‍🍳	4.0	woman cook	👩🏻‍🍳 👩🏼‍🍳 👩🏽‍🍳 👩🏾‍🍳 👩🏿‍🍳	4.0
+people-body	🧑‍🔧	12.1	mechanic	🧑🏻‍🔧 🧑🏼‍🔧 🧑🏽‍🔧 🧑🏾‍🔧 🧑🏿‍🔧	12.1
+people-body	👨‍🔧	4.0	man mechanic	👨🏻‍🔧 👨🏼‍🔧 👨🏽‍🔧 👨🏾‍🔧 👨🏿‍🔧	4.0
+people-body	👩‍🔧	4.0	woman mechanic	👩🏻‍🔧 👩🏼‍🔧 👩🏽‍🔧 👩🏾‍🔧 👩🏿‍🔧	4.0
+people-body	🧑‍🏭	12.1	factory worker	🧑🏻‍🏭 🧑🏼‍🏭 🧑🏽‍🏭 🧑🏾‍🏭 🧑🏿‍🏭	12.1
+people-body	👨‍🏭	4.0	man factory worker	👨🏻‍🏭 👨🏼‍🏭 👨🏽‍🏭 👨🏾‍🏭 👨🏿‍🏭	4.0
+people-body	👩‍🏭	4.0	woman factory worker	👩🏻‍🏭 👩🏼‍🏭 👩🏽‍🏭 👩🏾‍🏭 👩🏿‍🏭	4.0
+people-body	🧑‍💼	12.1	office worker	🧑🏻‍💼 🧑🏼‍💼 🧑🏽‍💼 🧑🏾‍💼 🧑🏿‍💼	12.1
+people-body	👨‍💼	4.0	man office worker	👨🏻‍💼 👨🏼‍💼 👨🏽‍💼 👨🏾‍💼 👨🏿‍💼	4.0
+people-body	👩‍💼	4.0	woman office worker	👩🏻‍💼 👩🏼‍💼 👩🏽‍💼 👩🏾‍💼 👩🏿‍💼	4.0
+people-body	🧑‍🔬	12.1	scientist	🧑🏻‍🔬 🧑🏼‍🔬 🧑🏽‍🔬 🧑🏾‍🔬 🧑🏿‍🔬	12.1
+people-body	👨‍🔬	4.0	man scientist	👨🏻‍🔬 👨🏼‍🔬 👨🏽‍🔬 👨🏾‍🔬 👨🏿‍🔬	4.0
+people-body	👩‍🔬	4.0	woman scientist	👩🏻‍🔬 👩🏼‍🔬 👩🏽‍🔬 👩🏾‍🔬 👩🏿‍🔬	4.0
+people-body	🧑‍💻	12.1	technologist	🧑🏻‍💻 🧑🏼‍💻 🧑🏽‍💻 🧑🏾‍💻 🧑🏿‍💻	12.1
+people-body	👨‍💻	4.0	man technologist	👨🏻‍💻 👨🏼‍💻 👨🏽‍💻 👨🏾‍💻 👨🏿‍💻	4.0
+people-body	👩‍💻	4.0	woman technologist	👩🏻‍💻 👩🏼‍💻 👩🏽‍💻 👩🏾‍💻 👩🏿‍💻	4.0
+people-body	🧑‍🎤	12.1	singer	🧑🏻‍🎤 🧑🏼‍🎤 🧑🏽‍🎤 🧑🏾‍🎤 🧑🏿‍🎤	12.1
+people-body	👨‍🎤	4.0	man singer	👨🏻‍🎤 👨🏼‍🎤 👨🏽‍🎤 👨🏾‍🎤 👨🏿‍🎤	4.0
+people-body	👩‍🎤	4.0	woman singer	👩🏻‍🎤 👩🏼‍🎤 👩🏽‍🎤 👩🏾‍🎤 👩🏿‍🎤	4.0
+people-body	🧑‍🎨	12.1	artist	🧑🏻‍🎨 🧑🏼‍🎨 🧑🏽‍🎨 🧑🏾‍🎨 🧑🏿‍🎨	12.1
+people-body	👨‍🎨	4.0	man artist	👨🏻‍🎨 👨🏼‍🎨 👨🏽‍🎨 👨🏾‍🎨 👨🏿‍🎨	4.0
+people-body	👩‍🎨	4.0	woman artist	👩🏻‍🎨 👩🏼‍🎨 👩🏽‍🎨 👩🏾‍🎨 👩🏿‍🎨	4.0
+people-body	🧑‍✈️	12.1	pilot	🧑🏻‍✈️ 🧑🏼‍✈️ 🧑🏽‍✈️ 🧑🏾‍✈️ 🧑🏿‍✈️	12.1
+people-body	👨‍✈️	4.0	man pilot	👨🏻‍✈️ 👨🏼‍✈️ 👨🏽‍✈️ 👨🏾‍✈️ 👨🏿‍✈️	4.0
+people-body	👩‍✈️	4.0	woman pilot	👩🏻‍✈️ 👩🏼‍✈️ 👩🏽‍✈️ 👩🏾‍✈️ 👩🏿‍✈️	4.0
+people-body	🧑‍🚀	12.1	astronaut	🧑🏻‍🚀 🧑🏼‍🚀 🧑🏽‍🚀 🧑🏾‍🚀 🧑🏿‍🚀	12.1
+people-body	👨‍🚀	4.0	man astronaut	👨🏻‍🚀 👨🏼‍🚀 👨🏽‍🚀 👨🏾‍🚀 👨🏿‍🚀	4.0
+people-body	👩‍🚀	4.0	woman astronaut	👩🏻‍🚀 👩🏼‍🚀 👩🏽‍🚀 👩🏾‍🚀 👩🏿‍🚀	4.0
+people-body	🧑‍🚒	12.1	firefighter	🧑🏻‍🚒 🧑🏼‍🚒 🧑🏽‍🚒 🧑🏾‍🚒 🧑🏿‍🚒	12.1
+people-body	👨‍🚒	4.0	man firefighter	👨🏻‍🚒 👨🏼‍🚒 👨🏽‍🚒 👨🏾‍🚒 👨🏿‍🚒	4.0
+people-body	👩‍🚒	4.0	woman firefighter	👩🏻‍🚒 👩🏼‍🚒 👩🏽‍🚒 👩🏾‍🚒 👩🏿‍🚒	4.0
+people-body	👮	0.6	police officer	👮🏻 👮🏼 👮🏽 👮🏾 👮🏿	1.0
+people-body	👮‍♂️	4.0	man police officer	👮🏻‍♂️ 👮🏼‍♂️ 👮🏽‍♂️ 👮🏾‍♂️ 👮🏿‍♂️	4.0
+people-body	👮‍♀️	4.0	woman police officer	👮🏻‍♀️ 👮🏼‍♀️ 👮🏽‍♀️ 👮🏾‍♀️ 👮🏿‍♀️	4.0
+people-body	🕵️	0.7	detective	🕵🏻 🕵🏼 🕵🏽 🕵🏾 🕵🏿	2.0
+people-body	🕵️‍♂️	4.0	man detective	🕵🏻‍♂️ 🕵🏼‍♂️ 🕵🏽‍♂️ 🕵🏾‍♂️ 🕵🏿‍♂️	4.0
+people-body	🕵️‍♀️	4.0	woman detective	🕵🏻‍♀️ 🕵🏼‍♀️ 🕵🏽‍♀️ 🕵🏾‍♀️ 🕵🏿‍♀️	4.0
+people-body	💂	0.6	guard	💂🏻 💂🏼 💂🏽 💂🏾 💂🏿	1.0
+people-body	💂‍♂️	4.0	man guard	💂🏻‍♂️ 💂🏼‍♂️ 💂🏽‍♂️ 💂🏾‍♂️ 💂🏿‍♂️	4.0
+people-body	💂‍♀️	4.0	woman guard	💂🏻‍♀️ 💂🏼‍♀️ 💂🏽‍♀️ 💂🏾‍♀️ 💂🏿‍♀️	4.0
+people-body	🥷	13.0	ninja	🥷🏻 🥷🏼 🥷🏽 🥷🏾 🥷🏿	13.0
+people-body	👷	0.6	construction worker	👷🏻 👷🏼 👷🏽 👷🏾 👷🏿	1.0
+people-body	👷‍♂️	4.0	man construction worker	👷🏻‍♂️ 👷🏼‍♂️ 👷🏽‍♂️ 👷🏾‍♂️ 👷🏿‍♂️	4.0
+people-body	👷‍♀️	4.0	woman construction worker	👷🏻‍♀️ 👷🏼‍♀️ 👷🏽‍♀️ 👷🏾‍♀️ 👷🏿‍♀️	4.0
+people-body	🫅	14.0	person with crown	🫅🏻 🫅🏼 🫅🏽 🫅🏾 🫅🏿	14.0
+people-body	🤴	3.0	prince	🤴🏻 🤴🏼 🤴🏽 🤴🏾 🤴🏿	3.0
+people-body	👸	0.6	princess	👸🏻 👸🏼 👸🏽 👸🏾 👸🏿	1.0
+people-body	👳	0.6	person wearing turban	👳🏻 👳🏼 👳🏽 👳🏾 👳🏿	1.0
+people-body	👳‍♂️	4.0	man wearing turban	👳🏻‍♂️ 👳🏼‍♂️ 👳🏽‍♂️ 👳🏾‍♂️ 👳🏿‍♂️	4.0
+people-body	👳‍♀️	4.0	woman wearing turban	👳🏻‍♀️ 👳🏼‍♀️ 👳🏽‍♀️ 👳🏾‍♀️ 👳🏿‍♀️	4.0
+people-body	👲	0.6	person with skullcap	👲🏻 👲🏼 👲🏽 👲🏾 👲🏿	1.0
+people-body	🧕	5.0	woman with headscarf	🧕🏻 🧕🏼 🧕🏽 🧕🏾 🧕🏿	5.0
+people-body	🤵	3.0	person in tuxedo	🤵🏻 🤵🏼 🤵🏽 🤵🏾 🤵🏿	3.0
+people-body	🤵‍♂️	13.0	man in tuxedo	🤵🏻‍♂️ 🤵🏼‍♂️ 🤵🏽‍♂️ 🤵🏾‍♂️ 🤵🏿‍♂️	13.0
+people-body	🤵‍♀️	13.0	woman in tuxedo	🤵🏻‍♀️ 🤵🏼‍♀️ 🤵🏽‍♀️ 🤵🏾‍♀️ 🤵🏿‍♀️	13.0
+people-body	👰	0.6	person with veil	👰🏻 👰🏼 👰🏽 👰🏾 👰🏿	1.0
+people-body	👰‍♂️	13.0	man with veil	👰🏻‍♂️ 👰🏼‍♂️ 👰🏽‍♂️ 👰🏾‍♂️ 👰🏿‍♂️	13.0
+people-body	👰‍♀️	13.0	woman with veil	👰🏻‍♀️ 👰🏼‍♀️ 👰🏽‍♀️ 👰🏾‍♀️ 👰🏿‍♀️	13.0
+people-body	🤰	3.0	pregnant woman	🤰🏻 🤰🏼 🤰🏽 🤰🏾 🤰🏿	3.0
+people-body	🫃	14.0	pregnant man	🫃🏻 🫃🏼 🫃🏽 🫃🏾 🫃🏿	14.0
+people-body	🫄	14.0	pregnant person	🫄🏻 🫄🏼 🫄🏽 🫄🏾 🫄🏿	14.0
+people-body	🤱	5.0	breast-feeding	🤱🏻 🤱🏼 🤱🏽 🤱🏾 🤱🏿	5.0
+people-body	👩‍🍼	13.0	woman feeding baby	👩🏻‍🍼 👩🏼‍🍼 👩🏽‍🍼 👩🏾‍🍼 👩🏿‍🍼	13.0
+people-body	👨‍🍼	13.0	man feeding baby	👨🏻‍🍼 👨🏼‍🍼 👨🏽‍🍼 👨🏾‍🍼 👨🏿‍🍼	13.0
+people-body	🧑‍🍼	13.0	person feeding baby	🧑🏻‍🍼 🧑🏼‍🍼 🧑🏽‍🍼 🧑🏾‍🍼 🧑🏿‍🍼	13.0
+people-body	👼	0.6	baby angel	👼🏻 👼🏼 👼🏽 👼🏾 👼🏿	1.0
+people-body	🎅	0.6	Santa Claus	🎅🏻 🎅🏼 🎅🏽 🎅🏾 🎅🏿	1.0
+people-body	🤶	3.0	Mrs. Claus	🤶🏻 🤶🏼 🤶🏽 🤶🏾 🤶🏿	3.0
+people-body	🧑‍🎄	13.0	Mx Claus	🧑🏻‍🎄 🧑🏼‍🎄 🧑🏽‍🎄 🧑🏾‍🎄 🧑🏿‍🎄	13.0
+people-body	🦸	11.0	superhero	🦸🏻 🦸🏼 🦸🏽 🦸🏾 🦸🏿	11.0
+people-body	🦸‍♂️	11.0	man superhero	🦸🏻‍♂️ 🦸🏼‍♂️ 🦸🏽‍♂️ 🦸🏾‍♂️ 🦸🏿‍♂️	11.0
+people-body	🦸‍♀️	11.0	woman superhero	🦸🏻‍♀️ 🦸🏼‍♀️ 🦸🏽‍♀️ 🦸🏾‍♀️ 🦸🏿‍♀️	11.0
+people-body	🦹	11.0	supervillain	🦹🏻 🦹🏼 🦹🏽 🦹🏾 🦹🏿	11.0
+people-body	🦹‍♂️	11.0	man supervillain	🦹🏻‍♂️ 🦹🏼‍♂️ 🦹🏽‍♂️ 🦹🏾‍♂️ 🦹🏿‍♂️	11.0
+people-body	🦹‍♀️	11.0	woman supervillain	🦹🏻‍♀️ 🦹🏼‍♀️ 🦹🏽‍♀️ 🦹🏾‍♀️ 🦹🏿‍♀️	11.0
+people-body	🧙	5.0	mage	🧙🏻 🧙🏼 🧙🏽 🧙🏾 🧙🏿	5.0
+people-body	🧙‍♂️	5.0	man mage	🧙🏻‍♂️ 🧙🏼‍♂️ 🧙🏽‍♂️ 🧙🏾‍♂️ 🧙🏿‍♂️	5.0
+people-body	🧙‍♀️	5.0	woman mage	🧙🏻‍♀️ 🧙🏼‍♀️ 🧙🏽‍♀️ 🧙🏾‍♀️ 🧙🏿‍♀️	5.0
+people-body	🧚	5.0	fairy	🧚🏻 🧚🏼 🧚🏽 🧚🏾 🧚🏿	5.0
+people-body	🧚‍♂️	5.0	man fairy	🧚🏻‍♂️ 🧚🏼‍♂️ 🧚🏽‍♂️ 🧚🏾‍♂️ 🧚🏿‍♂️	5.0
+people-body	🧚‍♀️	5.0	woman fairy	🧚🏻‍♀️ 🧚🏼‍♀️ 🧚🏽‍♀️ 🧚🏾‍♀️ 🧚🏿‍♀️	5.0
+people-body	🧛	5.0	vampire	🧛🏻 🧛🏼 🧛🏽 🧛🏾 🧛🏿	5.0
+people-body	🧛‍♂️	5.0	man vampire	🧛🏻‍♂️ 🧛🏼‍♂️ 🧛🏽‍♂️ 🧛🏾‍♂️ 🧛🏿‍♂️	5.0
+people-body	🧛‍♀️	5.0	woman vampire	🧛🏻‍♀️ 🧛🏼‍♀️ 🧛🏽‍♀️ 🧛🏾‍♀️ 🧛🏿‍♀️	5.0
+people-body	🧜	5.0	merperson	🧜🏻 🧜🏼 🧜🏽 🧜🏾 🧜🏿	5.0
+people-body	🧜‍♂️	5.0	merman	🧜🏻‍♂️ 🧜🏼‍♂️ 🧜🏽‍♂️ 🧜🏾‍♂️ 🧜🏿‍♂️	5.0
+people-body	🧜‍♀️	5.0	mermaid	🧜🏻‍♀️ 🧜🏼‍♀️ 🧜🏽‍♀️ 🧜🏾‍♀️ 🧜🏿‍♀️	5.0
+people-body	🧝	5.0	elf	🧝🏻 🧝🏼 🧝🏽 🧝🏾 🧝🏿	5.0
+people-body	🧝‍♂️	5.0	man elf	🧝🏻‍♂️ 🧝🏼‍♂️ 🧝🏽‍♂️ 🧝🏾‍♂️ 🧝🏿‍♂️	5.0
+people-body	🧝‍♀️	5.0	woman elf	🧝🏻‍♀️ 🧝🏼‍♀️ 🧝🏽‍♀️ 🧝🏾‍♀️ 🧝🏿‍♀️	5.0
+people-body	🧞	5.0	genie		
+people-body	🧞‍♂️	5.0	man genie		
+people-body	🧞‍♀️	5.0	woman genie		
+people-body	🧟	5.0	zombie		
+people-body	🧟‍♂️	5.0	man zombie		
+people-body	🧟‍♀️	5.0	woman zombie		
+people-body	🧌	14.0	troll		
+people-body	💆	0.6	person getting massage	💆🏻 💆🏼 💆🏽 💆🏾 💆🏿	1.0
+people-body	💆‍♂️	4.0	man getting massage	💆🏻‍♂️ 💆🏼‍♂️ 💆🏽‍♂️ 💆🏾‍♂️ 💆🏿‍♂️	4.0
+people-body	💆‍♀️	4.0	woman getting massage	💆🏻‍♀️ 💆🏼‍♀️ 💆🏽‍♀️ 💆🏾‍♀️ 💆🏿‍♀️	4.0
+people-body	💇	0.6	person getting haircut	💇🏻 💇🏼 💇🏽 💇🏾 💇🏿	1.0
+people-body	💇‍♂️	4.0	man getting haircut	💇🏻‍♂️ 💇🏼‍♂️ 💇🏽‍♂️ 💇🏾‍♂️ 💇🏿‍♂️	4.0
+people-body	💇‍♀️	4.0	woman getting haircut	💇🏻‍♀️ 💇🏼‍♀️ 💇🏽‍♀️ 💇🏾‍♀️ 💇🏿‍♀️	4.0
+people-body	🚶	0.6	person walking	🚶🏻 🚶🏼 🚶🏽 🚶🏾 🚶🏿	1.0
+people-body	🚶‍♂️	4.0	man walking	🚶🏻‍♂️ 🚶🏼‍♂️ 🚶🏽‍♂️ 🚶🏾‍♂️ 🚶🏿‍♂️	4.0
+people-body	🚶‍♀️	4.0	woman walking	🚶🏻‍♀️ 🚶🏼‍♀️ 🚶🏽‍♀️ 🚶🏾‍♀️ 🚶🏿‍♀️	4.0
+people-body	🚶‍➡️	15.1	person walking facing right	🚶🏻‍➡️ 🚶🏼‍➡️ 🚶🏽‍➡️ 🚶🏾‍➡️ 🚶🏿‍➡️	15.1
+people-body	🚶‍♀️‍➡️	15.1	woman walking facing right	🚶🏻‍♀️‍➡️ 🚶🏼‍♀️‍➡️ 🚶🏽‍♀️‍➡️ 🚶🏾‍♀️‍➡️ 🚶🏿‍♀️‍➡️	15.1
+people-body	🚶‍♂️‍➡️	15.1	man walking facing right	🚶🏻‍♂️‍➡️ 🚶🏼‍♂️‍➡️ 🚶🏽‍♂️‍➡️ 🚶🏾‍♂️‍➡️ 🚶🏿‍♂️‍➡️	15.1
+people-body	🧍	12.0	person standing	🧍🏻 🧍🏼 🧍🏽 🧍🏾 🧍🏿	12.0
+people-body	🧍‍♂️	12.0	man standing	🧍🏻‍♂️ 🧍🏼‍♂️ 🧍🏽‍♂️ 🧍🏾‍♂️ 🧍🏿‍♂️	12.0
+people-body	🧍‍♀️	12.0	woman standing	🧍🏻‍♀️ 🧍🏼‍♀️ 🧍🏽‍♀️ 🧍🏾‍♀️ 🧍🏿‍♀️	12.0
+people-body	🧎	12.0	person kneeling	🧎🏻 🧎🏼 🧎🏽 🧎🏾 🧎🏿	12.0
+people-body	🧎‍♂️	12.0	man kneeling	🧎🏻‍♂️ 🧎🏼‍♂️ 🧎🏽‍♂️ 🧎🏾‍♂️ 🧎🏿‍♂️	12.0
+people-body	🧎‍♀️	12.0	woman kneeling	🧎🏻‍♀️ 🧎🏼‍♀️ 🧎🏽‍♀️ 🧎🏾‍♀️ 🧎🏿‍♀️	12.0
+people-body	🧎‍➡️	15.1	person kneeling facing right	🧎🏻‍➡️ 🧎🏼‍➡️ 🧎🏽‍➡️ 🧎🏾‍➡️ 🧎🏿‍➡️	15.1
+people-body	🧎‍♀️‍➡️	15.1	woman kneeling facing right	🧎🏻‍♀️‍➡️ 🧎🏼‍♀️‍➡️ 🧎🏽‍♀️‍➡️ 🧎🏾‍♀️‍➡️ 🧎🏿‍♀️‍➡️	15.1
+people-body	🧎‍♂️‍➡️	15.1	man kneeling facing right	🧎🏻‍♂️‍➡️ 🧎🏼‍♂️‍➡️ 🧎🏽‍♂️‍➡️ 🧎🏾‍♂️‍➡️ 🧎🏿‍♂️‍➡️	15.1
+people-body	🧑‍🦯	12.1	person with white cane	🧑🏻‍🦯 🧑🏼‍🦯 🧑🏽‍🦯 🧑🏾‍🦯 🧑🏿‍🦯	12.1
+people-body	🧑‍🦯‍➡️	15.1	person with white cane facing right	🧑🏻‍🦯‍➡️ 🧑🏼‍🦯‍➡️ 🧑🏽‍🦯‍➡️ 🧑🏾‍🦯‍➡️ 🧑🏿‍🦯‍➡️	15.1
+people-body	👨‍🦯	12.0	man with white cane	👨🏻‍🦯 👨🏼‍🦯 👨🏽‍🦯 👨🏾‍🦯 👨🏿‍🦯	12.0
+people-body	👨‍🦯‍➡️	15.1	man with white cane facing right	👨🏻‍🦯‍➡️ 👨🏼‍🦯‍➡️ 👨🏽‍🦯‍➡️ 👨🏾‍🦯‍➡️ 👨🏿‍🦯‍➡️	15.1
+people-body	👩‍🦯	12.0	woman with white cane	👩🏻‍🦯 👩🏼‍🦯 👩🏽‍🦯 👩🏾‍🦯 👩🏿‍🦯	12.0
+people-body	👩‍🦯‍➡️	15.1	woman with white cane facing right	👩🏻‍🦯‍➡️ 👩🏼‍🦯‍➡️ 👩🏽‍🦯‍➡️ 👩🏾‍🦯‍➡️ 👩🏿‍🦯‍➡️	15.1
+people-body	🧑‍🦼	12.1	person in motorized wheelchair	🧑🏻‍🦼 🧑🏼‍🦼 🧑🏽‍🦼 🧑🏾‍🦼 🧑🏿‍🦼	12.1
+people-body	🧑‍🦼‍➡️	15.1	person in motorized wheelchair facing right	🧑🏻‍🦼‍➡️ 🧑🏼‍🦼‍➡️ 🧑🏽‍🦼‍➡️ 🧑🏾‍🦼‍➡️ 🧑🏿‍🦼‍➡️	15.1
+people-body	👨‍🦼	12.0	man in motorized wheelchair	👨🏻‍🦼 👨🏼‍🦼 👨🏽‍🦼 👨🏾‍🦼 👨🏿‍🦼	12.0
+people-body	👨‍🦼‍➡️	15.1	man in motorized wheelchair facing right	👨🏻‍🦼‍➡️ 👨🏼‍🦼‍➡️ 👨🏽‍🦼‍➡️ 👨🏾‍🦼‍➡️ 👨🏿‍🦼‍➡️	15.1
+people-body	👩‍🦼	12.0	woman in motorized wheelchair	👩🏻‍🦼 👩🏼‍🦼 👩🏽‍🦼 👩🏾‍🦼 👩🏿‍🦼	12.0
+people-body	👩‍🦼‍➡️	15.1	woman in motorized wheelchair facing right	👩🏻‍🦼‍➡️ 👩🏼‍🦼‍➡️ 👩🏽‍🦼‍➡️ 👩🏾‍🦼‍➡️ 👩🏿‍🦼‍➡️	15.1
+people-body	🧑‍🦽	12.1	person in manual wheelchair	🧑🏻‍🦽 🧑🏼‍🦽 🧑🏽‍🦽 🧑🏾‍🦽 🧑🏿‍🦽	12.1
+people-body	🧑‍🦽‍➡️	15.1	person in manual wheelchair facing right	🧑🏻‍🦽‍➡️ 🧑🏼‍🦽‍➡️ 🧑🏽‍🦽‍➡️ 🧑🏾‍🦽‍➡️ 🧑🏿‍🦽‍➡️	15.1
+people-body	👨‍🦽	12.0	man in manual wheelchair	👨🏻‍🦽 👨🏼‍🦽 👨🏽‍🦽 👨🏾‍🦽 👨🏿‍🦽	12.0
+people-body	👨‍🦽‍➡️	15.1	man in manual wheelchair facing right	👨🏻‍🦽‍➡️ 👨🏼‍🦽‍➡️ 👨🏽‍🦽‍➡️ 👨🏾‍🦽‍➡️ 👨🏿‍🦽‍➡️	15.1
+people-body	👩‍🦽	12.0	woman in manual wheelchair	👩🏻‍🦽 👩🏼‍🦽 👩🏽‍🦽 👩🏾‍🦽 👩🏿‍🦽	12.0
+people-body	👩‍🦽‍➡️	15.1	woman in manual wheelchair facing right	👩🏻‍🦽‍➡️ 👩🏼‍🦽‍➡️ 👩🏽‍🦽‍➡️ 👩🏾‍🦽‍➡️ 👩🏿‍🦽‍➡️	15.1
+people-body	🏃	0.6	person running	🏃🏻 🏃🏼 🏃🏽 🏃🏾 🏃🏿	1.0
+people-body	🏃‍♂️	4.0	man running	🏃🏻‍♂️ 🏃🏼‍♂️ 🏃🏽‍♂️ 🏃🏾‍♂️ 🏃🏿‍♂️	4.0
+people-body	🏃‍♀️	4.0	woman running	🏃🏻‍♀️ 🏃🏼‍♀️ 🏃🏽‍♀️ 🏃🏾‍♀️ 🏃🏿‍♀️	4.0
+people-body	🏃‍➡️	15.1	person running facing right	🏃🏻‍➡️ 🏃🏼‍➡️ 🏃🏽‍➡️ 🏃🏾‍➡️ 🏃🏿‍➡️	15.1
+people-body	🏃‍♀️‍➡️	15.1	woman running facing right	🏃🏻‍♀️‍➡️ 🏃🏼‍♀️‍➡️ 🏃🏽‍♀️‍➡️ 🏃🏾‍♀️‍➡️ 🏃🏿‍♀️‍➡️	15.1
+people-body	🏃‍♂️‍➡️	15.1	man running facing right	🏃🏻‍♂️‍➡️ 🏃🏼‍♂️‍➡️ 🏃🏽‍♂️‍➡️ 🏃🏾‍♂️‍➡️ 🏃🏿‍♂️‍➡️	15.1
+people-body	💃	0.6	woman dancing	💃🏻 💃🏼 💃🏽 💃🏾 💃🏿	1.0
+people-body	🕺	3.0	man dancing	🕺🏻 🕺🏼 🕺🏽 🕺🏾 🕺🏿	3.0
+people-body	🕴️	0.7	person in suit levitating	🕴🏻 🕴🏼 🕴🏽 🕴🏾 🕴🏿	4.0
+people-body	👯	0.6	people with bunny ears		
+people-body	👯‍♂️	4.0	men with bunny ears		
+people-body	👯‍♀️	4.0	women with bunny ears		
+people-body	🧖	5.0	person in steamy room	🧖🏻 🧖🏼 🧖🏽 🧖🏾 🧖🏿	5.0
+people-body	🧖‍♂️	5.0	man in steamy room	🧖🏻‍♂️ 🧖🏼‍♂️ 🧖🏽‍♂️ 🧖🏾‍♂️ 🧖🏿‍♂️	5.0
+people-body	🧖‍♀️	5.0	woman in steamy room	🧖🏻‍♀️ 🧖🏼‍♀️ 🧖🏽‍♀️ 🧖🏾‍♀️ 🧖🏿‍♀️	5.0
+people-body	🧗	5.0	person climbing	🧗🏻 🧗🏼 🧗🏽 🧗🏾 🧗🏿	5.0
+people-body	🧗‍♂️	5.0	man climbing	🧗🏻‍♂️ 🧗🏼‍♂️ 🧗🏽‍♂️ 🧗🏾‍♂️ 🧗🏿‍♂️	5.0
+people-body	🧗‍♀️	5.0	woman climbing	🧗🏻‍♀️ 🧗🏼‍♀️ 🧗🏽‍♀️ 🧗🏾‍♀️ 🧗🏿‍♀️	5.0
+people-body	🤺	3.0	person fencing		
+people-body	🏇	1.0	horse racing	🏇🏻 🏇🏼 🏇🏽 🏇🏾 🏇🏿	1.0
+people-body	⛷️	0.7	skier		
+people-body	🏂	0.6	snowboarder	🏂🏻 🏂🏼 🏂🏽 🏂🏾 🏂🏿	1.0
+people-body	🏌️	0.7	person golfing	🏌🏻 🏌🏼 🏌🏽 🏌🏾 🏌🏿	4.0
+people-body	🏌️‍♂️	4.0	man golfing	🏌🏻‍♂️ 🏌🏼‍♂️ 🏌🏽‍♂️ 🏌🏾‍♂️ 🏌🏿‍♂️	4.0
+people-body	🏌️‍♀️	4.0	woman golfing	🏌🏻‍♀️ 🏌🏼‍♀️ 🏌🏽‍♀️ 🏌🏾‍♀️ 🏌🏿‍♀️	4.0
+people-body	🏄	0.6	person surfing	🏄🏻 🏄🏼 🏄🏽 🏄🏾 🏄🏿	1.0
+people-body	🏄‍♂️	4.0	man surfing	🏄🏻‍♂️ 🏄🏼‍♂️ 🏄🏽‍♂️ 🏄🏾‍♂️ 🏄🏿‍♂️	4.0
+people-body	🏄‍♀️	4.0	woman surfing	🏄🏻‍♀️ 🏄🏼‍♀️ 🏄🏽‍♀️ 🏄🏾‍♀️ 🏄🏿‍♀️	4.0
+people-body	🚣	1.0	person rowing boat	🚣🏻 🚣🏼 🚣🏽 🚣🏾 🚣🏿	1.0
+people-body	🚣‍♂️	4.0	man rowing boat	🚣🏻‍♂️ 🚣🏼‍♂️ 🚣🏽‍♂️ 🚣🏾‍♂️ 🚣🏿‍♂️	4.0
+people-body	🚣‍♀️	4.0	woman rowing boat	🚣🏻‍♀️ 🚣🏼‍♀️ 🚣🏽‍♀️ 🚣🏾‍♀️ 🚣🏿‍♀️	4.0
+people-body	🏊	0.6	person swimming	🏊🏻 🏊🏼 🏊🏽 🏊🏾 🏊🏿	1.0
+people-body	🏊‍♂️	4.0	man swimming	🏊🏻‍♂️ 🏊🏼‍♂️ 🏊🏽‍♂️ 🏊🏾‍♂️ 🏊🏿‍♂️	4.0
+people-body	🏊‍♀️	4.0	woman swimming	🏊🏻‍♀️ 🏊🏼‍♀️ 🏊🏽‍♀️ 🏊🏾‍♀️ 🏊🏿‍♀️	4.0
+people-body	⛹️	0.7	person bouncing ball	⛹🏻 ⛹🏼 ⛹🏽 ⛹🏾 ⛹🏿	2.0
+people-body	⛹️‍♂️	4.0	man bouncing ball	⛹🏻‍♂️ ⛹🏼‍♂️ ⛹🏽‍♂️ ⛹🏾‍♂️ ⛹🏿‍♂️	4.0
+people-body	⛹️‍♀️	4.0	woman bouncing ball	⛹🏻‍♀️ ⛹🏼‍♀️ ⛹🏽‍♀️ ⛹🏾‍♀️ ⛹🏿‍♀️	4.0
+people-body	🏋️	0.7	person lifting weights	🏋🏻 🏋🏼 🏋🏽 🏋🏾 🏋🏿	2.0
+people-body	🏋️‍♂️	4.0	man lifting weights	🏋🏻‍♂️ 🏋🏼‍♂️ 🏋🏽‍♂️ 🏋🏾‍♂️ 🏋🏿‍♂️	4.0
+people-body	🏋️‍♀️	4.0	woman lifting weights	🏋🏻‍♀️ 🏋🏼‍♀️ 🏋🏽‍♀️ 🏋🏾‍♀️ 🏋🏿‍♀️	4.0
+people-body	🚴	1.0	person biking	🚴🏻 🚴🏼 🚴🏽 🚴🏾 🚴🏿	1.0
+people-body	🚴‍♂️	4.0	man biking	🚴🏻‍♂️ 🚴🏼‍♂️ 🚴🏽‍♂️ 🚴🏾‍♂️ 🚴🏿‍♂️	4.0
+people-body	🚴‍♀️	4.0	woman biking	🚴🏻‍♀️ 🚴🏼‍♀️ 🚴🏽‍♀️ 🚴🏾‍♀️ 🚴🏿‍♀️	4.0
+people-body	🚵	1.0	person mountain biking	🚵🏻 🚵🏼 🚵🏽 🚵🏾 🚵🏿	1.0
+people-body	🚵‍♂️	4.0	man mountain biking	🚵🏻‍♂️ 🚵🏼‍♂️ 🚵🏽‍♂️ 🚵🏾‍♂️ 🚵🏿‍♂️	4.0
+people-body	🚵‍♀️	4.0	woman mountain biking	🚵🏻‍♀️ 🚵🏼‍♀️ 🚵🏽‍♀️ 🚵🏾‍♀️ 🚵🏿‍♀️	4.0
+people-body	🤸	3.0	person cartwheeling	🤸🏻 🤸🏼 🤸🏽 🤸🏾 🤸🏿	3.0
+people-body	🤸‍♂️	4.0	man cartwheeling	🤸🏻‍♂️ 🤸🏼‍♂️ 🤸🏽‍♂️ 🤸🏾‍♂️ 🤸🏿‍♂️	4.0
+people-body	🤸‍♀️	4.0	woman cartwheeling	🤸🏻‍♀️ 🤸🏼‍♀️ 🤸🏽‍♀️ 🤸🏾‍♀️ 🤸🏿‍♀️	4.0
+people-body	🤼	3.0	people wrestling		
+people-body	🤼‍♂️	4.0	men wrestling		
+people-body	🤼‍♀️	4.0	women wrestling		
+people-body	🤽	3.0	person playing water polo	🤽🏻 🤽🏼 🤽🏽 🤽🏾 🤽🏿	3.0
+people-body	🤽‍♂️	4.0	man playing water polo	🤽🏻‍♂️ 🤽🏼‍♂️ 🤽🏽‍♂️ 🤽🏾‍♂️ 🤽🏿‍♂️	4.0
+people-body	🤽‍♀️	4.0	woman playing water polo	🤽🏻‍♀️ 🤽🏼‍♀️ 🤽🏽‍♀️ 🤽🏾‍♀️ 🤽🏿‍♀️	4.0
+people-body	🤾	3.0	person playing handball	🤾🏻 🤾🏼 🤾🏽 🤾🏾 🤾🏿	3.0
+people-body	🤾‍♂️	4.0	man playing handball	🤾🏻‍♂️ 🤾🏼‍♂️ 🤾🏽‍♂️ 🤾🏾‍♂️ 🤾🏿‍♂️	4.0
+people-body	🤾‍♀️	4.0	woman playing handball	🤾🏻‍♀️ 🤾🏼‍♀️ 🤾🏽‍♀️ 🤾🏾‍♀️ 🤾🏿‍♀️	4.0
+people-body	🤹	3.0	person juggling	🤹🏻 🤹🏼 🤹🏽 🤹🏾 🤹🏿	3.0
+people-body	🤹‍♂️	4.0	man juggling	🤹🏻‍♂️ 🤹🏼‍♂️ 🤹🏽‍♂️ 🤹🏾‍♂️ 🤹🏿‍♂️	4.0
+people-body	🤹‍♀️	4.0	woman juggling	🤹🏻‍♀️ 🤹🏼‍♀️ 🤹🏽‍♀️ 🤹🏾‍♀️ 🤹🏿‍♀️	4.0
+people-body	🧘	5.0	person in lotus position	🧘🏻 🧘🏼 🧘🏽 🧘🏾 🧘🏿	5.0
+people-body	🧘‍♂️	5.0	man in lotus position	🧘🏻‍♂️ 🧘🏼‍♂️ 🧘🏽‍♂️ 🧘🏾‍♂️ 🧘🏿‍♂️	5.0
+people-body	🧘‍♀️	5.0	woman in lotus position	🧘🏻‍♀️ 🧘🏼‍♀️ 🧘🏽‍♀️ 🧘🏾‍♀️ 🧘🏿‍♀️	5.0
+people-body	🛀	0.6	person taking bath	🛀🏻 🛀🏼 🛀🏽 🛀🏾 🛀🏿	1.0
+people-body	🛌	1.0	person in bed	🛌🏻 🛌🏼 🛌🏽 🛌🏾 🛌🏿	4.0
+people-body	🧑‍🤝‍🧑	12.0	people holding hands	🧑🏻‍🤝‍🧑🏻 🧑🏼‍🤝‍🧑🏼 🧑🏽‍🤝‍🧑🏽 🧑🏾‍🤝‍🧑🏾 🧑🏿‍🤝‍🧑🏿	12.0
+people-body	👭	1.0	women holding hands	👭🏻 👭🏼 👭🏽 👭🏾 👭🏿	12.0
+people-body	👫	0.6	woman and man holding hands	👫🏻 👫🏼 👫🏽 👫🏾 👫🏿	12.0
+people-body	👬	1.0	men holding hands	👬🏻 👬🏼 👬🏽 👬🏾 👬🏿	12.0
+people-body	💏	0.6	kiss	💏🏻 💏🏼 💏🏽 💏🏾 💏🏿	13.1
+people-body	👩‍❤️‍💋‍👨	2.0	kiss: woman, man	👩🏻‍❤️‍💋‍👨🏻 👩🏼‍❤️‍💋‍👨🏼 👩🏽‍❤️‍💋‍👨🏽 👩🏾‍❤️‍💋‍👨🏾 👩🏿‍❤️‍💋‍👨🏿	13.1
+people-body	👨‍❤️‍💋‍👨	2.0	kiss: man, man	👨🏻‍❤️‍💋‍👨🏻 👨🏼‍❤️‍💋‍👨🏼 👨🏽‍❤️‍💋‍👨🏽 👨🏾‍❤️‍💋‍👨🏾 👨🏿‍❤️‍💋‍👨🏿	13.1
+people-body	👩‍❤️‍💋‍👩	2.0	kiss: woman, woman	👩🏻‍❤️‍💋‍👩🏻 👩🏼‍❤️‍💋‍👩🏼 👩🏽‍❤️‍💋‍👩🏽 👩🏾‍❤️‍💋‍👩🏾 👩🏿‍❤️‍💋‍👩🏿	13.1
+people-body	💑	0.6	couple with heart	💑🏻 💑🏼 💑🏽 💑🏾 💑🏿	13.1
+people-body	👩‍❤️‍👨	2.0	couple with heart: woman, man	👩🏻‍❤️‍👨🏻 👩🏼‍❤️‍👨🏼 👩🏽‍❤️‍👨🏽 👩🏾‍❤️‍👨🏾 👩🏿‍❤️‍👨🏿	13.1
+people-body	👨‍❤️‍👨	2.0	couple with heart: man, man	👨🏻‍❤️‍👨🏻 👨🏼‍❤️‍👨🏼 👨🏽‍❤️‍👨🏽 👨🏾‍❤️‍👨🏾 👨🏿‍❤️‍👨🏿	13.1
+people-body	👩‍❤️‍👩	2.0	couple with heart: woman, woman	👩🏻‍❤️‍👩🏻 👩🏼‍❤️‍👩🏼 👩🏽‍❤️‍👩🏽 👩🏾‍❤️‍👩🏾 👩🏿‍❤️‍👩🏿	13.1
+people-body	👨‍👩‍👦	2.0	family: man, woman, boy		
+people-body	👨‍👩‍👧	2.0	family: man, woman, girl		
+people-body	👨‍👩‍👧‍👦	2.0	family: man, woman, girl, boy		
+people-body	👨‍👩‍👦‍👦	2.0	family: man, woman, boy, boy		
+people-body	👨‍👩‍👧‍👧	2.0	family: man, woman, girl, girl		
+people-body	👨‍👨‍👦	2.0	family: man, man, boy		
+people-body	👨‍👨‍👧	2.0	family: man, man, girl		
+people-body	👨‍👨‍👧‍👦	2.0	family: man, man, girl, boy		
+people-body	👨‍👨‍👦‍👦	2.0	family: man, man, boy, boy		
+people-body	👨‍👨‍👧‍👧	2.0	family: man, man, girl, girl		
+people-body	👩‍👩‍👦	2.0	family: woman, woman, boy		
+people-body	👩‍👩‍👧	2.0	family: woman, woman, girl		
+people-body	👩‍👩‍👧‍👦	2.0	family: woman, woman, girl, boy		
+people-body	👩‍👩‍👦‍👦	2.0	family: woman, woman, boy, boy		
+people-body	👩‍👩‍👧‍👧	2.0	family: woman, woman, girl, girl		
+people-body	👨‍👦	4.0	family: man, boy		
+people-body	👨‍👦‍👦	4.0	family: man, boy, boy		
+people-body	👨‍👧	4.0	family: man, girl		
+people-body	👨‍👧‍👦	4.0	family: man, girl, boy		
+people-body	👨‍👧‍👧	4.0	family: man, girl, girl		
+people-body	👩‍👦	4.0	family: woman, boy		
+people-body	👩‍👦‍👦	4.0	family: woman, boy, boy		
+people-body	👩‍👧	4.0	family: woman, girl		
+people-body	👩‍👧‍👦	4.0	family: woman, girl, boy		
+people-body	👩‍👧‍👧	4.0	family: woman, girl, girl		
+people-body	🗣️	0.7	speaking head		
+people-body	👤	0.6	bust in silhouette		
+people-body	👥	1.0	busts in silhouette		
+people-body	🫂	13.0	people hugging		
+people-body	👪	0.6	family		
+people-body	🧑‍🧑‍🧒	15.1	family: adult, adult, child		
+people-body	🧑‍🧑‍🧒‍🧒	15.1	family: adult, adult, child, child		
+people-body	🧑‍🧒	15.1	family: adult, child		
+people-body	🧑‍🧒‍🧒	15.1	family: adult, child, child		
+people-body	👣	0.6	footprints		
+people-body	🫆	16.0	fingerprint		
+animals-nature	🐵	0.6	monkey face		
+animals-nature	🐒	0.6	monkey		
+animals-nature	🦍	3.0	gorilla		
+animals-nature	🦧	12.0	orangutan		
+animals-nature	🐶	0.6	dog face		
+animals-nature	🐕	0.7	dog		
+animals-nature	🦮	12.0	guide dog		
+animals-nature	🐕‍🦺	12.0	service dog		
+animals-nature	🐩	0.6	poodle		
+animals-nature	🐺	0.6	wolf		
+animals-nature	🦊	3.0	fox		
+animals-nature	🦝	11.0	raccoon		
+animals-nature	🐱	0.6	cat face		
+animals-nature	🐈	0.7	cat		
+animals-nature	🐈‍⬛	13.0	black cat		
+animals-nature	🦁	1.0	lion		
+animals-nature	🐯	0.6	tiger face		
+animals-nature	🐅	1.0	tiger		
+animals-nature	🐆	1.0	leopard		
+animals-nature	🐴	0.6	horse face		
+animals-nature	🫎	15.0	moose		
+animals-nature	🫏	15.0	donkey		
+animals-nature	🐎	0.6	horse		
+animals-nature	🦄	1.0	unicorn		
+animals-nature	🦓	5.0	zebra		
+animals-nature	🦌	3.0	deer		
+animals-nature	🦬	13.0	bison		
+animals-nature	🐮	0.6	cow face		
+animals-nature	🐂	1.0	ox		
+animals-nature	🐃	1.0	water buffalo		
+animals-nature	🐄	1.0	cow		
+animals-nature	🐷	0.6	pig face		
+animals-nature	🐖	1.0	pig		
+animals-nature	🐗	0.6	boar		
+animals-nature	🐽	0.6	pig nose		
+animals-nature	🐏	1.0	ram		
+animals-nature	🐑	0.6	ewe		
+animals-nature	🐐	1.0	goat		
+animals-nature	🐪	1.0	camel		
+animals-nature	🐫	0.6	two-hump camel		
+animals-nature	🦙	11.0	llama		
+animals-nature	🦒	5.0	giraffe		
+animals-nature	🐘	0.6	elephant		
+animals-nature	🦣	13.0	mammoth		
+animals-nature	🦏	3.0	rhinoceros		
+animals-nature	🦛	11.0	hippopotamus		
+animals-nature	🐭	0.6	mouse face		
+animals-nature	🐁	1.0	mouse		
+animals-nature	🐀	1.0	rat		
+animals-nature	🐹	0.6	hamster		
+animals-nature	🐰	0.6	rabbit face		
+animals-nature	🐇	1.0	rabbit		
+animals-nature	🐿️	0.7	chipmunk		
+animals-nature	🦫	13.0	beaver		
+animals-nature	🦔	5.0	hedgehog		
+animals-nature	🦇	3.0	bat		
+animals-nature	🐻	0.6	bear		
+animals-nature	🐻‍❄️	13.0	polar bear		
+animals-nature	🐨	0.6	koala		
+animals-nature	🐼	0.6	panda		
+animals-nature	🦥	12.0	sloth		
+animals-nature	🦦	12.0	otter		
+animals-nature	🦨	12.0	skunk		
+animals-nature	🦘	11.0	kangaroo		
+animals-nature	🦡	11.0	badger		
+animals-nature	🐾	0.6	paw prints		
+animals-nature	🦃	1.0	turkey		
+animals-nature	🐔	0.6	chicken		
+animals-nature	🐓	1.0	rooster		
+animals-nature	🐣	0.6	hatching chick		
+animals-nature	🐤	0.6	baby chick		
+animals-nature	🐥	0.6	front-facing baby chick		
+animals-nature	🐦	0.6	bird		
+animals-nature	🐧	0.6	penguin		
+animals-nature	🕊️	0.7	dove		
+animals-nature	🦅	3.0	eagle		
+animals-nature	🦆	3.0	duck		
+animals-nature	🦢	11.0	swan		
+animals-nature	🦉	3.0	owl		
+animals-nature	🦤	13.0	dodo		
+animals-nature	🪶	13.0	feather		
+animals-nature	🦩	12.0	flamingo		
+animals-nature	🦚	11.0	peacock		
+animals-nature	🦜	11.0	parrot		
+animals-nature	🪽	15.0	wing		
+animals-nature	🐦‍⬛	15.0	black bird		
+animals-nature	🪿	15.0	goose		
+animals-nature	🐦‍🔥	15.1	phoenix		
+animals-nature	🐸	0.6	frog		
+animals-nature	🐊	1.0	crocodile		
+animals-nature	🐢	0.6	turtle		
+animals-nature	🦎	3.0	lizard		
+animals-nature	🐍	0.6	snake		
+animals-nature	🐲	0.6	dragon face		
+animals-nature	🐉	1.0	dragon		
+animals-nature	🦕	5.0	sauropod		
+animals-nature	🦖	5.0	T-Rex		
+animals-nature	🐳	0.6	spouting whale		
+animals-nature	🐋	1.0	whale		
+animals-nature	🐬	0.6	dolphin		
+animals-nature	🦭	13.0	seal		
+animals-nature	🐟	0.6	fish		
+animals-nature	🐠	0.6	tropical fish		
+animals-nature	🐡	0.6	blowfish		
+animals-nature	🦈	3.0	shark		
+animals-nature	🐙	0.6	octopus		
+animals-nature	🐚	0.6	spiral shell		
+animals-nature	🪸	14.0	coral		
+animals-nature	🪼	15.0	jellyfish		
+animals-nature	🦀	1.0	crab		
+animals-nature	🦞	11.0	lobster		
+animals-nature	🦐	3.0	shrimp		
+animals-nature	🦑	3.0	squid		
+animals-nature	🦪	12.0	oyster		
+animals-nature	🐌	0.6	snail		
+animals-nature	🦋	3.0	butterfly		
+animals-nature	🐛	0.6	bug		
+animals-nature	🐜	0.6	ant		
+animals-nature	🐝	0.6	honeybee		
+animals-nature	🪲	13.0	beetle		
+animals-nature	🐞	0.6	lady beetle		
+animals-nature	🦗	5.0	cricket		
+animals-nature	🪳	13.0	cockroach		
+animals-nature	🕷️	0.7	spider		
+animals-nature	🕸️	0.7	spider web		
+animals-nature	🦂	1.0	scorpion		
+animals-nature	🦟	11.0	mosquito		
+animals-nature	🪰	13.0	fly		
+animals-nature	🪱	13.0	worm		
+animals-nature	🦠	11.0	microbe		
+animals-nature	💐	0.6	bouquet		
+animals-nature	🌸	0.6	cherry blossom		
+animals-nature	💮	0.6	white flower		
+animals-nature	🪷	14.0	lotus		
+animals-nature	🏵️	0.7	rosette		
+animals-nature	🌹	0.6	rose		
+animals-nature	🥀	3.0	wilted flower		
+animals-nature	🌺	0.6	hibiscus		
+animals-nature	🌻	0.6	sunflower		
+animals-nature	🌼	0.6	blossom		
+animals-nature	🌷	0.6	tulip		
+animals-nature	🪻	15.0	hyacinth		
+animals-nature	🌱	0.6	seedling		
+animals-nature	🪴	13.0	potted plant		
+animals-nature	🌲	1.0	evergreen tree		
+animals-nature	🌳	1.0	deciduous tree		
+animals-nature	🌴	0.6	palm tree		
+animals-nature	🌵	0.6	cactus		
+animals-nature	🌾	0.6	sheaf of rice		
+animals-nature	🌿	0.6	herb		
+animals-nature	☘️	1.0	shamrock		
+animals-nature	🍀	0.6	four leaf clover		
+animals-nature	🍁	0.6	maple leaf		
+animals-nature	🍂	0.6	fallen leaf		
+animals-nature	🍃	0.6	leaf fluttering in wind		
+animals-nature	🪹	14.0	empty nest		
+animals-nature	🪺	14.0	nest with eggs		
+animals-nature	🍄	0.6	mushroom		
+animals-nature	🪾	16.0	leafless tree		
+food-drink	🍇	0.6	grapes		
+food-drink	🍈	0.6	melon		
+food-drink	🍉	0.6	watermelon		
+food-drink	🍊	0.6	tangerine		
+food-drink	🍋	1.0	lemon		
+food-drink	🍋‍🟩	15.1	lime		
+food-drink	🍌	0.6	banana		
+food-drink	🍍	0.6	pineapple		
+food-drink	🥭	11.0	mango		
+food-drink	🍎	0.6	red apple		
+food-drink	🍏	0.6	green apple		
+food-drink	🍐	1.0	pear		
+food-drink	🍑	0.6	peach		
+food-drink	🍒	0.6	cherries		
+food-drink	🍓	0.6	strawberry		
+food-drink	🫐	13.0	blueberries		
+food-drink	🥝	3.0	kiwi fruit		
+food-drink	🍅	0.6	tomato		
+food-drink	🫒	13.0	olive		
+food-drink	🥥	5.0	coconut		
+food-drink	🥑	3.0	avocado		
+food-drink	🍆	0.6	eggplant		
+food-drink	🥔	3.0	potato		
+food-drink	🥕	3.0	carrot		
+food-drink	🌽	0.6	ear of corn		
+food-drink	🌶️	0.7	hot pepper		
+food-drink	🫑	13.0	bell pepper		
+food-drink	🥒	3.0	cucumber		
+food-drink	🥬	11.0	leafy green		
+food-drink	🥦	5.0	broccoli		
+food-drink	🧄	12.0	garlic		
+food-drink	🧅	12.0	onion		
+food-drink	🥜	3.0	peanuts		
+food-drink	🫘	14.0	beans		
+food-drink	🌰	0.6	chestnut		
+food-drink	🫚	15.0	ginger root		
+food-drink	🫛	15.0	pea pod		
+food-drink	🍄‍🟫	15.1	brown mushroom		
+food-drink	🫜	16.0	root vegetable		
+food-drink	🍞	0.6	bread		
+food-drink	🥐	3.0	croissant		
+food-drink	🥖	3.0	baguette bread		
+food-drink	🫓	13.0	flatbread		
+food-drink	🥨	5.0	pretzel		
+food-drink	🥯	11.0	bagel		
+food-drink	🥞	3.0	pancakes		
+food-drink	🧇	12.0	waffle		
+food-drink	🧀	1.0	cheese wedge		
+food-drink	🍖	0.6	meat on bone		
+food-drink	🍗	0.6	poultry leg		
+food-drink	🥩	5.0	cut of meat		
+food-drink	🥓	3.0	bacon		
+food-drink	🍔	0.6	hamburger		
+food-drink	🍟	0.6	french fries		
+food-drink	🍕	0.6	pizza		
+food-drink	🌭	1.0	hot dog		
+food-drink	🥪	5.0	sandwich		
+food-drink	🌮	1.0	taco		
+food-drink	🌯	1.0	burrito		
+food-drink	🫔	13.0	tamale		
+food-drink	🥙	3.0	stuffed flatbread		
+food-drink	🧆	12.0	falafel		
+food-drink	🥚	3.0	egg		
+food-drink	🍳	0.6	cooking		
+food-drink	🥘	3.0	shallow pan of food		
+food-drink	🍲	0.6	pot of food		
+food-drink	🫕	13.0	fondue		
+food-drink	🥣	5.0	bowl with spoon		
+food-drink	🥗	3.0	green salad		
+food-drink	🍿	1.0	popcorn		
+food-drink	🧈	12.0	butter		
+food-drink	🧂	11.0	salt		
+food-drink	🥫	5.0	canned food		
+food-drink	🍱	0.6	bento box		
+food-drink	🍘	0.6	rice cracker		
+food-drink	🍙	0.6	rice ball		
+food-drink	🍚	0.6	cooked rice		
+food-drink	🍛	0.6	curry rice		
+food-drink	🍜	0.6	steaming bowl		
+food-drink	🍝	0.6	spaghetti		
+food-drink	🍠	0.6	roasted sweet potato		
+food-drink	🍢	0.6	oden		
+food-drink	🍣	0.6	sushi		
+food-drink	🍤	0.6	fried shrimp		
+food-drink	🍥	0.6	fish cake with swirl		
+food-drink	🥮	11.0	moon cake		
+food-drink	🍡	0.6	dango		
+food-drink	🥟	5.0	dumpling		
+food-drink	🥠	5.0	fortune cookie		
+food-drink	🥡	5.0	takeout box		
+food-drink	🍦	0.6	soft ice cream		
+food-drink	🍧	0.6	shaved ice		
+food-drink	🍨	0.6	ice cream		
+food-drink	🍩	0.6	doughnut		
+food-drink	🍪	0.6	cookie		
+food-drink	🎂	0.6	birthday cake		
+food-drink	🍰	0.6	shortcake		
+food-drink	🧁	11.0	cupcake		
+food-drink	🥧	5.0	pie		
+food-drink	🍫	0.6	chocolate bar		
+food-drink	🍬	0.6	candy		
+food-drink	🍭	0.6	lollipop		
+food-drink	🍮	0.6	custard		
+food-drink	🍯	0.6	honey pot		
+food-drink	🍼	1.0	baby bottle		
+food-drink	🥛	3.0	glass of milk		
+food-drink	☕	0.6	hot beverage		
+food-drink	🫖	13.0	teapot		
+food-drink	🍵	0.6	teacup without handle		
+food-drink	🍶	0.6	sake		
+food-drink	🍾	1.0	bottle with popping cork		
+food-drink	🍷	0.6	wine glass		
+food-drink	🍸	0.6	cocktail glass		
+food-drink	🍹	0.6	tropical drink		
+food-drink	🍺	0.6	beer mug		
+food-drink	🍻	0.6	clinking beer mugs		
+food-drink	🥂	3.0	clinking glasses		
+food-drink	🥃	3.0	tumbler glass		
+food-drink	🫗	14.0	pouring liquid		
+food-drink	🥤	5.0	cup with straw		
+food-drink	🧋	13.0	bubble tea		
+food-drink	🧃	12.0	beverage box		
+food-drink	🧉	12.0	mate		
+food-drink	🧊	12.0	ice		
+food-drink	🥢	5.0	chopsticks		
+food-drink	🍽️	0.7	fork and knife with plate		
+food-drink	🍴	0.6	fork and knife		
+food-drink	🥄	3.0	spoon		
+food-drink	🔪	0.6	kitchen knife		
+food-drink	🫙	14.0	jar		
+food-drink	🏺	1.0	amphora		
+travel-places	🌍	0.7	globe showing Europe-Africa		
+travel-places	🌎	0.7	globe showing Americas		
+travel-places	🌏	0.6	globe showing Asia-Australia		
+travel-places	🌐	1.0	globe with meridians		
+travel-places	🗺️	0.7	world map		
+travel-places	🗾	0.6	map of Japan		
+travel-places	🧭	11.0	compass		
+travel-places	🏔️	0.7	snow-capped mountain		
+travel-places	⛰️	0.7	mountain		
+travel-places	🌋	0.6	volcano		
+travel-places	🗻	0.6	mount fuji		
+travel-places	🏕️	0.7	camping		
+travel-places	🏖️	0.7	beach with umbrella		
+travel-places	🏜️	0.7	desert		
+travel-places	🏝️	0.7	desert island		
+travel-places	🏞️	0.7	national park		
+travel-places	🏟️	0.7	stadium		
+travel-places	🏛️	0.7	classical building		
+travel-places	🏗️	0.7	building construction		
+travel-places	🧱	11.0	brick		
+travel-places	🪨	13.0	rock		
+travel-places	🪵	13.0	wood		
+travel-places	🛖	13.0	hut		
+travel-places	🏘️	0.7	houses		
+travel-places	🏚️	0.7	derelict house		
+travel-places	🏠	0.6	house		
+travel-places	🏡	0.6	house with garden		
+travel-places	🏢	0.6	office building		
+travel-places	🏣	0.6	Japanese post office		
+travel-places	🏤	1.0	post office		
+travel-places	🏥	0.6	hospital		
+travel-places	🏦	0.6	bank		
+travel-places	🏨	0.6	hotel		
+travel-places	🏩	0.6	love hotel		
+travel-places	🏪	0.6	convenience store		
+travel-places	🏫	0.6	school		
+travel-places	🏬	0.6	department store		
+travel-places	🏭	0.6	factory		
+travel-places	🏯	0.6	Japanese castle		
+travel-places	🏰	0.6	castle		
+travel-places	💒	0.6	wedding		
+travel-places	🗼	0.6	Tokyo tower		
+travel-places	🗽	0.6	Statue of Liberty		
+travel-places	⛪	0.6	church		
+travel-places	🕌	1.0	mosque		
+travel-places	🛕	12.0	hindu temple		
+travel-places	🕍	1.0	synagogue		
+travel-places	⛩️	0.7	shinto shrine		
+travel-places	🕋	1.0	kaaba		
+travel-places	⛲	0.6	fountain		
+travel-places	⛺	0.6	tent		
+travel-places	🌁	0.6	foggy		
+travel-places	🌃	0.6	night with stars		
+travel-places	🏙️	0.7	cityscape		
+travel-places	🌄	0.6	sunrise over mountains		
+travel-places	🌅	0.6	sunrise		
+travel-places	🌆	0.6	cityscape at dusk		
+travel-places	🌇	0.6	sunset		
+travel-places	🌉	0.6	bridge at night		
+travel-places	♨️	0.6	hot springs		
+travel-places	🎠	0.6	carousel horse		
+travel-places	🛝	14.0	playground slide		
+travel-places	🎡	0.6	ferris wheel		
+travel-places	🎢	0.6	roller coaster		
+travel-places	💈	0.6	barber pole		
+travel-places	🎪	0.6	circus tent		
+travel-places	🚂	1.0	locomotive		
+travel-places	🚃	0.6	railway car		
+travel-places	🚄	0.6	high-speed train		
+travel-places	🚅	0.6	bullet train		
+travel-places	🚆	1.0	train		
+travel-places	🚇	0.6	metro		
+travel-places	🚈	1.0	light rail		
+travel-places	🚉	0.6	station		
+travel-places	🚊	1.0	tram		
+travel-places	🚝	1.0	monorail		
+travel-places	🚞	1.0	mountain railway		
+travel-places	🚋	1.0	tram car		
+travel-places	🚌	0.6	bus		
+travel-places	🚍	0.7	oncoming bus		
+travel-places	🚎	1.0	trolleybus		
+travel-places	🚐	1.0	minibus		
+travel-places	🚑	0.6	ambulance		
+travel-places	🚒	0.6	fire engine		
+travel-places	🚓	0.6	police car		
+travel-places	🚔	0.7	oncoming police car		
+travel-places	🚕	0.6	taxi		
+travel-places	🚖	1.0	oncoming taxi		
+travel-places	🚗	0.6	automobile		
+travel-places	🚘	0.7	oncoming automobile		
+travel-places	🚙	0.6	sport utility vehicle		
+travel-places	🛻	13.0	pickup truck		
+travel-places	🚚	0.6	delivery truck		
+travel-places	🚛	1.0	articulated lorry		
+travel-places	🚜	1.0	tractor		
+travel-places	🏎️	0.7	racing car		
+travel-places	🏍️	0.7	motorcycle		
+travel-places	🛵	3.0	motor scooter		
+travel-places	🦽	12.0	manual wheelchair		
+travel-places	🦼	12.0	motorized wheelchair		
+travel-places	🛺	12.0	auto rickshaw		
+travel-places	🚲	0.6	bicycle		
+travel-places	🛴	3.0	kick scooter		
+travel-places	🛹	11.0	skateboard		
+travel-places	🛼	13.0	roller skate		
+travel-places	🚏	0.6	bus stop		
+travel-places	🛣️	0.7	motorway		
+travel-places	🛤️	0.7	railway track		
+travel-places	🛢️	0.7	oil drum		
+travel-places	⛽	0.6	fuel pump		
+travel-places	🛞	14.0	wheel		
+travel-places	🚨	0.6	police car light		
+travel-places	🚥	0.6	horizontal traffic light		
+travel-places	🚦	1.0	vertical traffic light		
+travel-places	🛑	3.0	stop sign		
+travel-places	🚧	0.6	construction		
+travel-places	⚓	0.6	anchor		
+travel-places	🛟	14.0	ring buoy		
+travel-places	⛵	0.6	sailboat		
+travel-places	🛶	3.0	canoe		
+travel-places	🚤	0.6	speedboat		
+travel-places	🛳️	0.7	passenger ship		
+travel-places	⛴️	0.7	ferry		
+travel-places	🛥️	0.7	motor boat		
+travel-places	🚢	0.6	ship		
+travel-places	✈️	0.6	airplane		
+travel-places	🛩️	0.7	small airplane		
+travel-places	🛫	1.0	airplane departure		
+travel-places	🛬	1.0	airplane arrival		
+travel-places	🪂	12.0	parachute		
+travel-places	💺	0.6	seat		
+travel-places	🚁	1.0	helicopter		
+travel-places	🚟	1.0	suspension railway		
+travel-places	🚠	1.0	mountain cableway		
+travel-places	🚡	1.0	aerial tramway		
+travel-places	🛰️	0.7	satellite		
+travel-places	🚀	0.6	rocket		
+travel-places	🛸	5.0	flying saucer		
+travel-places	🛎️	0.7	bellhop bell		
+travel-places	🧳	11.0	luggage		
+travel-places	⌛	0.6	hourglass done		
+travel-places	⏳	0.6	hourglass not done		
+travel-places	⌚	0.6	watch		
+travel-places	⏰	0.6	alarm clock		
+travel-places	⏱️	1.0	stopwatch		
+travel-places	⏲️	1.0	timer clock		
+travel-places	🕰️	0.7	mantelpiece clock		
+travel-places	🕛	0.6	twelve o’clock		
+travel-places	🕧	0.7	twelve-thirty		
+travel-places	🕐	0.6	one o’clock		
+travel-places	🕜	0.7	one-thirty		
+travel-places	🕑	0.6	two o’clock		
+travel-places	🕝	0.7	two-thirty		
+travel-places	🕒	0.6	three o’clock		
+travel-places	🕞	0.7	three-thirty		
+travel-places	🕓	0.6	four o’clock		
+travel-places	🕟	0.7	four-thirty		
+travel-places	🕔	0.6	five o’clock		
+travel-places	🕠	0.7	five-thirty		
+travel-places	🕕	0.6	six o’clock		
+travel-places	🕡	0.7	six-thirty		
+travel-places	🕖	0.6	seven o’clock		
+travel-places	🕢	0.7	seven-thirty		
+travel-places	🕗	0.6	eight o’clock		
+travel-places	🕣	0.7	eight-thirty		
+travel-places	🕘	0.6	nine o’clock		
+travel-places	🕤	0.7	nine-thirty		
+travel-places	🕙	0.6	ten o’clock		
+travel-places	🕥	0.7	ten-thirty		
+travel-places	🕚	0.6	eleven o’clock		
+travel-places	🕦	0.7	eleven-thirty		
+travel-places	🌑	0.6	new moon		
+travel-places	🌒	1.0	waxing crescent moon		
+travel-places	🌓	0.6	first quarter moon		
+travel-places	🌔	0.6	waxing gibbous moon		
+travel-places	🌕	0.6	full moon		
+travel-places	🌖	1.0	waning gibbous moon		
+travel-places	🌗	1.0	last quarter moon		
+travel-places	🌘	1.0	waning crescent moon		
+travel-places	🌙	0.6	crescent moon		
+travel-places	🌚	1.0	new moon face		
+travel-places	🌛	0.6	first quarter moon face		
+travel-places	🌜	0.7	last quarter moon face		
+travel-places	🌡️	0.7	thermometer		
+travel-places	☀️	0.6	sun		
+travel-places	🌝	1.0	full moon face		
+travel-places	🌞	1.0	sun with face		
+travel-places	🪐	12.0	ringed planet		
+travel-places	⭐	0.6	star		
+travel-places	🌟	0.6	glowing star		
+travel-places	🌠	0.6	shooting star		
+travel-places	🌌	0.6	milky way		
+travel-places	☁️	0.6	cloud		
+travel-places	⛅	0.6	sun behind cloud		
+travel-places	⛈️	0.7	cloud with lightning and rain		
+travel-places	🌤️	0.7	sun behind small cloud		
+travel-places	🌥️	0.7	sun behind large cloud		
+travel-places	🌦️	0.7	sun behind rain cloud		
+travel-places	🌧️	0.7	cloud with rain		
+travel-places	🌨️	0.7	cloud with snow		
+travel-places	🌩️	0.7	cloud with lightning		
+travel-places	🌪️	0.7	tornado		
+travel-places	🌫️	0.7	fog		
+travel-places	🌬️	0.7	wind face		
+travel-places	🌀	0.6	cyclone		
+travel-places	🌈	0.6	rainbow		
+travel-places	🌂	0.6	closed umbrella		
+travel-places	☂️	0.7	umbrella		
+travel-places	☔	0.6	umbrella with rain drops		
+travel-places	⛱️	0.7	umbrella on ground		
+travel-places	⚡	0.6	high voltage		
+travel-places	❄️	0.6	snowflake		
+travel-places	☃️	0.7	snowman		
+travel-places	⛄	0.6	snowman without snow		
+travel-places	☄️	1.0	comet		
+travel-places	🔥	0.6	fire		
+travel-places	💧	0.6	droplet		
+travel-places	🌊	0.6	water wave		
+activities	🎃	0.6	jack-o-lantern		
+activities	🎄	0.6	Christmas tree		
+activities	🎆	0.6	fireworks		
+activities	🎇	0.6	sparkler		
+activities	🧨	11.0	firecracker		
+activities	✨	0.6	sparkles		
+activities	🎈	0.6	balloon		
+activities	🎉	0.6	party popper		
+activities	🎊	0.6	confetti ball		
+activities	🎋	0.6	tanabata tree		
+activities	🎍	0.6	pine decoration		
+activities	🎎	0.6	Japanese dolls		
+activities	🎏	0.6	carp streamer		
+activities	🎐	0.6	wind chime		
+activities	🎑	0.6	moon viewing ceremony		
+activities	🧧	11.0	red envelope		
+activities	🎀	0.6	ribbon		
+activities	🎁	0.6	wrapped gift		
+activities	🎗️	0.7	reminder ribbon		
+activities	🎟️	0.7	admission tickets		
+activities	🎫	0.6	ticket		
+activities	🎖️	0.7	military medal		
+activities	🏆	0.6	trophy		
+activities	🏅	1.0	sports medal		
+activities	🥇	3.0	1st place medal		
+activities	🥈	3.0	2nd place medal		
+activities	🥉	3.0	3rd place medal		
+activities	⚽	0.6	soccer ball		
+activities	⚾	0.6	baseball		
+activities	🥎	11.0	softball		
+activities	🏀	0.6	basketball		
+activities	🏐	1.0	volleyball		
+activities	🏈	0.6	american football		
+activities	🏉	1.0	rugby football		
+activities	🎾	0.6	tennis		
+activities	🥏	11.0	flying disc		
+activities	🎳	0.6	bowling		
+activities	🏏	1.0	cricket game		
+activities	🏑	1.0	field hockey		
+activities	🏒	1.0	ice hockey		
+activities	🥍	11.0	lacrosse		
+activities	🏓	1.0	ping pong		
+activities	🏸	1.0	badminton		
+activities	🥊	3.0	boxing glove		
+activities	🥋	3.0	martial arts uniform		
+activities	🥅	3.0	goal net		
+activities	⛳	0.6	flag in hole		
+activities	⛸️	0.7	ice skate		
+activities	🎣	0.6	fishing pole		
+activities	🤿	12.0	diving mask		
+activities	🎽	0.6	running shirt		
+activities	🎿	0.6	skis		
+activities	🛷	5.0	sled		
+activities	🥌	5.0	curling stone		
+activities	🎯	0.6	bullseye		
+activities	🪀	12.0	yo-yo		
+activities	🪁	12.0	kite		
+activities	🔫	0.6	water pistol		
+activities	🎱	0.6	pool 8 ball		
+activities	🔮	0.6	crystal ball		
+activities	🪄	13.0	magic wand		
+activities	🎮	0.6	video game		
+activities	🕹️	0.7	joystick		
+activities	🎰	0.6	slot machine		
+activities	🎲	0.6	game die		
+activities	🧩	11.0	puzzle piece		
+activities	🧸	11.0	teddy bear		
+activities	🪅	13.0	piñata		
+activities	🪩	14.0	mirror ball		
+activities	🪆	13.0	nesting dolls		
+activities	♠️	0.6	spade suit		
+activities	♥️	0.6	heart suit		
+activities	♦️	0.6	diamond suit		
+activities	♣️	0.6	club suit		
+activities	♟️	11.0	chess pawn		
+activities	🃏	0.6	joker		
+activities	🀄	0.6	mahjong red dragon		
+activities	🎴	0.6	flower playing cards		
+activities	🎭	0.6	performing arts		
+activities	🖼️	0.7	framed picture		
+activities	🎨	0.6	artist palette		
+activities	🧵	11.0	thread		
+activities	🪡	13.0	sewing needle		
+activities	🧶	11.0	yarn		
+activities	🪢	13.0	knot		
+objects	👓	0.6	glasses		
+objects	🕶️	0.7	sunglasses		
+objects	🥽	11.0	goggles		
+objects	🥼	11.0	lab coat		
+objects	🦺	12.0	safety vest		
+objects	👔	0.6	necktie		
+objects	👕	0.6	t-shirt		
+objects	👖	0.6	jeans		
+objects	🧣	5.0	scarf		
+objects	🧤	5.0	gloves		
+objects	🧥	5.0	coat		
+objects	🧦	5.0	socks		
+objects	👗	0.6	dress		
+objects	👘	0.6	kimono		
+objects	🥻	12.0	sari		
+objects	🩱	12.0	one-piece swimsuit		
+objects	🩲	12.0	briefs		
+objects	🩳	12.0	shorts		
+objects	👙	0.6	bikini		
+objects	👚	0.6	woman’s clothes		
+objects	🪭	15.0	folding hand fan		
+objects	👛	0.6	purse		
+objects	👜	0.6	handbag		
+objects	👝	0.6	clutch bag		
+objects	🛍️	0.7	shopping bags		
+objects	🎒	0.6	backpack		
+objects	🩴	13.0	thong sandal		
+objects	👞	0.6	man’s shoe		
+objects	👟	0.6	running shoe		
+objects	🥾	11.0	hiking boot		
+objects	🥿	11.0	flat shoe		
+objects	👠	0.6	high-heeled shoe		
+objects	👡	0.6	woman’s sandal		
+objects	🩰	12.0	ballet shoes		
+objects	👢	0.6	woman’s boot		
+objects	🪮	15.0	hair pick		
+objects	👑	0.6	crown		
+objects	👒	0.6	woman’s hat		
+objects	🎩	0.6	top hat		
+objects	🎓	0.6	graduation cap		
+objects	🧢	5.0	billed cap		
+objects	🪖	13.0	military helmet		
+objects	⛑️	0.7	rescue worker’s helmet		
+objects	📿	1.0	prayer beads		
+objects	💄	0.6	lipstick		
+objects	💍	0.6	ring		
+objects	💎	0.6	gem stone		
+objects	🔇	1.0	muted speaker		
+objects	🔈	0.7	speaker low volume		
+objects	🔉	1.0	speaker medium volume		
+objects	🔊	0.6	speaker high volume		
+objects	📢	0.6	loudspeaker		
+objects	📣	0.6	megaphone		
+objects	📯	1.0	postal horn		
+objects	🔔	0.6	bell		
+objects	🔕	1.0	bell with slash		
+objects	🎼	0.6	musical score		
+objects	🎵	0.6	musical note		
+objects	🎶	0.6	musical notes		
+objects	🎙️	0.7	studio microphone		
+objects	🎚️	0.7	level slider		
+objects	🎛️	0.7	control knobs		
+objects	🎤	0.6	microphone		
+objects	🎧	0.6	headphone		
+objects	📻	0.6	radio		
+objects	🎷	0.6	saxophone		
+objects	🪗	13.0	accordion		
+objects	🎸	0.6	guitar		
+objects	🎹	0.6	musical keyboard		
+objects	🎺	0.6	trumpet		
+objects	🎻	0.6	violin		
+objects	🪕	12.0	banjo		
+objects	🥁	3.0	drum		
+objects	🪘	13.0	long drum		
+objects	🪇	15.0	maracas		
+objects	🪈	15.0	flute		
+objects	🪉	16.0	harp		
+objects	📱	0.6	mobile phone		
+objects	📲	0.6	mobile phone with arrow		
+objects	☎️	0.6	telephone		
+objects	📞	0.6	telephone receiver		
+objects	📟	0.6	pager		
+objects	📠	0.6	fax machine		
+objects	🔋	0.6	battery		
+objects	🪫	14.0	low battery		
+objects	🔌	0.6	electric plug		
+objects	💻	0.6	laptop		
+objects	🖥️	0.7	desktop computer		
+objects	🖨️	0.7	printer		
+objects	⌨️	1.0	keyboard		
+objects	🖱️	0.7	computer mouse		
+objects	🖲️	0.7	trackball		
+objects	💽	0.6	computer disk		
+objects	💾	0.6	floppy disk		
+objects	💿	0.6	optical disk		
+objects	📀	0.6	dvd		
+objects	🧮	11.0	abacus		
+objects	🎥	0.6	movie camera		
+objects	🎞️	0.7	film frames		
+objects	📽️	0.7	film projector		
+objects	🎬	0.6	clapper board		
+objects	📺	0.6	television		
+objects	📷	0.6	camera		
+objects	📸	1.0	camera with flash		
+objects	📹	0.6	video camera		
+objects	📼	0.6	videocassette		
+objects	🔍	0.6	magnifying glass tilted left		
+objects	🔎	0.6	magnifying glass tilted right		
+objects	🕯️	0.7	candle		
+objects	💡	0.6	light bulb		
+objects	🔦	0.6	flashlight		
+objects	🏮	0.6	red paper lantern		
+objects	🪔	12.0	diya lamp		
+objects	📔	0.6	notebook with decorative cover		
+objects	📕	0.6	closed book		
+objects	📖	0.6	open book		
+objects	📗	0.6	green book		
+objects	📘	0.6	blue book		
+objects	📙	0.6	orange book		
+objects	📚	0.6	books		
+objects	📓	0.6	notebook		
+objects	📒	0.6	ledger		
+objects	📃	0.6	page with curl		
+objects	📜	0.6	scroll		
+objects	📄	0.6	page facing up		
+objects	📰	0.6	newspaper		
+objects	🗞️	0.7	rolled-up newspaper		
+objects	📑	0.6	bookmark tabs		
+objects	🔖	0.6	bookmark		
+objects	🏷️	0.7	label		
+objects	💰	0.6	money bag		
+objects	🪙	13.0	coin		
+objects	💴	0.6	yen banknote		
+objects	💵	0.6	dollar banknote		
+objects	💶	1.0	euro banknote		
+objects	💷	1.0	pound banknote		
+objects	💸	0.6	money with wings		
+objects	💳	0.6	credit card		
+objects	🧾	11.0	receipt		
+objects	💹	0.6	chart increasing with yen		
+objects	✉️	0.6	envelope		
+objects	📧	0.6	e-mail		
+objects	📨	0.6	incoming envelope		
+objects	📩	0.6	envelope with arrow		
+objects	📤	0.6	outbox tray		
+objects	📥	0.6	inbox tray		
+objects	📦	0.6	package		
+objects	📫	0.6	closed mailbox with raised flag		
+objects	📪	0.6	closed mailbox with lowered flag		
+objects	📬	0.7	open mailbox with raised flag		
+objects	📭	0.7	open mailbox with lowered flag		
+objects	📮	0.6	postbox		
+objects	🗳️	0.7	ballot box with ballot		
+objects	✏️	0.6	pencil		
+objects	✒️	0.6	black nib		
+objects	🖋️	0.7	fountain pen		
+objects	🖊️	0.7	pen		
+objects	🖌️	0.7	paintbrush		
+objects	🖍️	0.7	crayon		
+objects	📝	0.6	memo		
+objects	💼	0.6	briefcase		
+objects	📁	0.6	file folder		
+objects	📂	0.6	open file folder		
+objects	🗂️	0.7	card index dividers		
+objects	📅	0.6	calendar		
+objects	📆	0.6	tear-off calendar		
+objects	🗒️	0.7	spiral notepad		
+objects	🗓️	0.7	spiral calendar		
+objects	📇	0.6	card index		
+objects	📈	0.6	chart increasing		
+objects	📉	0.6	chart decreasing		
+objects	📊	0.6	bar chart		
+objects	📋	0.6	clipboard		
+objects	📌	0.6	pushpin		
+objects	📍	0.6	round pushpin		
+objects	📎	0.6	paperclip		
+objects	🖇️	0.7	linked paperclips		
+objects	📏	0.6	straight ruler		
+objects	📐	0.6	triangular ruler		
+objects	✂️	0.6	scissors		
+objects	🗃️	0.7	card file box		
+objects	🗄️	0.7	file cabinet		
+objects	🗑️	0.7	wastebasket		
+objects	🔒	0.6	locked		
+objects	🔓	0.6	unlocked		
+objects	🔏	0.6	locked with pen		
+objects	🔐	0.6	locked with key		
+objects	🔑	0.6	key		
+objects	🗝️	0.7	old key		
+objects	🔨	0.6	hammer		
+objects	🪓	12.0	axe		
+objects	⛏️	0.7	pick		
+objects	⚒️	1.0	hammer and pick		
+objects	🛠️	0.7	hammer and wrench		
+objects	🗡️	0.7	dagger		
+objects	⚔️	1.0	crossed swords		
+objects	💣	0.6	bomb		
+objects	🪃	13.0	boomerang		
+objects	🏹	1.0	bow and arrow		
+objects	🛡️	0.7	shield		
+objects	🪚	13.0	carpentry saw		
+objects	🔧	0.6	wrench		
+objects	🪛	13.0	screwdriver		
+objects	🔩	0.6	nut and bolt		
+objects	⚙️	1.0	gear		
+objects	🗜️	0.7	clamp		
+objects	⚖️	1.0	balance scale		
+objects	🦯	12.0	white cane		
+objects	🔗	0.6	link		
+objects	⛓️‍💥	15.1	broken chain		
+objects	⛓️	0.7	chains		
+objects	🪝	13.0	hook		
+objects	🧰	11.0	toolbox		
+objects	🧲	11.0	magnet		
+objects	🪜	13.0	ladder		
+objects	🪏	16.0	shovel		
+objects	⚗️	1.0	alembic		
+objects	🧪	11.0	test tube		
+objects	🧫	11.0	petri dish		
+objects	🧬	11.0	dna		
+objects	🔬	1.0	microscope		
+objects	🔭	1.0	telescope		
+objects	📡	0.6	satellite antenna		
+objects	💉	0.6	syringe		
+objects	🩸	12.0	drop of blood		
+objects	💊	0.6	pill		
+objects	🩹	12.0	adhesive bandage		
+objects	🩼	14.0	crutch		
+objects	🩺	12.0	stethoscope		
+objects	🩻	14.0	x-ray		
+objects	🚪	0.6	door		
+objects	🛗	13.0	elevator		
+objects	🪞	13.0	mirror		
+objects	🪟	13.0	window		
+objects	🛏️	0.7	bed		
+objects	🛋️	0.7	couch and lamp		
+objects	🪑	12.0	chair		
+objects	🚽	0.6	toilet		
+objects	🪠	13.0	plunger		
+objects	🚿	1.0	shower		
+objects	🛁	1.0	bathtub		
+objects	🪤	13.0	mouse trap		
+objects	🪒	12.0	razor		
+objects	🧴	11.0	lotion bottle		
+objects	🧷	11.0	safety pin		
+objects	🧹	11.0	broom		
+objects	🧺	11.0	basket		
+objects	🧻	11.0	roll of paper		
+objects	🪣	13.0	bucket		
+objects	🧼	11.0	soap		
+objects	🫧	14.0	bubbles		
+objects	🪥	13.0	toothbrush		
+objects	🧽	11.0	sponge		
+objects	🧯	11.0	fire extinguisher		
+objects	🛒	3.0	shopping cart		
+objects	🚬	0.6	cigarette		
+objects	⚰️	1.0	coffin		
+objects	🪦	13.0	headstone		
+objects	⚱️	1.0	funeral urn		
+objects	🧿	11.0	nazar amulet		
+objects	🪬	14.0	hamsa		
+objects	🗿	0.6	moai		
+objects	🪧	13.0	placard		
+objects	🪪	14.0	identification card		
+symbols	🏧	0.6	ATM sign		
+symbols	🚮	1.0	litter in bin sign		
+symbols	🚰	1.0	potable water		
+symbols	♿	0.6	wheelchair symbol		
+symbols	🚹	0.6	men’s room		
+symbols	🚺	0.6	women’s room		
+symbols	🚻	0.6	restroom		
+symbols	🚼	0.6	baby symbol		
+symbols	🚾	0.6	water closet		
+symbols	🛂	1.0	passport control		
+symbols	🛃	1.0	customs		
+symbols	🛄	1.0	baggage claim		
+symbols	🛅	1.0	left luggage		
+symbols	⚠️	0.6	warning		
+symbols	🚸	1.0	children crossing		
+symbols	⛔	0.6	no entry		
+symbols	🚫	0.6	prohibited		
+symbols	🚳	1.0	no bicycles		
+symbols	🚭	0.6	no smoking		
+symbols	🚯	1.0	no littering		
+symbols	🚱	1.0	non-potable water		
+symbols	🚷	1.0	no pedestrians		
+symbols	📵	1.0	no mobile phones		
+symbols	🔞	0.6	no one under eighteen		
+symbols	☢️	1.0	radioactive		
+symbols	☣️	1.0	biohazard		
+symbols	⬆️	0.6	up arrow		
+symbols	↗️	0.6	up-right arrow		
+symbols	➡️	0.6	right arrow		
+symbols	↘️	0.6	down-right arrow		
+symbols	⬇️	0.6	down arrow		
+symbols	↙️	0.6	down-left arrow		
+symbols	⬅️	0.6	left arrow		
+symbols	↖️	0.6	up-left arrow		
+symbols	↕️	0.6	up-down arrow		
+symbols	↔️	0.6	left-right arrow		
+symbols	↩️	0.6	right arrow curving left		
+symbols	↪️	0.6	left arrow curving right		
+symbols	⤴️	0.6	right arrow curving up		
+symbols	⤵️	0.6	right arrow curving down		
+symbols	🔃	0.6	clockwise vertical arrows		
+symbols	🔄	1.0	counterclockwise arrows button		
+symbols	🔙	0.6	BACK arrow		
+symbols	🔚	0.6	END arrow		
+symbols	🔛	0.6	ON! arrow		
+symbols	🔜	0.6	SOON arrow		
+symbols	🔝	0.6	TOP arrow		
+symbols	🛐	1.0	place of worship		
+symbols	⚛️	1.0	atom symbol		
+symbols	🕉️	0.7	om		
+symbols	✡️	0.7	star of David		
+symbols	☸️	0.7	wheel of dharma		
+symbols	☯️	0.7	yin yang		
+symbols	✝️	0.7	latin cross		
+symbols	☦️	1.0	orthodox cross		
+symbols	☪️	0.7	star and crescent		
+symbols	☮️	1.0	peace symbol		
+symbols	🕎	1.0	menorah		
+symbols	🔯	0.6	dotted six-pointed star		
+symbols	🪯	15.0	khanda		
+symbols	♈	0.6	Aries		
+symbols	♉	0.6	Taurus		
+symbols	♊	0.6	Gemini		
+symbols	♋	0.6	Cancer		
+symbols	♌	0.6	Leo		
+symbols	♍	0.6	Virgo		
+symbols	♎	0.6	Libra		
+symbols	♏	0.6	Scorpio		
+symbols	♐	0.6	Sagittarius		
+symbols	♑	0.6	Capricorn		
+symbols	♒	0.6	Aquarius		
+symbols	♓	0.6	Pisces		
+symbols	⛎	0.6	Ophiuchus		
+symbols	🔀	1.0	shuffle tracks button		
+symbols	🔁	1.0	repeat button		
+symbols	🔂	1.0	repeat single button		
+symbols	▶️	0.6	play button		
+symbols	⏩	0.6	fast-forward button		
+symbols	⏭️	0.7	next track button		
+symbols	⏯️	1.0	play or pause button		
+symbols	◀️	0.6	reverse button		
+symbols	⏪	0.6	fast reverse button		
+symbols	⏮️	0.7	last track button		
+symbols	🔼	0.6	upwards button		
+symbols	⏫	0.6	fast up button		
+symbols	🔽	0.6	downwards button		
+symbols	⏬	0.6	fast down button		
+symbols	⏸️	0.7	pause button		
+symbols	⏹️	0.7	stop button		
+symbols	⏺️	0.7	record button		
+symbols	⏏️	1.0	eject button		
+symbols	🎦	0.6	cinema		
+symbols	🔅	1.0	dim button		
+symbols	🔆	1.0	bright button		
+symbols	📶	0.6	antenna bars		
+symbols	🛜	15.0	wireless		
+symbols	📳	0.6	vibration mode		
+symbols	📴	0.6	mobile phone off		
+symbols	♀️	4.0	female sign		
+symbols	♂️	4.0	male sign		
+symbols	⚧️	13.0	transgender symbol		
+symbols	✖️	0.6	multiply		
+symbols	➕	0.6	plus		
+symbols	➖	0.6	minus		
+symbols	➗	0.6	divide		
+symbols	🟰	14.0	heavy equals sign		
+symbols	♾️	11.0	infinity		
+symbols	‼️	0.6	double exclamation mark		
+symbols	⁉️	0.6	exclamation question mark		
+symbols	❓	0.6	red question mark		
+symbols	❔	0.6	white question mark		
+symbols	❕	0.6	white exclamation mark		
+symbols	❗	0.6	red exclamation mark		
+symbols	〰️	0.6	wavy dash		
+symbols	💱	0.6	currency exchange		
+symbols	💲	0.6	heavy dollar sign		
+symbols	⚕️	4.0	medical symbol		
+symbols	♻️	0.6	recycling symbol		
+symbols	⚜️	1.0	fleur-de-lis		
+symbols	🔱	0.6	trident emblem		
+symbols	📛	0.6	name badge		
+symbols	🔰	0.6	Japanese symbol for beginner		
+symbols	⭕	0.6	hollow red circle		
+symbols	✅	0.6	check mark button		
+symbols	☑️	0.6	check box with check		
+symbols	✔️	0.6	check mark		
+symbols	❌	0.6	cross mark		
+symbols	❎	0.6	cross mark button		
+symbols	➰	0.6	curly loop		
+symbols	➿	1.0	double curly loop		
+symbols	〽️	0.6	part alternation mark		
+symbols	✳️	0.6	eight-spoked asterisk		
+symbols	✴️	0.6	eight-pointed star		
+symbols	❇️	0.6	sparkle		
+symbols	©️	0.6	copyright		
+symbols	®️	0.6	registered		
+symbols	™️	0.6	trade mark		
+symbols	🫟	16.0	splatter		
+symbols	#️⃣	0.6	keycap: #		
+symbols	*️⃣	2.0	keycap: *		
+symbols	0️⃣	0.6	keycap: 0		
+symbols	1️⃣	0.6	keycap: 1		
+symbols	2️⃣	0.6	keycap: 2		
+symbols	3️⃣	0.6	keycap: 3		
+symbols	4️⃣	0.6	keycap: 4		
+symbols	5️⃣	0.6	keycap: 5		
+symbols	6️⃣	0.6	keycap: 6		
+symbols	7️⃣	0.6	keycap: 7		
+symbols	8️⃣	0.6	keycap: 8		
+symbols	9️⃣	0.6	keycap: 9		
+symbols	🔟	0.6	keycap: 10		
+symbols	🔠	0.6	input latin uppercase		
+symbols	🔡	0.6	input latin lowercase		
+symbols	🔢	0.6	input numbers		
+symbols	🔣	0.6	input symbols		
+symbols	🔤	0.6	input latin letters		
+symbols	🅰️	0.6	A button (blood type)		
+symbols	🆎	0.6	AB button (blood type)		
+symbols	🅱️	0.6	B button (blood type)		
+symbols	🆑	0.6	CL button		
+symbols	🆒	0.6	COOL button		
+symbols	🆓	0.6	FREE button		
+symbols	ℹ️	0.6	information		
+symbols	🆔	0.6	ID button		
+symbols	Ⓜ️	0.6	circled M		
+symbols	🆕	0.6	NEW button		
+symbols	🆖	0.6	NG button		
+symbols	🅾️	0.6	O button (blood type)		
+symbols	🆗	0.6	OK button		
+symbols	🅿️	0.6	P button		
+symbols	🆘	0.6	SOS button		
+symbols	🆙	0.6	UP! button		
+symbols	🆚	0.6	VS button		
+symbols	🈁	0.6	Japanese “here” button		
+symbols	🈂️	0.6	Japanese “service charge” button		
+symbols	🈷️	0.6	Japanese “monthly amount” button		
+symbols	🈶	0.6	Japanese “not free of charge” button		
+symbols	🈯	0.6	Japanese “reserved” button		
+symbols	🉐	0.6	Japanese “bargain” button		
+symbols	🈹	0.6	Japanese “discount” button		
+symbols	🈚	0.6	Japanese “free of charge” button		
+symbols	🈲	0.6	Japanese “prohibited” button		
+symbols	🉑	0.6	Japanese “acceptable” button		
+symbols	🈸	0.6	Japanese “application” button		
+symbols	🈴	0.6	Japanese “passing grade” button		
+symbols	🈳	0.6	Japanese “vacancy” button		
+symbols	㊗️	0.6	Japanese “congratulations” button		
+symbols	㊙️	0.6	Japanese “secret” button		
+symbols	🈺	0.6	Japanese “open for business” button		
+symbols	🈵	0.6	Japanese “no vacancy” button		
+symbols	🔴	0.6	red circle		
+symbols	🟠	12.0	orange circle		
+symbols	🟡	12.0	yellow circle		
+symbols	🟢	12.0	green circle		
+symbols	🔵	0.6	blue circle		
+symbols	🟣	12.0	purple circle		
+symbols	🟤	12.0	brown circle		
+symbols	⚫	0.6	black circle		
+symbols	⚪	0.6	white circle		
+symbols	🟥	12.0	red square		
+symbols	🟧	12.0	orange square		
+symbols	🟨	12.0	yellow square		
+symbols	🟩	12.0	green square		
+symbols	🟦	12.0	blue square		
+symbols	🟪	12.0	purple square		
+symbols	🟫	12.0	brown square		
+symbols	⬛	0.6	black large square		
+symbols	⬜	0.6	white large square		
+symbols	◼️	0.6	black medium square		
+symbols	◻️	0.6	white medium square		
+symbols	◾	0.6	black medium-small square		
+symbols	◽	0.6	white medium-small square		
+symbols	▪️	0.6	black small square		
+symbols	▫️	0.6	white small square		
+symbols	🔶	0.6	large orange diamond		
+symbols	🔷	0.6	large blue diamond		
+symbols	🔸	0.6	small orange diamond		
+symbols	🔹	0.6	small blue diamond		
+symbols	🔺	0.6	red triangle pointed up		
+symbols	🔻	0.6	red triangle pointed down		
+symbols	💠	0.6	diamond with a dot		
+symbols	🔘	0.6	radio button		
+symbols	🔳	0.6	white square button		
+symbols	🔲	0.6	black square button		
+flags	🏁	0.6	chequered flag		
+flags	🚩	0.6	triangular flag		
+flags	🎌	0.6	crossed flags		
+flags	🏴	1.0	black flag		
+flags	🏳️	0.7	white flag		
+flags	🏳️‍🌈	4.0	rainbow flag		
+flags	🏳️‍⚧️	13.0	transgender flag		
+flags	🏴‍☠️	11.0	pirate flag		
+flags	🇦🇨	2.0	flag: Ascension Island		
+flags	🇦🇩	2.0	flag: Andorra		
+flags	🇦🇪	2.0	flag: United Arab Emirates		
+flags	🇦🇫	2.0	flag: Afghanistan		
+flags	🇦🇬	2.0	flag: Antigua & Barbuda		
+flags	🇦🇮	2.0	flag: Anguilla		
+flags	🇦🇱	2.0	flag: Albania		
+flags	🇦🇲	2.0	flag: Armenia		
+flags	🇦🇴	2.0	flag: Angola		
+flags	🇦🇶	2.0	flag: Antarctica		
+flags	🇦🇷	2.0	flag: Argentina		
+flags	🇦🇸	2.0	flag: American Samoa		
+flags	🇦🇹	2.0	flag: Austria		
+flags	🇦🇺	2.0	flag: Australia		
+flags	🇦🇼	2.0	flag: Aruba		
+flags	🇦🇽	2.0	flag: Åland Islands		
+flags	🇦🇿	2.0	flag: Azerbaijan		
+flags	🇧🇦	2.0	flag: Bosnia & Herzegovina		
+flags	🇧🇧	2.0	flag: Barbados		
+flags	🇧🇩	2.0	flag: Bangladesh		
+flags	🇧🇪	2.0	flag: Belgium		
+flags	🇧🇫	2.0	flag: Burkina Faso		
+flags	🇧🇬	2.0	flag: Bulgaria		
+flags	🇧🇭	2.0	flag: Bahrain		
+flags	🇧🇮	2.0	flag: Burundi		
+flags	🇧🇯	2.0	flag: Benin		
+flags	🇧🇱	2.0	flag: St. Barthélemy		
+flags	🇧🇲	2.0	flag: Bermuda		
+flags	🇧🇳	2.0	flag: Brunei		
+flags	🇧🇴	2.0	flag: Bolivia		
+flags	🇧🇶	2.0	flag: Caribbean Netherlands		
+flags	🇧🇷	2.0	flag: Brazil		
+flags	🇧🇸	2.0	flag: Bahamas		
+flags	🇧🇹	2.0	flag: Bhutan		
+flags	🇧🇻	2.0	flag: Bouvet Island		
+flags	🇧🇼	2.0	flag: Botswana		
+flags	🇧🇾	2.0	flag: Belarus		
+flags	🇧🇿	2.0	flag: Belize		
+flags	🇨🇦	2.0	flag: Canada		
+flags	🇨🇨	2.0	flag: Cocos (Keeling) Islands		
+flags	🇨🇩	2.0	flag: Congo - Kinshasa		
+flags	🇨🇫	2.0	flag: Central African Republic		
+flags	🇨🇬	2.0	flag: Congo - Brazzaville		
+flags	🇨🇭	2.0	flag: Switzerland		
+flags	🇨🇮	2.0	flag: Côte d’Ivoire		
+flags	🇨🇰	2.0	flag: Cook Islands		
+flags	🇨🇱	2.0	flag: Chile		
+flags	🇨🇲	2.0	flag: Cameroon		
+flags	🇨🇳	0.6	flag: China		
+flags	🇨🇴	2.0	flag: Colombia		
+flags	🇨🇵	2.0	flag: Clipperton Island		
+flags	🇨🇶	16.0	flag: Sark		
+flags	🇨🇷	2.0	flag: Costa Rica		
+flags	🇨🇺	2.0	flag: Cuba		
+flags	🇨🇻	2.0	flag: Cape Verde		
+flags	🇨🇼	2.0	flag: Curaçao		
+flags	🇨🇽	2.0	flag: Christmas Island		
+flags	🇨🇾	2.0	flag: Cyprus		
+flags	🇨🇿	2.0	flag: Czechia		
+flags	🇩🇪	0.6	flag: Germany		
+flags	🇩🇬	2.0	flag: Diego Garcia		
+flags	🇩🇯	2.0	flag: Djibouti		
+flags	🇩🇰	2.0	flag: Denmark		
+flags	🇩🇲	2.0	flag: Dominica		
+flags	🇩🇴	2.0	flag: Dominican Republic		
+flags	🇩🇿	2.0	flag: Algeria		
+flags	🇪🇦	2.0	flag: Ceuta & Melilla		
+flags	🇪🇨	2.0	flag: Ecuador		
+flags	🇪🇪	2.0	flag: Estonia		
+flags	🇪🇬	2.0	flag: Egypt		
+flags	🇪🇭	2.0	flag: Western Sahara		
+flags	🇪🇷	2.0	flag: Eritrea		
+flags	🇪🇸	0.6	flag: Spain		
+flags	🇪🇹	2.0	flag: Ethiopia		
+flags	🇪🇺	2.0	flag: European Union		
+flags	🇫🇮	2.0	flag: Finland		
+flags	🇫🇯	2.0	flag: Fiji		
+flags	🇫🇰	2.0	flag: Falkland Islands		
+flags	🇫🇲	2.0	flag: Micronesia		
+flags	🇫🇴	2.0	flag: Faroe Islands		
+flags	🇫🇷	0.6	flag: France		
+flags	🇬🇦	2.0	flag: Gabon		
+flags	🇬🇧	0.6	flag: United Kingdom		
+flags	🇬🇩	2.0	flag: Grenada		
+flags	🇬🇪	2.0	flag: Georgia		
+flags	🇬🇫	2.0	flag: French Guiana		
+flags	🇬🇬	2.0	flag: Guernsey		
+flags	🇬🇭	2.0	flag: Ghana		
+flags	🇬🇮	2.0	flag: Gibraltar		
+flags	🇬🇱	2.0	flag: Greenland		
+flags	🇬🇲	2.0	flag: Gambia		
+flags	🇬🇳	2.0	flag: Guinea		
+flags	🇬🇵	2.0	flag: Guadeloupe		
+flags	🇬🇶	2.0	flag: Equatorial Guinea		
+flags	🇬🇷	2.0	flag: Greece		
+flags	🇬🇸	2.0	flag: South Georgia & South Sandwich Islands		
+flags	🇬🇹	2.0	flag: Guatemala		
+flags	🇬🇺	2.0	flag: Guam		
+flags	🇬🇼	2.0	flag: Guinea-Bissau		
+flags	🇬🇾	2.0	flag: Guyana		
+flags	🇭🇰	2.0	flag: Hong Kong SAR China		
+flags	🇭🇲	2.0	flag: Heard & McDonald Islands		
+flags	🇭🇳	2.0	flag: Honduras		
+flags	🇭🇷	2.0	flag: Croatia		
+flags	🇭🇹	2.0	flag: Haiti		
+flags	🇭🇺	2.0	flag: Hungary		
+flags	🇮🇨	2.0	flag: Canary Islands		
+flags	🇮🇩	2.0	flag: Indonesia		
+flags	🇮🇪	2.0	flag: Ireland		
+flags	🇮🇱	2.0	flag: Israel		
+flags	🇮🇲	2.0	flag: Isle of Man		
+flags	🇮🇳	2.0	flag: India		
+flags	🇮🇴	2.0	flag: British Indian Ocean Territory		
+flags	🇮🇶	2.0	flag: Iraq		
+flags	🇮🇷	2.0	flag: Iran		
+flags	🇮🇸	2.0	flag: Iceland		
+flags	🇮🇹	0.6	flag: Italy		
+flags	🇯🇪	2.0	flag: Jersey		
+flags	🇯🇲	2.0	flag: Jamaica		
+flags	🇯🇴	2.0	flag: Jordan		
+flags	🇯🇵	0.6	flag: Japan		
+flags	🇰🇪	2.0	flag: Kenya		
+flags	🇰🇬	2.0	flag: Kyrgyzstan		
+flags	🇰🇭	2.0	flag: Cambodia		
+flags	🇰🇮	2.0	flag: Kiribati		
+flags	🇰🇲	2.0	flag: Comoros		
+flags	🇰🇳	2.0	flag: St. Kitts & Nevis		
+flags	🇰🇵	2.0	flag: North Korea		
+flags	🇰🇷	0.6	flag: South Korea		
+flags	🇰🇼	2.0	flag: Kuwait		
+flags	🇰🇾	2.0	flag: Cayman Islands		
+flags	🇰🇿	2.0	flag: Kazakhstan		
+flags	🇱🇦	2.0	flag: Laos		
+flags	🇱🇧	2.0	flag: Lebanon		
+flags	🇱🇨	2.0	flag: St. Lucia		
+flags	🇱🇮	2.0	flag: Liechtenstein		
+flags	🇱🇰	2.0	flag: Sri Lanka		
+flags	🇱🇷	2.0	flag: Liberia		
+flags	🇱🇸	2.0	flag: Lesotho		
+flags	🇱🇹	2.0	flag: Lithuania		
+flags	🇱🇺	2.0	flag: Luxembourg		
+flags	🇱🇻	2.0	flag: Latvia		
+flags	🇱🇾	2.0	flag: Libya		
+flags	🇲🇦	2.0	flag: Morocco		
+flags	🇲🇨	2.0	flag: Monaco		
+flags	🇲🇩	2.0	flag: Moldova		
+flags	🇲🇪	2.0	flag: Montenegro		
+flags	🇲🇫	2.0	flag: St. Martin		
+flags	🇲🇬	2.0	flag: Madagascar		
+flags	🇲🇭	2.0	flag: Marshall Islands		
+flags	🇲🇰	2.0	flag: North Macedonia		
+flags	🇲🇱	2.0	flag: Mali		
+flags	🇲🇲	2.0	flag: Myanmar (Burma)		
+flags	🇲🇳	2.0	flag: Mongolia		
+flags	🇲🇴	2.0	flag: Macao SAR China		
+flags	🇲🇵	2.0	flag: Northern Mariana Islands		
+flags	🇲🇶	2.0	flag: Martinique		
+flags	🇲🇷	2.0	flag: Mauritania		
+flags	🇲🇸	2.0	flag: Montserrat		
+flags	🇲🇹	2.0	flag: Malta		
+flags	🇲🇺	2.0	flag: Mauritius		
+flags	🇲🇻	2.0	flag: Maldives		
+flags	🇲🇼	2.0	flag: Malawi		
+flags	🇲🇽	2.0	flag: Mexico		
+flags	🇲🇾	2.0	flag: Malaysia		
+flags	🇲🇿	2.0	flag: Mozambique		
+flags	🇳🇦	2.0	flag: Namibia		
+flags	🇳🇨	2.0	flag: New Caledonia		
+flags	🇳🇪	2.0	flag: Niger		
+flags	🇳🇫	2.0	flag: Norfolk Island		
+flags	🇳🇬	2.0	flag: Nigeria		
+flags	🇳🇮	2.0	flag: Nicaragua		
+flags	🇳🇱	2.0	flag: Netherlands		
+flags	🇳🇴	2.0	flag: Norway		
+flags	🇳🇵	2.0	flag: Nepal		
+flags	🇳🇷	2.0	flag: Nauru		
+flags	🇳🇺	2.0	flag: Niue		
+flags	🇳🇿	2.0	flag: New Zealand		
+flags	🇴🇲	2.0	flag: Oman		
+flags	🇵🇦	2.0	flag: Panama		
+flags	🇵🇪	2.0	flag: Peru		
+flags	🇵🇫	2.0	flag: French Polynesia		
+flags	🇵🇬	2.0	flag: Papua New Guinea		
+flags	🇵🇭	2.0	flag: Philippines		
+flags	🇵🇰	2.0	flag: Pakistan		
+flags	🇵🇱	2.0	flag: Poland		
+flags	🇵🇲	2.0	flag: St. Pierre & Miquelon		
+flags	🇵🇳	2.0	flag: Pitcairn Islands		
+flags	🇵🇷	2.0	flag: Puerto Rico		
+flags	🇵🇸	2.0	flag: Palestinian Territories		
+flags	🇵🇹	2.0	flag: Portugal		
+flags	🇵🇼	2.0	flag: Palau		
+flags	🇵🇾	2.0	flag: Paraguay		
+flags	🇶🇦	2.0	flag: Qatar		
+flags	🇷🇪	2.0	flag: Réunion		
+flags	🇷🇴	2.0	flag: Romania		
+flags	🇷🇸	2.0	flag: Serbia		
+flags	🇷🇺	0.6	flag: Russia		
+flags	🇷🇼	2.0	flag: Rwanda		
+flags	🇸🇦	2.0	flag: Saudi Arabia		
+flags	🇸🇧	2.0	flag: Solomon Islands		
+flags	🇸🇨	2.0	flag: Seychelles		
+flags	🇸🇩	2.0	flag: Sudan		
+flags	🇸🇪	2.0	flag: Sweden		
+flags	🇸🇬	2.0	flag: Singapore		
+flags	🇸🇭	2.0	flag: St. Helena		
+flags	🇸🇮	2.0	flag: Slovenia		
+flags	🇸🇯	2.0	flag: Svalbard & Jan Mayen		
+flags	🇸🇰	2.0	flag: Slovakia		
+flags	🇸🇱	2.0	flag: Sierra Leone		
+flags	🇸🇲	2.0	flag: San Marino		
+flags	🇸🇳	2.0	flag: Senegal		
+flags	🇸🇴	2.0	flag: Somalia		
+flags	🇸🇷	2.0	flag: Suriname		
+flags	🇸🇸	2.0	flag: South Sudan		
+flags	🇸🇹	2.0	flag: São Tomé & Príncipe		
+flags	🇸🇻	2.0	flag: El Salvador		
+flags	🇸🇽	2.0	flag: Sint Maarten		
+flags	🇸🇾	2.0	flag: Syria		
+flags	🇸🇿	2.0	flag: Eswatini		
+flags	🇹🇦	2.0	flag: Tristan da Cunha		
+flags	🇹🇨	2.0	flag: Turks & Caicos Islands		
+flags	🇹🇩	2.0	flag: Chad		
+flags	🇹🇫	2.0	flag: French Southern Territories		
+flags	🇹🇬	2.0	flag: Togo		
+flags	🇹🇭	2.0	flag: Thailand		
+flags	🇹🇯	2.0	flag: Tajikistan		
+flags	🇹🇰	2.0	flag: Tokelau		
+flags	🇹🇱	2.0	flag: Timor-Leste		
+flags	🇹🇲	2.0	flag: Turkmenistan		
+flags	🇹🇳	2.0	flag: Tunisia		
+flags	🇹🇴	2.0	flag: Tonga		
+flags	🇹🇷	2.0	flag: Türkiye		
+flags	🇹🇹	2.0	flag: Trinidad & Tobago		
+flags	🇹🇻	2.0	flag: Tuvalu		
+flags	🇹🇼	2.0	flag: Taiwan		
+flags	🇹🇿	2.0	flag: Tanzania		
+flags	🇺🇦	2.0	flag: Ukraine		
+flags	🇺🇬	2.0	flag: Uganda		
+flags	🇺🇲	2.0	flag: U.S. Outlying Islands		
+flags	🇺🇳	4.0	flag: United Nations		
+flags	🇺🇸	0.6	flag: United States		
+flags	🇺🇾	2.0	flag: Uruguay		
+flags	🇺🇿	2.0	flag: Uzbekistan		
+flags	🇻🇦	2.0	flag: Vatican City		
+flags	🇻🇨	2.0	flag: St. Vincent & Grenadines		
+flags	🇻🇪	2.0	flag: Venezuela		
+flags	🇻🇬	2.0	flag: British Virgin Islands		
+flags	🇻🇮	2.0	flag: U.S. Virgin Islands		
+flags	🇻🇳	2.0	flag: Vietnam		
+flags	🇻🇺	2.0	flag: Vanuatu		
+flags	🇼🇫	2.0	flag: Wallis & Futuna		
+flags	🇼🇸	2.0	flag: Samoa		
+flags	🇽🇰	2.0	flag: Kosovo		
+flags	🇾🇪	2.0	flag: Yemen		
+flags	🇾🇹	2.0	flag: Mayotte		
+flags	🇿🇦	2.0	flag: South Africa		
+flags	🇿🇲	2.0	flag: Zambia		
+flags	🇿🇼	2.0	flag: Zimbabwe		
+flags	🏴󠁧󠁢󠁥󠁮󠁧󠁿	5.0	flag: England		
+flags	🏴󠁧󠁢󠁳󠁣󠁴󠁿	5.0	flag: Scotland		
+flags	🏴󠁧󠁢󠁷󠁬󠁳󠁿	5.0	flag: Wales		

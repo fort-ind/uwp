@@ -503,9 +503,13 @@ namespace Fort.ind_UWP
                     return false;
                 }
 
-                var builder = new ToastContentBuilder()
-                    .AddArgument(toast.ArgumentKey, toast.ArgumentValue)
-                    .AddText(SanitizeText(toast.Title));
+                var builder = new ToastContentBuilder();
+                foreach (var argument in toast.Arguments)
+                {
+                    builder.AddArgument(argument.Key, argument.Value);
+                }
+
+                builder.AddText(SanitizeText(toast.Title));
 
                 if (!string.IsNullOrWhiteSpace(toast.Body))
                 {
@@ -527,6 +531,8 @@ namespace Fort.ind_UWP
                     builder.AddCustomTimeStamp(toast.Timestamp.UtcDateTime);
                 }
 
+                AddQuickReply(builder, toast.QuickReply);
+
                 ToastNotification notification = new ToastNotification(builder.GetToastContent().GetXml());
                 notification.Group = toast.Group;
                 notification.Tag = toast.Tag;
@@ -537,6 +543,34 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"LiveTileService: ShowGroupedToast failed – {ex.GetType().Name}: {ex.Message}");
                 return false;
+            }
+        }
+
+        private static void AddQuickReply(ToastContentBuilder builder, ToastQuickReply reply)
+        {
+            if (reply == null || string.IsNullOrEmpty(reply.NoteId) || string.IsNullOrEmpty(reply.Account)) return;
+
+            if (!string.IsNullOrEmpty(reply.ReplyText))
+            {
+                builder.AddInputTextBox(AppConstants.ToastReplyInputId, SanitizeText(reply.Placeholder), null);
+                builder.AddButton(new ToastButton()
+                                  .SetContent(SanitizeText(reply.ReplyText))
+                                  .AddArgument(AppConstants.ToastArgumentAction, AppConstants.ToastActionReply)
+                                  .AddArgument(AppConstants.ToastArgumentNote, reply.NoteId)
+                                  .AddArgument(AppConstants.ToastArgumentAccount, reply.Account)
+                                  .SetTextBoxId(AppConstants.ToastReplyInputId)
+                                  .SetImageUri(new Uri(AppConstants.SocialToastSendIcon))
+                                  .SetBackgroundActivation());
+            }
+
+            if (!string.IsNullOrEmpty(reply.LikeText))
+            {
+                builder.AddButton(new ToastButton()
+                                  .SetContent(SanitizeText(reply.LikeText))
+                                  .AddArgument(AppConstants.ToastArgumentAction, AppConstants.ToastActionLike)
+                                  .AddArgument(AppConstants.ToastArgumentNote, reply.NoteId)
+                                  .AddArgument(AppConstants.ToastArgumentAccount, reply.Account)
+                                  .SetBackgroundActivation());
             }
         }
 
@@ -621,8 +655,22 @@ namespace Fort.ind_UWP
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.MinValue;
         public string Group { get; set; }
         public string Tag { get; set; }
-        public string ArgumentKey { get; set; }
-        public string ArgumentValue { get; set; }
+        public IList<KeyValuePair<string, string>> Arguments { get; } = new List<KeyValuePair<string, string>>();
+        public ToastQuickReply QuickReply { get; set; }
+
+        public void AddArgument(string key, string value)
+        {
+            Arguments.Add(new KeyValuePair<string, string>(key, value ?? ""));
+        }
+    }
+
+    public sealed class ToastQuickReply
+    {
+        public string NoteId { get; set; }
+        public string Account { get; set; }
+        public string Placeholder { get; set; }
+        public string ReplyText { get; set; }
+        public string LikeText { get; set; }
     }
 
     public sealed class TilePreview

@@ -15,6 +15,8 @@ namespace Fort.ind_UWP
             if (!_signInAgainHandlerAttached)
             {
                 SocialNotificationService.NeedsSignInAgainChanged += OnNeedsSignInAgainChanged;
+                SocialPermissions.Changed += OnNeedsSignInAgainChanged;
+                ProfileService.AuthStateChanged += OnSignInAgainAuthChanged;
                 _signInAgainHandlerAttached = true;
             }
 
@@ -26,7 +28,14 @@ namespace Fort.ind_UWP
             if (!_signInAgainHandlerAttached) return;
 
             SocialNotificationService.NeedsSignInAgainChanged -= OnNeedsSignInAgainChanged;
+            SocialPermissions.Changed -= OnNeedsSignInAgainChanged;
+            ProfileService.AuthStateChanged -= OnSignInAgainAuthChanged;
             _signInAgainHandlerAttached = false;
+        }
+
+        private void OnSignInAgainAuthChanged(object sender, bool isSignedIn)
+        {
+            OnNeedsSignInAgainChanged(sender, EventArgs.Empty);
         }
 
         private async void OnNeedsSignInAgainChanged(object sender, EventArgs e)
@@ -53,12 +62,33 @@ namespace Fort.ind_UWP
 
         private void UpdateSignInAgainInfoBar()
         {
-            var needed = SocialNotificationService.NeedsSignInAgain
+            var signedIn = ProfileService.CurrentUser != null;
+            var needed = signedIn
+                         && SocialNotificationService.NeedsSignInAgain
                          && SocialNotificationService.Enabled
-                         && ProfileService.CurrentUser != null
                          && !SocialNotificationService.SignInAgainDismissed;
 
             SocialPermissionInfoBar.IsOpen = needed;
+
+            SocialWritePermissionInfoBar.IsOpen = signedIn
+                                                  && !needed
+                                                  && !SocialPermissions.HasAllPosting
+                                                  && !IsWriteSignInDismissed();
+        }
+
+        private static bool IsWriteSignInDismissed()
+        {
+            try
+            {
+                var account = SocialContentService.CurrentAccountId();
+                var stored = Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialWriteSignInDismissed] as string;
+                return account != null && string.Equals(stored, account, StringComparison.Ordinal);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not read the permission banner dismissal - {ex.Message}");
+                return false;
+            }
         }
 
         private void SocialPermissionInfoBar_CloseButtonClick(Microsoft.UI.Xaml.Controls.InfoBar sender, object args)
@@ -66,20 +96,41 @@ namespace Fort.ind_UWP
             SocialNotificationService.DismissSignInAgain();
         }
 
-        private void SocialPermissionSignInButton_Click(object sender, RoutedEventArgs e)
+        private void SocialWritePermissionInfoBar_CloseButtonClick(Microsoft.UI.Xaml.Controls.InfoBar sender, object args)
         {
             try
             {
-                NavigateToTag(AppConstants.NavigationProfile);
-
-                if (ContentFrame.Content is ProfilePage)
+                var account = SocialContentService.CurrentAccountId();
+                if (account != null)
                 {
-                    ContentFrame.Navigate(typeof(LoginPage));
+                    Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialWriteSignInDismissed] = account;
                 }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"MainPage: could not remember the permission banner dismissal - {ex.Message}");
+            }
+        }
+
+        private void SocialPermissionSignInButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ShowSignIn();
+            }
+            catch (Exception ex)
+            {
                 Debug.WriteLine($"MainPage: could not open sign-in from the banner - {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        internal void ShowSignIn()
+        {
+            NavigateToTag(AppConstants.NavigationProfile);
+
+            if (ContentFrame.Content is ProfilePage)
+            {
+                ContentFrame.Navigate(typeof(LoginPage));
             }
         }
     }

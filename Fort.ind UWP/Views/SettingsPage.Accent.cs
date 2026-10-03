@@ -16,6 +16,7 @@ namespace Fort.ind_UWP
         private const string DefaultCustomAccentSeed = "#0078D7";
 
         private Button[] _accentTagSwatches;
+        private Button _selectedAccentSwatch;
 
         private Button[] AccentTagSwatches
         {
@@ -96,6 +97,7 @@ namespace Fort.ind_UWP
                                                 BaseSwatchName(AccentCustomButton), selectedTag));
                 }
 
+                _selectedAccentSwatch = sel;
                 sel.BorderBrush = isDark ? s_selectedBrushDark : s_selectedBrushLight;
                 ShowAccentSwatchCheck(sel);
                 AutomationProperties.SetName(

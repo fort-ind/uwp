@@ -163,6 +163,24 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static async Task ClearAvatarsAsync()
+        {
+            await s_gate.WaitAsync();
+            try
+            {
+                lock (s_lock)
+                {
+                    RemoveShown();
+                }
+
+                await AvatarIconService.RetainTileAvatarsAsync(new Uri[0]);
+            }
+            finally
+            {
+                s_gate.Release();
+            }
+        }
+
         private static async Task<TilePreview> BuildPreviewAsync(SocialNotification notification, CancellationToken cancellationToken)
         {
             var item = SocialFeedItem.FromNotification(notification, true);

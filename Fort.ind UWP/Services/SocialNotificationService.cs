@@ -188,6 +188,7 @@ namespace Fort.ind_UWP
                     }
 
                     await ApplyBackgroundCheckAsync();
+                    await SocialToastActions.EnsureRegisteredAsync();
 
                     if (!s_suspended)
                     {
@@ -201,6 +202,7 @@ namespace Fort.ind_UWP
 
                 WriteStoredString(AppConstants.SettingSocialNotificationsAccount, null);
                 UnregisterBackgroundCheck();
+                SocialToastActions.Unregister();
                 LeaveAccount(wasActive || previousAccount != null || ReadWatermark().HasValue);
             }
             finally
@@ -445,6 +447,7 @@ namespace Fort.ind_UWP
                     else
                     {
                         UnregisterBackgroundCheck();
+                        if (!Enabled || ReadActiveAccount() == null) SocialToastActions.Unregister();
                     }
                 }
                 catch (OperationCanceledException)
@@ -467,16 +470,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                RemoveAccessAfterUpdate();
-
-                var status = await BackgroundExecutionManager.RequestAccessAsync();
-                BackgroundAccessDenied = status == BackgroundAccessStatus.DeniedByUser ||
-                                         status == BackgroundAccessStatus.DeniedBySystemPolicy;
-                if (BackgroundAccessDenied)
-                {
-                    Debug.WriteLine($"SocialNotificationService: background access is {status}");
-                    return;
-                }
+                if (!await RequestBackgroundAccessAsync()) return;
 
                 var minutes = BackgroundCheckMinutes;
                 if (FindBackgroundCheck() != null)
@@ -498,6 +492,21 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"SocialNotificationService: could not register the background check - {ex.GetType().Name}: {ex.Message}");
             }
+        }
+
+        internal static async Task<bool> RequestBackgroundAccessAsync()
+        {
+            RemoveAccessAfterUpdate();
+
+            var status = await BackgroundExecutionManager.RequestAccessAsync();
+            BackgroundAccessDenied = status == BackgroundAccessStatus.DeniedByUser ||
+                                     status == BackgroundAccessStatus.DeniedBySystemPolicy;
+            if (BackgroundAccessDenied)
+            {
+                Debug.WriteLine($"SocialNotificationService: background access is {status}");
+            }
+
+            return !BackgroundAccessDenied;
         }
 
         private static void RemoveAccessAfterUpdate()
@@ -888,12 +897,12 @@ namespace Fort.ind_UWP
             return user.UserId ?? string.Empty;
         }
 
-        private static string ReadActiveAccount()
+        internal static string ReadActiveAccount()
         {
             return ReadStoredString(AppConstants.SettingSocialNotificationsAccount);
         }
 
-        private static bool IsActiveAccount(string account)
+        internal static bool IsActiveAccount(string account)
         {
             return account != null && string.Equals(ReadActiveAccount(), account, StringComparison.Ordinal);
         }
@@ -942,7 +951,7 @@ namespace Fort.ind_UWP
                 logo = await AvatarIconService.GetToastAvatarUriAsync(notification.User.AvatarUrl, cancellationToken);
             }
 
-            LiveTileService.ShowGroupedToast(new GroupedToast
+            var toast = new GroupedToast
             {
                 Title = item.Title,
                 Body = item.IsDirect ? LocalizedStrings.Get("SocialToastDirectNoteBody") : item.Body,
@@ -950,24 +959,45 @@ namespace Fort.ind_UWP
                 AppLogo = logo,
                 Timestamp = notification.CreatedAt,
                 Group = AppConstants.SocialToastGroup,
-                Tag = ToastKeyFor(notification),
-                ArgumentKey = AppConstants.ToastArgumentOpen,
-                ArgumentValue = AppConstants.ToastOpenNotifications
-            });
+                Tag = ToastKeyFor(notification)
+            };
+
+            var account = ReadActiveAccount();
+            var note = notification.Note;
+            if (IsConversation(notification) && note != null && !string.IsNullOrEmpty(note.Id) && account != null)
+            {
+                toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenNote);
+                toast.AddArgument(AppConstants.ToastArgumentNote, note.Id);
+                toast.AddArgument(AppConstants.ToastArgumentAccount, account);
+                toast.QuickReply = SocialToastActions.QuickReplyFor(note, account);
+            }
+            else
+            {
+                toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenNotifications);
+            }
+
+            LiveTileService.ShowGroupedToast(toast);
+        }
+
+        private static bool IsConversation(SocialNotification notification)
+        {
+            return string.Equals(notification.Type, "mention", StringComparison.Ordinal)
+                   || string.Equals(notification.Type, "reply", StringComparison.Ordinal);
         }
 
         private static void ShowSummaryToast(int count)
         {
-            LiveTileService.ShowGroupedToast(new GroupedToast
+            var toast = new GroupedToast
             {
                 Title = LocalizedStrings.Get("SocialToastSummaryTitle"),
                 Body = LocalizedStrings.Format("SocialToastSummaryBodyFormat", count),
                 Attribution = LocalizedStrings.Get("SocialToastAttribution"),
                 Group = AppConstants.SocialToastGroup,
-                Tag = "summary",
-                ArgumentKey = AppConstants.ToastArgumentOpen,
-                ArgumentValue = AppConstants.ToastOpenNotifications
-            });
+                Tag = "summary"
+            };
+            toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenNotifications);
+
+            LiveTileService.ShowGroupedToast(toast);
         }
 
         private static async void ToastFromStream(SocialNotification notification)

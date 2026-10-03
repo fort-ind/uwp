@@ -1,26 +1,18 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Windows.Globalization.DateTimeFormatting;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Fort.ind_UWP
 {
-    public sealed class SocialFeedItem : INotifyPropertyChanged
+    public sealed class SocialFeedItem : INotifyPropertyChanged, ISocialFeedEntry
     {
         private const int ExcerptTextElements = 280;
 
         private const int AvatarDecodeSize = 40;
-
-        private static readonly Lazy<DateTimeFormatter> s_timeFormatter =
-            new Lazy<DateTimeFormatter>(() => new DateTimeFormatter("shorttime"));
-
-        private static readonly Lazy<DateTimeFormatter> s_dateFormatter =
-            new Lazy<DateTimeFormatter>(() => new DateTimeFormatter("shortdate"));
 
         private bool _isUnread;
 
@@ -28,11 +20,18 @@ namespace Fort.ind_UWP
 
         private bool _avatarCreated;
 
+        private string _timeText;
+
         private SocialFeedItem()
         {
         }
 
         public string Id { get; private set; }
+
+        public string PagingId
+        {
+            get { return Id; }
+        }
 
         public string Glyph { get; private set; }
 
@@ -42,13 +41,36 @@ namespace Fort.ind_UWP
 
         public bool IsDirect { get; private set; }
 
-        public string TimeText { get; private set; }
+        public DateTimeOffset CreatedAt { get; private set; }
+
+        public string TimeText
+        {
+            get { return _timeText; }
+        }
+
+        public string TimeFull { get; private set; }
 
         public string ActorName { get; private set; }
+
+        public SocialUser Actor { get; private set; }
+
+        public string ActorProfileLabel
+        {
+            get { return Actor == null ? "" : LocalizedStrings.Format("SocialMenuViewUserFormat", Actor.Handle); }
+        }
+
+        public bool HasActorProfile
+        {
+            get { return Actor != null && !string.IsNullOrEmpty(Actor.Id); }
+        }
 
         public Uri AvatarUri { get; private set; }
 
         public string TargetUrl { get; private set; }
+
+        public SocialNote ThreadNote { get; private set; }
+
+        public bool OpensActor { get; private set; }
 
         public Visibility BodyVisibility
         {
@@ -111,8 +133,17 @@ namespace Fort.ind_UWP
                               : LocalizedStrings.Format("SocialFeedItemContentFormat", Title, Body);
 
                 return LocalizedStrings.Format(_isUnread ? "SocialFeedItemUnreadAutomationFormat" : "SocialFeedItemAutomationFormat",
-                                               content, TimeText);
+                                               content, TimeFull);
             }
+        }
+
+        public void RefreshTime(DateTimeOffset now)
+        {
+            var text = RelativeTime.Short(CreatedAt, now);
+            if (string.Equals(text, _timeText, StringComparison.Ordinal)) return;
+
+            _timeText = text;
+            OnPropertyChanged("TimeText");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -136,12 +167,17 @@ namespace Fort.ind_UWP
                 Title = TitleFor(notification, actor),
                 Body = BodyFor(notification),
                 IsDirect = notification.Type != "app" && IsDirectNote(notification.Note),
-                TimeText = FormatTime(notification.CreatedAt),
+                CreatedAt = notification.CreatedAt,
+                TimeFull = RelativeTime.Full(notification.CreatedAt),
                 ActorName = actor,
+                Actor = user,
                 AvatarUri = user == null ? null : WebLauncher.TryCreateFetchUri(user.AvatarUrl),
                 TargetUrl = TargetUrlFor(notification),
+                ThreadNote = ThreadNoteFor(notification),
+                OpensActor = notification.Type == "follow" || notification.Type == "followRequestAccepted",
                 _isUnread = isUnread
             };
+            item._timeText = RelativeTime.Short(item.CreatedAt, DateTimeOffset.Now);
 
             return item;
         }
@@ -153,18 +189,24 @@ namespace Fort.ind_UWP
             var user = note.User;
             var actor = user == null ? LocalizedStrings.Get("SocialUnknownUser") : user.DisplayName;
 
-            return new SocialFeedItem
+            var item = new SocialFeedItem
             {
                 Id = note.Id,
                 Glyph = "",
                 Title = actor,
                 Body = Excerpt(note),
                 IsDirect = IsDirectNote(note),
-                TimeText = FormatTime(note.CreatedAt),
+                CreatedAt = note.CreatedAt,
+                TimeFull = RelativeTime.Full(note.CreatedAt),
                 ActorName = actor,
+                Actor = user,
                 AvatarUri = user == null ? null : WebLauncher.TryCreateFetchUri(user.AvatarUrl),
-                TargetUrl = NoteUrl(note.Id)
+                TargetUrl = NoteUrl(note.Id),
+                ThreadNote = note
             };
+            item._timeText = RelativeTime.Short(item.CreatedAt, DateTimeOffset.Now);
+
+            return item;
         }
 
         private static string GlyphFor(string type)
@@ -267,6 +309,29 @@ namespace Fort.ind_UWP
             }
         }
 
+        private static SocialNote ThreadNoteFor(SocialNotification notification)
+        {
+            var note = notification.Note;
+            if (note == null) return null;
+
+            switch (notification.Type)
+            {
+                case "renote":
+                    return note.Renote ?? note;
+                case "mention":
+                case "reply":
+                case "quote":
+                case "reaction":
+                case "note":
+                case "edited":
+                case "pollVote":
+                case "pollEnded":
+                    return note;
+                default:
+                    return null;
+            }
+        }
+
         private static string Excerpt(SocialNote note)
         {
             if (note == null) return "";
@@ -344,46 +409,19 @@ namespace Fort.ind_UWP
             return head.Length < text.Length ? head + "…" : head;
         }
 
-        private static string FormatTime(DateTimeOffset createdAt)
-        {
-            if (createdAt == DateTimeOffset.MinValue) return "";
-
-            try
-            {
-                var local = createdAt.ToLocalTime();
-                return local.Date == DateTimeOffset.Now.Date
-                       ? s_timeFormatter.Value.Format(local)
-                       : s_dateFormatter.Value.Format(local);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"SocialFeedItem: could not format a timestamp - {ex.Message}");
-                return "";
-            }
-        }
-
         private static string InstanceUrl(string path)
         {
-            return "https://" + MisskeyAuthService.InstanceHost + path;
+            return SocialLinks.InstanceUrl(path);
         }
 
         private static string NoteUrl(string noteId)
         {
-            if (string.IsNullOrWhiteSpace(noteId)) return InstanceUrl("/my/notifications");
-            return InstanceUrl("/notes/" + Uri.EscapeDataString(noteId));
+            return SocialLinks.NoteUrl(noteId) ?? InstanceUrl("/my/notifications");
         }
 
         private static string UserUrl(SocialUser user)
         {
-            if (user == null || string.IsNullOrWhiteSpace(user.Username)) return null;
-
-            var handle = "/@" + Uri.EscapeDataString(user.Username);
-            if (!string.IsNullOrWhiteSpace(user.Host) && Uri.CheckHostName(user.Host) != UriHostNameType.Unknown)
-            {
-                handle += "@" + user.Host;
-            }
-
-            return InstanceUrl(handle);
+            return SocialLinks.UserUrl(user);
         }
     }
 }

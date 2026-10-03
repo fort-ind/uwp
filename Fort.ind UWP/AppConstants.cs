@@ -118,9 +118,75 @@ namespace Fort.ind_UWP
         public const int SocialFeedPageSize = 20;
         public const int SocialTilePreviewLimit = 5;
         public const int SocialTileListLimit = 3;
+        public const int SocialLinkPreviewCacheLimit = 200;
+        public const int SocialLinkPreviewConcurrency = 4;
+        public const int SocialMediaGridLimit = 4;
+        public const int SocialLightboxEnterMilliseconds = 300;
+        public const int SocialLightboxExitMilliseconds = 150;
+        public const int UnusedPageUnloadSeconds = 60;
+        public const int HiddenWindowTrimSeconds = 60;
+
+        public const int SocialThreadReplyDepthLimit = 4;
+        public const int SocialThreadPageSize = 20;
+        public const int SocialThreadChildPageSize = 10;
+        public const int SocialThreadPrefetchBudget = 12;
+        public const int SocialThreadPrefetchConcurrency = 4;
+        public const int SocialConversationLimit = 30;
+        public const int SocialNoteCaptureLimit = 50;
+        public const int SocialNoteCaptureLingerSeconds = 30;
+        public const double SocialThreadIndent = 16;
+        public const int SocialReactionsTabPageSize = 20;
+        public const int SocialNoteStateCacheLimit = 200;
+
+        public const int SocialRecentPostLimit = 10;
+
+        public const int SocialNoteMaxLength = 3000;
+        public const int SocialWarningMaxLength = 500;
+        public const int SocialAltTextMaxLength = 20000;
+        public const int SocialAttachmentLimit = 16;
+        public const ulong SocialUploadLimitBytes = 25UL * 1024 * 1024;
+        public const string SocialDraftsFileName = "social-drafts.json";
+        public const int SocialDraftSaveDelayMilliseconds = 800;
+        public const int SocialComposeChangeDelayMilliseconds = 500;
+        public const int SocialMentionResolveDelayMilliseconds = 1000;
+        public const int SocialSuggestDelayMilliseconds = 250;
+        public const int SocialComposeSizeSaveDelayMilliseconds = 500;
+        public const string WindowKeyCompose = "compose";
+        public const double SocialComposeWindowWidth = 520;
+        public const double SocialComposeWindowHeight = 600;
+        public const double SocialComposeMinWidth = 360;
+        public const double SocialComposeMinHeight = 400;
+        public const string SettingSocialLastVisibility = "SocialLastVisibility";
+        public const string SettingSocialLastLocalOnly = "SocialLastLocalOnly";
+        public const string SettingSocialComposeWindowSize = "SocialComposeWindowSize";
+
+        public const string SettingSocialRecentReactions = "SocialRecentReactions";
+        public const string SettingSocialEmojiSkinTone = "SocialEmojiSkinTone";
+        public const string SettingSocialWriteSignInDismissed = "SocialWriteSignInDismissed";
+
+        public const string SettingSocialRemoteListNotice = "SocialRemoteListNotice";
+
+        public const string WindowKeyUserPrefix = "user:";
+        public const double SocialUserWindowWidth = 480;
+        public const double SocialUserWindowHeight = 760;
+        public const double SocialWindowMinWidth = 360;
+        public const double SocialWindowMinHeight = 500;
 
         public const string ToastArgumentOpen = "open";
         public const string ToastOpenNotifications = "notifications";
+        public const string ToastOpenNote = "note";
+        public const string ToastArgumentNote = "note";
+        public const string ToastArgumentAccount = "account";
+        public const string ToastArgumentRestore = "restore";
+        public const string ToastArgumentAction = "action";
+        public const string ToastActionReply = "reply";
+        public const string ToastActionLike = "like";
+        public const string ToastReplyInputId = "reply";
+        public const string SocialToastActionTaskName = "SocialToastAction";
+        public const string SocialToastFailureGroup = "socialFailed";
+        public const string SettingSocialToastFailedReply = "SocialToastFailedReply";
+        public const int SocialToastFailedReplyLimit = 3500;
+        public const string SocialToastSendIcon = "ms-appx:///Assets/Toast/Send.png";
 
         public const double KeepOnTopWindowWidth = 360;
         public const double KeepOnTopWindowHeight = 480;
@@ -129,7 +195,12 @@ namespace Fort.ind_UWP
         public const string SettingProfileRefreshMinutes = "ProfileRefreshMinutes";
         public const int DefaultProfileRefreshMinutes = 5;
 
+        public const string SettingMediaCacheLimitMegabytes = "MediaCacheLimitMegabytes";
+        public const int DefaultMediaCacheLimitMegabytes = 500;
+        public const int MediaCacheCheckDelaySeconds = 10;
+
         public const string JumpArgumentPrefix = "jump:";
+        public const string JumpTaskCompose = "compose";
 
         public const string GameTileArgumentPrefix = "game:";
         public const string GameTileIdPrefix = "game.";

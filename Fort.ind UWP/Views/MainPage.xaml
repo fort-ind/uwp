@@ -51,6 +51,7 @@
                     <VisualState.Setters>
                         <Setter Target="UpdateInfoBar.Margin" Value="12,8,12,0"/>
                         <Setter Target="SocialPermissionInfoBar.Margin" Value="12,8,12,0"/>
+                        <Setter Target="SocialWritePermissionInfoBar.Margin" Value="12,8,12,0"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="WideState">
@@ -60,6 +61,7 @@
                     <VisualState.Setters>
                         <Setter Target="UpdateInfoBar.Margin" Value="24,8,24,0"/>
                         <Setter Target="SocialPermissionInfoBar.Margin" Value="24,8,24,0"/>
+                        <Setter Target="SocialWritePermissionInfoBar.Margin" Value="24,8,24,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -225,6 +227,18 @@
                                   CloseButtonClick="SocialPermissionInfoBar_CloseButtonClick">
                         <muxc:InfoBar.ActionButton>
                             <Button x:Uid="SocialPermissionSignInButton"
+                                    Click="SocialPermissionSignInButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
+                    <muxc:InfoBar x:Uid="SocialWritePermissionInfoBar" x:Name="SocialWritePermissionInfoBar"
+                                  Margin="24,8,24,0"
+                                  Severity="Informational"
+                                  IsOpen="False"
+                                  IsClosable="True"
+                                  CloseButtonClick="SocialWritePermissionInfoBar_CloseButtonClick">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialWritePermissionSignInButton"
                                     Click="SocialPermissionSignInButton_Click"/>
                         </muxc:InfoBar.ActionButton>
                     </muxc:InfoBar>

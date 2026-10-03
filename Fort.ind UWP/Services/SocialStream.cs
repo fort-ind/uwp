@@ -22,19 +22,51 @@ namespace Fort.ind_UWP
         public JsonObject Body { get; }
     }
 
+    public sealed class SocialNoteStreamEventArgs : EventArgs
+    {
+        public SocialNoteStreamEventArgs(string noteId, string type, JsonObject body)
+        {
+            NoteId = noteId;
+            Type = type;
+            Body = body;
+        }
+
+        public string NoteId { get; }
+
+        public string Type { get; }
+
+        public JsonObject Body { get; }
+    }
+
     public sealed class SocialStream : IDisposable
     {
-        private const string MainChannel = "main";
+        public const string MainChannel = "main";
 
         private readonly string _channelId = Guid.NewGuid().ToString("N");
 
+        private readonly string _channel;
+
         private readonly object _lock = new object();
+
+        private readonly SemaphoreSlim _sendGate = new SemaphoreSlim(1, 1);
 
         private MessageWebSocket _socket;
 
         private bool _closed;
 
+        public SocialStream()
+            : this(MainChannel)
+        {
+        }
+
+        public SocialStream(string channel)
+        {
+            _channel = channel;
+        }
+
         public event EventHandler<SocialStreamEventArgs> MessageReceived;
+
+        public event EventHandler<SocialNoteStreamEventArgs> NoteUpdated;
 
         public event EventHandler Closed;
 
@@ -63,20 +95,13 @@ namespace Fort.ind_UWP
                 await socket.ConnectAsync(new Uri($"wss://{MisskeyAuthService.InstanceHost}/streaming"))
                             .AsTask(cancellationToken);
 
-                JsonObject body = new JsonObject();
-                body.Add("channel", JsonValue.CreateStringValue(MainChannel));
-                body.Add("id", JsonValue.CreateStringValue(_channelId));
-
-                JsonObject message = new JsonObject();
-                message.Add("type", JsonValue.CreateStringValue("connect"));
-                message.Add("body", body);
-
-                using (var writer = new DataWriter(socket.OutputStream))
+                if (_channel != null)
                 {
-                    writer.UnicodeEncoding = UnicodeEncoding.Utf8;
-                    writer.WriteString(message.Stringify());
-                    await writer.StoreAsync().AsTask(cancellationToken);
-                    writer.DetachStream();
+                    JsonObject body = new JsonObject();
+                    body.Add("channel", JsonValue.CreateStringValue(_channel));
+                    body.Add("id", JsonValue.CreateStringValue(_channelId));
+
+                    await WriteAsync(socket, "connect", body, cancellationToken);
                 }
 
                 return true;
@@ -88,6 +113,52 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"SocialStream: connect failed - {status} {ex.GetType().Name}: {ex.Message}");
                 Dispose();
                 return false;
+            }
+        }
+
+        public async Task<bool> SendAsync(string type, JsonObject body)
+        {
+            MessageWebSocket socket;
+            lock (_lock)
+            {
+                socket = _closed ? null : _socket;
+            }
+
+            if (socket == null) return false;
+
+            try
+            {
+                await WriteAsync(socket, type, body, CancellationToken.None);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialStream: send failed - {WebSocketError.GetStatus(ex.HResult)} {ex.Message}");
+                Dispose();
+                return false;
+            }
+        }
+
+        private async Task WriteAsync(MessageWebSocket socket, string type, JsonObject body, CancellationToken cancellationToken)
+        {
+            JsonObject message = new JsonObject();
+            message.Add("type", JsonValue.CreateStringValue(type));
+            message.Add("body", body ?? new JsonObject());
+
+            await _sendGate.WaitAsync(cancellationToken);
+            try
+            {
+                using (var writer = new DataWriter(socket.OutputStream))
+                {
+                    writer.UnicodeEncoding = UnicodeEncoding.Utf8;
+                    writer.WriteString(message.Stringify());
+                    await writer.StoreAsync().AsTask(cancellationToken);
+                    writer.DetachStream();
+                }
+            }
+            finally
+            {
+                _sendGate.Release();
             }
         }
 
@@ -113,7 +184,21 @@ namespace Fort.ind_UWP
             {
                 JsonObject message;
                 if (!JsonObject.TryParse(text, out message)) return;
-                if (!string.Equals(SocialJson.String(message, "type"), "channel", StringComparison.Ordinal)) return;
+
+                var messageType = SocialJson.String(message, "type");
+                if (string.Equals(messageType, "noteUpdated", StringComparison.Ordinal))
+                {
+                    var update = SocialJson.Object(message, "body");
+                    var noteId = SocialJson.String(update, "id");
+                    var updateType = SocialJson.String(update, "type");
+                    if (!string.IsNullOrEmpty(noteId) && !string.IsNullOrEmpty(updateType))
+                    {
+                        NoteUpdated?.Invoke(this, new SocialNoteStreamEventArgs(noteId, updateType, SocialJson.Object(update, "body")));
+                    }
+                    return;
+                }
+
+                if (!string.Equals(messageType, "channel", StringComparison.Ordinal)) return;
 
                 var envelope = SocialJson.Object(message, "body");
                 if (!string.Equals(SocialJson.String(envelope, "id"), _channelId, StringComparison.Ordinal)) return;
@@ -131,7 +216,15 @@ namespace Fort.ind_UWP
 
         private void OnClosed(IWebSocket sender, WebSocketClosedEventArgs args)
         {
-            Debug.WriteLine($"SocialStream: closed by the server - {args.Code} {args.Reason}");
+            try
+            {
+                Debug.WriteLine($"SocialStream: closed by the server - {args.Code} {args.Reason}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialStream: could not read why the socket closed - {ex.GetType().Name}: {ex.Message}");
+            }
+
             Dispose();
         }
 
@@ -146,23 +239,47 @@ namespace Fort.ind_UWP
                 _socket = null;
             }
 
-            if (socket != null)
+            if (socket != null) Release(socket);
+
+            try
+            {
+                Closed?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialStream: a close handler failed - {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        private void Release(MessageWebSocket socket)
+        {
+            try
             {
                 socket.MessageReceived -= OnMessageReceived;
                 socket.Closed -= OnClosed;
-
-                try
-                {
-                    socket.Close(1000, "");
-                    socket.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"SocialStream: close failed - {ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialStream: could not detach from the socket - {ex.GetType().Name}: {ex.Message}");
             }
 
-            Closed?.Invoke(this, EventArgs.Empty);
+            try
+            {
+                socket.Close(1000, "");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialStream: close failed - {ex.GetType().Name}: {ex.Message}");
+            }
+
+            try
+            {
+                socket.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialStream: dispose failed - {ex.GetType().Name}: {ex.Message}");
+            }
         }
     }
 }

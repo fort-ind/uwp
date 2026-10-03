@@ -123,6 +123,7 @@ namespace Fort.ind_UWP
         private static async Task LogoutAsync(bool tokenRejected)
         {
             var name = CurrentUser != null ? DisplayNameOf(CurrentUser) : "";
+            var account = CurrentUser != null ? CurrentUser.UserId : null;
             CurrentUser = null;
             s_lastRefreshUtc = null;
             MisskeyAuthService.ClearToken();
@@ -138,6 +139,18 @@ namespace Fort.ind_UWP
             {
                 LiveTileService.SendToast(LocalizedStrings.Get("SignOutToastTitle"),
                                           LocalizedStrings.Format("SignOutToastBodyFormat", name));
+            }
+
+            if (!tokenRejected)
+            {
+                try
+                {
+                    await SocialDraftService.ForgetAccountAsync(account);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"ProfileService: could not forget the account's drafts - {ex.Message}");
+                }
             }
         }
 
@@ -155,9 +168,19 @@ namespace Fort.ind_UWP
             LiveTileService.ClearBadge();
             await LocalStorageService.ResetAllAppDataAsync();
 
+            try
+            {
+                await MediaCacheService.ClearAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfileService: media cache clear during reset failed - {ex.Message}");
+            }
+
             AvatarIconService.InvalidateCache();
 
             FavoritesService.ResetForAppDataWipe();
+            SocialDraftService.ResetForAppDataWipe();
 
             AuthStateChanged?.Invoke(null, false);
         }
@@ -226,6 +249,23 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"ProfileService: profile visit refresh failed - {ex.Message}");
+            }
+        }
+
+        public static async void RefreshNow()
+        {
+            try
+            {
+                if (CurrentUser == null) return;
+
+                var token = await MisskeyAuthService.TryGetTokenAsync();
+                if (string.IsNullOrEmpty(token)) return;
+
+                await RefreshCurrentUserAsync(token);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfileService: immediate refresh failed - {ex.Message}");
             }
         }
 
@@ -303,7 +343,6 @@ namespace Fort.ind_UWP
 
             if (HasSameAccountDetails(current, fetched)) return;
 
-            fetched.LastLoginDate = current.LastLoginDate;
             CurrentUser = fetched;
             await LocalStorageService.SaveProfileAsync(fetched);
             AuthStateChanged?.Invoke(null, true);
@@ -323,7 +362,8 @@ namespace Fort.ind_UWP
                    && string.Equals(current.BannerBlurhash, fetched.BannerBlurhash, StringComparison.Ordinal)
                    && current.FollowersCount == fetched.FollowersCount
                    && current.FollowingCount == fetched.FollowingCount
-                   && current.CreatedDate.Ticks == fetched.CreatedDate.Ticks;
+                   && current.CreatedDate.Ticks == fetched.CreatedDate.Ticks
+                   && string.Equals(current.DetailJson, fetched.DetailJson, StringComparison.Ordinal);
         }
     }
 

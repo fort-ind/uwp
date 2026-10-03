@@ -23,6 +23,8 @@ namespace Fort.ind_UWP
 
         private ViewLifetimeControl _view;
 
+        private string _baseTitle;
+
         private FrameworkElement _windowRoot;
 
         private DisplayInformation _displayInformation;
@@ -32,6 +34,12 @@ namespace Fort.ind_UWP
         private bool _backButtonShown = false;
 
         private bool _keepOnTopSupported = false;
+
+        private IImmersiveWindowPage _immersivePage;
+
+        private bool _immersive = false;
+
+        private DispatcherTimer _hiddenTrimTimer;
 
         public SecondaryWindowPage()
         {
@@ -60,6 +68,7 @@ namespace Fort.ind_UWP
         internal void Release()
         {
             ReleaseContent();
+            ForgetImmersivePage();
             DetachHandlers();
 
             try
@@ -100,21 +109,88 @@ namespace Fort.ind_UWP
         private void ShowContent()
         {
             var title = _view.Title ?? string.Empty;
-            var header = _view.Header ?? title;
 
+            _baseTitle = title;
+            ApplyTitle(title);
+
+            if (string.IsNullOrEmpty(_view.Header))
+            {
+                HeaderText.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                HeaderText.Text = _view.Header;
+                AutomationProperties.SetName(ContentFrame, _view.Header);
+            }
+
+            ContentFrame.Navigate(_view.PageType, _view.Parameter);
+        }
+
+        internal void UpdateTitle(string title)
+        {
+            if (string.IsNullOrEmpty(title)) return;
+
+            _baseTitle = title;
+            if (ContentFrame.Content is SocialNotePage) return;
+
+            ShowTitle(title);
+        }
+
+        private void ShowTitle(string title)
+        {
+            ApplyTitle(title);
+
+            try
+            {
+                ApplicationView.GetForCurrentView().Title = title;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: could not retitle the view - {ex.Message}");
+            }
+        }
+
+        private void FollowContentTitle()
+        {
+            var title = ContentFrame.Content is SocialNotePage ? LocalizedStrings.Get("WindowTitleNote") : _baseTitle;
+            if (string.IsNullOrEmpty(title) || string.Equals(title, WindowTitleText.Text, StringComparison.OrdinalIgnoreCase)) return;
+
+            ShowTitle(title);
+        }
+
+        private void LimitBackStack()
+        {
+            var stack = ContentFrame.BackStack;
+            while (stack.Count > AppConstants.ContentBackStackLimit)
+            {
+                stack.RemoveAt(1);
+            }
+        }
+
+        internal void Reopen(object parameter)
+        {
+            var page = ContentFrame.Content as IReopenablePage;
+            if (page != null) page.Reopen(parameter);
+        }
+
+        private void ApplyTitle(string title)
+        {
             WindowTitleText.Text = title.ToUpperInvariant();
             AutomationProperties.SetName(WindowTitleText, title);
 
-            HeaderText.Text = header;
-            AutomationProperties.SetName(ContentFrame, header);
-
-            ContentFrame.Navigate(_view.PageType, _view.NavTag);
+            if (_view == null || string.IsNullOrEmpty(_view.Header))
+            {
+                AutomationProperties.SetName(ContentFrame, title);
+            }
         }
 
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
             try
             {
+                if (e.NavigationMode == NavigationMode.New) LimitBackStack();
+                FollowContentTitle();
+
                 if (ContentFrame.CanGoBack && !_backButtonShown)
                 {
                     _backButtonShown = true;
@@ -127,13 +203,70 @@ namespace Fort.ind_UWP
                 var page = ContentFrame.Content as IShellContentPage;
                 if (page != null && page.ContentRegion != null && _view != null)
                 {
-                    AutomationProperties.SetName(page.ContentRegion, _view.Header ?? _view.Title);
+                    AutomationProperties.SetName(page.ContentRegion, string.IsNullOrEmpty(_view.Header) ? _view.Title : _view.Header);
                 }
+
+                WatchImmersivePage(ContentFrame.Content as IImmersiveWindowPage);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SecondaryWindowPage: content navigation bookkeeping failed - {ex.Message}");
             }
+        }
+
+        private void WatchImmersivePage(IImmersiveWindowPage page)
+        {
+            if (ReferenceEquals(page, _immersivePage)) return;
+
+            ForgetImmersivePage();
+            _immersivePage = page;
+            if (_immersivePage != null) _immersivePage.TitleBarChanged += ImmersivePage_TitleBarChanged;
+
+            ApplyImmersiveTitleBar();
+        }
+
+        private void ForgetImmersivePage()
+        {
+            if (_immersivePage == null) return;
+
+            _immersivePage.TitleBarChanged -= ImmersivePage_TitleBarChanged;
+            _immersivePage = null;
+        }
+
+        private void ImmersivePage_TitleBarChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ApplyImmersiveTitleBar();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: could not follow the page's title bar - {ex.Message}");
+            }
+        }
+
+        private void ApplyImmersiveTitleBar()
+        {
+            var page = _immersivePage;
+            var immersive = page != null
+                            && page.ExtendsUnderTitleBar
+                            && !_accessibilitySettings.HighContrast
+                            && AppTitleBar.Visibility == Visibility.Visible;
+
+            if (immersive != _immersive)
+            {
+                _immersive = immersive;
+                VisualStateManager.GoToState(this, immersive ? "TitleBarImmersiveState" : "TitleBarBandState", false);
+            }
+
+            var theme = immersive ? page.TitleBarTheme : ElementTheme.Default;
+            AppTitleBar.RequestedTheme = theme;
+            TitleBarBackButton.RequestedTheme = theme;
+            KeepOnTopButton.RequestedTheme = theme;
+
+            if (page != null) page.SetTitleBarInset(immersive ? AppTitleBar.Height : 0);
+
+            UpdateTitleBarColors();
         }
 
         private void SetupTitleBar()
@@ -169,6 +302,8 @@ namespace Fort.ind_UWP
             TitleBarRightInset.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
             TitleBarBackButton.Margin = new Thickness(coreTitleBar.SystemOverlayLeftInset, 0, 0, 0);
             KeepOnTopButton.Margin = new Thickness(0, 0, coreTitleBar.SystemOverlayRightInset, 0);
+
+            if (_immersive && _immersivePage != null) _immersivePage.SetTitleBarInset(AppTitleBar.Height);
         }
 
         private void SetupKeepOnTop()
@@ -260,9 +395,14 @@ namespace Fort.ind_UWP
 
         private void UpdateTitleBarColors()
         {
+            var theme = AppTitleBar.RequestedTheme;
+            var isDark = theme == ElementTheme.Default
+                         ? AppearanceService.IsEffectiveThemeDark(_windowRoot)
+                         : theme == ElementTheme.Dark;
+
             CaptionButtonColors.Apply(ApplicationView.GetForCurrentView().TitleBar,
                                       _accessibilitySettings.HighContrast,
-                                      AppearanceService.IsEffectiveThemeDark(_windowRoot));
+                                      isDark);
         }
 
         private void AttachHandlers()
@@ -286,10 +426,72 @@ namespace Fort.ind_UWP
                 _displayInformation = DisplayInformation.GetForCurrentView();
                 _displayInformation.DpiChanged += OnDpiChanged;
                 ApplyTitleBarHairline();
+
+                Window.Current.CoreWindow.VisibilityChanged += OnCoreWindowVisibilityChanged;
+                MemoryService.TrimRequested += OnTrimRequested;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SecondaryWindowPage: could not attach window handlers - {ex.Message}");
+            }
+        }
+
+        private void OnCoreWindowVisibilityChanged(CoreWindow sender, VisibilityChangedEventArgs args)
+        {
+            try
+            {
+                if (args.Visible)
+                {
+                    StopHiddenTrimTimer();
+                    return;
+                }
+
+                if (_hiddenTrimTimer == null)
+                {
+                    _hiddenTrimTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(AppConstants.HiddenWindowTrimSeconds) };
+                    _hiddenTrimTimer.Tick += HiddenTrimTimer_Tick;
+                }
+                _hiddenTrimTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: could not follow the window's visibility - {ex.Message}");
+            }
+        }
+
+        private void HiddenTrimTimer_Tick(object sender, object e)
+        {
+            StopHiddenTrimTimer();
+            TrimContent();
+        }
+
+        private void StopHiddenTrimTimer()
+        {
+            if (_hiddenTrimTimer != null) _hiddenTrimTimer.Stop();
+        }
+
+        private async void OnTrimRequested(object sender, MemoryTrimEventArgs e)
+        {
+            try
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, TrimContent);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: memory trim handler failed - {ex.Message}");
+            }
+        }
+
+        private void TrimContent()
+        {
+            try
+            {
+                var page = ContentFrame.Content as ITrimmablePage;
+                if (page != null) page.Trim();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SecondaryWindowPage: could not trim the content page - {ex.Message}");
             }
         }
 
@@ -316,6 +518,10 @@ namespace Fort.ind_UWP
                     _displayInformation.DpiChanged -= OnDpiChanged;
                     _displayInformation = null;
                 }
+
+                Window.Current.CoreWindow.VisibilityChanged -= OnCoreWindowVisibilityChanged;
+                MemoryService.TrimRequested -= OnTrimRequested;
+                StopHiddenTrimTimer();
             }
             catch (Exception ex)
             {
@@ -367,6 +573,7 @@ namespace Fort.ind_UWP
                 AppTitleBar.Visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
                 UpdateBackButtonVisibility();
                 UpdateKeepOnTopButtonVisibility();
+                ApplyImmersiveTitleBar();
             }
             catch (Exception ex)
             {
@@ -380,7 +587,7 @@ namespace Fort.ind_UWP
             {
                 try
                 {
-                    UpdateTitleBarColors();
+                    ApplyImmersiveTitleBar();
                 }
                 catch (Exception ex)
                 {
@@ -445,6 +652,8 @@ namespace Fort.ind_UWP
             try
             {
                 if (DialogService.IsDialogOpen) return false;
+
+                if (SocialMediaLightbox.CloseCurrent()) return true;
 
                 if (!ContentFrame.CanGoBack) return false;
 

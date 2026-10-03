@@ -60,7 +60,7 @@ namespace Fort.ind_UWP
 
         private const int ToastIconPixelSize = 96;
 
-        private const string ToastFolderName = "toast-avatars";
+        internal const string ToastFolderName = "toast-avatars";
 
         private static readonly TimeSpan ToastAvatarLifetime = TimeSpan.FromDays(3);
 
@@ -68,7 +68,7 @@ namespace Fort.ind_UWP
 
         private const int TileIconPixelSize = 300;
 
-        private const string TileFolderName = "tile-avatars";
+        internal const string TileFolderName = "tile-avatars";
 
         private static readonly SemaphoreSlim s_tileGate = new SemaphoreSlim(1, 1);
 
@@ -261,6 +261,36 @@ namespace Fort.ind_UWP
             finally
             {
                 s_tileGate.Release();
+            }
+        }
+
+        public static async Task ClearToastAvatarsAsync()
+        {
+            await s_toastGate.WaitAsync();
+            try
+            {
+                var folder = await ApplicationData.Current.LocalFolder.TryGetItemAsync(ToastFolderName) as StorageFolder;
+                if (folder == null) return;
+
+                foreach (var file in await folder.GetFilesAsync())
+                {
+                    try
+                    {
+                        await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"AvatarIconService: could not delete toast avatar {file.Name} - {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AvatarIconService: toast avatar clear failed - {ex.Message}");
+            }
+            finally
+            {
+                s_toastGate.Release();
             }
         }
 

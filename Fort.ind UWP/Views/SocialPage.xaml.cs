@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class SocialPage : Page, IReleasablePage
+    public sealed partial class SocialPage : Page, IReleasablePage, ITrimmablePage
     {
         private enum GateKind
         {
@@ -26,25 +27,37 @@ namespace Fort.ind_UWP
             NeedsPermission
         }
 
-        private const int NotificationsIndex = 0;
+        private const int ForYouIndex = 0;
 
-        private static int s_lastPivotIndex = NotificationsIndex;
+        private const int NotificationsIndex = 1;
 
-        private readonly SocialFeedCollection _notifications;
+        private static int s_lastPivotIndex = ForYouIndex;
 
-        private readonly SocialFeedCollection _mentions;
+        private readonly SocialFeedCollection<SocialNoteItem> _forYou;
+
+        private readonly SocialFeedCollection<SocialFeedItem> _notifications;
+
+        private readonly SocialFeedCollection<SocialFeedItem> _mentions;
 
         private GateKind _gate = GateKind.None;
 
         private string _shownUserId;
 
+        private bool _forYouRequested;
+
         private bool _notificationsRequested;
 
+        private bool _notificationsStale;
+
         private bool _mentionsRequested;
+
+        private int _forYouVersion;
 
         private int _notificationsVersion;
 
         private int _mentionsVersion;
+
+        private FeedState _forYouState = FeedState.Loading;
 
         private FeedState _notificationsState = FeedState.Loading;
 
@@ -52,18 +65,30 @@ namespace Fort.ind_UWP
 
         private bool _unseenLiveNotifications;
 
+        private bool _loadedBefore;
+
         private bool _authHandlerAttached;
 
         private bool _arrivalHandlerAttached;
 
         private bool _activationHandlerAttached;
 
+        private bool _noteHandlerAttached;
+
+        private int _seenPostsVersion = SocialNoteService.PostsVersion;
+
+        private bool _keepListsOnUnload;
+
         public SocialPage()
         {
             this.InitializeComponent();
 
-            _notifications = new SocialFeedCollection(LoadMoreNotificationsAsync);
-            _mentions = new SocialFeedCollection(LoadMoreMentionsAsync);
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+
+            _forYou = new SocialFeedCollection<SocialNoteItem>(LoadMoreForYouAsync, SocialFeedPaging.NonEmpty);
+            _notifications = new SocialFeedCollection<SocialFeedItem>(LoadMoreNotificationsAsync, SocialFeedPaging.FullPage);
+            _mentions = new SocialFeedCollection<SocialFeedItem>(LoadMoreMentionsAsync, SocialFeedPaging.FullPage);
+            ForYouList.ItemsSource = _forYou;
             NotificationsList.ItemsSource = _notifications;
             MentionsList.ItemsSource = _mentions;
 
@@ -82,6 +107,8 @@ namespace Fort.ind_UWP
 
         private void SocialPage_Loaded(object sender, RoutedEventArgs e)
         {
+            _keepListsOnUnload = false;
+
             if (!_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged += OnAuthStateChanged;
@@ -100,12 +127,53 @@ namespace Fort.ind_UWP
                 _activationHandlerAttached = true;
             }
 
+            if (!_noteHandlerAttached)
+            {
+                SocialNoteService.Changed += OnNoteChanged;
+                _noteHandlerAttached = true;
+            }
+
             RefreshGate();
+            RemoveForYouRows(item => item.IsGone);
+            foreach (var note in SocialNoteService.PostsSince(_seenPostsVersion))
+            {
+                InsertPosted(note);
+            }
+            _seenPostsVersion = SocialNoteService.PostsVersion;
+
+            if (_loadedBefore)
+            {
+                RefreshTimes();
+                CatchUpNotifications();
+            }
+            _loadedBefore = true;
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+
+            _keepListsOnUnload = e.SourcePageType == typeof(SocialNotePage);
         }
 
         private void SocialPage_Unloaded(object sender, RoutedEventArgs e)
         {
             Release();
+            if (!_keepListsOnUnload) Trim();
+        }
+
+        public void Trim()
+        {
+            _forYou.TrimToFirstPage();
+            _notifications.TrimToFirstPage();
+            _mentions.TrimToFirstPage();
+        }
+
+        private void TrimPivot(object pivotItem)
+        {
+            if (pivotItem == ForYouPivotItem) _forYou.TrimToFirstPage();
+            else if (pivotItem == NotificationsPivotItem) _notifications.TrimToFirstPage();
+            else if (pivotItem == MentionsPivotItem) _mentions.TrimToFirstPage();
         }
 
         public void Release()
@@ -134,6 +202,71 @@ namespace Fort.ind_UWP
                 }
                 _activationHandlerAttached = false;
             }
+
+            if (_noteHandlerAttached)
+            {
+                SocialNoteService.Changed -= OnNoteChanged;
+                _noteHandlerAttached = false;
+            }
+        }
+
+        private async void OnNoteChanged(object sender, SocialNoteChange change)
+        {
+            try
+            {
+                if (change == null) return;
+                if (change.Kind != SocialNoteChangeKind.Deleted && change.Kind != SocialNoteChangeKind.Unrenoted
+                    && change.Kind != SocialNoteChangeKind.Posted) return;
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    try
+                    {
+                        if (change.Kind == SocialNoteChangeKind.Posted)
+                        {
+                            InsertPosted(change.Note);
+                            _seenPostsVersion = SocialNoteService.PostsVersion;
+                        }
+                        else
+                        {
+                            RemoveForYouRows(item => SocialNoteItem.IsRemovedBy(item, change));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"SocialPage: could not remove a note - {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialPage: note change handler failed - {ex.Message}");
+            }
+        }
+
+        private void InsertPosted(SocialNote note)
+        {
+            if (note == null || !string.IsNullOrEmpty(note.ReplyId) || !_forYouRequested) return;
+            if (_forYouState != FeedState.Ready && _forYouState != FeedState.Empty) return;
+            if (!SocialContentService.IsCurrentAccount(note.UserId)) return;
+
+            foreach (var existing in _forYou)
+            {
+                if (string.Equals(existing.Note.Id, note.Id, StringComparison.Ordinal)) return;
+            }
+
+            var item = SocialNoteItem.Create(note, SocialContentService.CachedEmojiMap, false);
+            if (item == null) return;
+
+            _forYou.Insert(0, item);
+            if (_forYouState != FeedState.Ready) SetForYouState(FeedState.Ready);
+        }
+
+        private void RemoveForYouRows(Func<SocialNoteItem, bool> predicate)
+        {
+            if (_forYou.RemoveWhere(predicate) == 0) return;
+
+            if (_forYou.Count == 0 && _forYouState == FeedState.Ready && !_forYou.HasMoreItems) SetForYouState(FeedState.Empty);
         }
 
         private void RefreshGate()
@@ -184,18 +317,57 @@ namespace Fort.ind_UWP
 
         private void ResetFeeds()
         {
+            _forYouVersion++;
             _notificationsVersion++;
             _mentionsVersion++;
+            _forYouRequested = false;
             _notificationsRequested = false;
+            _notificationsStale = false;
             _mentionsRequested = false;
             _unseenLiveNotifications = false;
+            _forYou.ReplaceAll(new SocialNoteItem[0], false);
             _notifications.ReplaceAll(new SocialFeedItem[0], false);
             _mentions.ReplaceAll(new SocialFeedItem[0], false);
+        }
+
+        private void RefreshTimes()
+        {
+            var now = DateTimeOffset.Now;
+            foreach (var item in _forYou) item.RefreshTime(now);
+            foreach (var item in _notifications) item.RefreshTime(now);
+            foreach (var item in _mentions) item.RefreshTime(now);
+        }
+
+        private async void CatchUpNotifications()
+        {
+            try
+            {
+                if (_gate != GateKind.None || !_notificationsRequested) return;
+
+                var version = _notificationsVersion;
+                var unread = await SocialNotificationService.GetUnreadCountAsync(CancellationToken.None);
+                if (version != _notificationsVersion || unread <= 0) return;
+
+                _notificationsStale = true;
+                if (_gate == GateKind.None && SocialPivot.SelectedItem == NotificationsPivotItem)
+                {
+                    LoadNotifications();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialPage: notifications catch-up failed - {ex.Message}");
+            }
         }
 
         private void SocialPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_gate != GateKind.None) return;
+
+            foreach (var removed in e.RemovedItems)
+            {
+                TrimPivot(removed);
+            }
 
             s_lastPivotIndex = SocialPivot.SelectedIndex;
             EnsureSelectedFeedLoaded();
@@ -208,9 +380,13 @@ namespace Fort.ind_UWP
 
         private void EnsureSelectedFeedLoaded()
         {
-            if (SocialPivot.SelectedItem == NotificationsPivotItem)
+            if (SocialPivot.SelectedItem == ForYouPivotItem)
             {
-                if (!_notificationsRequested) LoadNotifications();
+                if (!_forYouRequested) LoadForYou();
+            }
+            else if (SocialPivot.SelectedItem == NotificationsPivotItem)
+            {
+                if (!_notificationsRequested || _notificationsStale) LoadNotifications();
             }
             else if (SocialPivot.SelectedItem == MentionsPivotItem)
             {
@@ -218,10 +394,41 @@ namespace Fort.ind_UWP
             }
         }
 
+        private async void LoadForYou()
+        {
+            var version = ++_forYouVersion;
+            _forYouRequested = true;
+            SetForYouState(FeedState.Loading);
+
+            try
+            {
+                var emojiTask = SocialContentService.GetEmojiMapAsync();
+                var result = await SocialContentService.FetchTimelineAsync(null, CancellationToken.None);
+                var emojis = await emojiTask;
+                if (version != _forYouVersion) return;
+
+                if (result.Status != SocialApiStatus.Ok)
+                {
+                    SetForYouState(result.Status == SocialApiStatus.PermissionDenied ? FeedState.NeedsPermission : FeedState.Failed);
+                    return;
+                }
+
+                var items = SocialNoteItem.CreateAll(result.Value, emojis, false);
+                _forYou.ReplaceAll(items, result.Value.Count > 0);
+                SetForYouState(items.Count == 0 ? FeedState.Empty : FeedState.Ready);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialPage: timeline load failed - {ex.GetType().Name}: {ex.Message}");
+                if (version == _forYouVersion) SetForYouState(FeedState.Failed);
+            }
+        }
+
         private async void LoadNotifications()
         {
             var version = ++_notificationsVersion;
             _notificationsRequested = true;
+            _notificationsStale = false;
             _unseenLiveNotifications = false;
             SetNotificationsState(FeedState.Loading);
 
@@ -296,6 +503,14 @@ namespace Fort.ind_UWP
             }
         }
 
+        private async Task<IReadOnlyList<SocialNoteItem>> LoadMoreForYouAsync(string untilId, CancellationToken cancellationToken)
+        {
+            var result = await SocialContentService.FetchTimelineAsync(untilId, cancellationToken);
+            if (result.Status != SocialApiStatus.Ok) return null;
+
+            return SocialNoteItem.CreateAll(result.Value, SocialContentService.CachedEmojiMap, false);
+        }
+
         private async Task<IReadOnlyList<SocialFeedItem>> LoadMoreNotificationsAsync(string untilId, CancellationToken cancellationToken)
         {
             var result = await SocialNotificationService.FetchNotificationsAsync(untilId, false, cancellationToken);
@@ -322,6 +537,14 @@ namespace Fort.ind_UWP
                 if (item != null) items.Add(item);
             }
             return items;
+        }
+
+        private void SetForYouState(FeedState state)
+        {
+            _forYouState = state;
+            ApplyFeedState(state, ForYouList, ForYouLoadingRing, ForYouStatePanel,
+                           ForYouStateGlyph, ForYouStateText, ForYouStateButton,
+                           "SocialForYouEmpty", "SocialForYouFailed");
         }
 
         private void SetNotificationsState(FeedState state)
@@ -376,6 +599,18 @@ namespace Fort.ind_UWP
             AutomationHelper.AnnounceLiveRegion(text);
         }
 
+        private void ForYouStateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_forYouState == FeedState.NeedsPermission)
+            {
+                OpenSignIn();
+            }
+            else
+            {
+                LoadForYou();
+            }
+        }
+
         private void NotificationsStateButton_Click(object sender, RoutedEventArgs e)
         {
             if (_notificationsState == FeedState.NeedsPermission)
@@ -404,13 +639,29 @@ namespace Fort.ind_UWP
         {
             if (_gate != GateKind.None) return;
 
-            if (SocialPivot.SelectedItem == MentionsPivotItem)
+            if (SocialPivot.SelectedItem == ForYouPivotItem)
+            {
+                LoadForYou();
+            }
+            else if (SocialPivot.SelectedItem == MentionsPivotItem)
             {
                 LoadMentions();
             }
             else
             {
                 LoadNotifications();
+            }
+        }
+
+        private async void NewNoteButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await SocialWindows.ShowComposeAsync(this, SocialComposeMode.New, null);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialPage: could not open the composer - {ex.Message}");
             }
         }
 
@@ -439,13 +690,62 @@ namespace Fort.ind_UWP
             try
             {
                 var item = e.ClickedItem as SocialFeedItem;
-                if (item == null || string.IsNullOrEmpty(item.TargetUrl)) return;
+                if (item == null) return;
 
-                await WebLauncher.LaunchAsync(item.TargetUrl);
+                if (item.ThreadNote != null
+                    && SocialThreads.Open(this, item.ThreadNote, item.ThreadNote.Id, false, SocialThreadTab.Replies))
+                {
+                    return;
+                }
+
+                if (item.OpensActor && item.HasActorProfile)
+                {
+                    await SocialWindows.ShowUserAsync(item.Actor);
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(item.TargetUrl)) await WebLauncher.LaunchAsync(item.TargetUrl);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialPage: could not open the item - {ex.Message}");
+            }
+        }
+
+        private async void NoteList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                var item = e.ClickedItem as SocialNoteItem;
+                if (item == null) return;
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => { });
+                if (MfmInlineBuilder.WasLinkJustInvoked) return;
+
+                if (!SocialThreads.Open(this, item.Note, item.Note.Id, false, SocialThreadTab.Replies))
+                {
+                    await WebLauncher.LaunchAsync(item.NoteUrl);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialPage: could not open the note - {ex.Message}");
+            }
+        }
+
+        private async void FeedActorButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var element = sender as FrameworkElement;
+                var item = element == null ? null : element.DataContext as SocialFeedItem;
+                if (item == null || !item.HasActorProfile) return;
+
+                await SocialWindows.ShowUserAsync(item.Actor);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialPage: could not open the profile - {ex.Message}");
             }
         }
 

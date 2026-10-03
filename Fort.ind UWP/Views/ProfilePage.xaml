@@ -5,36 +5,40 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     Background="Transparent">
 
     <Page.Resources>
-        <CubicEase x:Key="FadeEase" EasingMode="EaseOut"/>
-        <Storyboard x:Key="AvatarFadeIn">
-            <DoubleAnimation Storyboard.TargetName="AvatarGrid"
-                             Storyboard.TargetProperty="Opacity"
-                             From="0" To="1"
-                             Duration="0:0:0.4"
-                             EasingFunction="{StaticResource FadeEase}"/>
-        </Storyboard>
-        <Storyboard x:Key="BannerFadeIn">
-            <DoubleAnimation Storyboard.TargetName="BannerImagePath"
-                             Storyboard.TargetProperty="Opacity"
-                             From="0" To="1"
-                             Duration="0:0:0.4"
-                             EasingFunction="{StaticResource FadeEase}"/>
-        </Storyboard>
+        <DataTemplate x:Key="ProfileNoteItemTemplate" x:DataType="local:SocialNoteItem">
+            <local:SocialNoteView Item="{x:Bind}"
+                                  AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"/>
+        </DataTemplate>
+
+        <Style x:Key="ProfileNoteContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <Style x:Key="SubtitleRichTextBlockStyle" TargetType="RichTextBlock" BasedOn="{StaticResource BaseRichTextBlockStyle}">
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
     </Page.Resources>
 
-    <ScrollViewer HorizontalContentAlignment="Center">
+    <Grid x:Name="RootGrid">
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="WindowWidthStates">
+            <VisualStateGroup x:Name="WindowWidthStates"
+                              CurrentStateChanged="WindowWidthStates_CurrentStateChanged">
                 <VisualState x:Name="NarrowState">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                        <Setter Target="SignedOutPanel.Padding" Value="12"/>
+                        <Setter Target="DashboardGrid.Margin" Value="0,12,0,0"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="WideState">
@@ -42,28 +46,17 @@
                         <AdaptiveTrigger MinWindowWidth="641"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="ContentPanel.Padding" Value="24"/>
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-            <VisualStateGroup x:Name="BannerStates">
-                <VisualState x:Name="NoBannerState"/>
-                <VisualState x:Name="BannerState">
-                    <VisualState.Setters>
-                        <Setter Target="BannerHost.Visibility" Value="Visible"/>
-                        <Setter Target="ProfileHeader.Padding" Value="24,0,24,24"/>
-                        <Setter Target="AvatarGrid.Margin" Value="0,-40,0,0"/>
-                        <Setter Target="ProfileTextPanel.(Grid.Row)" Value="1"/>
-                        <Setter Target="ProfileTextPanel.(Grid.Column)" Value="0"/>
-                        <Setter Target="ProfileTextPanel.(Grid.ColumnSpan)" Value="2"/>
-                        <Setter Target="ProfileTextPanel.Margin" Value="0,12,0,0"/>
+                        <Setter Target="SignedOutPanel.Padding" Value="24"/>
+                        <Setter Target="DashboardGrid.Margin" Value="0,24,0,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <StackPanel x:Name="ContentPanel" Padding="24" MaxWidth="600" HorizontalAlignment="Center">
-            <StackPanel x:Name="NotLoggedInPanel" Visibility="Collapsed">
+        <ScrollViewer x:Name="SignedOutScroller"
+                      HorizontalContentAlignment="Center"
+                      Visibility="Collapsed">
+            <StackPanel x:Name="SignedOutPanel" Padding="24" MaxWidth="600" HorizontalAlignment="Center">
                 <Grid Background="{ThemeResource CardBackgroundBrush}"
                       BorderBrush="{ThemeResource CardBorderBrush}"
                       BorderThickness="1"
@@ -87,131 +80,199 @@
                     </StackPanel>
                 </Grid>
             </StackPanel>
+        </ScrollViewer>
 
-            <StackPanel x:Name="LoggedInPanel" Spacing="16">
-                <Grid Background="{ThemeResource CardBackgroundBrush}"
+        <Grid x:Name="DashboardGrid"
+              Margin="0,24,0,0"
+              Visibility="Collapsed"
+              SizeChanged="DashboardGrid_SizeChanged">
+            <ScrollViewer x:Name="CardScroller"
+                          Canvas.ZIndex="1"
+                          Width="360"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="0,0,0,24">
+                <Grid x:Name="ProfileCard"
+                      Background="{ThemeResource CardBackgroundBrush}"
                       BorderBrush="{ThemeResource CardBorderBrush}"
-                      BorderThickness="1">
+                      BorderThickness="1"
+                      VerticalAlignment="Top">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Grid x:Name="BannerHost"
-                          Visibility="Collapsed"
                           FlowDirection="LeftToRight"
                           SizeChanged="BannerHost_SizeChanged"
                           AutomationProperties.AccessibilityView="Raw">
-                        <Canvas>
-                            <Path x:Name="BannerPlaceholderPath"
-                                  AutomationProperties.AccessibilityView="Raw"/>
-                            <Path x:Name="BannerImagePath"
-                                  Opacity="0"
-                                  AutomationProperties.AccessibilityView="Raw"/>
-                        </Canvas>
-                    </Grid>
-
-                    <Grid x:Name="ProfileHeader" Grid.Row="1" Padding="24">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <Grid x:Name="AvatarGrid"
-                              Width="80" Height="80"
-                              CornerRadius="40"
-                              Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
-                              Opacity="0"
-                              AutomationProperties.AccessibilityView="Raw">
-                            <Image x:Name="ProfileImage"
-                                   Stretch="UniformToFill"
-                                   Visibility="Collapsed"
+                        <Rectangle Fill="{ThemeResource SystemControlBackgroundListLowBrush}"
                                    AutomationProperties.AccessibilityView="Raw"/>
-                            <TextBlock x:Uid="ProfileInitials" x:Name="ProfileInitials"
-                                       FontSize="32"
-                                       FontWeight="SemiBold"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       AutomationProperties.AccessibilityView="Raw"/>
-                        </Grid>
+                        <Rectangle x:Name="BannerPlaceholder"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                        <Rectangle x:Name="BannerImage"
+                                   Opacity="0"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                    </Grid>
 
-                        <StackPanel x:Name="ProfileTextPanel" Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
-                            <TextBlock x:Uid="DisplayNameText" x:Name="DisplayNameText"
-                                       Style="{StaticResource SubtitleTextBlockStyle}"/>
-                            <TextBlock x:Uid="UsernameText" x:Name="UsernameText"
+                    <StackPanel x:Name="ActionsPanel"
+                                Grid.Row="1"
+                                Margin="16,12,16,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                        <Button x:Uid="SocialProfileManageButton"
+                                x:Name="ManageButton"
+                                AccessKey="M"
+                                Click="ManageButton_Click"/>
+                        <Button x:Uid="SocialProfileMoreButton" x:Name="MoreButton"
+                                VerticalAlignment="Stretch"
+                                Click="MoreButton_Click">
+                            <FontIcon Glyph="&#xE712;"
+                                      FontSize="16"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                        </Button>
+                    </StackPanel>
+
+                    <PersonPicture x:Name="AvatarPicture"
+                                   Grid.Row="1"
+                                   Width="80" Height="80"
+                                   Margin="16,-40,0,0"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+
+                    <StackPanel Grid.Row="2" Padding="16,10,16,0" Spacing="2">
+                        <RichTextBlock x:Name="NameText"
+                                       Style="{StaticResource SubtitleRichTextBlockStyle}"
+                                       IsTextSelectionEnabled="False"
+                                       AutomationProperties.HeadingLevel="Level2"/>
+                        <TextBlock x:Name="HandleText"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   IsTextSelectionEnabled="True"/>
+                    </StackPanel>
+
+                    <local:SocialProfileDetails x:Name="Details"
+                                                Grid.Row="3"
+                                                Margin="16,16,16,16"
+                                                ShowAccountAge="True"/>
+                </Grid>
+            </ScrollViewer>
+
+            <ListView x:Name="NotesList"
+                      ItemTemplate="{StaticResource ProfileNoteItemTemplate}"
+                      ItemContainerStyle="{StaticResource ProfileNoteContainerStyle}"
+                      SelectionMode="None"
+                      IsItemClickEnabled="True"
+                      ItemClick="NotesList_ItemClick"
+                      Loaded="NotesList_Loaded"
+                      SizeChanged="NotesList_SizeChanged">
+                <i:Interaction.Behaviors>
+                    <local:SocialContextMenuBehavior/>
+                    <local:SocialNoteShortcutsBehavior/>
+                </i:Interaction.Behaviors>
+
+                <ListView.Header>
+                    <StackPanel x:Name="ListHeader" SizeChanged="ListHeader_SizeChanged">
+                        <Border x:Name="NarrowCardSlot" Margin="0,0,0,16" Visibility="Collapsed"/>
+
+                        <Grid x:Name="TabBar">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid x:Name="TabBackdrop"
+                                  Grid.ColumnSpan="2"
+                                  AutomationProperties.AccessibilityView="Raw">
+                                <Border Background="{ThemeResource HighContrastWindowSurfaceBrush}"/>
+                            </Grid>
+
+                            <local:SocialTabStrip x:Uid="SocialProfileTabs"
+                                                  x:Name="TabStrip">
+                                <local:SocialTabButton x:Name="NotesTab"
+                                                       GroupName="ProfilePageTabs"
+                                                       Style="{StaticResource SocialTabButtonStyle}"
+                                                       Checked="Tab_Checked">
+                                    <TextBlock x:Uid="SocialProfileNotesTab" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                </local:SocialTabButton>
+                                <local:SocialTabButton x:Name="RepliesTab"
+                                                       GroupName="ProfilePageTabs"
+                                                       Style="{StaticResource SocialTabButtonStyle}"
+                                                       Checked="Tab_Checked">
+                                    <TextBlock x:Uid="SocialProfileRepliesTab" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                </local:SocialTabButton>
+                                <local:SocialTabButton x:Name="MediaTab"
+                                                       GroupName="ProfilePageTabs"
+                                                       Style="{StaticResource SocialTabButtonStyle}"
+                                                       Checked="Tab_Checked">
+                                    <TextBlock x:Uid="SocialProfileMediaTab" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                </local:SocialTabButton>
+                                <local:SocialTabButton x:Name="FavoritesTab"
+                                                       GroupName="ProfilePageTabs"
+                                                       Style="{StaticResource SocialTabButtonStyle}"
+                                                       Checked="Tab_Checked">
+                                    <TextBlock x:Uid="SocialProfileFavoritesTab" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                </local:SocialTabButton>
+                            </local:SocialTabStrip>
+
+                            <Button x:Uid="SocialProfileRefreshButton" x:Name="RefreshButton"
+                                    Grid.Column="1"
+                                    Style="{StaticResource ButtonRevealStyle}"
+                                    Background="Transparent"
+                                    Width="40" Height="40"
+                                    MinWidth="40" MinHeight="40"
+                                    Padding="0"
+                                    CornerRadius="0"
+                                    VerticalAlignment="Center"
+                                    KeyboardAcceleratorPlacementMode="Hidden"
+                                    Click="RefreshButton_Click">
+                                <Button.KeyboardAccelerators>
+                                    <KeyboardAccelerator Key="F5"/>
+                                </Button.KeyboardAccelerators>
+                                <FontIcon Glyph="&#xE72C;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </ListView.Header>
+
+                <ListView.Footer>
+                    <Grid x:Name="FooterHost" MinHeight="160" Padding="12,24,12,24">
+                        <ProgressRing x:Uid="SocialProfileLoading"
+                                      x:Name="LoadingRing"
+                                      Width="32" Height="32"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Top"/>
+
+                        <StackPanel x:Name="StatePanel"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    MaxWidth="360"
+                                    Spacing="12"
+                                    Visibility="Collapsed">
+                            <FontIcon x:Name="StateGlyph"
+                                      FontSize="32"
+                                      HorizontalAlignment="Center"
+                                      Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Name="StateText"
                                        Style="{StaticResource BodyTextBlockStyle}"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                            <TextBlock x:Uid="MemberSinceText" x:Name="MemberSinceText"
-                                       Style="{StaticResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                       Margin="0,4,0,0"/>
-                            <TextBlock x:Name="LastLoginText"
-                                       Text=""
-                                       Style="{StaticResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                       Margin="0,2,0,0"
-                                       Visibility="Collapsed"/>
-                            <StackPanel x:Name="FollowStatsPanel"
-                                        Orientation="Horizontal"
-                                        Spacing="16"
-                                        Visibility="Collapsed">
-                                <HyperlinkButton x:Uid="FollowingLink" x:Name="FollowingLink"
-                                                 Click="FollowingLink_Click">
-                                    <TextBlock x:Name="FollowingCountText"
-                                               Style="{StaticResource BodyTextBlockStyle}"/>
-                                </HyperlinkButton>
-                                <HyperlinkButton x:Uid="FollowersLink" x:Name="FollowersLink"
-                                                 Click="FollowersLink_Click">
-                                    <TextBlock x:Name="FollowersCountText"
-                                               Style="{StaticResource BodyTextBlockStyle}"/>
-                                </HyperlinkButton>
-                            </StackPanel>
+                                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <Button x:Name="StateButton"
+                                    HorizontalAlignment="Center"
+                                    Click="StateButton_Click"/>
                         </StackPanel>
                     </Grid>
-                </Grid>
-
-                <Grid Background="{ThemeResource CardBackgroundBrush}"
-                      BorderBrush="{ThemeResource CardBorderBrush}"
-                      BorderThickness="1"
-                      Padding="20">
-                    <StackPanel>
-                        <TextBlock x:Uid="ProfileAbout"
-                                   Style="{StaticResource BaseTextBlockStyle}"
-                                   Margin="0,0,0,8"/>
-                        <TextBlock x:Uid="BioText" x:Name="BioText"
-                                   TextWrapping="Wrap"
-                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"/>
-                    </StackPanel>
-                </Grid>
-
-                <TextBlock x:Uid="ProfileYourProfileIsManaged"
-                           Style="{StaticResource CaptionTextBlockStyle}"
-                           TextWrapping="Wrap"
-                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <Button x:Uid="ManageOnFortSocialButton" x:Name="ManageOnFortSocialButton"
-                            Click="ManageOnFortSocialButton_Click"
-                            AccessKey="M">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE774;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
-                            <TextBlock x:Uid="ProfileManageOnFortSocial"/>
-                        </StackPanel>
-                    </Button>
-                    <Button x:Uid="LogoutButton" x:Name="LogoutButton"
-                            Click="LogoutButton_Click"
-                            AccessKey="O">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xF3B1;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
-                            <TextBlock x:Uid="ProfileSignOut"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+                </ListView.Footer>
+            </ListView>
+        </Grid>
+    </Grid>
 </Page>

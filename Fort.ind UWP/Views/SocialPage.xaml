@@ -5,11 +5,17 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     KeyboardAcceleratorPlacementMode="Hidden"
     Background="Transparent">
 
     <Page.Resources>
+        <DataTemplate x:Key="SocialNoteItemTemplate" x:DataType="local:SocialNoteItem">
+            <local:SocialNoteView Item="{x:Bind}"
+                                  AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"/>
+        </DataTemplate>
+
         <DataTemplate x:Key="SocialFeedItemTemplate" x:DataType="local:SocialFeedItem">
             <Grid AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}">
                 <Rectangle Width="3"
@@ -25,13 +31,19 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <PersonPicture Width="40" Height="40"
-                                   VerticalAlignment="Top"
-                                   DisplayName="{x:Bind ActorName}"
-                                   ProfilePicture="{x:Bind Avatar}"
-                                   BadgeGlyph="{x:Bind Glyph}"
-                                   Visibility="{x:Bind ActorVisibility}"
-                                   AutomationProperties.AccessibilityView="Raw"/>
+                    <Button Style="{StaticResource SocialBareButtonStyle}"
+                            Visibility="{x:Bind ActorVisibility}"
+                            IsHitTestVisible="{x:Bind HasActorProfile}"
+                            IsTabStop="{x:Bind HasActorProfile}"
+                            AutomationProperties.Name="{x:Bind ActorProfileLabel}"
+                            ToolTipService.ToolTip="{x:Bind ActorProfileLabel}"
+                            Click="FeedActorButton_Click">
+                        <PersonPicture Width="40" Height="40"
+                                       DisplayName="{x:Bind ActorName}"
+                                       ProfilePicture="{x:Bind Avatar}"
+                                       BadgeGlyph="{x:Bind Glyph}"
+                                       AutomationProperties.AccessibilityView="Raw"/>
+                    </Button>
 
                     <Grid Width="40" Height="40"
                           VerticalAlignment="Top"
@@ -63,7 +75,8 @@
                     </StackPanel>
 
                     <TextBlock Grid.Column="2"
-                               Text="{x:Bind TimeText}"
+                               Text="{x:Bind TimeText, Mode=OneWay}"
+                               ToolTipService.ToolTip="{x:Bind TimeFull}"
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
                                TextWrapping="NoWrap"
@@ -72,7 +85,7 @@
             </Grid>
         </DataTemplate>
 
-        <Style x:Key="SocialFeedItemContainerStyle" TargetType="ListViewItem">
+        <Style x:Key="SocialFeedItemContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="VerticalContentAlignment" Value="Stretch"/>
             <Setter Property="Padding" Value="0"/>
@@ -134,8 +147,22 @@
             </Pivot.HeaderTemplate>
 
             <Pivot.RightHeader>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button x:Uid="SocialNewNoteButton" x:Name="NewNoteButton"
+                        Style="{StaticResource AccentButtonStyle}"
+                        VerticalAlignment="Center"
+                        Click="NewNoteButton_Click">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="N" Modifiers="Control"/>
+                    </Button.KeyboardAccelerators>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE70F;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                        <TextBlock x:Uid="SocialNewNoteLabel"/>
+                    </StackPanel>
+                </Button>
                 <Button x:Uid="SocialRefreshButton" x:Name="SocialRefreshButton"
                         Style="{StaticResource ButtonRevealStyle}"
+                        Background="Transparent"
                         Width="40" Height="40"
                         MinWidth="40" MinHeight="40"
                         Padding="0"
@@ -147,7 +174,48 @@
                     </Button.KeyboardAccelerators>
                     <FontIcon Glyph="&#xE72C;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                 </Button>
+                </StackPanel>
             </Pivot.RightHeader>
+
+            <PivotItem x:Uid="SocialForYouPivotItem" x:Name="ForYouPivotItem">
+                <Grid>
+                    <ListView x:Uid="SocialForYouList" x:Name="ForYouList"
+                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="NoteList_ItemClick"
+                              Visibility="Collapsed">
+                        <i:Interaction.Behaviors>
+                            <local:SocialContextMenuBehavior/>
+                            <local:SocialNoteShortcutsBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ListView>
+
+                    <ProgressRing x:Uid="SocialForYouLoading" x:Name="ForYouLoadingRing"
+                                  Width="32" Height="32"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <StackPanel x:Name="ForYouStatePanel"
+                                Style="{StaticResource SocialStatePanelStyle}"
+                                Visibility="Collapsed">
+                        <FontIcon x:Name="ForYouStateGlyph"
+                                  FontSize="32"
+                                  HorizontalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Name="ForYouStateText"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   AutomationProperties.LiveSetting="Polite"/>
+                        <Button x:Name="ForYouStateButton"
+                                HorizontalAlignment="Center"
+                                Click="ForYouStateButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
 
             <PivotItem x:Uid="SocialNotificationsPivotItem" x:Name="NotificationsPivotItem">
                 <Grid>
@@ -157,7 +225,11 @@
                               SelectionMode="None"
                               IsItemClickEnabled="True"
                               ItemClick="FeedList_ItemClick"
-                              Visibility="Collapsed"/>
+                              Visibility="Collapsed">
+                        <i:Interaction.Behaviors>
+                            <local:SocialContextMenuBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ListView>
 
                     <ProgressRing x:Uid="SocialNotificationsLoading" x:Name="NotificationsLoadingRing"
                                   Width="32" Height="32"
@@ -192,7 +264,11 @@
                               SelectionMode="None"
                               IsItemClickEnabled="True"
                               ItemClick="FeedList_ItemClick"
-                              Visibility="Collapsed"/>
+                              Visibility="Collapsed">
+                        <i:Interaction.Behaviors>
+                            <local:SocialContextMenuBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ListView>
 
                     <ProgressRing x:Uid="SocialMentionsLoading" x:Name="MentionsLoadingRing"
                                   Width="32" Height="32"

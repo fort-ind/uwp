@@ -40,7 +40,7 @@ namespace Fort.ind_UWP
         public DateTime CreatedDate { get; set; }
 
         [DataMember]
-        public DateTime LastLoginDate { get; set; }
+        public string DetailJson { get; set; }
 
         [DataMember]
         public UserPreferences Preferences
@@ -63,7 +63,6 @@ namespace Fort.ind_UWP
         {
             Preferences = new UserPreferences();
             CreatedDate = UnsetDate;
-            LastLoginDate = UnsetDate;
         }
 
         public UserProfile Clone()
@@ -81,7 +80,7 @@ namespace Fort.ind_UWP
                 FollowersCount = this.FollowersCount,
                 FollowingCount = this.FollowingCount,
                 CreatedDate = this.CreatedDate,
-                LastLoginDate = this.LastLoginDate
+                DetailJson = this.DetailJson
             };
             var prefs = this.Preferences;
             copy.Preferences = new UserPreferences()

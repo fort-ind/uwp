@@ -36,6 +36,7 @@ namespace Fort.ind_UWP
                 new SearchItem(LocalizedStrings.Get("SearchItemSettings"), AppConstants.CategoryMenu, AppConstants.NavigationSettings),
                 SettingsItem("SearchItemDataStorage", AppConstants.SettingsSectionStorage),
                 SettingsItem("SearchItemLocalJsonStorage", AppConstants.SettingsSectionStorage),
+                SettingsItem("SearchItemClearMediaCache", AppConstants.SettingsSectionStorage),
                 SettingsItem("SearchItemLiveTile", AppConstants.SettingsSectionTile),
                 SettingsItem("SearchItemRefreshLiveTile", AppConstants.SettingsSectionTile),
                 SettingsItem("SearchItemClearLiveTile", AppConstants.SettingsSectionTile),

@@ -1,75 +1,214 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Globalization.NumberFormatting;
-using Windows.UI.Text;
+using Windows.UI.Composition;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Navigation;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class ProfilePage : Page, IReleasablePage
+    public sealed partial class ProfilePage : Page, IReleasablePage, ITrimmablePage
     {
+        private const double TwoColumnMinWidth = 840;
+
+        private const double CardGap = 24;
+
+        private const double NotesMaxWidth = 720;
+
+        private const double NarrowGutter = 12;
+
+        private const double WideGutter = 24;
+
         private const double BannerAspectRatio = 3.0;
 
-        private const double BannerRingWidth = 4;
+        private const int BannerDecodeWidth = 720;
 
-        private const int BannerDecodeWidth = 600;
+        private const int AvatarDecodeSize = 80;
 
         private const int BlurhashPixelWidth = 32;
 
         private const int BlurhashPixelHeight = 11;
 
+        private const double FooterMinHeight = 160;
+
+        private const string SignOutGlyph = "";
+
+        private const string StickyExpression = "Vector3(0, Max(0, -scroll.Translation.Y - props.tabTop), 0)";
+
+        private const string BackdropExpression = "Clamp((-scroll.Translation.Y - props.tabTop) / 12, 0, 1)";
+
+        private readonly SocialProfileFeeds _feeds = new SocialProfileFeeds();
+
         private bool _authHandlerAttached = false;
 
-        private string _lastAvatarUrl = null;
+        private bool _noteHandlerAttached;
 
-        private bool _avatarApplied = false;
+        private int _pinsVersion;
 
-        private string _lastBannerUrl = null;
+        private int _seenPostsVersion = SocialNoteService.PostsVersion;
 
-        private string _lastBannerBlurhash = null;
+        private bool _keepListsOnUnload;
 
-        private bool _bannerApplied = false;
+        private UserProfile _shownProfile;
 
-        private bool _bannerHasPlaceholder = false;
+        private SocialUserDetail _detail;
 
-        private BitmapImage _bannerBitmap = null;
+        private bool _detailFromServer;
 
-        private static DecimalFormatter s_countFormatter;
+        private int _loadVersion;
 
-        private string _failedBannerUrl = null;
+        private bool _twoColumns = true;
 
-        private bool _bannerRevealPending = false;
+        private string _avatarUrl;
+
+        private BitmapImage _bannerBitmap;
+
+        private ScrollViewer _scroller;
+
+        private CompositionPropertySet _scrollProperties;
+
+        private CompositionPropertySet _stickyProperties;
+
+        private bool _stickyAttached;
+
+        private double _tabTop;
+
+        private SocialFeedState _state = SocialFeedState.Loading;
+
+        private bool _released;
+
+        private AcrylicBrush _tabBackdropBrush;
 
         public ProfilePage()
         {
             this.InitializeComponent();
 
-            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+
+            _feeds.StateChanged += Feeds_StateChanged;
+            Details.FollowListRequested += Details_FollowListRequested;
 
             Loaded += ProfilePage_Loaded;
             Unloaded += ProfilePage_Unloaded;
         }
 
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+
+            _keepListsOnUnload = e.SourcePageType == typeof(SocialNotePage);
+        }
+
         private void ProfilePage_Unloaded(object sender, RoutedEventArgs e)
         {
-            Release();
+            DetachAuthHandler();
+            AppearanceService.DetachInAppSurface(_tabBackdropBrush);
+            if (!_keepListsOnUnload) Trim();
         }
 
         public void Release()
+        {
+            if (_released) return;
+            _released = true;
+
+            DetachAuthHandler();
+            AppearanceService.DetachInAppSurface(_tabBackdropBrush);
+            _feeds.Release();
+        }
+
+        public void Trim()
+        {
+            if (_released) return;
+
+            _feeds.TrimAll();
+        }
+
+        private void DetachAuthHandler()
         {
             if (_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged -= OnAuthStateChanged;
                 _authHandlerAttached = false;
+            }
+
+            if (_noteHandlerAttached)
+            {
+                SocialNoteService.Changed -= OnNoteChanged;
+                _noteHandlerAttached = false;
+            }
+        }
+
+        private async void OnNoteChanged(object sender, SocialNoteChange change)
+        {
+            try
+            {
+                if (change == null || change.Kind == SocialNoteChangeKind.Reset) return;
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    try
+                    {
+                        ApplyNoteChange(change);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"ProfilePage: could not apply a note change - {ex.Message}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: note change handler failed - {ex.Message}");
+            }
+        }
+
+        private void ApplyNoteChange(SocialNoteChange change)
+        {
+            if (_released) return;
+
+            if (change.Kind == SocialNoteChangeKind.PinChanged)
+            {
+                ReloadPinned();
+                return;
+            }
+
+            _feeds.ApplyChange(change);
+            if (change.Kind == SocialNoteChangeKind.Posted) _seenPostsVersion = SocialNoteService.PostsVersion;
+        }
+
+        private void CatchUpNoteChanges()
+        {
+            _feeds.Sweep();
+
+            foreach (var note in SocialNoteService.PostsSince(_seenPostsVersion))
+            {
+                _feeds.ApplyChange(SocialNoteChange.Posted(note));
+            }
+            _seenPostsVersion = SocialNoteService.PostsVersion;
+
+            if (_feeds.FavoritesChangedSinceLoad) _feeds.Invalidate(SocialUserNotesTab.Favorites);
+            if (_detailFromServer && _pinsVersion != SocialNoteService.PinsVersion) ReloadPinned();
+        }
+
+        private void ReloadPinned()
+        {
+            _pinsVersion = SocialNoteService.PinsVersion;
+            if (string.IsNullOrEmpty(_feeds.UserId)) return;
+
+            if (_feeds.Current == SocialUserNotesTab.Notes)
+            {
+                _feeds.Refresh();
+                LoadOnline(SocialUserNotesTab.Notes);
+            }
+            else
+            {
+                _feeds.Invalidate(SocialUserNotesTab.Notes);
             }
         }
 
@@ -77,7 +216,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                     () =>
                     {
                         try
@@ -98,108 +237,644 @@ namespace Fort.ind_UWP
 
         private void ProfilePage_Loaded(object sender, RoutedEventArgs e)
         {
+            _keepListsOnUnload = false;
+            if (_released) return;
+
             if (!_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged += OnAuthStateChanged;
                 _authHandlerAttached = true;
             }
+
+            if (!_noteHandlerAttached)
+            {
+                SocialNoteService.Changed += OnNoteChanged;
+                _noteHandlerAttached = true;
+            }
+
+            _tabBackdropBrush = AppearanceService.AttachInAppSurface(_tabBackdropBrush);
+            TabBackdrop.Background = _tabBackdropBrush;
+
             RefreshUI();
+            CatchUpNoteChanges();
 
             ProfileService.RefreshOnProfileVisit();
         }
 
         public void RefreshUI()
         {
-            if (ProfileService.CurrentUser != null)
-            {
-                ShowLoggedInState();
-            }
-            else
-            {
-                ShowNotLoggedInState();
-            }
-        }
-
-        private void ShowLoggedInState()
-        {
-            NotLoggedInPanel.Visibility = Visibility.Collapsed;
-            LoggedInPanel.Visibility = Visibility.Visible;
+            if (_released) return;
 
             var user = ProfileService.CurrentUser;
-            var host = string.IsNullOrWhiteSpace(user.Host) ? MisskeyAuthService.InstanceHost : user.Host;
+            var detail = user == null ? null : SocialUserDetail.FromProfile(user);
 
-            DisplayNameText.Text = string.IsNullOrWhiteSpace(user.DisplayName) ? user.Username : user.DisplayName;
-            UsernameText.Text = LocalizedStrings.Format("ProfileHandleFormat", user.Username, host);
-
-            if (user.CreatedDate > DateTime.MinValue)
+            if (detail == null)
             {
-                MemberSinceText.Text = LocalizedStrings.Format("ProfileMemberSinceFormat", FormatMemberSince(user.CreatedDate));
-                MemberSinceText.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                MemberSinceText.Visibility = Visibility.Collapsed;
+                ShowSignedOut();
+                return;
             }
 
-            if (user.LastLoginDate > DateTime.MinValue)
+            SetSignedIn(true);
+
+            if (ReferenceEquals(user, _shownProfile)) return;
+
+            var sameAccount = _shownProfile != null
+                              && string.Equals(_shownProfile.UserId, user.UserId, StringComparison.Ordinal);
+            _shownProfile = user;
+
+            if (sameAccount)
             {
-                LastLoginText.Text = LocalizedStrings.Format("ProfileLastSignedInFormat", FormatLastLogin(user.LastLoginDate));
-                LastLoginText.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                LastLoginText.Visibility = Visibility.Collapsed;
-            }
-
-            var name = string.IsNullOrWhiteSpace(user.DisplayName) ? user.Username : user.DisplayName;
-            ProfileInitials.Text = GetInitials(name);
-
-            BioText.Text = string.IsNullOrWhiteSpace(user.Bio) ? LocalizedStrings.Get("ProfileNoBio") : user.Bio;
-
-            UpdateFollowStats(user);
-
-            if (UpdateAvatarUI(user.AvatarUrl))
-            {
-                PlayAvatarFadeIn();
+                PaintDetail(detail, false);
+                return;
             }
 
-            AvatarGrid.Opacity = 1;
-
-            UpdateBannerUI(user.BannerUrl, user.BannerBlurhash);
+            ShowAccount(detail);
         }
 
-        private void PlayAvatarFadeIn()
+        private void ShowAccount(SocialUserDetail detail)
         {
+            _loadVersion++;
+            _detail = null;
+            _detailFromServer = false;
+            _avatarUrl = null;
+            AvatarPicture.ProfilePicture = null;
+            ClearBanner();
+
+            _feeds.Reset(detail.User.Id);
+            _feeds.Emojis = SocialContentService.CachedEmojiMap;
+            PaintDetail(detail, false);
+
+            _feeds.BeginLoading(SocialUserNotesTab.Notes);
+            if (NotesTab.IsChecked == true)
+            {
+                SelectTab(SocialUserNotesTab.Notes);
+            }
+            else
+            {
+                NotesTab.IsChecked = true;
+            }
+
+            ScrollToTop();
+            LoadOnline(SocialUserNotesTab.Notes);
+        }
+
+        private void ShowSignedOut()
+        {
+            SetSignedIn(false);
+
+            if (_shownProfile == null) return;
+
+            _shownProfile = null;
+            _loadVersion++;
+            _detail = null;
+            _detailFromServer = false;
+            _feeds.Reset(null);
+            Details.Clear();
+        }
+
+        private void SetSignedIn(bool signedIn)
+        {
+            DashboardGrid.Visibility = signedIn ? Visibility.Visible : Visibility.Collapsed;
+            SignedOutScroller.Visibility = signedIn ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private async void LoadOnline(SocialUserNotesTab tab)
+        {
+            var version = ++_loadVersion;
+
             try
             {
-                var storyboard = this.Resources["AvatarFadeIn"] as Storyboard;
-                if (storyboard == null)
+                var userId = _feeds.UserId;
+                if (string.IsNullOrEmpty(userId)) return;
+
+                var emojiTask = SocialContentService.GetEmojiMapAsync();
+                var notesTask = FetchFirstNotesAsync(userId, tab);
+
+                var result = await SocialContentService.FetchUserAsync(userId, _feeds.Token);
+                if (version != _loadVersion || _released) return;
+
+                var emojis = await emojiTask;
+                if (emojis != null) _feeds.Emojis = emojis;
+                var notes = await notesTask;
+                if (version != _loadVersion || _released) return;
+
+                if (result.Status == SocialApiStatus.Ok)
                 {
-                    AvatarGrid.Opacity = 1;
-                    return;
+                    PaintDetail(result.Value, true);
+                }
+                else if (_detail != null)
+                {
+                    PaintDetail(_detail, false);
                 }
 
-                storyboard.Stop();
-                storyboard.Begin();
+                _feeds.ApplyFirstPage(tab, notes);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine("ProfilePage: profile load cancelled");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: avatar fade-in failed - {ex.Message}");
-                AvatarGrid.Opacity = 1;
+                Debug.WriteLine($"ProfilePage: profile load failed - {ex.GetType().Name}: {ex.Message}");
+                if (version == _loadVersion && !_released) _feeds.Fail(tab);
             }
         }
 
-        private void ShowNotLoggedInState()
+        private async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchFirstNotesAsync(string userId, SocialUserNotesTab tab)
         {
-            NotLoggedInPanel.Visibility = Visibility.Visible;
-            LoggedInPanel.Visibility = Visibility.Collapsed;
-            _lastAvatarUrl = null;
-            _avatarApplied = false;
-            _lastBannerUrl = null;
-            _lastBannerBlurhash = null;
-            _bannerApplied = false;
-            _failedBannerUrl = null;
-            HideBanner();
+            try
+            {
+                return await SocialContentService.FetchUserNotesAsync(userId, tab, null, _feeds.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: first notes fetch failed - {ex.GetType().Name}: {ex.Message}");
+                return null;
+            }
+        }
+
+        private void PaintDetail(SocialUserDetail detail, bool fromServer)
+        {
+            _detail = detail;
+            if (fromServer)
+            {
+                _detailFromServer = true;
+                _feeds.PinnedNotes = detail.PinnedNotes;
+                RememberPinned(detail);
+            }
+
+            PaintIdentity(detail.User);
+            Details.Paint(detail, _feeds.Emojis ?? SocialContentService.CachedEmojiMap);
+            PaintBanner(detail.BannerUrl, detail.BannerBlurhash);
+        }
+
+        private void RememberPinned(SocialUserDetail detail)
+        {
+            if (detail.User == null || !SocialContentService.IsCurrentAccount(detail.User.Id)) return;
+
+            var ids = new List<string>();
+            foreach (var note in detail.PinnedNotes)
+            {
+                ids.Add(note.Id);
+            }
+
+            SocialNoteService.RememberPinned(ids);
+            _pinsVersion = SocialNoteService.PinsVersion;
+        }
+
+        private void PaintIdentity(SocialUser user)
+        {
+            MfmInlineBuilder.Fill(NameText, MfmText.ParseName(user.DisplayName, user.Emojis), false, 24);
+            HandleText.Text = SocialLinks.FormatHandle(user.Username,
+                                                       string.IsNullOrWhiteSpace(user.Host) ? MisskeyAuthService.InstanceHost : user.Host);
+            AvatarPicture.DisplayName = SocialNoteItem.DisplayNameOf(user);
+
+            if (string.Equals(user.AvatarUrl, _avatarUrl, StringComparison.Ordinal)) return;
+            _avatarUrl = user.AvatarUrl;
+
+            var avatarUri = WebLauncher.TryCreateFetchUri(user.AvatarUrl);
+            if (avatarUri == null)
+            {
+                AvatarPicture.ProfilePicture = null;
+                return;
+            }
+
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.DecodePixelType = DecodePixelType.Logical;
+            bitmap.DecodePixelWidth = AvatarDecodeSize;
+            bitmap.DecodePixelHeight = AvatarDecodeSize;
+            bitmap.UriSource = avatarUri;
+            AvatarPicture.ProfilePicture = bitmap;
+        }
+
+        private void PaintBanner(string bannerUrl, string blurhash)
+        {
+            BannerPlaceholder.Fill = BlurhashImage.CreateBrush(blurhash, BlurhashPixelWidth, BlurhashPixelHeight, Stretch.Fill);
+
+            var bannerUri = WebLauncher.TryCreateFetchUri(bannerUrl);
+            if (bannerUri == null)
+            {
+                _bannerBitmap = null;
+                BannerImage.Fill = null;
+                BannerImage.Opacity = 0;
+                return;
+            }
+
+            if (_bannerBitmap != null && _bannerBitmap.UriSource == bannerUri) return;
+
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.DecodePixelType = DecodePixelType.Logical;
+            bitmap.DecodePixelWidth = BannerDecodeWidth;
+            bitmap.ImageOpened += BannerBitmap_ImageOpened;
+            bitmap.UriSource = bannerUri;
+            _bannerBitmap = bitmap;
+
+            BannerImage.Opacity = 0;
+            BannerImage.Fill = new ImageBrush { ImageSource = bitmap, Stretch = Stretch.UniformToFill };
+        }
+
+        private void ClearBanner()
+        {
+            _bannerBitmap = null;
+            BannerImage.Fill = null;
+            BannerImage.Opacity = 0;
+            BannerPlaceholder.Fill = null;
+        }
+
+        private void BannerBitmap_ImageOpened(object sender, RoutedEventArgs e)
+        {
+            if (!ReferenceEquals(sender, _bannerBitmap)) return;
+            BannerImage.Opacity = 1;
+        }
+
+        private void BannerHost_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var width = e.NewSize.Width;
+            if (width <= 0) return;
+
+            var height = Math.Round(width / BannerAspectRatio);
+            if (double.IsNaN(BannerHost.Height) || Math.Abs(BannerHost.Height - height) >= 1)
+            {
+                BannerHost.Height = height;
+            }
+        }
+
+        private void DashboardGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ApplyDashboardLayout();
+        }
+
+        private void WindowWidthStates_CurrentStateChanged(object sender, VisualStateChangedEventArgs e)
+        {
+            ApplyDashboardLayout();
+        }
+
+        private void ApplyDashboardLayout()
+        {
+            try
+            {
+                var width = DashboardGrid.ActualWidth;
+                if (width <= 0) return;
+
+                var gutter = WindowWidthStates.CurrentState == NarrowState ? NarrowGutter : WideGutter;
+                var content = Math.Max(0, width - 2 * gutter);
+                var twoColumns = content >= TwoColumnMinWidth;
+                ApplyLayout(twoColumns);
+
+                var aside = twoColumns ? CardScroller.Width + CardGap : 0;
+                var block = Math.Min(content, aside + NotesMaxWidth);
+                var left = Math.Floor((width - block) / 2);
+
+                var cardMargin = new Thickness(left, 0, 0, 0);
+                if (CardScroller.Margin != cardMargin) CardScroller.Margin = cardMargin;
+
+                var notesPadding = new Thickness(left + aside, 0, width - left - block, 0);
+                if (NotesList.Padding != notesPadding) NotesList.Padding = notesPadding;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not lay out the dashboard - {ex.Message}");
+            }
+        }
+
+        private void ApplyLayout(bool twoColumns)
+        {
+            if (twoColumns == _twoColumns) return;
+            _twoColumns = twoColumns;
+
+            if (twoColumns)
+            {
+                NarrowCardSlot.Child = null;
+                NarrowCardSlot.Visibility = Visibility.Collapsed;
+                CardScroller.Content = ProfileCard;
+                CardScroller.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                CardScroller.Content = null;
+                CardScroller.Visibility = Visibility.Collapsed;
+                NarrowCardSlot.Child = ProfileCard;
+                NarrowCardSlot.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ListHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateTabTop();
+        }
+
+        private void UpdateTabTop()
+        {
+            _tabTop = NarrowCardSlot.Visibility == Visibility.Visible
+                      ? NarrowCardSlot.ActualHeight + NarrowCardSlot.Margin.Bottom
+                      : 0;
+
+            if (_stickyProperties != null) _stickyProperties.InsertScalar("tabTop", (float)_tabTop);
+            ApplyFooterHeight();
+        }
+
+        private void NotesList_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                AttachStickyTabs();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: the tabs could not be made sticky - {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        private void AttachStickyTabs()
+        {
+            if (_stickyAttached || _released) return;
+
+            var scroller = VisualTreeSearch.FindDescendantByName(NotesList, "ScrollViewer") as ScrollViewer;
+            if (scroller == null)
+            {
+                Debug.WriteLine("ProfilePage: the list has no ScrollViewer yet; the tabs will scroll away");
+                return;
+            }
+
+            _stickyAttached = true;
+            _scroller = scroller;
+            RaiseHeaderAboveItems();
+
+            _scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(_scroller);
+            var compositor = _scrollProperties.Compositor;
+            _stickyProperties = compositor.CreatePropertySet();
+            _stickyProperties.InsertScalar("tabTop", (float)_tabTop);
+
+            ElementCompositionPreview.SetIsTranslationEnabled(TabBar, true);
+            Animate(ElementCompositionPreview.GetElementVisual(TabBar), "Translation", StickyExpression);
+            Animate(ElementCompositionPreview.GetElementVisual(TabBackdrop), "Opacity", BackdropExpression);
+
+            ApplyFooterHeight();
+        }
+
+        private void Animate(CompositionObject target, string property, string expression)
+        {
+            var animation = target.Compositor.CreateExpressionAnimation(expression);
+            animation.SetReferenceParameter("scroll", _scrollProperties);
+            animation.SetReferenceParameter("props", _stickyProperties);
+            target.StartAnimation(property, animation);
+        }
+
+        private void RaiseHeaderAboveItems()
+        {
+            var presenter = VisualTreeHelper.GetParent(ListHeader) as UIElement;
+            var container = presenter == null ? null : VisualTreeHelper.GetParent(presenter) as UIElement;
+            if (container == null)
+            {
+                Debug.WriteLine("ProfilePage: no header container found; notes may draw over the pinned tabs");
+                return;
+            }
+
+            Canvas.SetZIndex(container, 1);
+        }
+
+        private void NotesList_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ApplyFooterHeight();
+        }
+
+        private void ApplyFooterHeight()
+        {
+            var minHeight = FooterMinHeight;
+            if (_scroller != null && _state != SocialFeedState.Ready)
+            {
+                minHeight = Math.Max(minHeight, _scroller.ViewportHeight - TabBar.ActualHeight);
+            }
+
+            if (Math.Abs(FooterHost.MinHeight - minHeight) >= 1)
+            {
+                FooterHost.MinHeight = minHeight;
+            }
+        }
+
+        private bool IsTabsPinned()
+        {
+            return _scroller != null && _scroller.VerticalOffset >= _tabTop - 1;
+        }
+
+        private void Repin()
+        {
+            try
+            {
+                NotesList.UpdateLayout();
+                _scroller.ChangeView(null, _tabTop, null, true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not keep the tabs pinned - {ex.Message}");
+            }
+        }
+
+        private void ScrollToTop()
+        {
+            try
+            {
+                if (_scroller != null) _scroller.ChangeView(null, 0, null, true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not scroll back to the top - {ex.Message}");
+            }
+        }
+
+        private void Tab_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender == NotesTab) SelectTab(SocialUserNotesTab.Notes);
+            else if (sender == RepliesTab) SelectTab(SocialUserNotesTab.Replies);
+            else if (sender == MediaTab) SelectTab(SocialUserNotesTab.Media);
+            else if (sender == FavoritesTab) SelectTab(SocialUserNotesTab.Favorites);
+        }
+
+        private void SelectTab(SocialUserNotesTab tab)
+        {
+            if (_released || string.IsNullOrEmpty(_feeds.UserId)) return;
+
+            var keepPinned = IsTabsPinned();
+            _feeds.Select(tab);
+            NotesList.ItemsSource = _feeds.CollectionOf(tab);
+            SetState(_feeds.CurrentState);
+
+            if (keepPinned) Repin();
+        }
+
+        private void Feeds_StateChanged(object sender, SocialUserNotesTab tab)
+        {
+            if (tab == _feeds.Current) SetState(_feeds.StateOf(tab));
+        }
+
+        private void SetState(SocialFeedState state)
+        {
+            _state = state;
+
+            LoadingRing.IsActive = state == SocialFeedState.Loading;
+            LoadingRing.Visibility = state == SocialFeedState.Loading ? Visibility.Visible : Visibility.Collapsed;
+
+            var showPanel = state == SocialFeedState.Empty || state == SocialFeedState.Failed || state == SocialFeedState.NeedsSignIn;
+            StatePanel.Visibility = showPanel ? Visibility.Visible : Visibility.Collapsed;
+            FooterHost.Visibility = state == SocialFeedState.Ready ? Visibility.Collapsed : Visibility.Visible;
+            ApplyFooterHeight();
+            if (!showPanel) return;
+
+            if (state == SocialFeedState.Empty)
+            {
+                StateGlyph.Glyph = "";
+                StateText.Text = LocalizedStrings.Get(_feeds.Current == SocialUserNotesTab.Favorites ? "SocialProfileFavoritesEmpty"
+                                                      : _feeds.Current == SocialUserNotesTab.Media ? "SocialProfileMediaEmpty" : "SocialProfileNotesEmpty");
+                if (_feeds.Current == SocialUserNotesTab.Favorites) StateGlyph.Glyph = "";
+                StateButton.Visibility = Visibility.Collapsed;
+            }
+            else if (state == SocialFeedState.NeedsSignIn)
+            {
+                StateGlyph.Glyph = "";
+                StateText.Text = LocalizedStrings.Get("SocialProfileFavoritesNeedsSignIn");
+                StateButton.Content = LocalizedStrings.Get("SocialSignInAgainButton");
+                StateButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                StateGlyph.Glyph = "";
+                StateText.Text = LocalizedStrings.Get("SocialProfileNotesFailed");
+                StateButton.Content = LocalizedStrings.Get("SocialRetryButton");
+                StateButton.Visibility = Visibility.Visible;
+            }
+
+            AutomationHelper.AnnounceLiveRegion(StateText);
+        }
+
+        private void StateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_state == SocialFeedState.NeedsSignIn)
+            {
+                SignInButton_Click(sender, e);
+                return;
+            }
+
+            if (_state != SocialFeedState.Failed) return;
+
+            if (!_detailFromServer)
+            {
+                _feeds.BeginLoading(_feeds.Current);
+                LoadOnline(_feeds.Current);
+                return;
+            }
+
+            _feeds.Retry();
+        }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_released || string.IsNullOrEmpty(_feeds.UserId)) return;
+
+            _feeds.Refresh();
+            ProfileService.RefreshNow();
+            LoadOnline(_feeds.Current);
+        }
+
+        private async void NotesList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                var item = e.ClickedItem as SocialNoteItem;
+                if (item == null) return;
+
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => { });
+                if (MfmInlineBuilder.WasLinkJustInvoked) return;
+
+                if (!SocialThreads.Open(this, item.Note, item.Note.Id, false, SocialThreadTab.Replies))
+                {
+                    await WebLauncher.LaunchAsync(item.NoteUrl);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not open the note - {ex.Message}");
+            }
+        }
+
+        private async void ManageButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await WebLauncher.LaunchAsync(SocialLinks.ProfileSettingsUrl());
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not open the profile settings - {ex.Message}");
+            }
+        }
+
+        private void MoreButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var user = _detail == null ? null : _detail.User;
+                var flyout = SocialMenus.BuildForUser(user, null, this) ?? new MenuFlyout();
+                if (flyout.Items.Count > 0) flyout.Items.Add(new MenuFlyoutSeparator());
+
+                var signOut = new MenuFlyoutItem
+                {
+                    Text = LocalizedStrings.Get("SocialProfileSignOutMenuItem"),
+                    Icon = new FontIcon { Glyph = SignOutGlyph }
+                };
+                signOut.Click += SignOutItem_Click;
+                flyout.Items.Add(signOut);
+
+                SocialMenus.ShowAt(flyout, MoreButton, null);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not show the profile menu - {ex.Message}");
+            }
+        }
+
+        private async void SignOutItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var confirmed = await DialogService.ShowConfirmAsync(
+                    this,
+                    LocalizedStrings.Get("SignOutDialogTitle"),
+                    LocalizedStrings.Get("SignOutDialogBody"),
+                    LocalizedStrings.Get("SignOutDialogConfirm"),
+                    LocalizedStrings.Get("DialogCancel"),
+                    ContentDialogButton.Close);
+
+                if (!confirmed) return;
+
+                await ProfileService.LogoutAsync();
+                RefreshUI();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: Logout failed – {ex.Message}");
+            }
+        }
+
+        private void Details_FollowListRequested(object sender, SocialFollowList list)
+        {
+            try
+            {
+                var account = SocialContentService.CurrentAccountId();
+                if (account == null || Frame == null || string.IsNullOrEmpty(_feeds.UserId)) return;
+
+                var user = _detail == null ? null : _detail.User;
+                Frame.Navigate(typeof(SocialUserListPage),
+                               new SocialUserListArgs(account, _feeds.UserId, user == null ? null : user.Handle, user, list));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not open the follow list - {ex.GetType().Name}: {ex.Message}"
+                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+            }
         }
 
         private async void SignInButton_Click(object sender, RoutedEventArgs e)
@@ -231,531 +906,6 @@ namespace Fort.ind_UWP
                     Debug.WriteLine($"ProfilePage: could not report the navigation failure - {ex.Message}");
                 }
             }
-        }
-
-        private async void ManageOnFortSocialButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                await OpenProfileOnInstanceAsync("");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Failed to open fort.social profile - {ex.Message}");
-            }
-        }
-
-        private async void FollowingLink_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                await OpenProfileOnInstanceAsync("/following");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Failed to open following list - {ex.Message}");
-            }
-        }
-
-        private async void FollowersLink_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                await OpenProfileOnInstanceAsync("/followers");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Failed to open followers list - {ex.Message}");
-            }
-        }
-
-        private static async Task OpenProfileOnInstanceAsync(string pathSuffix)
-        {
-            var user = ProfileService.CurrentUser;
-            if (user == null) return;
-
-            var host = string.IsNullOrWhiteSpace(user.Host) ? MisskeyAuthService.InstanceHost : user.Host;
-            if (Uri.CheckHostName(host) == UriHostNameType.Unknown)
-            {
-                host = MisskeyAuthService.InstanceHost;
-            }
-
-            await WebLauncher.LaunchAsync($"https://{host}/@{Uri.EscapeDataString(user.Username)}{pathSuffix}");
-        }
-
-        private void UpdateFollowStats(UserProfile user)
-        {
-            var following = user.FollowingCount;
-            var followers = user.FollowersCount;
-
-            if (following.HasValue)
-            {
-                SetCountText(FollowingCountText, "ProfileFollowingCountFormat", following.Value);
-            }
-
-            if (followers.HasValue)
-            {
-                SetCountText(FollowersCountText,
-                             followers.Value == 1 ? "ProfileFollowersCountOneFormat" : "ProfileFollowersCountFormat",
-                             followers.Value);
-            }
-
-            FollowingLink.Visibility = following.HasValue ? Visibility.Visible : Visibility.Collapsed;
-            FollowersLink.Visibility = followers.HasValue ? Visibility.Visible : Visibility.Collapsed;
-            FollowStatsPanel.Visibility = following.HasValue || followers.HasValue
-                                          ? Visibility.Visible
-                                          : Visibility.Collapsed;
-        }
-
-        private static void SetCountText(TextBlock target, string formatKey, int count)
-        {
-            var format = LocalizedStrings.Get(formatKey);
-            var number = FormatCount(count);
-
-            target.Inlines.Clear();
-
-            var index = format.IndexOf("{0}", StringComparison.Ordinal);
-            if (index < 0)
-            {
-                target.Inlines.Add(new Run { Text = LocalizedStrings.FormatPattern(format, formatKey, number) });
-                return;
-            }
-
-            var before = format.Substring(0, index);
-            var after = format.Substring(index + 3);
-
-            if (before.Length > 0)
-            {
-                target.Inlines.Add(new Run { Text = before });
-            }
-
-            target.Inlines.Add(new Run { Text = number, FontWeight = FontWeights.SemiBold });
-
-            if (after.Length > 0)
-            {
-                target.Inlines.Add(new Run { Text = after });
-            }
-        }
-
-        private static string FormatCount(int count)
-        {
-            try
-            {
-                if (s_countFormatter == null)
-                {
-                    s_countFormatter = new DecimalFormatter()
-                    {
-                        FractionDigits = 0,
-                        IsGrouped = true
-                    };
-                }
-
-                return s_countFormatter.FormatInt(count);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: count formatting failed - {ex.Message}");
-                return count.ToString(System.Globalization.CultureInfo.CurrentCulture);
-            }
-        }
-
-        private async void LogoutButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var confirmed = await DialogService.ShowConfirmAsync(
-                    this,
-                    LocalizedStrings.Get("SignOutDialogTitle"),
-                    LocalizedStrings.Get("SignOutDialogBody"),
-                    LocalizedStrings.Get("SignOutDialogConfirm"),
-                    LocalizedStrings.Get("DialogCancel"),
-                    ContentDialogButton.Close);
-
-                if (!confirmed) return;
-
-                await ProfileService.LogoutAsync();
-                RefreshUI();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Logout failed – {ex.Message}");
-            }
-        }
-
-        private static string FormatMemberSince(DateTime value)
-        {
-            try
-            {
-                var formatter = new Windows.Globalization.DateTimeFormatting.DateTimeFormatter("month year");
-                return formatter.Format(new DateTimeOffset(value));
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Member-since formatting failed - {ex.Message}");
-                return value.ToString("yyyy-MM", System.Globalization.CultureInfo.InvariantCulture);
-            }
-        }
-
-        private static string FormatLastLogin(DateTime value)
-        {
-            try
-            {
-                var dateFormatter = new Windows.Globalization.DateTimeFormatting.DateTimeFormatter("shortdate");
-                var timeFormatter = new Windows.Globalization.DateTimeFormatting.DateTimeFormatter("shorttime");
-
-                DateTimeOffset offset = new DateTimeOffset(value);
-
-                return $"{dateFormatter.Format(offset)} {timeFormatter.Format(offset)}";
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Date formatting failed - {ex.Message}");
-                return value.ToString("u", System.Globalization.CultureInfo.InvariantCulture);
-            }
-        }
-
-        private string GetInitials(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return "?";
-            }
-
-            var parts = name.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 0)
-            {
-                return "?";
-            }
-
-            if (parts.Length >= 2 && parts[1].Length > 0)
-            {
-                return (TextHelper.FirstTextElements(parts[0], 1) +
-                        TextHelper.FirstTextElements(parts[1], 1)).ToUpperInvariant();
-            }
-
-            return TextHelper.FirstTextElements(parts[0], 1).ToUpperInvariant();
-        }
-
-        private bool UpdateAvatarUI(string avatarUrl)
-        {
-            if (_avatarApplied && string.Equals(avatarUrl, _lastAvatarUrl, StringComparison.Ordinal))
-            {
-                return false;
-            }
-            _lastAvatarUrl = avatarUrl;
-            _avatarApplied = true;
-
-            try
-            {
-                var avatarUri = WebLauncher.TryCreateFetchUri(avatarUrl);
-                if (avatarUri == null)
-                {
-                    ShowAvatarInitials();
-                    return true;
-                }
-
-                BitmapImage bitmap = new BitmapImage();
-                bitmap.DecodePixelType = DecodePixelType.Logical;
-                bitmap.DecodePixelWidth = 80;
-                bitmap.DecodePixelHeight = 80;
-                bitmap.ImageOpened += AvatarBitmap_ImageOpened;
-                bitmap.ImageFailed += AvatarBitmap_ImageFailed;
-                bitmap.UriSource = avatarUri;
-                ProfileImage.Source = bitmap;
-                ProfileImage.Visibility = Visibility.Visible;
-                ProfileInitials.Visibility = Visibility.Visible;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Avatar load failed - {ex.Message}");
-                ShowAvatarInitials();
-                return true;
-            }
-        }
-
-        private void ShowAvatarInitials()
-        {
-            ProfileImage.Source = null;
-            ProfileImage.Visibility = Visibility.Collapsed;
-            ProfileInitials.Visibility = Visibility.Visible;
-        }
-
-        private void AvatarBitmap_ImageOpened(object sender, RoutedEventArgs e)
-        {
-            if (!ReferenceEquals(sender, ProfileImage.Source)) return;
-
-            ProfileInitials.Visibility = Visibility.Collapsed;
-        }
-
-        private void AvatarBitmap_ImageFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            if (!ReferenceEquals(sender, ProfileImage.Source)) return;
-
-            Debug.WriteLine($"ProfilePage: avatar image failed to load - {e.ErrorMessage}");
-            ShowAvatarInitials();
-            _avatarApplied = false;
-        }
-
-        private void UpdateBannerUI(string bannerUrl, string blurhash)
-        {
-            if (_bannerApplied
-                && string.Equals(bannerUrl, _lastBannerUrl, StringComparison.Ordinal)
-                && string.Equals(blurhash, _lastBannerBlurhash, StringComparison.Ordinal))
-            {
-                return;
-            }
-            _lastBannerUrl = bannerUrl;
-            _lastBannerBlurhash = blurhash;
-            _bannerApplied = true;
-
-            try
-            {
-                var bannerUri = WebLauncher.TryCreateFetchUri(bannerUrl);
-                if (bannerUri == null)
-                {
-                    HideBanner();
-                    return;
-                }
-
-                StopBannerFadeIn();
-
-                var placeholder = CreateBlurhashBrush(blurhash);
-                _bannerHasPlaceholder = placeholder != null;
-                BannerPlaceholderPath.Fill = placeholder;
-
-                _bannerRevealPending = placeholder == null
-                                       && string.Equals(bannerUrl, _failedBannerUrl, StringComparison.Ordinal);
-
-                BitmapImage bitmap = new BitmapImage();
-                bitmap.DecodePixelType = DecodePixelType.Logical;
-                bitmap.DecodePixelWidth = BannerDecodeWidth;
-                bitmap.ImageOpened += BannerBitmap_ImageOpened;
-                bitmap.ImageFailed += BannerBitmap_ImageFailed;
-                bitmap.UriSource = bannerUri;
-                _bannerBitmap = bitmap;
-
-                BannerImagePath.Opacity = 0;
-                BannerImagePath.Fill = new ImageBrush { ImageSource = bitmap, Stretch = Stretch.UniformToFill };
-
-                VisualStateManager.GoToState(this, _bannerRevealPending ? "NoBannerState" : "BannerState", false);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: Banner load failed - {ex.Message}");
-                HideBanner();
-            }
-        }
-
-        private void HideBanner()
-        {
-            StopBannerFadeIn();
-            _bannerBitmap = null;
-            _bannerHasPlaceholder = false;
-            _bannerRevealPending = false;
-            BannerImagePath.Fill = null;
-            BannerImagePath.Opacity = 0;
-            BannerPlaceholderPath.Fill = null;
-            VisualStateManager.GoToState(this, "NoBannerState", false);
-        }
-
-        private void BannerBitmap_ImageOpened(object sender, RoutedEventArgs e)
-        {
-            if (!ReferenceEquals(sender, _bannerBitmap)) return;
-
-            _failedBannerUrl = null;
-            if (_bannerRevealPending)
-            {
-                _bannerRevealPending = false;
-                VisualStateManager.GoToState(this, "BannerState", false);
-            }
-
-            PlayBannerFadeIn();
-        }
-
-        private void BannerBitmap_ImageFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            if (!ReferenceEquals(sender, _bannerBitmap)) return;
-
-            Debug.WriteLine($"ProfilePage: banner image failed to load - {e.ErrorMessage}");
-            _bannerApplied = false;
-
-            if (_bannerHasPlaceholder)
-            {
-                StopBannerFadeIn();
-                _bannerBitmap = null;
-                BannerImagePath.Fill = null;
-                BannerImagePath.Opacity = 0;
-            }
-            else
-            {
-                _failedBannerUrl = _lastBannerUrl;
-                HideBanner();
-            }
-        }
-
-        private void PlayBannerFadeIn()
-        {
-            try
-            {
-                var storyboard = this.Resources["BannerFadeIn"] as Storyboard;
-                if (storyboard == null)
-                {
-                    BannerImagePath.Opacity = 1;
-                    return;
-                }
-
-                storyboard.Stop();
-                storyboard.Begin();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: banner fade-in failed - {ex.Message}");
-                BannerImagePath.Opacity = 1;
-            }
-        }
-
-        private void StopBannerFadeIn()
-        {
-            try
-            {
-                var storyboard = this.Resources["BannerFadeIn"] as Storyboard;
-                storyboard?.Stop();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: banner fade-in could not be stopped - {ex.Message}");
-            }
-        }
-
-        private static Brush CreateBlurhashBrush(string blurhash)
-        {
-            try
-            {
-                var pixels = Blurhash.DecodeToBgra(blurhash, BlurhashPixelWidth, BlurhashPixelHeight);
-                if (pixels == null) return null;
-
-                WriteableBitmap bitmap = new WriteableBitmap(BlurhashPixelWidth, BlurhashPixelHeight);
-                using (var stream = bitmap.PixelBuffer.AsStream())
-                {
-                    stream.Write(pixels, 0, pixels.Length);
-                }
-                bitmap.Invalidate();
-
-                return new ImageBrush { ImageSource = bitmap, Stretch = Stretch.Fill };
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: blurhash placeholder failed - {ex.Message}");
-                return null;
-            }
-        }
-
-        private void BannerHost_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            try
-            {
-                var width = e.NewSize.Width;
-                if (width <= 0) return;
-
-                var height = Math.Round(width / BannerAspectRatio);
-                if (double.IsNaN(BannerHost.Height) || Math.Abs(BannerHost.Height - height) >= 1)
-                {
-                    BannerHost.Height = height;
-                    return;
-                }
-
-                UpdateBannerGeometry(width, e.NewSize.Height);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: banner layout failed - {ex.Message}");
-            }
-        }
-
-        private void UpdateBannerGeometry(double width, double height)
-        {
-            Geometry hole = null;
-            Geometry holeCopy = null;
-
-            Point center;
-            double radius;
-            if (TryGetAvatarHole(width, height, out center, out radius))
-            {
-                hole = BuildHoleGeometry(height, center, radius);
-                holeCopy = BuildHoleGeometry(height, center, radius);
-            }
-
-            BannerPlaceholderPath.Data = BuildBannerGeometry(width, height, hole);
-            BannerImagePath.Data = BuildBannerGeometry(width, height, holeCopy);
-        }
-
-        private bool TryGetAvatarHole(double width, double height, out Point center, out double radius)
-        {
-            center = default(Point);
-            radius = 0;
-
-            try
-            {
-                if (AvatarGrid.ActualWidth <= 0 || AvatarGrid.ActualHeight <= 0) return false;
-
-                radius = AvatarGrid.ActualWidth / 2 + BannerRingWidth;
-                center = AvatarGrid.TransformToVisual(BannerHost)
-                                   .TransformPoint(new Point(AvatarGrid.ActualWidth / 2, AvatarGrid.ActualHeight / 2));
-
-                return center.X - radius >= 0
-                       && center.X + radius <= width
-                       && center.Y - radius >= 0
-                       && center.Y - radius < height;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfilePage: avatar position unavailable for the banner - {ex.Message}");
-                return false;
-            }
-        }
-
-        private static Geometry BuildBannerGeometry(double width, double height, Geometry hole)
-        {
-            GeometryGroup group = new GeometryGroup { FillRule = FillRule.EvenOdd };
-            group.Children.Add(new RectangleGeometry { Rect = new Rect(0, 0, width, height) });
-
-            if (hole != null)
-            {
-                group.Children.Add(hole);
-            }
-
-            return group;
-        }
-
-        private static Geometry BuildHoleGeometry(double bottom, Point center, double radius)
-        {
-            if (center.Y + radius <= bottom)
-            {
-                return new EllipseGeometry { Center = center, RadiusX = radius, RadiusY = radius };
-            }
-
-            double offset = bottom - center.Y;
-            double halfChord = Math.Sqrt(radius * radius - offset * offset);
-            if (halfChord < 0.5) return null;
-
-            PathFigure figure = new PathFigure
-            {
-                StartPoint = new Point(center.X - halfChord, bottom),
-                IsClosed = true,
-                IsFilled = true
-            };
-            figure.Segments.Add(new ArcSegment
-            {
-                Point = new Point(center.X + halfChord, bottom),
-                Size = new Size(radius, radius),
-                SweepDirection = SweepDirection.Clockwise,
-                IsLargeArc = center.Y < bottom
-            });
-
-            PathGeometry geometry = new PathGeometry();
-            geometry.Figures.Add(figure);
-            return geometry;
         }
     }
 }

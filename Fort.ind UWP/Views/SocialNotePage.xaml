@@ -1,0 +1,304 @@
+<Page
+    x:Class="Fort.ind_UWP.SocialNotePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    mc:Ignorable="d"
+    KeyboardAcceleratorPlacementMode="Hidden"
+    Background="Transparent"
+    Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded">
+
+    <Page.Resources>
+        <DataTemplate x:Key="SocialNoteItemTemplate" x:DataType="local:SocialNoteItem">
+            <local:SocialNoteView Item="{x:Bind}"
+                                  AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SocialNotePersonTemplate" x:DataType="local:SocialNotePersonItem">
+            <Grid Padding="12,8,12,8"
+                  ColumnSpacing="12"
+                  BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                  BorderThickness="0,0,0,1"
+                  AutomationProperties.Name="{x:Bind AutomationName}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <PersonPicture Width="32" Height="32"
+                               DisplayName="{x:Bind DisplayName}"
+                               ProfilePicture="{x:Bind Avatar}"
+                               AutomationProperties.AccessibilityView="Raw"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind DisplayName}"
+                               Style="{StaticResource BaseTextBlockStyle}"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                    <TextBlock Text="{x:Bind Handle}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                </StackPanel>
+
+                <Grid Grid.Column="2"
+                      VerticalAlignment="Center"
+                      AutomationProperties.AccessibilityView="Raw">
+                    <TextBlock Text="{x:Bind ReactionText}"
+                               Visibility="{x:Bind ReactionTextVisibility}"
+                               FontFamily="Segoe UI Emoji"
+                               FontSize="16"
+                               IsTextScaleFactorEnabled="False"
+                               VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind ReactionImage}"
+                           Visibility="{x:Bind ReactionImageVisibility}"
+                           Width="20" Height="20"
+                           Stretch="Uniform"/>
+                </Grid>
+
+                <TextBlock Grid.Column="3"
+                           Text="{x:Bind TimeText}"
+                           ToolTipService.ToolTip="{x:Bind TimeFull}"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           TextWrapping="NoWrap"
+                           AutomationProperties.AccessibilityView="Raw"/>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="SocialThreadContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid x:Name="RootGrid">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NoteList.Margin" Value="0"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NoteList.Margin" Value="12,0,12,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ListView
+                  x:Name="NoteList"
+                  MaxWidth="720"
+                  ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                  ItemContainerStyle="{StaticResource SocialThreadContainerStyle}"
+                  SelectionMode="None"
+                  IsItemClickEnabled="True"
+                  ItemClick="NoteList_ItemClick">
+            <i:Interaction.Behaviors>
+                <local:SocialContextMenuBehavior/>
+                <local:SocialNoteShortcutsBehavior/>
+            </i:Interaction.Behaviors>
+
+            <ListView.Header>
+                <StackPanel>
+                    <ListView x:Uid="SocialThreadAncestorsList"
+                              x:Name="AncestorsList"
+                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                              ItemContainerStyle="{StaticResource SocialThreadContainerStyle}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="NoteList_ItemClick"
+                              ScrollViewer.VerticalScrollMode="Disabled"
+                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                              Visibility="Collapsed">
+                        <i:Interaction.Behaviors>
+                            <local:SocialContextMenuBehavior/>
+                            <local:SocialNoteShortcutsBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ListView>
+
+                    <ProgressBar x:Name="AncestorsLoading"
+                                 IsIndeterminate="True"
+                                 Background="Transparent"
+                                 Visibility="Collapsed"/>
+
+                    <Grid x:Name="FocusedHost"
+                          BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                          BorderThickness="0">
+                        <local:SocialNoteView x:Name="FocusedView"
+                                              Presentation="Focused"
+                                              Visibility="Collapsed"/>
+
+                        <StackPanel x:Name="NoteStatePanel"
+                                    Padding="12,24,12,24"
+                                    HorizontalAlignment="Center"
+                                    MaxWidth="360"
+                                    Spacing="12"
+                                    Visibility="Collapsed">
+                            <FontIcon x:Name="NoteStateGlyph"
+                                      FontSize="32"
+                                      HorizontalAlignment="Center"
+                                      Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Name="NoteStateText"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <Button x:Name="NoteStateButton"
+                                    HorizontalAlignment="Center"
+                                    Click="NoteStateButton_Click"/>
+                        </StackPanel>
+
+                        <ProgressRing x:Uid="SocialThreadLoading"
+                                      x:Name="NoteLoadingRing"
+                                      Width="32" Height="32"
+                                      Margin="0,24,0,24"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Top"/>
+                    </Grid>
+
+                    <Border x:Name="ReplyBoxSlot"
+                            Visibility="Collapsed"
+                            Padding="12,8,12,8"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                            BorderThickness="0,0,0,1">
+                        <local:SocialComposer x:Name="ReplyComposer"
+                                              DraftChanged="ReplyComposer_DraftChanged"
+                                              Posted="ReplyComposer_Posted"
+                                              Discarded="ReplyComposer_Discarded"/>
+                    </Border>
+
+                    <Grid x:Name="TabBar"
+                          BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                          BorderThickness="0,0,0,1"
+                          Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <local:SocialTabStrip x:Uid="SocialThreadTabs" x:Name="TabStrip">
+                            <local:SocialTabButton x:Name="RepliesTab"
+                                                   GroupName="SocialThreadTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="Tab_Checked">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock x:Uid="SocialThreadRepliesTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                                    <TextBlock x:Name="RepliesTabCount"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </local:SocialTabButton>
+                            <local:SocialTabButton x:Name="RenotesTab"
+                                                   GroupName="SocialThreadTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="Tab_Checked">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock x:Uid="SocialThreadRenotesTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                                    <TextBlock x:Name="RenotesTabCount"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </local:SocialTabButton>
+                            <local:SocialTabButton x:Name="ReactionsTab"
+                                                   GroupName="SocialThreadTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="Tab_Checked">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock x:Uid="SocialThreadReactionsTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                                    <TextBlock x:Name="ReactionsTabCount"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </local:SocialTabButton>
+                        </local:SocialTabStrip>
+
+                        <Button x:Uid="SocialThreadRefreshButton"
+                                x:Name="RefreshButton"
+                                Grid.Column="1"
+                                Style="{StaticResource ButtonRevealStyle}"
+                                Background="Transparent"
+                                Width="40" Height="40"
+                                MinWidth="40" MinHeight="40"
+                                Padding="0"
+                                CornerRadius="0"
+                                VerticalAlignment="Center"
+                                Click="RefreshButton_Click">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="F5"/>
+                            </Button.KeyboardAccelerators>
+                            <FontIcon Glyph="&#xE72C;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                        </Button>
+                    </Grid>
+
+                    <ScrollViewer x:Name="ReactionFilterScroller"
+                                  HorizontalScrollMode="Enabled"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollMode="Disabled"
+                                  VerticalScrollBarVisibility="Disabled"
+                                  Visibility="Collapsed">
+                        <StackPanel x:Name="ReactionFilters"
+                                    Orientation="Horizontal"
+                                    Spacing="6"
+                                    Padding="12,8,12,8"
+                                    XYFocusKeyboardNavigation="Enabled"/>
+                    </ScrollViewer>
+                </StackPanel>
+            </ListView.Header>
+
+            <ListView.Footer>
+                <Grid x:Name="FooterHost" MinHeight="160" Padding="12,24,12,24">
+                    <ProgressRing x:Uid="SocialThreadTabLoading"
+                                  x:Name="TabLoadingRing"
+                                  Width="32" Height="32"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Top"/>
+
+                    <StackPanel x:Name="TabStatePanel"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                MaxWidth="360"
+                                Spacing="12"
+                                Visibility="Collapsed">
+                        <FontIcon x:Name="TabStateGlyph"
+                                  FontSize="32"
+                                  HorizontalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Name="TabStateText"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   AutomationProperties.LiveSetting="Polite"/>
+                        <Button x:Name="TabStateButton"
+                                HorizontalAlignment="Center"
+                                Click="TabStateButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </ListView.Footer>
+        </ListView>
+    </Grid>
+</Page>

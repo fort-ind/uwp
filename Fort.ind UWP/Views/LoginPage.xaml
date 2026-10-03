@@ -10,66 +10,91 @@
     Background="Transparent"
     Loaded="LoginPage_Loaded">
 
-    <Grid Background="Transparent">
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Grid Background="{ThemeResource CardBackgroundBrush}"
-                  BorderBrush="{ThemeResource CardBorderBrush}"
-                  BorderThickness="1"
-                  Padding="40"
-                  MinWidth="380"
-                  MaxWidth="420">
+    <Grid x:Name="RootGrid" Background="Transparent">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                        <Setter Target="LoginCard.Padding" Value="24"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="24"/>
+                        <Setter Target="LoginCard.Padding" Value="40"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
-                <StackPanel Spacing="16">
-                    <StackPanel HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <FontIcon Glyph="&#xE72E;"
-                                  FontSize="48"
-                                  HorizontalAlignment="Center"
-                                  AutomationProperties.AccessibilityView="Raw"/>
-                        <TextBlock x:Uid="LoginFortDesktop"
-                                   Style="{StaticResource TitleTextBlockStyle}"
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock x:Uid="LoginSignInWithYour"
-                                   Style="{StaticResource BodyTextBlockStyle}"
+        <ScrollViewer x:Name="PageScrollViewer">
+            <Grid x:Name="ContentPanel" Padding="24" VerticalAlignment="Center">
+                <Grid x:Name="LoginCard"
+                      Background="{ThemeResource CardBackgroundBrush}"
+                      BorderBrush="{ThemeResource CardBorderBrush}"
+                      BorderThickness="1"
+                      Padding="40"
+                      MaxWidth="420">
+
+                    <StackPanel Spacing="16">
+                        <StackPanel HorizontalAlignment="Center" Margin="0,0,0,16">
+                            <FontIcon Glyph="&#xE72E;"
+                                      FontSize="48"
+                                      HorizontalAlignment="Center"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="LoginFortDesktop"
+                                       Style="{StaticResource TitleTextBlockStyle}"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock x:Uid="LoginSignInWithYour"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       HorizontalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"/>
+                        </StackPanel>
+
+                        <TextBlock x:Uid="LoginYouLlBeTaken"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                   HorizontalAlignment="Center"
                                    TextWrapping="Wrap"
                                    TextAlignment="Center"/>
+
+                        <TextBlock x:Name="ErrorText"
+                                   Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   Visibility="Collapsed"
+                                   AutomationProperties.LiveSetting="Assertive"/>
+
+                        <Button x:Uid="SignInButton" x:Name="SignInButton"
+                                HorizontalAlignment="Stretch"
+                                Click="SignInButton_Click"
+                                Style="{StaticResource AccentButtonStyle}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                                <FontIcon Glyph="&#xE774;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                                <TextBlock x:Uid="LoginSignInWithFort"/>
+                            </StackPanel>
+                        </Button>
+
+                        <HyperlinkButton x:Uid="SkipButton" x:Name="SkipButton"
+                                         HorizontalAlignment="Center"
+                                         Click="SkipButton_Click"/>
+
+                        <muxc:TeachingTip x:Uid="SkipHintTip" x:Name="SkipHintTip"
+                                          Target="{x:Bind SkipButton}"
+                                          PreferredPlacement="Bottom"/>
                     </StackPanel>
-
-                    <TextBlock x:Uid="LoginYouLlBeTaken"
-                               Style="{StaticResource CaptionTextBlockStyle}"
-                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"/>
-
-                    <TextBlock x:Name="ErrorText"
-                               Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"
-                               Style="{StaticResource CaptionTextBlockStyle}"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"
-                               Visibility="Collapsed"
-                               AutomationProperties.LiveSetting="Assertive"/>
-
-                    <Button x:Uid="SignInButton" x:Name="SignInButton"
-                            HorizontalAlignment="Stretch"
-                            Click="SignInButton_Click"
-                            Style="{StaticResource AccentButtonStyle}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-                            <FontIcon Glyph="&#xE774;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
-                            <TextBlock x:Uid="LoginSignInWithFort"/>
-                        </StackPanel>
-                    </Button>
-
-                    <HyperlinkButton x:Uid="SkipButton" x:Name="SkipButton"
-                                     HorizontalAlignment="Center"
-                                     Click="SkipButton_Click"/>
-
-                    <muxc:TeachingTip x:Uid="SkipHintTip" x:Name="SkipHintTip"
-                                      Target="{x:Bind SkipButton}"
-                                      PreferredPlacement="Bottom"/>
-                </StackPanel>
+                </Grid>
             </Grid>
-        </Grid>
+        </ScrollViewer>
 
         <Grid x:Name="LoadingOverlay"
               Background="{ThemeResource SystemControlPageBackgroundMediumAltMediumBrush}"
@@ -80,9 +105,10 @@
                            Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
                            TextAlignment="Center"
                            AutomationProperties.LiveSetting="Polite"/>
-                <HyperlinkButton x:Uid="CancelSignInButton" x:Name="CancelSignInButton"
-                                 HorizontalAlignment="Center"
-                                 Click="CancelSignInButton_Click"/>
+                <Button x:Uid="CancelSignInButton" x:Name="CancelSignInButton"
+                        HorizontalAlignment="Center"
+                        Margin="0,8,0,0"
+                        Click="CancelSignInButton_Click"/>
             </StackPanel>
         </Grid>
     </Grid>

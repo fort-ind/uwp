@@ -23,5 +23,18 @@ namespace Fort.ind_UWP
 
             return null;
         }
+
+        public static bool IsDescendantOf(DependencyObject element, DependencyObject ancestor)
+        {
+            if (ancestor == null) return false;
+
+            while (element is UIElement)
+            {
+                if (element == ancestor) return true;
+                element = VisualTreeHelper.GetParent(element);
+            }
+
+            return false;
+        }
     }
 }

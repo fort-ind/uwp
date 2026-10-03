@@ -37,6 +37,9 @@ namespace Fort.ind_UWP
 
         private static readonly List<WindowSurface> s_windowSurfaces = new List<WindowSurface>();
 
+        [ThreadStatic]
+        private static List<AcrylicBrush> t_inAppSurfaces;
+
         private static readonly Debouncer s_persistDebouncer = new Debouncer();
 
         private static string s_themePaintKey;
@@ -72,40 +75,68 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var localSettings = ApplicationData.Current.LocalSettings;
-
-                Theme = ReadTag(localSettings, AppConstants.SettingAppTheme, AppConstants.ThemeDefault);
-                ApplyThemeToRootFrame(Theme);
-
-                var tintTag = ReadTag(localSettings, AppConstants.SettingAppTintColor, AppConstants.ThemeDefault);
-                if (!IsUsableTintTag(tintTag))
-                {
-                    Debug.WriteLine($"AppearanceService: tint tag '{tintTag}' is not a colour; using the default surface");
-                    tintTag = AppConstants.ThemeDefault;
-                }
-                TintTag = tintTag;
-
-                BodyAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppBodyAcrylicOpacity,
-                                                 AppConstants.DefaultBodyAcrylicOpacity);
-                PaneAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppPaneAcrylicOpacity,
-                                                 AppConstants.DefaultPaneAcrylicOpacity);
-
-                TintScope = AppConstants.TintScopeDefault;
-                if (localSettings.Values.ContainsKey(AppConstants.SettingAppTintScope))
-                {
-                    var saved = localSettings.Values[AppConstants.SettingAppTintScope]?.ToString();
-                    if (IsUsableTintScope(saved)) TintScope = saved;
-                }
+                ReadSettings();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"AppearanceService: Initialize failed - {ex.Message}");
             }
 
+            try
+            {
+                ApplyThemeToRootFrame(Theme);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AppearanceService: could not apply the theme - {ex.Message}");
+            }
+
             s_acrylicUnsaved = false;
             s_themePaintKey = null;
             RepaintSurfaces();
             s_themePaintKey = PaintKey();
+        }
+
+        public static void EnsureLoaded()
+        {
+            if (s_surfacePaint != null) return;
+
+            try
+            {
+                ReadSettings();
+                s_surfacePaint = ComputeSurfacePaint();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AppearanceService: could not load the appearance for a window - {ex.Message}");
+            }
+        }
+
+        private static void ReadSettings()
+        {
+            var localSettings = ApplicationData.Current.LocalSettings;
+
+            Theme = ReadTag(localSettings, AppConstants.SettingAppTheme, AppConstants.ThemeDefault);
+
+            var tintTag = ReadTag(localSettings, AppConstants.SettingAppTintColor, AppConstants.ThemeDefault);
+            if (!IsUsableTintTag(tintTag))
+            {
+                Debug.WriteLine($"AppearanceService: tint tag '{tintTag}' is not a colour; using the default surface");
+                tintTag = AppConstants.ThemeDefault;
+            }
+            TintTag = tintTag;
+
+            BodyAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppBodyAcrylicOpacity,
+                                             AppConstants.DefaultBodyAcrylicOpacity);
+            PaneAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppPaneAcrylicOpacity,
+                                             AppConstants.DefaultPaneAcrylicOpacity);
+
+            TintScope = AppConstants.TintScopeDefault;
+            if (localSettings.Values.ContainsKey(AppConstants.SettingAppTintScope))
+            {
+                var saved = localSettings.Values[AppConstants.SettingAppTintScope]?.ToString();
+                if (IsUsableTintScope(saved)) TintScope = saved;
+            }
         }
 
         public static void Reload()
@@ -265,17 +296,13 @@ namespace Fort.ind_UWP
                 var isDark = IsEffectiveThemeDark();
                 var colorTag = TintTag;
                 var isTinted = !(string.IsNullOrEmpty(colorTag) || colorTag == AppConstants.ThemeDefault);
-
-                var tintBody = isTinted && TintScope != AppConstants.TintScopeSidebar;
                 var tintPane = isTinted && TintScope != AppConstants.TintScopeContent;
 
-                var paint = new SurfacePaint(
-                    tintBody ? ColorHelper.HexToColor(colorTag) : s_surfaceTintDark,
-                    tintBody ? ColorHelper.ForLightTheme(colorTag) : s_surfaceTintLight,
-                    BodyAcrylicOpacity);
+                var paint = ComputeSurfacePaint();
                 s_surfacePaint = paint;
 
                 paint.ApplyTo(SurfaceBrush, isDark);
+                PaintInAppSurfaces(paint, isDark);
 
                 RepaintPaneBrushes(colorTag, tintPane);
 
@@ -285,6 +312,18 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"AppearanceService: RepaintSurfaces failed - {ex.Message}");
             }
+        }
+
+        private static SurfacePaint ComputeSurfacePaint()
+        {
+            var colorTag = TintTag;
+            var isTinted = !(string.IsNullOrEmpty(colorTag) || colorTag == AppConstants.ThemeDefault);
+            var tintBody = isTinted && TintScope != AppConstants.TintScopeSidebar;
+
+            return new SurfacePaint(
+                tintBody ? ColorHelper.HexToColor(colorTag) : s_surfaceTintDark,
+                tintBody ? ColorHelper.ForLightTheme(colorTag) : s_surfaceTintLight,
+                BodyAcrylicOpacity);
         }
 
         public static AcrylicBrush AttachWindowSurface(FrameworkElement windowRoot)
@@ -351,12 +390,68 @@ namespace Fort.ind_UWP
                 var paint = s_surfacePaint;
                 if (paint == null) return;
 
-                paint.ApplyTo(surface.Brush, IsEffectiveThemeDark(surface.Root));
+                var isDark = IsEffectiveThemeDark(surface.Root);
+                paint.ApplyTo(surface.Brush, isDark);
+                PaintInAppSurfaces(paint, isDark);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"AppearanceService: could not paint a secondary window - {ex.Message}");
             }
+        }
+
+        public static AcrylicBrush AttachInAppSurface(AcrylicBrush brush)
+        {
+            if (brush == null)
+            {
+                brush = new AcrylicBrush()
+                {
+                    BackgroundSource = AcrylicBackgroundSource.Backdrop
+                };
+            }
+
+            if (t_inAppSurfaces == null) t_inAppSurfaces = new List<AcrylicBrush>();
+            if (!t_inAppSurfaces.Contains(brush)) t_inAppSurfaces.Add(brush);
+
+            try
+            {
+                var paint = s_surfacePaint;
+                if (paint != null) paint.ApplyTo(brush, IsCurrentWindowDark());
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AppearanceService: could not paint an in-app surface - {ex.Message}");
+            }
+
+            return brush;
+        }
+
+        public static void DetachInAppSurface(AcrylicBrush brush)
+        {
+            if (brush == null || t_inAppSurfaces == null) return;
+
+            t_inAppSurfaces.Remove(brush);
+        }
+
+        private static void PaintInAppSurfaces(SurfacePaint paint, bool isDark)
+        {
+            var surfaces = t_inAppSurfaces;
+            if (surfaces == null) return;
+
+            foreach (var brush in surfaces)
+            {
+                paint.ApplyTo(brush, isDark);
+            }
+        }
+
+        private static bool IsCurrentWindowDark()
+        {
+            foreach (var surface in WindowSurfacesSnapshot())
+            {
+                if (surface.Dispatcher.HasThreadAccess) return IsEffectiveThemeDark(surface.Root);
+            }
+
+            return IsEffectiveThemeDark();
         }
 
         private static void RunOnWindow(WindowSurface surface, DispatchedHandler action)

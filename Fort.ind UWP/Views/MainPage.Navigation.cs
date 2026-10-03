@@ -381,6 +381,29 @@ namespace Fort.ind_UWP
             }
         }
 
+        internal void ShowSocialThread(string noteId, bool restoredReply)
+        {
+            try
+            {
+                var thread = ContentFrame.Content as SocialNotePage;
+                if (thread != null && thread.Shows(noteId))
+                {
+                    if (restoredReply) thread.ReloadReplyDraft();
+                    SocialThreads.Open(thread, null, noteId, restoredReply, SocialThreadTab.Replies);
+                    return;
+                }
+
+                if (!(ContentFrame.Content is SocialPage)) NavigateToTag(AppConstants.NavigationSocial);
+
+                var origin = ContentFrame.Content as SocialPage;
+                if (origin != null) SocialThreads.Open(origin, null, noteId, restoredReply, SocialThreadTab.Replies);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not open the note from a toast - {ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
         private void AlignPaneToggleButton()
         {
             try
@@ -475,8 +498,13 @@ namespace Fort.ind_UWP
                 }
 
                 TitleBarBackButton.IsEnabled = ContentFrame.CanGoBack;
+                TrackContentPage(e.Content as Page);
 
-                if (e.NavigationMode == NavigationMode.Back)
+                if (e.Content is SocialNotePage)
+                {
+                    TitleSubPage(LocalizedStrings.Get("HeaderNote"));
+                }
+                else if (e.NavigationMode == NavigationMode.Back)
                 {
                     ShowSectionAfterBack(e.Parameter as string);
                 }
@@ -487,21 +515,32 @@ namespace Fort.ind_UWP
             }
         }
 
+        private void TitleSubPage(string header)
+        {
+            NavView.Header = header;
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentHost, header);
+            NameContentRegion(header);
+        }
+
         private void PruneContentBackStack(Type currentPageType)
         {
             try
             {
                 var stack = ContentFrame.BackStack;
+                var intoThread = currentPageType == typeof(SocialNotePage);
 
                 for (int i = stack.Count - 1; i >= 0; i--)
                 {
-                    if (stack[i].SourcePageType == typeof(LoginPage))
+                    var type = stack[i].SourcePageType;
+                    if (type == typeof(LoginPage)
+                        || type == typeof(SocialUserListPage)
+                        || (!intoThread && type == typeof(SocialNotePage)))
                     {
                         stack.RemoveAt(i);
                     }
                 }
 
-                if (stack.Count > 0 && stack[stack.Count - 1].SourcePageType == currentPageType)
+                if (!intoThread && stack.Count > 0 && stack[stack.Count - 1].SourcePageType == currentPageType)
                 {
                     stack.RemoveAt(stack.Count - 1);
                 }
@@ -569,6 +608,8 @@ namespace Fort.ind_UWP
             try
             {
                 if (DialogService.IsDialogOpen) return false;
+
+                if (SocialMediaLightbox.CloseCurrent()) return true;
 
                 if (ClosePaneUnlessExpanded()) return true;
 
