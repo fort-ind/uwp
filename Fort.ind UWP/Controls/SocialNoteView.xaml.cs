@@ -51,6 +51,12 @@ namespace Fort.ind_UWP
 
         private bool _isLoaded;
 
+        private int _drawnVersion;
+
+        private int _drawnContentVersion;
+
+        private SocialLinkPreview _drawnPreview;
+
         private int _mediaShown;
 
         private double _singleAspect = 9.0 / 16.0;
@@ -99,10 +105,21 @@ namespace Fort.ind_UWP
         {
             _isLoaded = true;
             Subscribe(Item);
+
+            try
+            {
+                CatchUp(Item);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialNoteView: could not catch up with a note - {ex.GetType().Name}: {ex.Message}");
+            }
         }
 
         private void SocialNoteView_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (IsLoaded) return;
+
             _isLoaded = false;
             Subscribe(null);
 
@@ -126,12 +143,39 @@ namespace Fort.ind_UWP
             if (_subscribed != null) _subscribed.PropertyChanged += Item_PropertyChanged;
         }
 
+        private void CatchUp(SocialNoteItem item)
+        {
+            if (item == null || item.Version == _drawnVersion) return;
+
+            if (item.ContentVersion != _drawnContentVersion)
+            {
+                Bind(item);
+                return;
+            }
+
+            MarkDrawn(item);
+            TimeTextBlock.Text = item.TimeText ?? "";
+            ApplyDeleted(item);
+            RenderCounts(item);
+            RenderReactions(item);
+            RenderPoll(item);
+            ApplyContentWarning(item);
+            if (!ReferenceEquals(item.IsHidden ? null : item.LinkPreview, _drawnPreview)) RenderLinkCard(item);
+        }
+
+        private void MarkDrawn(SocialNoteItem item)
+        {
+            _drawnVersion = item.Version;
+            _drawnContentVersion = item.ContentVersion;
+        }
+
         private void Bind(SocialNoteItem item)
         {
             SocialMediaLightbox.CloseFor(this);
             Subscribe(_isLoaded ? item : null);
             if (item == null) return;
 
+            MarkDrawn(item);
             ApplyDepth(item);
             RenderContext(item);
             RenderHeader(item);
@@ -151,6 +195,8 @@ namespace Fort.ind_UWP
                 var item = sender as SocialNoteItem;
                 if (item == null || !ReferenceEquals(item, Item)) return;
 
+                if (e.PropertyName != "Note") MarkDrawn(item);
+
                 switch (e.PropertyName)
                 {
                     case "Note":
@@ -169,8 +215,8 @@ namespace Fort.ind_UWP
                         RenderLinkCard(item);
                         break;
                     case "Reactions":
-                        RenderReactions(item);
                         RenderCounts(item);
+                        RenderReactions(item);
                         break;
                     case "RepliesCount":
                     case "RenoteCount":
@@ -612,6 +658,7 @@ namespace Fort.ind_UWP
         private void RenderLinkCard(SocialNoteItem item)
         {
             var preview = item.IsHidden ? null : item.LinkPreview;
+            _drawnPreview = preview;
             if (preview == null)
             {
                 if (LinkCardButton != null) LinkCardButton.Visibility = Visibility.Collapsed;

@@ -67,6 +67,10 @@ namespace Fort.ind_UWP
 
         public string PagingId { get; private set; }
 
+        public int Version { get; private set; }
+
+        public int ContentVersion { get; private set; }
+
         public SocialNote Note { get; private set; }
 
         public SocialUser Author
@@ -360,6 +364,7 @@ namespace Fort.ind_UWP
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
+            Version++;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
@@ -527,6 +532,7 @@ namespace Fort.ind_UWP
             }
 
             _extraReactionEmojis = null;
+            ContentVersion++;
             OnPropertyChanged("Note");
             OnPropertyChanged("AutomationName");
         }
