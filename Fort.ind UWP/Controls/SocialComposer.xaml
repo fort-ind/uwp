@@ -252,8 +252,7 @@
             <StackPanel x:Name="ToolButtons" Orientation="Horizontal" Spacing="2" Margin="-10,0,0,0">
                 <Button x:Uid="SocialComposeEmojiButton"
                         x:Name="EmojiButton"
-                        Style="{StaticResource SocialActionButtonStyle}"
-                        Width="40" Padding="0">
+                        Style="{StaticResource SocialToolButtonStyle}">
                     <FontIcon Glyph="&#xE76E;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                     <Button.Flyout>
                         <Flyout x:Name="EmojiFlyout" Opening="EmojiFlyout_Opening"/>
@@ -261,39 +260,31 @@
                 </Button>
                 <ToggleButton x:Uid="SocialComposeWarningButton"
                               x:Name="WarningToggle"
-                              Background="Transparent"
-                              BorderThickness="0"
-                              Width="40" Height="40" Padding="0"
+                              Style="{StaticResource SocialToolToggleButtonStyle}"
                               Click="WarningToggle_Click">
                     <FontIcon Glyph="&#xE7BA;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                 </ToggleButton>
                 <Button x:Uid="SocialComposeAttachButton"
                         x:Name="AttachButton"
-                        Style="{StaticResource SocialActionButtonStyle}"
-                        Width="40" Padding="0"
+                        Style="{StaticResource SocialToolButtonStyle}"
                         Click="AttachButton_Click">
                     <FontIcon Glyph="&#xE723;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                 </Button>
                 <ToggleButton x:Uid="SocialComposePollButton"
                               x:Name="PollToggle"
-                              Background="Transparent"
-                              BorderThickness="0"
-                              Width="40" Height="40" Padding="0"
+                              Style="{StaticResource SocialToolToggleButtonStyle}"
                               Click="PollToggle_Click">
                     <FontIcon Glyph="&#xE8FD;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                 </ToggleButton>
                 <ToggleButton x:Uid="SocialComposePreviewButton"
                               x:Name="PreviewToggle"
-                              Background="Transparent"
-                              BorderThickness="0"
-                              Width="40" Height="40" Padding="0"
+                              Style="{StaticResource SocialToolToggleButtonStyle}"
                               Click="PreviewToggle_Click">
                     <FontIcon Glyph="&#xE890;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                 </ToggleButton>
                 <Button x:Uid="SocialComposeMoreButton"
                         x:Name="MoreButton"
-                        Style="{StaticResource SocialActionButtonStyle}"
-                        Width="40" Padding="0">
+                        Style="{StaticResource SocialToolButtonStyle}">
                     <FontIcon Glyph="&#xE712;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                     <Button.Flyout>
                         <MenuFlyout x:Name="MoreMenu">

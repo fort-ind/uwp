@@ -69,7 +69,7 @@ namespace Fort.ind_UWP
             var chips = 0;
             foreach (var child in Children)
             {
-                if (!ReferenceEquals(child, overflow) && child.Visibility == Visibility.Visible) chips++;
+                if (!ReferenceEquals(child, overflow) && child.IsShown()) chips++;
             }
 
             var fitted = Fit(width, overflow, chips, false);
@@ -81,7 +81,7 @@ namespace Fort.ind_UWP
             var placed = 0;
             foreach (var child in Children)
             {
-                if (ReferenceEquals(child, overflow) || child.Visibility != Visibility.Visible) continue;
+                if (ReferenceEquals(child, overflow) || !child.IsShown()) continue;
 
                 var size = child.DesiredSize;
                 if (placed < fitted)
@@ -130,7 +130,7 @@ namespace Fort.ind_UWP
             var fitted = 0;
             foreach (var child in Children)
             {
-                if (ReferenceEquals(child, overflow) || child.Visibility != Visibility.Visible) continue;
+                if (ReferenceEquals(child, overflow) || !child.IsShown()) continue;
 
                 var start = fitted == 0 ? 0 : x + Spacing;
                 if (start + child.DesiredSize.Width > budget) break;
@@ -160,7 +160,7 @@ namespace Fort.ind_UWP
                     continue;
                 }
 
-                if (child.Visibility == Visibility.Collapsed) continue;
+                if (!child.IsShown()) continue;
 
                 var size = child.DesiredSize;
                 var start = lineHasItems ? x + Spacing : 0;

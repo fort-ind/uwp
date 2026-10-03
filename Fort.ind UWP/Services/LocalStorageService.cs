@@ -213,10 +213,8 @@ namespace Fort.ind_UWP
                     continue;
                 }
 
-                foreach (var entry in entries)
+                foreach (var entry in entries.Where(entry => (entry.Attributes & System.IO.FileAttributes.ReparsePoint) == 0))
                 {
-                    if ((entry.Attributes & System.IO.FileAttributes.ReparsePoint) != 0) continue;
-
                     var file = entry as FileInfo;
                     if (file != null)
                     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Core;
@@ -31,7 +32,7 @@ namespace Fort.ind_UWP
 
         private const int NotificationsIndex = 1;
 
-        private static int s_lastPivotIndex = ForYouIndex;
+        private static int LastPivotIndex { get; set; } = ForYouIndex;
 
         private readonly SocialFeedCollection<SocialNoteItem> _forYou;
 
@@ -40,6 +41,8 @@ namespace Fort.ind_UWP
         private readonly SocialFeedCollection<SocialFeedItem> _mentions;
 
         private GateKind _gate = GateKind.None;
+
+        private bool IsGated => _gate != GateKind.None;
 
         private string _shownUserId;
 
@@ -98,7 +101,7 @@ namespace Fort.ind_UWP
 
         internal void ShowNotifications()
         {
-            s_lastPivotIndex = NotificationsIndex;
+            LastPivotIndex = NotificationsIndex;
             if (_gate == GateKind.None && SocialPivot.SelectedIndex != NotificationsIndex)
             {
                 SocialPivot.SelectedIndex = NotificationsIndex;
@@ -301,14 +304,14 @@ namespace Fort.ind_UWP
 
         private void ShowFeeds()
         {
-            var wasGated = _gate != GateKind.None || SocialPivot.Visibility != Visibility.Visible;
+            var wasGated = _gate != GateKind.None || !SocialPivot.IsShown();
             _gate = GateKind.None;
             GateScrollViewer.Visibility = Visibility.Collapsed;
             SocialPivot.Visibility = Visibility.Visible;
 
-            if (wasGated && SocialPivot.SelectedIndex != s_lastPivotIndex)
+            if (wasGated && SocialPivot.SelectedIndex != LastPivotIndex)
             {
-                SocialPivot.SelectedIndex = s_lastPivotIndex;
+                SocialPivot.SelectedIndex = LastPivotIndex;
                 return;
             }
 
@@ -349,7 +352,7 @@ namespace Fort.ind_UWP
                 if (version != _notificationsVersion || unread <= 0) return;
 
                 _notificationsStale = true;
-                if (_gate == GateKind.None && SocialPivot.SelectedItem == NotificationsPivotItem)
+                if (!IsGated && SocialPivot.SelectedItem == NotificationsPivotItem)
                 {
                     LoadNotifications();
                 }
@@ -369,7 +372,7 @@ namespace Fort.ind_UWP
                 TrimPivot(removed);
             }
 
-            s_lastPivotIndex = SocialPivot.SelectedIndex;
+            LastPivotIndex = SocialPivot.SelectedIndex;
             EnsureSelectedFeedLoaded();
 
             if (IsViewingNotifications())
@@ -380,17 +383,18 @@ namespace Fort.ind_UWP
 
         private void EnsureSelectedFeedLoaded()
         {
-            if (SocialPivot.SelectedItem == ForYouPivotItem)
+            var selected = SocialPivot.SelectedItem;
+            if (selected == ForYouPivotItem && !_forYouRequested)
             {
-                if (!_forYouRequested) LoadForYou();
+                LoadForYou();
             }
-            else if (SocialPivot.SelectedItem == NotificationsPivotItem)
+            else if (selected == NotificationsPivotItem && (!_notificationsRequested || _notificationsStale))
             {
-                if (!_notificationsRequested || _notificationsStale) LoadNotifications();
+                LoadNotifications();
             }
-            else if (SocialPivot.SelectedItem == MentionsPivotItem)
+            else if (selected == MentionsPivotItem && !_mentionsRequested)
             {
-                if (!_mentionsRequested) LoadMentions();
+                LoadMentions();
             }
         }
 
@@ -486,13 +490,7 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                var items = new List<SocialFeedItem>();
-                foreach (var note in result.Value)
-                {
-                    var item = SocialFeedItem.FromNote(note);
-                    if (item != null) items.Add(item);
-                }
-
+                var items = FeedItemsFromNotes(result.Value);
                 _mentions.ReplaceAll(items, result.Value.Count >= AppConstants.SocialFeedPageSize);
                 SetMentionsState(items.Count == 0 ? FeedState.Empty : FeedState.Ready);
             }
@@ -516,13 +514,9 @@ namespace Fort.ind_UWP
             var result = await SocialNotificationService.FetchNotificationsAsync(untilId, false, cancellationToken);
             if (result.Status != SocialApiStatus.Ok) return null;
 
-            var items = new List<SocialFeedItem>();
-            foreach (var notification in result.Value)
-            {
-                var item = SocialFeedItem.FromNotification(notification, false);
-                if (item != null) items.Add(item);
-            }
-            return items;
+            return result.Value.Select(notification => SocialFeedItem.FromNotification(notification, false))
+                               .Where(item => item != null)
+                               .ToList();
         }
 
         private async Task<IReadOnlyList<SocialFeedItem>> LoadMoreMentionsAsync(string untilId, CancellationToken cancellationToken)
@@ -530,13 +524,12 @@ namespace Fort.ind_UWP
             var result = await SocialNotificationService.FetchMentionsAsync(untilId, cancellationToken);
             if (result.Status != SocialApiStatus.Ok) return null;
 
-            var items = new List<SocialFeedItem>();
-            foreach (var note in result.Value)
-            {
-                var item = SocialFeedItem.FromNote(note);
-                if (item != null) items.Add(item);
-            }
-            return items;
+            return FeedItemsFromNotes(result.Value);
+        }
+
+        private static List<SocialFeedItem> FeedItemsFromNotes(IEnumerable<SocialNote> notes)
+        {
+            return notes.Select(SocialFeedItem.FromNote).Where(item => item != null).ToList();
         }
 
         private void SetForYouState(FeedState state)

@@ -263,7 +263,7 @@ namespace Fort.ind_UWP
                 if (check == null || !(check.Tag is int)) return;
 
                 var index = (int)check.Tag;
-                if (check.IsChecked == true) _pollSelection.Add(index);
+                if (check.IsChecked.GetValueOrDefault()) _pollSelection.Add(index);
                 else _pollSelection.Remove(index);
 
                 if (_pollVoteButton != null) _pollVoteButton.IsEnabled = _pollSelection.Count > 0;

@@ -65,7 +65,7 @@ namespace Fort.ind_UWP
                 Type = type,
                 Name = SocialJson.String(obj, "name"),
                 Kind = KindFor(type),
-                IsSensitive = SocialJson.Bool(obj, "isSensitive") == true,
+                IsSensitive = SocialJson.Bool(obj, "isSensitive").GetValueOrDefault(),
                 Blurhash = SocialJson.String(obj, "blurhash"),
                 Width = PositiveOrNull(SocialJson.Int(properties, "width")),
                 Height = PositiveOrNull(SocialJson.Int(properties, "height")),

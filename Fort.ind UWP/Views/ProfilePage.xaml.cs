@@ -83,6 +83,8 @@ namespace Fort.ind_UWP
 
         private bool _released;
 
+        private bool IsReleased => _released;
+
         private AcrylicBrush _tabBackdropBrush;
 
         public ProfilePage()
@@ -305,7 +307,7 @@ namespace Fort.ind_UWP
             PaintDetail(detail, false);
 
             _feeds.BeginLoading(SocialUserNotesTab.Notes);
-            if (NotesTab.IsChecked == true)
+            if (NotesTab.IsChecked.GetValueOrDefault())
             {
                 SelectTab(SocialUserNotesTab.Notes);
             }
@@ -351,12 +353,12 @@ namespace Fort.ind_UWP
                 var notesTask = FetchFirstNotesAsync(userId, tab);
 
                 var result = await SocialContentService.FetchUserAsync(userId, _feeds.Token);
-                if (version != _loadVersion || _released) return;
+                if (version != _loadVersion || IsReleased) return;
 
                 var emojis = await emojiTask;
                 if (emojis != null) _feeds.Emojis = emojis;
                 var notes = await notesTask;
-                if (version != _loadVersion || _released) return;
+                if (version != _loadVersion || IsReleased) return;
 
                 if (result.Status == SocialApiStatus.Ok)
                 {
@@ -376,7 +378,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"ProfilePage: profile load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == _loadVersion && !_released) _feeds.Fail(tab);
+                if (version == _loadVersion && !IsReleased) _feeds.Fail(tab);
             }
         }
 
@@ -569,7 +571,7 @@ namespace Fort.ind_UWP
 
         private void UpdateTabTop()
         {
-            _tabTop = NarrowCardSlot.Visibility == Visibility.Visible
+            _tabTop = NarrowCardSlot.IsShown()
                       ? NarrowCardSlot.ActualHeight + NarrowCardSlot.Margin.Bottom
                       : 0;
 

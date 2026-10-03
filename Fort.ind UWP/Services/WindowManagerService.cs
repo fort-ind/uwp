@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
@@ -133,12 +134,7 @@ namespace Fort.ind_UWP
 
             var views = await RunOnMainAsync(mainDispatcher, () =>
             {
-                var scoped = new List<ViewLifetimeControl>();
-                foreach (var view in s_secondaryViews)
-                {
-                    if (view.AccountScoped) scoped.Add(view);
-                }
-                return Task.FromResult(scoped);
+                return Task.FromResult(s_secondaryViews.Where(view => view.AccountScoped).ToList());
             });
 
             foreach (var view in views)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Windows.Data.Json;
 
 namespace Fort.ind_UWP
@@ -36,16 +37,7 @@ namespace Fort.ind_UWP
 
         public int FilledChoices
         {
-            get
-            {
-                var count = 0;
-                foreach (var choice in Choices)
-                {
-                    if (!string.IsNullOrWhiteSpace(choice)) count++;
-                }
-
-                return count;
-            }
+            get { return Choices.Count(choice => !string.IsNullOrWhiteSpace(choice)); }
         }
 
         public static TimeSpan? DurationOf(SocialPollExpiry expiry)
@@ -99,7 +91,7 @@ namespace Fort.ind_UWP
 
             var expiresAt = SocialJson.Date(obj, "expiresAt");
             return new SocialDraftPoll(SocialJson.StringList(obj, "choices"),
-                                       SocialJson.Bool(obj, "multiple") == true,
+                                       SocialJson.Bool(obj, "multiple").GetValueOrDefault(),
                                        expiry,
                                        expiresAt == DateTimeOffset.MinValue ? (DateTimeOffset?)null : expiresAt);
         }
@@ -251,7 +243,7 @@ namespace Fort.ind_UWP
             return Create(SocialJson.String(obj, "text"),
                           SocialJson.String(obj, "cw"),
                           SocialJson.String(obj, "visibility"),
-                          SocialJson.Bool(obj, "localOnly") == true,
+                          SocialJson.Bool(obj, "localOnly").GetValueOrDefault(),
                           recipients,
                           SocialJson.String(obj, "reactionAcceptance"),
                           SocialDraftPoll.FromJson(SocialJson.Object(obj, "poll")),

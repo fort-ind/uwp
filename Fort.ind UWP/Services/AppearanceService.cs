@@ -378,8 +378,7 @@ namespace Fort.ind_UWP
         {
             foreach (var surface in WindowSurfacesSnapshot())
             {
-                var target = surface;
-                RunOnWindow(target, () => PaintWindowSurface(target));
+                RunOnWindow(surface, () => PaintWindowSurface(surface));
             }
         }
 
@@ -532,12 +531,11 @@ namespace Fort.ind_UWP
 
             foreach (var surface in WindowSurfacesSnapshot())
             {
-                var target = surface;
-                RunOnWindow(target, () =>
+                RunOnWindow(surface, () =>
                 {
                     try
                     {
-                        ApplyTheme(target.Root, theme);
+                        ApplyTheme(surface.Root, theme);
                     }
                     catch (Exception ex)
                     {

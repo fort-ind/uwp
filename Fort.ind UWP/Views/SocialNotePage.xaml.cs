@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Core;
@@ -52,7 +53,7 @@ namespace Fort.ind_UWP
 
         private string _reactionType;
 
-        private CancellationTokenSource _cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private SocialNoteWatch _watch;
 
@@ -63,6 +64,8 @@ namespace Fort.ind_UWP
         private bool _replyBoxReady;
 
         private bool _released;
+
+        private bool IsReleased => _released;
 
         public SocialNotePage()
         {
@@ -138,7 +141,7 @@ namespace Fort.ind_UWP
 
         private void FocusReplyBox()
         {
-            if (ReplyBoxSlot.Visibility != Visibility.Visible) return;
+            if (!ReplyBoxSlot.IsShown()) return;
 
             ReplyComposer.FocusEditor();
             ReplyBoxSlot.StartBringIntoView();
@@ -471,7 +474,7 @@ namespace Fort.ind_UWP
 
                 var emojis = await emojiTask;
                 var shown = await showTask;
-                if (version != _noteVersion || _released) return;
+                if (version != _noteVersion || IsReleased) return;
 
                 if (shown.Status == SocialApiStatus.Ok)
                 {
@@ -502,7 +505,7 @@ namespace Fort.ind_UWP
                 if (conversationTask != null)
                 {
                     var conversation = await conversationTask;
-                    if (version != _noteVersion || _released) return;
+                    if (version != _noteVersion || IsReleased) return;
 
                     AncestorsLoading.Visibility = Visibility.Collapsed;
                     if (conversation.Status == SocialApiStatus.Ok) ShowAncestors(conversation.Value, emojis);
@@ -517,7 +520,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialNotePage: note load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == _noteVersion && !_released)
+                if (version == _noteVersion && !IsReleased)
                 {
                     AncestorsLoading.Visibility = Visibility.Collapsed;
                     if (_focused == null) ShowNoteState(false);
@@ -620,7 +623,7 @@ namespace Fort.ind_UWP
         private void SelectTab(SocialThreadTab tab)
         {
             var button = tab == SocialThreadTab.Renotes ? RenotesTab : tab == SocialThreadTab.Reactions ? ReactionsTab : RepliesTab;
-            if (button.IsChecked == true)
+            if (button.IsChecked.GetValueOrDefault())
             {
                 ShowTab(tab);
             }
@@ -694,10 +697,10 @@ namespace Fort.ind_UWP
             try
             {
                 await SocialContentService.GetEmojiMapAsync();
-                if (version != feed.Version || _released) return;
+                if (version != feed.Version || IsReleased) return;
 
                 var page = await LoadReplyPageAsync(null, _cancellation.Token);
-                if (version != feed.Version || _released) return;
+                if (version != feed.Version || IsReleased) return;
 
                 if (page == null)
                 {
@@ -716,7 +719,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialNotePage: replies load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == feed.Version && !_released) SetFeedState(feed, SocialThreadTab.Replies, ListState.Failed);
+                if (version == feed.Version && !IsReleased) SetFeedState(feed, SocialThreadTab.Replies, ListState.Failed);
             }
         }
 
@@ -725,14 +728,9 @@ namespace Fort.ind_UWP
             if (_released || _args == null) return null;
 
             var page = await LoadReplyPageAsync(afterId, cancellationToken);
-            if (page == null || _released) return null;
+            if (page == null || IsReleased) return null;
 
-            var items = new List<SocialNoteItem>();
-            foreach (var item in page.Items)
-            {
-                if (IndexOfReply(item.Note.Id) < 0) items.Add(item);
-            }
-
+            var items = page.Items.Where(item => IndexOfReply(item.Note.Id) < 0).ToList();
             UpdateWatch();
             return items;
         }
@@ -770,10 +768,8 @@ namespace Fort.ind_UWP
                 while (level.Count > 0)
                 {
                     var fetches = new List<Task>();
-                    foreach (var node in level)
+                    foreach (var node in level.Where(node => node.Note.RepliesCount > 0))
                     {
-                        if (node.Note.RepliesCount <= 0) continue;
-
                         if (node.Depth >= MaxReplyDepth)
                         {
                             node.Deeper = true;
@@ -863,14 +859,7 @@ namespace Fort.ind_UWP
             var result = await SocialContentService.FetchRenotesAsync(_args.NoteId, untilId, cancellationToken);
             if (result.Status != SocialApiStatus.Ok) return null;
 
-            var items = new List<SocialNotePersonItem>();
-            foreach (var renote in result.Value)
-            {
-                var item = SocialNotePersonItem.FromRenote(renote);
-                if (item != null) items.Add(item);
-            }
-
-            return items;
+            return result.Value.Select(SocialNotePersonItem.FromRenote).Where(item => item != null).ToList();
         }
 
         private void ShowReactions()
@@ -905,8 +894,8 @@ namespace Fort.ind_UWP
 
         private void BuildReactionFilters(IReadOnlyList<SocialReactionCount> reactions)
         {
-            var count = reactions == null ? 0 : reactions.Count;
-            for (var i = 0; i < count; i++)
+            var shown = reactions ?? new SocialReactionCount[0];
+            for (var i = 0; i < shown.Count; i++)
             {
                 if (i >= _reactionFilters.Count)
                 {
@@ -919,14 +908,14 @@ namespace Fort.ind_UWP
                     ReactionFilters.Children.Add(chip.Button);
                 }
 
-                _reactionFilters[i].Show(_focused, reactions[i]);
+                _reactionFilters[i].Show(_focused, shown[i]);
                 AutomationProperties.SetName(_reactionFilters[i].Button,
                                              LocalizedStrings.Format("SocialThreadReactionFilterFormat",
-                                                                     SocialReactions.SpokenName(reactions[i].Key),
-                                                                     CountText.Format(reactions[i].Count)));
+                                                                     SocialReactions.SpokenName(shown[i].Key),
+                                                                     CountText.Format(shown[i].Count)));
             }
 
-            for (var i = count; i < _reactionFilters.Count; i++)
+            for (var i = shown.Count; i < _reactionFilters.Count; i++)
             {
                 _reactionFilters[i].Hide();
             }
@@ -1017,7 +1006,7 @@ namespace Fort.ind_UWP
             try
             {
                 var items = await load(_cancellation.Token);
-                if (version != feed.Version || _released) return;
+                if (version != feed.Version || IsReleased) return;
 
                 if (items == null)
                 {
@@ -1035,7 +1024,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialNotePage: list load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == feed.Version && !_released) SetFeedState(feed, tab, ListState.Failed);
+                if (version == feed.Version && !IsReleased) SetFeedState(feed, tab, ListState.Failed);
             }
         }
 
@@ -1223,11 +1212,11 @@ namespace Fort.ind_UWP
                 if (note == null)
                 {
                     var result = await SocialContentService.FetchNoteAsync(childId, _cancellation.Token);
-                    if (_released || result.Status != SocialApiStatus.Ok) return;
+                    if (IsReleased || result.Status != SocialApiStatus.Ok) return;
                     note = result.Value;
                 }
 
-                if (_released || IndexOfReply(childId) >= 0) return;
+                if (IsReleased || IndexOfReply(childId) >= 0) return;
 
                 SocialNoteItem item;
                 int index;

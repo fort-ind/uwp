@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -215,7 +216,8 @@ namespace Fort.ind_UWP
 
             foreach (var feed in _feeds)
             {
-                if (feed.Collection.RemoveWhere(item => SocialNoteItem.IsRemovedBy(item, change)) > 0) SettleAfterRemoval(feed);
+                var removed = feed.Collection.RemoveWhere(item => SocialNoteItem.IsRemovedBy(item, change));
+                if (removed > 0) SettleAfterRemoval(feed);
             }
         }
 
@@ -226,10 +228,8 @@ namespace Fort.ind_UWP
             var reply = !string.IsNullOrEmpty(note.ReplyId);
             var emojis = Emojis ?? SocialContentService.CachedEmojiMap;
 
-            foreach (var feed in _feeds)
+            foreach (var feed in _feeds.Where(feed => feed.Requested && (feed.State == SocialFeedState.Ready || feed.State == SocialFeedState.Empty)))
             {
-                if (!feed.Requested || (feed.State != SocialFeedState.Ready && feed.State != SocialFeedState.Empty)) continue;
-
                 bool include;
                 switch (feed.Tab)
                 {
@@ -276,7 +276,8 @@ namespace Fort.ind_UWP
 
             foreach (var feed in _feeds)
             {
-                if (feed.Collection.RemoveWhere(item => item.IsGone) > 0) SettleAfterRemoval(feed);
+                var removed = feed.Collection.RemoveWhere(item => item.IsGone);
+                if (removed > 0) SettleAfterRemoval(feed);
             }
         }
 

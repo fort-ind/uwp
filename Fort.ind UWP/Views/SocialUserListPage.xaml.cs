@@ -31,7 +31,7 @@ namespace Fort.ind_UWP
 
         private ListState _state = ListState.Loading;
 
-        private CancellationTokenSource _cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 
         private bool _followHandlerAttached;
 
@@ -285,7 +285,7 @@ namespace Fort.ind_UWP
         private void SelectTab(SocialFollowList list)
         {
             var tab = list == SocialFollowList.Followers ? FollowersTab : FollowingTab;
-            if (tab.IsChecked == true)
+            if (tab.IsChecked.GetValueOrDefault())
             {
                 ShowList(list);
             }

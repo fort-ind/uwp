@@ -53,6 +53,8 @@ namespace Fort.ind_UWP
 
         private bool _released;
 
+        private bool IsReleased => _released;
+
         public SocialProfileView()
         {
             this.InitializeComponent();
@@ -153,7 +155,7 @@ namespace Fort.ind_UWP
                 if (detail == null)
                 {
                     var result = await SocialContentService.FetchUserAsync(userId, _feeds.Token);
-                    if (version != _profileVersion || _released) return;
+                    if (version != _profileVersion || IsReleased) return;
 
                     if (result.Status == SocialApiStatus.Ok)
                     {
@@ -169,13 +171,13 @@ namespace Fort.ind_UWP
                 var emojis = await emojiTask;
                 if (emojis != null) _feeds.Emojis = emojis;
                 var notes = await notesTask;
-                if (version != _profileVersion || _released) return;
+                if (version != _profileVersion || IsReleased) return;
 
                 ApplyDetail(detail ?? _detail, detail != null);
                 if (IsUnavailable(_detail)) return;
 
                 _feeds.ApplyFirstPage(firstTab, notes);
-                if (TabBar.Visibility != Visibility.Visible) RevealTabs(firstTab);
+                if (!TabBar.IsShown()) RevealTabs(firstTab);
             }
             catch (OperationCanceledException)
             {
@@ -184,7 +186,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialProfileView: profile load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == _profileVersion && !_released)
+                if (version == _profileVersion && !IsReleased)
                 {
                     if (_detail != null && !IsUnavailable(_detail))
                     {
@@ -255,7 +257,7 @@ namespace Fort.ind_UWP
             TabBar.Visibility = Visibility.Visible;
 
             var button = TabButtonFor(tab);
-            if (button.IsChecked == true)
+            if (button.IsChecked.GetValueOrDefault())
             {
                 SelectTab(tab);
             }

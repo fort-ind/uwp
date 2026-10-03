@@ -32,6 +32,12 @@ namespace Fort.ind_UWP
         [ThreadStatic]
         private static SocialMediaLightbox t_current;
 
+        private static SocialMediaLightbox ShownInWindow
+        {
+            get => t_current;
+            set => t_current = value;
+        }
+
         private readonly List<LightboxSlot> _slots = new List<LightboxSlot>();
 
         private readonly Popup _popup;
@@ -70,7 +76,7 @@ namespace Fort.ind_UWP
 
         public static bool Show(SocialNoteView owner, SocialNoteItem item, int fileIndex, FocusState focusState)
         {
-            if (owner == null || item == null || t_current != null) return false;
+            if (owner == null || item == null || ShownInWindow != null) return false;
 
             var lightbox = new SocialMediaLightbox();
             return lightbox.Open(owner, item, fileIndex, focusState);
@@ -78,7 +84,7 @@ namespace Fort.ind_UWP
 
         public static bool CloseCurrent()
         {
-            var current = t_current;
+            var current = ShownInWindow;
             if (current == null) return false;
 
             current.Close(true);
@@ -87,7 +93,7 @@ namespace Fort.ind_UWP
 
         public static void CloseFor(SocialNoteView owner)
         {
-            var current = t_current;
+            var current = ShownInWindow;
             if (current != null && ReferenceEquals(current._owner, owner)) current.Close(false);
         }
 
@@ -133,7 +139,7 @@ namespace Fort.ind_UWP
                 MediaFlipView.Opacity = 0;
             }
 
-            t_current = this;
+            ShownInWindow = this;
             _popup.IsOpen = true;
 
             Fade(true, anchor == null ? MediaFlipView : null);
@@ -145,7 +151,7 @@ namespace Fort.ind_UWP
             if (_closing) return;
             _closing = true;
 
-            if (ReferenceEquals(t_current, this)) t_current = null;
+            if (ReferenceEquals(ShownInWindow, this)) ShownInWindow = null;
 
             try
             {

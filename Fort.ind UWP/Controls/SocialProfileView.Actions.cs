@@ -160,7 +160,7 @@ namespace Fort.ind_UWP
                 _followBusy = false;
                 try
                 {
-                    if (!_released) UpdateFollowButtons();
+                    if (!IsReleased) UpdateFollowButtons();
                 }
                 catch (Exception ex)
                 {

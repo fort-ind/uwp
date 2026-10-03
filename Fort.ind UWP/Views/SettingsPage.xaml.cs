@@ -508,7 +508,7 @@ namespace Fort.ind_UWP
         {
             var denied = SocialNotificationsToggle.IsOn && SocialBackgroundCheckToggle.IsOn &&
                          SocialNotificationService.BackgroundAccessDenied;
-            var wasVisible = SocialNotificationsBackgroundDenied.Visibility == Visibility.Visible;
+            var wasVisible = SocialNotificationsBackgroundDenied.IsShown();
 
             SocialNotificationsBackgroundDenied.Visibility = denied ? Visibility.Visible : Visibility.Collapsed;
 
@@ -676,7 +676,7 @@ namespace Fort.ind_UWP
         private void ToggleSettingsRow(ExpanderHeaderButton header, StackPanel content,
                                        RotateTransform chevronTransform, string settingKey = null)
         {
-            var isExpanded = content.Visibility == Visibility.Collapsed;
+            var isExpanded = !content.IsShown();
 
             if (isExpanded)
             {
@@ -729,7 +729,7 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                if (row.Content.Visibility == Visibility.Collapsed)
+                if (!row.Content.IsShown())
                 {
                     ToggleSettingsRow(row.Header, row.Content, row.Chevron, row.SettingKey);
                 }

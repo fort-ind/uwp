@@ -36,9 +36,12 @@ namespace Fort.ind_UWP
                 int ac;
                 if (!TryDecode83(hash, 4 + i * 2, 2, out ac)) return null;
 
-                colors[i * 3] = SignedSquare((ac / (19 * 19) - 9) / 9.0) * maximumValue;
-                colors[i * 3 + 1] = SignedSquare((ac / 19 % 19 - 9) / 9.0) * maximumValue;
-                colors[i * 3 + 2] = SignedSquare((ac % 19 - 9) / 9.0) * maximumValue;
+                var red = ac / (19 * 19);
+                var green = ac / 19 % 19;
+                var blue = ac % 19;
+                colors[i * 3] = SignedSquare((red - 9) / 9.0) * maximumValue;
+                colors[i * 3 + 1] = SignedSquare((green - 9) / 9.0) * maximumValue;
+                colors[i * 3 + 2] = SignedSquare((blue - 9) / 9.0) * maximumValue;
             }
 
             var cosinesX = new double[width * componentsX];

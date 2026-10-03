@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -122,16 +123,11 @@ namespace Fort.ind_UWP
 
         public static IReadOnlyList<SocialUserItem> CreateAll(IReadOnlyList<SocialFollowEntry> entries)
         {
-            var items = new List<SocialUserItem>();
-            if (entries == null) return items;
+            if (entries == null) return new List<SocialUserItem>();
 
-            foreach (var entry in entries)
-            {
-                if (entry == null || entry.User == null || entry.User.User == null) continue;
-                items.Add(new SocialUserItem(entry.Id, entry.User));
-            }
-
-            return items;
+            return entries.Where(entry => entry != null && entry.User != null && entry.User.User != null)
+                          .Select(entry => new SocialUserItem(entry.Id, entry.User))
+                          .ToList();
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

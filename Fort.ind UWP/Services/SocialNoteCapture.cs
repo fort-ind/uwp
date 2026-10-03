@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -22,25 +23,10 @@ namespace Fort.ind_UWP
             if (_disposed) return;
 
             var next = new HashSet<string>(StringComparer.Ordinal);
-            if (ids != null)
-            {
-                foreach (var id in ids)
-                {
-                    if (!string.IsNullOrEmpty(id)) next.Add(id);
-                }
-            }
+            if (ids != null) next.UnionWith(ids.Where(id => !string.IsNullOrEmpty(id)));
 
-            var added = new List<string>();
-            foreach (var id in next)
-            {
-                if (!_ids.Contains(id)) added.Add(id);
-            }
-
-            var removed = new List<string>();
-            foreach (var id in _ids)
-            {
-                if (!next.Contains(id)) removed.Add(id);
-            }
+            var added = next.Where(id => !_ids.Contains(id)).ToList();
+            var removed = _ids.Where(id => !next.Contains(id)).ToList();
 
             if (added.Count == 0 && removed.Count == 0) return;
 

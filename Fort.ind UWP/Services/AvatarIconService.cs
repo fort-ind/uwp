@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
@@ -234,11 +235,9 @@ namespace Fort.ind_UWP
                 var folder = item as StorageFolder;
                 if (folder == null) return;
 
-                var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var uri in inUse)
-                {
-                    if (uri != null) keep.Add(System.IO.Path.GetFileName(uri.AbsolutePath));
-                }
+                var keep = new HashSet<string>(inUse.Where(uri => uri != null)
+                                                    .Select(uri => System.IO.Path.GetFileName(uri.AbsolutePath)),
+                                               StringComparer.OrdinalIgnoreCase);
 
                 foreach (var file in await folder.GetFilesAsync())
                 {

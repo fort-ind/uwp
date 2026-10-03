@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -97,10 +98,7 @@ namespace Fort.ind_UWP
             var recipients = new List<string>();
             if (visibility == DirectVisibility)
             {
-                foreach (var id in parent.VisibleUserIds)
-                {
-                    if (!string.IsNullOrEmpty(id) && id != me && !recipients.Contains(id)) recipients.Add(id);
-                }
+                recipients.AddRange(parent.VisibleUserIds.Where(id => !string.IsNullOrEmpty(id) && id != me).Distinct());
 
                 if (parent.User != null && parent.User.Id != me && !recipients.Contains(parent.User.Id)) recipients.Add(parent.User.Id);
             }
@@ -111,12 +109,12 @@ namespace Fort.ind_UWP
                 prefix.Append(parent.User.Handle).Append(' ');
             }
 
-            foreach (var pair in parent.MentionHandles)
+            var handles = parent.MentionHandles.Where(pair => pair.Key != me && !string.IsNullOrEmpty(pair.Value))
+                                               .Select(pair => pair.Value);
+            foreach (var handle in handles)
             {
-                if (pair.Key == me || string.IsNullOrEmpty(pair.Value)) continue;
-                if (prefix.ToString().IndexOf(pair.Value + " ", StringComparison.OrdinalIgnoreCase) >= 0) continue;
-
-                prefix.Append(pair.Value).Append(' ');
+                var present = prefix.ToString().IndexOf(handle + " ", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (!present) prefix.Append(handle).Append(' ');
             }
 
             return new SocialReplyDefaults(visibility, parent.LocalOnly, recipients, prefix.ToString());
@@ -206,9 +204,9 @@ namespace Fort.ind_UWP
             if (poll == null || poll.FilledChoices < 2) return null;
 
             var choices = new JsonArray();
-            foreach (var choice in poll.Choices)
+            foreach (var choice in poll.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice)))
             {
-                if (!string.IsNullOrWhiteSpace(choice)) choices.Add(JsonValue.CreateStringValue(choice.Trim()));
+                choices.Add(JsonValue.CreateStringValue(choice.Trim()));
             }
 
             var body = new JsonObject();
@@ -307,10 +305,8 @@ namespace Fort.ind_UWP
             var segments = MfmText.Parse(NormalizeText(text), null, null, null);
             var me = SocialContentService.CurrentAccountId();
 
-            foreach (var segment in segments)
+            foreach (var segment in segments.Where(segment => segment.Kind == MfmSegmentKind.Mention && !string.IsNullOrEmpty(segment.Username)))
             {
-                if (segment.Kind != MfmSegmentKind.Mention || string.IsNullOrEmpty(segment.Username)) continue;
-
                 var host = string.IsNullOrEmpty(segment.Host)
                            || string.Equals(segment.Host, MisskeyAuthService.InstanceHost, StringComparison.OrdinalIgnoreCase)
                            ? null

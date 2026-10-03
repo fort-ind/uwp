@@ -106,7 +106,7 @@ namespace Fort.ind_UWP
 
         private SocialDraftPoll GetPoll()
         {
-            if (PollPanel.Visibility != Visibility.Visible) return null;
+            if (!PollPanel.IsShown()) return null;
 
             var choices = new List<string>();
             foreach (var box in _choiceBoxes)
@@ -123,7 +123,7 @@ namespace Fort.ind_UWP
                 expiresAt = original.HasValue && Math.Abs((original.Value - custom).TotalMinutes) < 1 ? original.Value : custom;
             }
 
-            return new SocialDraftPoll(choices, MultipleBox.IsChecked == true, expiry, expiresAt);
+            return new SocialDraftPoll(choices, MultipleBox.IsChecked.GetValueOrDefault(), expiry, expiresAt);
         }
 
         private bool IsPollValid()
@@ -212,7 +212,7 @@ namespace Fort.ind_UWP
 
         private void PollToggle_Click(object sender, RoutedEventArgs e)
         {
-            var on = PollToggle.IsChecked == true;
+            var on = PollToggle.IsChecked.GetValueOrDefault();
             PollPanel.Visibility = Shown(on);
 
             if (on)

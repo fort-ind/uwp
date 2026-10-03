@@ -276,6 +276,22 @@
                         </Setter>
                     </Style>
 
+                    <Style x:Key="SocialToolButtonStyle" TargetType="Button" BasedOn="{StaticResource SocialActionButtonStyle}">
+                        <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+                        <Setter Property="Width" Value="40"/>
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+
+                    <Style x:Key="SocialToolToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource ToggleButtonRevealStyle}">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Width" Value="40"/>
+                        <Setter Property="Height" Value="40"/>
+                        <Setter Property="MinWidth" Value="40"/>
+                        <Setter Property="MinHeight" Value="40"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="CornerRadius" Value="0"/>
+                    </Style>
+
                     <Style x:Key="SocialReactionSplitButtonStyle" TargetType="ToggleSplitButton">
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>

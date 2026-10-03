@@ -65,7 +65,7 @@ namespace Fort.ind_UWP
 
         private readonly AccessibilitySettings _accessibilitySettings = new AccessibilitySettings();
 
-        private bool _animationsEnabled;
+        private readonly bool _animationsEnabled;
 
         private bool _collapseUnavailable;
 
@@ -82,6 +82,8 @@ namespace Fort.ind_UWP
         private SpriteVisual _blurVisual;
 
         private CompositionEffectBrush _blurBrush;
+
+        private GaussianBlurEffect _blurEffect;
 
         private bool _collapseAttached;
 
@@ -254,9 +256,10 @@ namespace Fort.ind_UWP
 
         private void ApplyEffectsMode()
         {
+            var energySaver = PowerManager.EnergySaverStatus;
             _effectsEnabled = _blurVisual != null
                               && _uiSettings.AdvancedEffectsEnabled
-                              && PowerManager.EnergySaverStatus != EnergySaverStatus.On
+                              && energySaver != EnergySaverStatus.On
                               && !_accessibilitySettings.HighContrast;
 
             if (_blurVisual != null) _blurVisual.IsVisible = _effectsEnabled;
@@ -373,7 +376,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var effect = new GaussianBlurEffect
+                _blurEffect = new GaussianBlurEffect
                 {
                     Name = BlurEffectName,
                     BlurAmount = 0,
@@ -382,7 +385,7 @@ namespace Fort.ind_UWP
                     Source = new CompositionEffectSourceParameter(BlurSourceName)
                 };
 
-                var brush = compositor.CreateEffectFactory(effect, new[] { BlurAmountProperty }).CreateBrush();
+                var brush = compositor.CreateEffectFactory(_blurEffect, new[] { BlurAmountProperty }).CreateBrush();
                 brush.SetSourceParameter(BlurSourceName, compositor.CreateBackdropBrush());
 
                 var visual = compositor.CreateSpriteVisual();
@@ -404,6 +407,7 @@ namespace Fort.ind_UWP
                 Debug.WriteLine($"SocialProfileView: the banner blur could not start, using the veil - {ex.GetType().Name}: {ex.Message}");
                 _blurBrush = null;
                 _blurVisual = null;
+                _blurEffect = null;
             }
         }
 
@@ -472,7 +476,7 @@ namespace Fort.ind_UWP
 
         private double TabsHeight()
         {
-            return TabBar.Visibility == Visibility.Visible ? TabBar.ActualHeight : 0;
+            return TabBar.IsShown() ? TabBar.ActualHeight : 0;
         }
 
         private double CompactBarHeight()

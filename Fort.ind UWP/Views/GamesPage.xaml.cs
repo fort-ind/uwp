@@ -387,7 +387,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                if (GamesZoom.Visibility != Visibility.Visible) return;
+                if (!GamesZoom.IsShown()) return;
                 if (GamesZoom.IsZoomedInViewActive == zoomedIn)
                 {
                     args.Handled = true;

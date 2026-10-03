@@ -949,8 +949,8 @@ namespace Fort.ind_UWP
 
             public UIElement AnchorFor(int index)
             {
-                if (!(Button.Tag is int) || (int)Button.Tag != index || Button.Visibility != Visibility.Visible) return null;
-                if (_sensitive.Visibility == Visibility.Visible) return null;
+                if (!(Button.Tag is int) || (int)Button.Tag != index || !Button.IsShown()) return null;
+                if (_sensitive.IsShown()) return null;
 
                 if (_thumbnail.Source != null) return _thumbnail;
                 return _placeholder.Source != null ? _placeholder : null;

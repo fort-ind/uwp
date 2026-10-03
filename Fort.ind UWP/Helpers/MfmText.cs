@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Fort.ind_UWP
@@ -116,11 +117,7 @@ namespace Fort.ind_UWP
         {
             if (segments == null) return null;
 
-            foreach (var segment in segments)
-            {
-                if (segment.Kind == MfmSegmentKind.Link && !segment.IsSilent) return segment;
-            }
-            return null;
+            return segments.FirstOrDefault(segment => segment.Kind == MfmSegmentKind.Link && !segment.IsSilent);
         }
 
         private static string CollapseSpaces(string text)
@@ -592,16 +589,7 @@ namespace Fort.ind_UWP
                 if (j == i + 1) return false;
 
                 var tag = _s.Substring(i + 1, j - i - 1);
-                var allDigits = true;
-                foreach (var c in tag)
-                {
-                    if (c < '0' || c > '9')
-                    {
-                        allDigits = false;
-                        break;
-                    }
-                }
-                if (allDigits) return false;
+                if (tag.All(c => c >= '0' && c <= '9')) return false;
 
                 FlushText();
                 _segments.Add(new MfmSegment

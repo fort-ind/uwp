@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Windows.Data.Json;
 
 namespace Fort.ind_UWP
@@ -224,16 +225,10 @@ namespace Fort.ind_UWP
 
         public static IReadOnlyList<SocialNote> PostsSince(int version)
         {
-            var posts = new List<SocialNote>();
             lock (s_lock)
             {
-                foreach (var pair in s_posts)
-                {
-                    if (pair.Key > version) posts.Add(pair.Value);
-                }
+                return s_posts.Where(pair => pair.Key > version).Select(pair => pair.Value).ToList();
             }
-
-            return posts;
         }
 
         public static int FavoritesVersion
@@ -327,13 +322,7 @@ namespace Fort.ind_UWP
         public static void RememberPinned(IEnumerable<string> noteIds)
         {
             var pinned = new HashSet<string>(StringComparer.Ordinal);
-            if (noteIds != null)
-            {
-                foreach (var id in noteIds)
-                {
-                    if (!string.IsNullOrEmpty(id)) pinned.Add(id);
-                }
-            }
+            if (noteIds != null) pinned.UnionWith(noteIds.Where(id => !string.IsNullOrEmpty(id)));
 
             lock (s_lock)
             {

@@ -112,7 +112,7 @@ namespace Fort.ind_UWP
                             if (trimmable != null) trimmable.Trim();
                         }
 
-                        GC.Collect();
+                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                     }
                     catch (Exception ex)
                     {

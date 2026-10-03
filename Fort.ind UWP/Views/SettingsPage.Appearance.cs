@@ -40,7 +40,7 @@ namespace Fort.ind_UWP
                 UpdateTintSelection(AppearanceService.TintTag);
 
                 var rememberedCustom = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppCustomTintColor] as string;
-                if (TintCustomIcon.Visibility == Visibility.Visible && !string.IsNullOrEmpty(rememberedCustom))
+                if (TintCustomIcon.IsShown() && !string.IsNullOrEmpty(rememberedCustom))
                 {
                     ShowCustomSwatchColor(rememberedCustom);
                 }
@@ -188,7 +188,7 @@ namespace Fort.ind_UWP
                     LocalizedStrings.Format("TintCustomSwatchWithColorFormat",
                                             BaseSwatchName(TintCustomButton), selectedTag));
             }
-            else if (TintCustomIcon.Visibility == Visibility.Collapsed)
+            else if (!TintCustomIcon.IsShown())
             {
                 var remembered = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppCustomTintColor] as string;
                 if (!string.IsNullOrEmpty(remembered))
@@ -219,7 +219,7 @@ namespace Fort.ind_UWP
 
                 var selected = sender == AccentSwatchGroup ? _selectedAccentSwatch : _selectedTintSwatch;
                 if (selected == null || selected == args.NewFocusedElement) return;
-                if (!selected.IsEnabled || selected.Visibility != Visibility.Visible) return;
+                if (!selected.IsEnabled || !selected.IsShown()) return;
 
                 args.TrySetNewFocusedElement(selected);
             }

@@ -59,7 +59,7 @@ namespace Fort.ind_UWP
 
             foreach (var child in Children)
             {
-                if (child.Visibility == Visibility.Collapsed) continue;
+                if (!child.IsShown()) continue;
 
                 var size = child.DesiredSize;
                 var start = lineHasItems ? x + HorizontalSpacing : 0;

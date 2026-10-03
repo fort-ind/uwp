@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
@@ -245,10 +246,8 @@ namespace Fort.ind_UWP
 
             string current = null;
             var items = new List<SocialEmojiItem>();
-            foreach (var entry in _catalog.Custom)
+            foreach (var entry in _catalog.Custom.Where(Allows))
             {
-                if (!Allows(entry)) continue;
-
                 if (current != null && !string.Equals(current, entry.Group, StringComparison.Ordinal))
                 {
                     _groups.Add(new SocialEmojiGroup(current, CustomGroupTitle(current), items));
@@ -263,11 +262,9 @@ namespace Fort.ind_UWP
 
             foreach (var group in SocialEmojiService.UnicodeGroups)
             {
-                var unicode = new List<SocialEmojiItem>();
-                foreach (var entry in _catalog.Unicode)
-                {
-                    if (string.Equals(entry.Group, group, StringComparison.Ordinal)) unicode.Add(new SocialEmojiItem(entry, tone));
-                }
+                var unicode = _catalog.Unicode.Where(entry => string.Equals(entry.Group, group, StringComparison.Ordinal))
+                                              .Select(entry => new SocialEmojiItem(entry, tone))
+                                              .ToList();
 
                 if (unicode.Count > 0) _groups.Add(new SocialEmojiGroup(group, UnicodeGroupTitle(group), unicode));
             }
@@ -327,9 +324,8 @@ namespace Fort.ind_UWP
         private static string UnicodeGroupTitle(string group)
         {
             var key = new System.Text.StringBuilder("SocialEmojiGroup");
-            foreach (var part in group.Split('-'))
+            foreach (var part in group.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                if (part.Length == 0) continue;
                 key.Append(char.ToUpperInvariant(part[0]));
                 key.Append(part.Substring(1));
             }
@@ -432,13 +428,8 @@ namespace Fort.ind_UWP
             try
             {
                 var id = (sender as FrameworkElement)?.Tag as string;
-                foreach (var group in _groups)
-                {
-                    if (group.Id != id || group.Count == 0) continue;
-
-                    EmojiGrid.ScrollIntoView(group[0], ScrollIntoViewAlignment.Leading);
-                    return;
-                }
+                var target = _groups.FirstOrDefault(group => group.Id == id && group.Count > 0);
+                if (target != null) EmojiGrid.ScrollIntoView(target[0], ScrollIntoViewAlignment.Leading);
             }
             catch (Exception ex)
             {
@@ -500,7 +491,7 @@ namespace Fort.ind_UWP
             try
             {
                 if (e.Key != VirtualKey.Down && e.Key != VirtualKey.Enter) return;
-                if (EmojiGrid.Visibility != Visibility.Visible || EmojiGrid.Items.Count == 0) return;
+                if (!EmojiGrid.IsShown() || EmojiGrid.Items.Count == 0) return;
 
                 if (e.Key == VirtualKey.Enter)
                 {

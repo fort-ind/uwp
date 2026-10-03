@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using Windows.Globalization.DateTimeFormatting;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -43,11 +44,11 @@ namespace Fort.ind_UWP
         {
             get
             {
-                return TagsPanel.Visibility == Visibility.Visible
-                       || BioText.Visibility == Visibility.Visible
-                       || FieldsGrid.Visibility == Visibility.Visible
-                       || InfoPanel.Visibility == Visibility.Visible
-                       || CountsText.Visibility == Visibility.Visible;
+                return TagsPanel.IsShown()
+                       || BioText.IsShown()
+                       || FieldsGrid.IsShown()
+                       || InfoPanel.IsShown()
+                       || CountsText.IsShown();
             }
         }
 
@@ -174,9 +175,8 @@ namespace Fort.ind_UWP
             _tagsHighContrast = _accessibilitySettings.HighContrast;
 
             var index = 0;
-            foreach (var role in detail.Roles)
+            foreach (var tag in detail.Roles.Select(BuildRoleTag))
             {
-                var tag = BuildRoleTag(role);
                 TagsPanel.Children.Insert(index++, tag);
                 _roleTags.Add(tag);
             }
@@ -305,9 +305,9 @@ namespace Fort.ind_UWP
             SetInfoLine(BirthdayLine, BirthdayText, FormatBirthday(detail.Birthday));
             SetInfoLine(JoinedLine, JoinedText, FormatJoined(detail.CreatedAt));
 
-            InfoPanel.Visibility = LocationLine.Visibility == Visibility.Visible
-                                   || BirthdayLine.Visibility == Visibility.Visible
-                                   || JoinedLine.Visibility == Visibility.Visible
+            InfoPanel.Visibility = LocationLine.IsShown()
+                                   || BirthdayLine.IsShown()
+                                   || JoinedLine.IsShown()
                                    ? Visibility.Visible
                                    : Visibility.Collapsed;
         }
@@ -394,15 +394,16 @@ namespace Fort.ind_UWP
             if (detail.ShowsFollowingCount(viewer))
             {
                 AppendSeparator(parts);
-                CountsText.Inlines.Add(CountLink("ProfileFollowingCountFormat", detail.FollowingCount.Value, SocialFollowList.Following));
+                CountsText.Inlines.Add(CountLink("ProfileFollowingCountFormat", detail.FollowingCount.GetValueOrDefault(), SocialFollowList.Following));
                 parts++;
             }
 
             if (detail.ShowsFollowersCount(viewer))
             {
                 AppendSeparator(parts);
-                CountsText.Inlines.Add(CountLink(detail.FollowersCount.Value == 1 ? "ProfileFollowersCountOneFormat" : "ProfileFollowersCountFormat",
-                                                 detail.FollowersCount.Value,
+                var followers = detail.FollowersCount.GetValueOrDefault();
+                CountsText.Inlines.Add(CountLink(followers == 1 ? "ProfileFollowersCountOneFormat" : "ProfileFollowersCountFormat",
+                                                 followers,
                                                  SocialFollowList.Followers));
                 parts++;
             }

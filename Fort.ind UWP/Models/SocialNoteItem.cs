@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Windows.UI.Xaml.Media;
@@ -478,8 +479,9 @@ namespace Fort.ind_UWP
                    && string.Equals(current.ContentWarning, note.ContentWarning, StringComparison.Ordinal)
                    && string.Equals(current.Visibility, note.Visibility, StringComparison.Ordinal)
                    && current.Files.Count == note.Files.Count
-                   && (current.Poll == null) == (note.Poll == null)
-                   && (current.Poll == null || current.Poll.Choices.Count == note.Poll.Choices.Count);
+                   && (current.Poll == null
+                       ? note.Poll == null
+                       : note.Poll != null && current.Poll.Choices.Count == note.Poll.Choices.Count);
         }
 
         private void ApplyState(SocialNote note)
@@ -623,15 +625,9 @@ namespace Fort.ind_UWP
 
         public static List<SocialNoteItem> CreateAll(IReadOnlyList<SocialNote> notes, IReadOnlyDictionary<string, Uri> localEmojis, bool isPinned)
         {
-            var items = new List<SocialNoteItem>();
-            if (notes == null) return items;
+            if (notes == null) return new List<SocialNoteItem>();
 
-            foreach (var note in notes)
-            {
-                var item = Create(note, localEmojis, isPinned);
-                if (item != null) items.Add(item);
-            }
-            return items;
+            return notes.Select(note => Create(note, localEmojis, isPinned)).Where(item => item != null).ToList();
         }
 
         public static SocialNoteItem Create(SocialNote outer, IReadOnlyDictionary<string, Uri> localEmojis, bool isPinned)

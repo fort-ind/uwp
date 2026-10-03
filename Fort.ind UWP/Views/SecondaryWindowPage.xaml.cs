@@ -251,7 +251,7 @@ namespace Fort.ind_UWP
             var immersive = page != null
                             && page.ExtendsUnderTitleBar
                             && !_accessibilitySettings.HighContrast
-                            && AppTitleBar.Visibility == Visibility.Visible;
+                            && AppTitleBar.IsShown();
 
             if (immersive != _immersive)
             {

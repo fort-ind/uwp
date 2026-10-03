@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,11 +71,8 @@ namespace Fort.ind_UWP
         {
             if (items == null) return;
 
-            foreach (var storageItem in items)
+            foreach (var file in items.OfType<StorageFile>())
             {
-                var file = storageItem as StorageFile;
-                if (file == null) continue;
-
                 if (_attachments.Count >= AppConstants.SocialAttachmentLimit)
                 {
                     AutomationHelper.AnnounceStatus(this,

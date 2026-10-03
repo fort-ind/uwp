@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -172,15 +173,7 @@ namespace Fort.ind_UWP
 
         private static SearchItem FirstDestination(IEnumerable<SearchItem> destinations, Func<SearchItem, bool> predicate)
         {
-            foreach (var item in destinations)
-            {
-                if (!string.IsNullOrEmpty(item.NavigationTag) && predicate(item))
-                {
-                    return item;
-                }
-            }
-
-            return null;
+            return destinations.FirstOrDefault(item => !string.IsNullOrEmpty(item.NavigationTag) && predicate(item));
         }
 
         private static async Task<bool> AnyGameMatchesAsync(string query)

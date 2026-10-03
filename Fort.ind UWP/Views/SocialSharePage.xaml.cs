@@ -30,6 +30,8 @@ namespace Fort.ind_UWP
 
         private bool _released;
 
+        private bool IsReleased => _released;
+
         public SocialSharePage()
         {
             this.InitializeComponent();
@@ -85,7 +87,7 @@ namespace Fort.ind_UWP
                     await ProfileService.TryRestoreSessionAsync();
                 }
 
-                if (_released) return;
+                if (IsReleased) return;
 
                 if (ProfileService.CurrentUser == null)
                 {
@@ -100,7 +102,7 @@ namespace Fort.ind_UWP
                 }
 
                 var shared = await ReadSharedAsync();
-                if (_released) return;
+                if (IsReleased) return;
 
                 var draft = SocialComposeDraft.Create(shared.Text, null, SocialComposePage.LastVisibility(), SocialComposePage.LastLocalOnly(),
                                                       null, null, null, null, null, null, null);
@@ -118,7 +120,7 @@ namespace Fort.ind_UWP
                     await Composer.AddBitmapAsync(shared.Bitmap);
                 }
 
-                if (_released) return;
+                if (IsReleased) return;
                 ReportDataRetrieved();
 
                 Composer.FocusEditorAt(shared.CaretAtStart ? 0 : int.MaxValue);

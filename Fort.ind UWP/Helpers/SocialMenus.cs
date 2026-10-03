@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
@@ -76,10 +77,8 @@ namespace Fort.ind_UWP
             }
 
             var linkItems = flyout.Items.Count;
-            foreach (var person in new[] { author, renoter })
+            foreach (var person in new[] { author, renoter }.Where(person => person != null && !string.IsNullOrEmpty(person.Id)))
             {
-                if (person == null || string.IsNullOrEmpty(person.Id)) continue;
-
                 if (linkItems > 0 && flyout.Items.Count == linkItems) flyout.Items.Add(new MenuFlyoutSeparator());
                 flyout.Items.Add(ViewUserItem(person));
             }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -30,12 +31,7 @@ namespace Fort.ind_UWP
             {
                 if (SocialReactions.IsRemoteCustom(key)) return null;
 
-                foreach (var entry in Custom)
-                {
-                    if (string.Equals(entry.Name, name, StringComparison.Ordinal)) return entry;
-                }
-
-                return null;
+                return Custom.FirstOrDefault(entry => string.Equals(entry.Name, name, StringComparison.Ordinal));
             }
 
             foreach (var entry in Unicode)
@@ -135,13 +131,7 @@ namespace Fort.ind_UWP
                     var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialRecentReactions] as string;
                     if (string.IsNullOrEmpty(stored)) return new string[0];
 
-                    var keys = new List<string>();
-                    foreach (var key in stored.Split(RecentSeparator))
-                    {
-                        if (key.Length > 0 && keys.Count < RecentLimit) keys.Add(key);
-                    }
-
-                    return keys;
+                    return stored.Split(RecentSeparator).Where(key => key.Length > 0).Take(RecentLimit).ToList();
                 }
                 catch (Exception ex)
                 {

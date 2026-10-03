@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Controls;
@@ -239,14 +240,11 @@ namespace Fort.ind_UWP
                 var item = Item;
                 if (item == null) return;
 
-                foreach (var chip in _chips)
-                {
-                    if (!ReferenceEquals(chip.Button, sender)) continue;
+                var chip = _chips.FirstOrDefault(candidate => ReferenceEquals(candidate.Button, sender));
+                if (chip == null) return;
 
-                    chip.Button.IsChecked = SocialReactions.AreSame(chip.Key, item.MyReaction);
-                    if (chip.Key != null && SocialReactions.CanReactWith(chip.Key)) React(item, chip.Key);
-                    return;
-                }
+                chip.Button.IsChecked = SocialReactions.AreSame(chip.Key, item.MyReaction);
+                if (chip.Key != null && SocialReactions.CanReactWith(chip.Key)) React(item, chip.Key);
             }
             catch (Exception ex)
             {

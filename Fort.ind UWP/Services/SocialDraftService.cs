@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -24,7 +25,7 @@ namespace Fort.ind_UWP
 
         private static JsonObject s_root = new JsonObject();
 
-        private static bool s_loaded;
+        private static volatile bool s_loaded;
 
         private static bool s_dirty;
 
@@ -100,11 +101,7 @@ namespace Fort.ind_UWP
             lock (s_lock)
             {
                 var prefix = account + "|";
-                var replies = new List<string>();
-                foreach (var key in s_replies.Keys)
-                {
-                    if (key.StartsWith(prefix, StringComparison.Ordinal)) replies.Add(key);
-                }
+                var replies = s_replies.Keys.Where(key => key.StartsWith(prefix, StringComparison.Ordinal)).ToList();
                 foreach (var key in replies)
                 {
                     s_replies.Remove(key);

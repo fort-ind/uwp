@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -531,7 +532,7 @@ namespace Fort.ind_UWP
             if (root == null) return SocialApiResult<SocialNoteState>.Failed(SocialApiStatus.Failed);
 
             return SocialApiResult<SocialNoteState>.Succeeded(
-                new SocialNoteState(SocialJson.Bool(root, "isFavorited") == true, SocialJson.Bool(root, "isMutedThread") == true));
+                new SocialNoteState(SocialJson.Bool(root, "isFavorited").GetValueOrDefault(), SocialJson.Bool(root, "isMutedThread").GetValueOrDefault()));
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialFavoriteEntry>>> GetFavoritesAsync(
@@ -665,9 +666,9 @@ namespace Fort.ind_UWP
                                                                                           CancellationToken cancellationToken)
         {
             var ids = new JsonArray();
-            foreach (var id in userIds)
+            foreach (var id in userIds.Where(id => !string.IsNullOrEmpty(id)))
             {
-                if (!string.IsNullOrEmpty(id)) ids.Add(JsonValue.CreateStringValue(id));
+                ids.Add(JsonValue.CreateStringValue(id));
             }
 
             JsonObject body = new JsonObject();

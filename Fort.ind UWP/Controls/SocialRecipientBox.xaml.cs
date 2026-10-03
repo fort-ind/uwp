@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -61,10 +62,9 @@ namespace Fort.ind_UWP
             _recipients.Clear();
             if (users != null)
             {
-                foreach (var user in users)
-                {
-                    if (user != null && !Contains(user)) _recipients.Add(user);
-                }
+                _recipients.AddRange(users.Where(user => user != null)
+                                          .GroupBy(user => user.Id, StringComparer.Ordinal)
+                                          .Select(sameId => sameId.First()));
             }
 
             RenderChips();
@@ -167,13 +167,9 @@ namespace Fort.ind_UWP
                 if (cancellationToken.IsCancellationRequested || result.Status != SocialApiStatus.Ok) return;
 
                 var me = SocialContentService.CurrentAccountId();
-                var suggestions = new List<SocialRecipientSuggestion>();
-                foreach (var user in result.Value)
-                {
-                    if (user.Id != me && !Contains(user)) suggestions.Add(new SocialRecipientSuggestion(user));
-                }
-
-                SearchBox.ItemsSource = suggestions;
+                SearchBox.ItemsSource = result.Value.Where(user => user.Id != me && !Contains(user))
+                                                    .Select(user => new SocialRecipientSuggestion(user))
+                                                    .ToList();
             }
             catch (OperationCanceledException)
             {

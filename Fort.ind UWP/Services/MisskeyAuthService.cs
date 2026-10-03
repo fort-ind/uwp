@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -500,12 +501,9 @@ namespace Fort.ind_UWP
                 var values = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
                 if (!values.TryGetValue(GrantedPermissionsSettingKey, out stamp)) return;
 
-                var kept = new System.Collections.Generic.List<string>();
-                foreach (var part in ((stamp as string) ?? "").Split(','))
-                {
-                    var trimmed = part.Trim();
-                    if (trimmed.Length > 0 && !string.Equals(trimmed, permission, StringComparison.Ordinal)) kept.Add(trimmed);
-                }
+                var kept = ((stamp as string) ?? "").Split(',')
+                                                    .Select(part => part.Trim())
+                                                    .Where(part => part.Length > 0 && !string.Equals(part, permission, StringComparison.Ordinal));
 
                 WriteGrantedPermissions(string.Join(",", kept));
             }

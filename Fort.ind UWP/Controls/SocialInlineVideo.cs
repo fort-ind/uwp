@@ -20,6 +20,12 @@ namespace Fort.ind_UWP
         [ThreadStatic]
         private static SocialInlineVideo t_playing;
 
+        private static SocialInlineVideo PlayingInWindow
+        {
+            get => t_playing;
+            set => t_playing = value;
+        }
+
         private readonly Grid _host;
 
         private readonly UIElement _cover;
@@ -54,7 +60,7 @@ namespace Fort.ind_UWP
 
         public static void StopCurrentView()
         {
-            var playing = t_playing;
+            var playing = PlayingInWindow;
             if (playing != null) playing.Stop();
         }
 
@@ -62,12 +68,12 @@ namespace Fort.ind_UWP
         {
             if (file == null) return;
 
-            var playing = t_playing;
+            var playing = PlayingInWindow;
             if (playing != null && !ReferenceEquals(playing, this)) playing.Stop();
             Stop();
 
             File = file;
-            t_playing = this;
+            PlayingInWindow = this;
             _focusState = focusState == FocusState.Keyboard ? FocusState.Keyboard : FocusState.Programmatic;
 
             _host.Visibility = Visibility.Visible;
@@ -118,7 +124,7 @@ namespace Fort.ind_UWP
 
         public void Stop()
         {
-            if (ReferenceEquals(t_playing, this)) t_playing = null;
+            if (ReferenceEquals(PlayingInWindow, this)) PlayingInWindow = null;
             if (File == null && _host.Children.Count == 0) return;
 
             File = null;

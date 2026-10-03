@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
@@ -232,14 +233,12 @@ namespace Fort.ind_UWP
 
         public SocialComposeDraft GetDraft()
         {
-            var files = new List<SocialDriveFile>();
-            foreach (var item in _attachments)
-            {
-                if (item.State == SocialAttachmentState.Done && item.File != null) files.Add(item.File);
-            }
+            var files = _attachments.Where(item => item.State == SocialAttachmentState.Done && item.File != null)
+                                    .Select(item => item.File)
+                                    .ToList();
 
             return SocialComposeDraft.Create(Editor.Text,
-                                             WarningToggle.IsChecked == true ? WarningBox.Text : null,
+                                             WarningToggle.IsChecked.GetValueOrDefault() ? WarningBox.Text : null,
                                              _visibility,
                                              _localOnly,
                                              _visibility == SocialPostService.DirectVisibility ? RecipientBox.Recipients : null,
@@ -396,7 +395,7 @@ namespace Fort.ind_UWP
 
             OnEdited();
             UpdateSuggestionsSoon();
-            if (PreviewHost.Visibility == Visibility.Visible) RenderPreview();
+            if (PreviewHost.IsShown()) RenderPreview();
             if (_visibility == SocialPostService.DirectVisibility && _context.Mode != SocialComposerMode.Reply)
             {
                 AddMentionedRecipients(_mentionDebounce.Restart());
@@ -408,7 +407,7 @@ namespace Fort.ind_UWP
             if (_loading) return;
 
             OnEdited();
-            if (PreviewHost.Visibility == Visibility.Visible) RenderPreview();
+            if (PreviewHost.IsShown()) RenderPreview();
         }
 
         private void RecipientBox_Changed(object sender, EventArgs e)
@@ -491,14 +490,14 @@ namespace Fort.ind_UWP
             var hasContent = text.Trim().Length > 0 || done > 0 || poll != null || _quoteId != null;
             if (!hasContent || text.Length > AppConstants.SocialNoteMaxLength) return false;
 
-            if (WarningToggle.IsChecked == true)
+            if (WarningToggle.IsChecked.GetValueOrDefault())
             {
                 var warning = WarningBox.Text ?? "";
                 if (warning.Trim().Length == 0 || warning.Length > AppConstants.SocialWarningMaxLength) return false;
             }
 
             if (done > AppConstants.SocialAttachmentLimit) return false;
-            return PollPanel.Visibility != Visibility.Visible || IsPollValid();
+            return !PollPanel.IsShown() || IsPollValid();
         }
 
         private void PostButton_Click(object sender, RoutedEventArgs e)
@@ -673,7 +672,7 @@ namespace Fort.ind_UWP
 
         private void WarningToggle_Click(object sender, RoutedEventArgs e)
         {
-            var on = WarningToggle.IsChecked == true;
+            var on = WarningToggle.IsChecked.GetValueOrDefault();
             WarningBox.Visibility = Shown(on);
             if (on) WarningBox.Focus(FocusState.Programmatic);
             OnEdited();
@@ -681,14 +680,14 @@ namespace Fort.ind_UWP
 
         private void PreviewToggle_Click(object sender, RoutedEventArgs e)
         {
-            var on = PreviewToggle.IsChecked == true;
+            var on = PreviewToggle.IsChecked.GetValueOrDefault();
             PreviewHost.Visibility = Shown(on);
             if (on) RenderPreview();
         }
 
         private void RenderPreview()
         {
-            var warning = WarningToggle.IsChecked == true ? (WarningBox.Text ?? "").Trim() : "";
+            var warning = WarningToggle.IsChecked.GetValueOrDefault() ? (WarningBox.Text ?? "").Trim() : "";
             PreviewWarning.Text = warning;
             PreviewWarning.Visibility = Shown(warning.Length > 0);
 

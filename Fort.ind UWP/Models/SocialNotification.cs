@@ -57,7 +57,7 @@ namespace Fort.ind_UWP
                 Name = SocialJson.String(obj, "name"),
                 AvatarUrl = SocialJson.String(obj, "avatarUrl"),
                 AvatarBlurhash = SocialJson.String(obj, "avatarBlurhash"),
-                IsBot = SocialJson.Bool(obj, "isBot") == true,
+                IsBot = SocialJson.Bool(obj, "isBot").GetValueOrDefault(),
                 Emojis = SocialJson.StringMap(obj, "emojis")
             };
         }
@@ -184,7 +184,7 @@ namespace Fort.ind_UWP
             var id = SocialJson.String(obj, "id");
             if (string.IsNullOrWhiteSpace(id)) return null;
 
-            var isHidden = SocialJson.Bool(obj, "isHidden") == true;
+            var isHidden = SocialJson.Bool(obj, "isHidden").GetValueOrDefault();
             var reactions = isHidden
                             ? (IReadOnlyList<SocialReactionCount>)new SocialReactionCount[0]
                             : SocialReactionCount.ListFromJson(SocialJson.Object(obj, "reactions"));
@@ -197,7 +197,7 @@ namespace Fort.ind_UWP
                 Id = id,
                 UserId = SocialJson.String(obj, "userId"),
                 UpdatedAt = updatedAt == DateTimeOffset.MinValue ? (DateTimeOffset?)null : updatedAt,
-                LocalOnly = SocialJson.Bool(obj, "localOnly") == true,
+                LocalOnly = SocialJson.Bool(obj, "localOnly").GetValueOrDefault(),
                 ReactionAcceptance = SocialJson.String(obj, "reactionAcceptance"),
                 Reactions = reactions,
                 ReactionEmojis = SocialJson.StringMap(obj, "reactionEmojis"),

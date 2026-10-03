@@ -146,10 +146,8 @@ namespace Fort.ind_UWP
             int deleted = 0;
             int skipped = 0;
 
-            foreach (var container in new DirectoryInfo(webCache).EnumerateDirectories())
+            foreach (var container in new DirectoryInfo(webCache).EnumerateDirectories().Where(container => !IsReparsePoint(container)))
             {
-                if ((container.Attributes & System.IO.FileAttributes.ReparsePoint) != 0) continue;
-
                 FileInfo[] files;
                 try
                 {
@@ -161,10 +159,8 @@ namespace Fort.ind_UWP
                     continue;
                 }
 
-                foreach (var file in files)
+                foreach (var file in files.Where(file => !IsReparsePoint(file)))
                 {
-                    if ((file.Attributes & System.IO.FileAttributes.ReparsePoint) != 0) continue;
-
                     try
                     {
                         file.Delete();
@@ -178,6 +174,11 @@ namespace Fort.ind_UWP
             }
 
             Debug.WriteLine($"MediaCacheService: deleted {deleted} cached files, skipped {skipped} in use");
+        }
+
+        private static bool IsReparsePoint(FileSystemInfo entry)
+        {
+            return (entry.Attributes & System.IO.FileAttributes.ReparsePoint) != 0;
         }
     }
 }

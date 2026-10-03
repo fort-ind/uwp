@@ -168,7 +168,8 @@ namespace Fort.ind_UWP
 
         private bool ClosePaneUnlessExpanded()
         {
-            if (NavView.DisplayMode == NavigationViewDisplayMode.Expanded || !NavView.IsPaneOpen) return false;
+            var displayMode = NavView.DisplayMode;
+            if (displayMode == NavigationViewDisplayMode.Expanded || !NavView.IsPaneOpen) return false;
 
             NavView.IsPaneOpen = false;
             return true;

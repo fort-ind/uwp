@@ -35,7 +35,7 @@ namespace Fort.ind_UWP
                 Aliases = SocialJson.StringList(obj, "aliases"),
                 Category = SocialJson.String(obj, "category"),
                 Url = url,
-                IsSensitive = SocialJson.Bool(obj, "isSensitive") == true
+                IsSensitive = SocialJson.Bool(obj, "isSensitive").GetValueOrDefault()
             };
         }
     }

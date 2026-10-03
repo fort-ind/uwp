@@ -88,7 +88,7 @@ namespace Fort.ind_UWP
 
                     if (isFirstNavigation)
                     {
-                        s_composeAfterRestore = composeRequested;
+                        _composeAfterRestore = composeRequested;
                         var ignored = rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                                                     RestoreSessionInBackground);
                     }
@@ -159,9 +159,9 @@ namespace Fort.ind_UWP
                 await ProfileService.TryRestoreSessionAsync();
                 StartSocialNotifications();
 
-                if (s_composeAfterRestore)
+                if (_composeAfterRestore)
                 {
-                    s_composeAfterRestore = false;
+                    _composeAfterRestore = false;
                     OpenComposeFromLaunch();
                 }
 
@@ -174,7 +174,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static bool s_composeAfterRestore;
+        private bool _composeAfterRestore;
 
         private static async void OpenComposeFromLaunch()
         {

@@ -206,13 +206,13 @@ namespace Fort.ind_UWP
                     var choice = value.GetObject();
                     choices.Add(new SocialPollChoice(SocialJson.String(choice, "text") ?? "",
                                                      Math.Max(0, SocialJson.Int(choice, "votes") ?? 0),
-                                                     SocialJson.Bool(choice, "isVoted") == true));
+                                                     SocialJson.Bool(choice, "isVoted").GetValueOrDefault()));
                 }
             }
 
             var expires = SocialJson.Date(obj, "expiresAt");
 
-            return new SocialPoll(SocialJson.Bool(obj, "multiple") == true,
+            return new SocialPoll(SocialJson.Bool(obj, "multiple").GetValueOrDefault(),
                                   expires == DateTimeOffset.MinValue ? (DateTimeOffset?)null : expires,
                                   choices);
         }

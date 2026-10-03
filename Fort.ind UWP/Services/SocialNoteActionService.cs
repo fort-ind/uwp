@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -421,11 +422,9 @@ namespace Fort.ind_UWP
             if (poll.IsExpired(DateTimeOffset.Now)) return;
             if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteVotes, SocialSignInPrompt.Vote)) return;
 
-            var valid = new List<int>();
-            foreach (var choice in choices)
-            {
-                if (choice >= 0 && choice < poll.Choices.Count && !poll.Choices[choice].IsVoted && !valid.Contains(choice)) valid.Add(choice);
-            }
+            var valid = choices.Where(choice => choice >= 0 && choice < poll.Choices.Count && !poll.Choices[choice].IsVoted)
+                               .Distinct()
+                               .ToList();
             if (valid.Count == 0) return;
 
             var confirmed = await DialogService.ShowConfirmAsync(owner,
@@ -491,7 +490,7 @@ namespace Fort.ind_UWP
                 list.Append(poll.Choices[choice].Text ?? "");
             }
 
-            return LocalizedStrings.Format("SocialVoteDialogBodyMultipleFormat", list.ToString());
+            return LocalizedStrings.Format("SocialVoteDialogBodyMultipleFormat", list);
         }
 
         public static async Task RefreshAsync(string noteId)
