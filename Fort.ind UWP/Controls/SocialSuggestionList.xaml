@@ -1,0 +1,49 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialSuggestionList"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Border Background="{ThemeResource SystemControlTransientBackgroundBrush}"
+            BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
+            BorderThickness="{ThemeResource FlyoutBorderThemeThickness}"
+            Width="280">
+        <ListView x:Uid="SocialComposeSuggestions"
+                  x:Name="List"
+                  MaxHeight="240"
+                  SelectionMode="Single"
+                  IsItemClickEnabled="True"
+                  ItemClick="List_ItemClick"
+                  AllowFocusOnInteraction="False"
+                  IsTabStop="False">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:SocialSuggestion">
+                    <Grid ColumnSpacing="10" Padding="0,4,0,4" AutomationProperties.Name="{x:Bind AutomationName}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{x:Bind Glyph}"
+                                   FontFamily="Segoe UI Emoji"
+                                   FontSize="18"
+                                   IsTextScaleFactorEnabled="False"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <Image Source="{x:Bind Image}" Width="24" Height="24" Stretch="Uniform"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind Title}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{x:Bind Detail}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Visibility="{x:Bind local:SocialComposer.Shown(HasDetail)}"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Border>
+</UserControl>

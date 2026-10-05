@@ -17,7 +17,8 @@ namespace Fort.ind_UWP
         Mute,
         Delete,
         Report,
-        Post
+        Post,
+        Profile
     }
 
     public static class SocialPermissions

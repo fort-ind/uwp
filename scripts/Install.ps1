@@ -183,7 +183,7 @@ if ($dependencyPaths.Count -gt 0) {
     }
 } else {
     Write-Status "No bundled dependencies found next to this script (did you extract the whole zip?)" "Warning"
-    Write-Status "The install will fail if a framework the app needs (WinUI 2.5, .NET Native, VCLibs) is missing" "Warning"
+    Write-Status "The install will fail if a framework the app needs (WinUI 2.7, .NET Native, VCLibs) is missing" "Warning"
 }
 
 Write-Section "Signing Certificate"

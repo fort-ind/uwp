@@ -92,7 +92,7 @@ namespace Fort.ind_UWP
             return false;
         }
 
-        public static async Task ShowInMainWindowAsync(string navTag)
+        public static async Task ShowInMainWindowAsync(string navTag, string settingsSection = null)
         {
             var mainDispatcher = s_mainDispatcher;
             if (mainDispatcher == null) return;
@@ -100,7 +100,7 @@ namespace Fort.ind_UWP
             await mainDispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 var shell = MainPage.Current;
-                if (shell != null) shell.NavigateToTag(navTag);
+                if (shell != null) shell.NavigateToTag(navTag, settingsSection);
             });
 
             await ApplicationViewSwitcher.SwitchAsync(s_mainViewId);

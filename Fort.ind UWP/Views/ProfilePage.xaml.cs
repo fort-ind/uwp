@@ -39,6 +39,8 @@ namespace Fort.ind_UWP
 
         private const string SignOutGlyph = "";
 
+        private const string MoreSettingsGlyph = "";
+
         private const string StickyExpression = "Vector3(0, Max(0, -scroll.Translation.Y - props.tabTop), 0)";
 
         private const string BackdropExpression = "Clamp((-scroll.Translation.Y - props.tabTop) / 12, 0, 1)";
@@ -806,11 +808,18 @@ namespace Fort.ind_UWP
         {
             try
             {
-                await WebLauncher.LaunchAsync(SocialLinks.ProfileSettingsUrl());
+                if (WindowManagerService.IsSecondaryView)
+                {
+                    await WindowManagerService.ShowInMainWindowAsync(AppConstants.NavigationSettings, AppConstants.SettingsSectionProfile);
+                    return;
+                }
+
+                var shell = MainPage.Current;
+                if (shell != null) shell.NavigateToTag(AppConstants.NavigationSettings, AppConstants.SettingsSectionProfile);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not open the profile settings - {ex.Message}");
+                Debug.WriteLine($"ProfilePage: could not open the profile editor - {ex.Message}");
             }
         }
 
@@ -821,6 +830,14 @@ namespace Fort.ind_UWP
                 var user = _detail == null ? null : _detail.User;
                 var flyout = SocialMenus.BuildForUser(user, null, this) ?? new MenuFlyout();
                 if (flyout.Items.Count > 0) flyout.Items.Add(new MenuFlyoutSeparator());
+
+                var moreSettings = new MenuFlyoutItem
+                {
+                    Text = LocalizedStrings.Get("SocialProfileMoreSettingsMenuItem"),
+                    Icon = new FontIcon { Glyph = MoreSettingsGlyph }
+                };
+                moreSettings.Click += MoreSettingsItem_Click;
+                flyout.Items.Add(moreSettings);
 
                 var signOut = new MenuFlyoutItem
                 {
@@ -835,6 +852,18 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"ProfilePage: could not show the profile menu - {ex.Message}");
+            }
+        }
+
+        private async void MoreSettingsItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await WebLauncher.LaunchAsync(SocialLinks.ProfileSettingsUrl());
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ProfilePage: could not open the profile settings - {ex.Message}");
             }
         }
 

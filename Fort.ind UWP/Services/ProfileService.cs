@@ -334,6 +334,21 @@ namespace Fort.ind_UWP
             await ApplyFetchedProfileAsync(fetched);
         }
 
+        public static async Task ApplyOwnUpdateAsync(string token, UserProfile updated)
+        {
+            if (updated == null) return;
+
+            var current = CurrentUser;
+            if (current == null || !string.Equals(current.UserId, updated.UserId, StringComparison.Ordinal)) return;
+
+            if (!string.Equals(await MisskeyAuthService.TryGetTokenAsync(), token, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            await ApplyFetchedProfileAsync(updated);
+        }
+
         private static async Task ApplyFetchedProfileAsync(UserProfile fetched)
         {
             var current = CurrentUser;

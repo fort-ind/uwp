@@ -96,7 +96,8 @@ namespace Fort.ind_UWP
                 _imageUri = null;
                 _emojiImage.Source = null;
                 _emojiImage.Visibility = Visibility.Collapsed;
-                _emojiText.FontFamily = custom ? FontFamily.XamlAutoFontFamily : s_emojiFont;
+                if (custom) _emojiText.ClearValue(TextBlock.FontFamilyProperty);
+                else _emojiText.FontFamily = s_emojiFont;
                 _emojiText.FontSize = custom ? _countText.FontSize : EmojiFontSize;
                 _emojiText.Text = SocialReactions.SpokenName(reaction.Key);
                 _emojiText.Visibility = Visibility.Visible;

@@ -136,6 +136,7 @@
     <Compile Include="Behaviors\GameContextMenuBehavior.cs" />
     <Compile Include="Behaviors\SocialContextMenuBehavior.cs" />
     <Compile Include="Behaviors\SocialNoteShortcutsBehavior.cs" />
+    <Compile Include="Behaviors\SocialSuggestionsBehavior.cs" />
     <Compile Include="Behaviors\WindowActivationStateBehavior.cs" />
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
     <Compile Include="Controls\SocialCharacterRing.xaml.cs">
@@ -147,8 +148,14 @@
     <Compile Include="Controls\SocialComposer.Attachments.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\SocialComposer.Autocomplete.cs">
-      <DependentUpon>SocialComposer.xaml</DependentUpon>
+    <Compile Include="Controls\SocialProfileEditor.xaml.cs">
+      <DependentUpon>SocialProfileEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialProfileEditor.Images.cs">
+      <DependentUpon>SocialProfileEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialSuggestionList.xaml.cs">
+      <DependentUpon>SocialSuggestionList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\SocialComposer.Poll.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
@@ -226,6 +233,7 @@
     <Compile Include="Models\SocialNotePersonItem.cs" />
     <Compile Include="Models\SocialNotification.cs" />
     <Compile Include="Models\SocialProfileFeeds.cs" />
+    <Compile Include="Models\SocialSuggestion.cs" />
     <Compile Include="Models\SocialUserDetail.cs" />
     <Compile Include="Models\SocialUserItem.cs" />
     <Compile Include="Models\SocialWindowArgs.cs" />
@@ -258,6 +266,7 @@
     <Compile Include="Services\SocialNotificationService.cs" />
     <Compile Include="Services\SocialPermissions.cs" />
     <Compile Include="Services\SocialPostService.cs" />
+    <Compile Include="Services\SocialProfileEditService.cs" />
     <Compile Include="Services\SocialStream.cs" />
     <Compile Include="Services\SocialTileService.cs" />
     <Compile Include="Services\SocialToastActions.cs" />
@@ -564,6 +573,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\SocialProfileEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialSuggestionList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\SocialRecipientBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -610,8 +627,11 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Animations">
       <Version>7.1.3</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Media">
+      <Version>7.1.3</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.5.0</Version>
+      <Version>2.7.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
       <Version>18.7.23</Version>

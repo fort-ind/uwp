@@ -74,6 +74,7 @@ namespace Fort.ind_UWP
                 UpdateStorageInfo();
                 UpdateTileNotificationsVisibility();
                 UpdateBackgroundDeniedNotice(false);
+                RefreshProfileEditorIfShown();
 
                 RevealPendingSection();
             }
@@ -646,6 +647,19 @@ namespace Fort.ind_UWP
         private void ProfileHeader_Tapped(object sender, RoutedEventArgs e)
         {
             ToggleSettingsRow(ProfileHeader, ProfileContent, ProfileChevronRotation, AppConstants.SettingSettingsProfileExpanded);
+            RefreshProfileEditorIfShown();
+        }
+
+        private void RefreshProfileEditorIfShown()
+        {
+            try
+            {
+                if (ProfileContent.IsShown()) ProfileEditor.RefreshFromServer();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SettingsPage: could not refresh the profile editor - {ex.Message}");
+            }
         }
 
         private void NotificationsHeader_Tapped(object sender, RoutedEventArgs e)
@@ -733,6 +747,7 @@ namespace Fort.ind_UWP
                 {
                     ToggleSettingsRow(row.Header, row.Content, row.Chevron, row.SettingKey);
                 }
+                if (section == AppConstants.SettingsSectionProfile) RefreshProfileEditorIfShown();
 
                 row.Header.Focus(FocusState.Programmatic);
 

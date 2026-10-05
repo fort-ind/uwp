@@ -1260,7 +1260,7 @@ Open your profile and try again.</value>
     <value>Profile</value>
   </data>
   <data name="MainProfileSettingsCaption.Text" xml:space="preserve">
-    <value>How often your profile and notifications are updated</value>
+    <value>Edit your fort.social profile, and choose how often it updates</value>
   </data>
   <data name="ProfileAutoRefreshToggle.Header" xml:space="preserve">
     <value>Refresh follower counts automatically</value>
@@ -2012,13 +2012,13 @@ Open your profile and try again.</value>
     <value>Shows a note at the top of the following and followers lists of people on other servers, since fort.social may only know part of those lists.</value>
   </data>
   <data name="SocialProfileManageButton.Content" xml:space="preserve">
-    <value>Manage on fort.social</value>
+    <value>Manage</value>
   </data>
   <data name="SocialProfileManageButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Opens your profile settings on fort.social in the browser</value>
+    <value>Opens Settings to edit your fort.social profile</value>
   </data>
   <data name="SocialProfileManageButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Edit your profile on fort.social</value>
+    <value>Edit your profile in Settings</value>
   </data>
   <data name="SocialProfileSignOutMenuItem" xml:space="preserve">
     <value>Sign out</value>
@@ -2980,7 +2980,7 @@ Open your profile and try again.</value>
     <value>The upload didn't finish. Select it to try again.</value>
   </data>
   <data name="SocialAttachmentNeedsSignIn" xml:space="preserve">
-    <value>Sign in again to upload files.</value>
+    <value>Sign in again to upload files. </value>
   </data>
   <data name="SocialAttachmentLimitFormat" xml:space="preserve">
     <value>You can attach up to {0} files.</value>
@@ -3142,5 +3142,134 @@ Open your profile and try again.</value>
   </data>
   <data name="SocialShareFailedBody" xml:space="preserve">
     <value>Something went wrong reading it. Try sharing again.</value>
+  </data>
+  <data name="SocialProfileEditorHeading.Text" xml:space="preserve">
+    <value>Your profile</value>
+  </data>
+  <data name="SocialProfileEditorSignedOut.Text" xml:space="preserve">
+    <value>Sign in to fort.social to edit your name, bio, avatar and banner from here.</value>
+  </data>
+  <data name="SocialProfileEditorSignInButton.Content" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="SocialProfileChangeAvatarButton.Content" xml:space="preserve">
+    <value>Change avatar</value>
+  </data>
+  <data name="SocialProfileChangeBannerButton.Content" xml:space="preserve">
+    <value>Change banner</value>
+  </data>
+  <data name="SocialProfileNameBox.Header" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="SocialProfileBioBox.Header" xml:space="preserve">
+    <value>Bio</value>
+  </data>
+  <data name="SocialProfileBioBox.PlaceholderText" xml:space="preserve">
+    <value>Tell people a bit about yourself</value>
+  </data>
+  <data name="SocialProfileSaveButton.Content" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SocialProfileDiscardButton.Content" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="SocialProfileSaving.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Saving your profile</value>
+  </data>
+  <data name="SocialProfileSaved" xml:space="preserve">
+    <value>Profile saved</value>
+  </data>
+  <data name="SocialProfileAccountTypeHeading.Text" xml:space="preserve">
+    <value>Account type</value>
+  </data>
+  <data name="SocialProfileBotToggle.Header" xml:space="preserve">
+    <value>Mark this account as a clan- i mean bot</value>
+  </data>
+  <data name="SocialProfileBotDescription.Text" xml:space="preserve">
+    <value>Turn this on if a program runs this account. Other bots and apps use it to avoid endless chains of replies.</value>
+  </data>
+  <data name="SocialProfileCatToggle.Header" xml:space="preserve">
+    <value>Mark this account as a cat</value>
+  </data>
+  <data name="SocialProfileCatDescription.Text" xml:space="preserve">
+    <value>meow meow meow meow meow :3 pspspspsps </value>
+  </data>
+  <data name="SocialProfileSpeakAsCatToggle.Header" xml:space="preserve">
+    <value>speak like a cat :)</value>
+  </data>
+  <data name="SocialProfileSpeakAsCatDescription.Text" xml:space="preserve">
+    <value>you are a cat. you will be nyanafied. your not safe. :3 </value>
+  </data>
+  <data name="SocialProfileSaveFailedTitle" xml:space="preserve">
+    <value>Your profile wasn't saved</value>
+  </data>
+  <data name="SocialProfileFlagFailedTitle" xml:space="preserve">
+    <value>That setting wasn't changed</value>
+  </data>
+  <data name="SocialProfileErrorProhibitedName" xml:space="preserve">
+    <value>Your display name contains words fort.social doesn't allow. To use it anyway, contact the server's administrator.</value>
+  </data>
+  <data name="SocialProfileErrorNotAnImage" xml:space="preserve">
+    <value>fort.social couldn't use that file as an image. Try a PNG or JPEG.</value>
+  </data>
+  <data name="SocialProfileErrorTooLarge" xml:space="preserve">
+    <value>That image is too large for fort.social.</value>
+  </data>
+  <data name="SocialProfileErrorNoSpace" xml:space="preserve">
+    <value>Your fort.social drive is full. Delete some files on fort.social, then try again.</value>
+  </data>
+  <data name="SocialProfileErrorInappropriate" xml:space="preserve">
+    <value>fort.social didn't accept that image.</value>
+  </data>
+  <data name="SocialProfileErrorRateLimit" xml:space="preserve">
+    <value>You're changing your profile too often. Wait a minute, then try again.</value>
+  </data>
+  <data name="SocialProfileErrorGeneric" xml:space="preserve">
+    <value>fort.social didn't accept the change. Check your connection and try again; your edits are kept.</value>
+  </data>
+  <data name="SocialProfileImageTooLargeTitle" xml:space="preserve">
+    <value>That image is too large</value>
+  </data>
+  <data name="SocialProfileImageTooLargeFormat" xml:space="preserve">
+    <value>Images can be up to {0} MB.</value>
+  </data>
+  <data name="SocialProfileCropAskTitle" xml:space="preserve">
+    <value>Crop this image?</value>
+  </data>
+  <data name="SocialProfileCropAskAvatar" xml:space="preserve">
+    <value>Avatars are shown as a circle.</value>
+  </data>
+  <data name="SocialProfileCropAskBanner" xml:space="preserve">
+    <value>Banners are shown twice as wide as they are tall.</value>
+  </data>
+  <data name="SocialProfileCropYes" xml:space="preserve">
+    <value>Crop</value>
+  </data>
+  <data name="SocialProfileCropNo" xml:space="preserve">
+    <value>Use as-is</value>
+  </data>
+  <data name="SocialProfileCropAvatarTitle" xml:space="preserve">
+    <value>Crop avatar</value>
+  </data>
+  <data name="SocialProfileCropBannerTitle" xml:space="preserve">
+    <value>Crop banner</value>
+  </data>
+  <data name="SocialProfileCropDone" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="SocialProfileImageUnreadableTitle" xml:space="preserve">
+    <value>That image couldn't be opened</value>
+  </data>
+  <data name="SocialProfileImageUnreadableBody" xml:space="preserve">
+    <value>Try a PNG or JPEG image.</value>
+  </data>
+  <data name="SocialSignInPromptProfileTitle" xml:space="preserve">
+    <value>Sign in again to edit your profile</value>
+  </data>
+  <data name="SocialProfileMoreSettingsMenuItem" xml:space="preserve">
+    <value>More settings on fort.social</value>
+  </data>
+  <data name="ProfileRefreshingHeading.Text" xml:space="preserve">
+    <value>Refreshing</value>
   </data>
 </root>

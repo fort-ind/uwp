@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -146,7 +147,10 @@ namespace Fort.ind_UWP
 
         internal static ResourceDictionary FindOverrideDictionary(ResourceDictionary root)
         {
-            var merged = root.MergedDictionaries;
+            var host = root as Microsoft.UI.Xaml.Controls.XamlControlsResources
+                       ?? root.MergedDictionaries.OfType<Microsoft.UI.Xaml.Controls.XamlControlsResources>().FirstOrDefault()
+                       ?? root;
+            var merged = host.MergedDictionaries;
             for (var i = merged.Count - 1; i >= 0; i--)
             {
                 if (merged[i].Source == null) return merged[i];

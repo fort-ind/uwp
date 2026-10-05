@@ -93,6 +93,8 @@ namespace Fort.ind_UWP
             AddHandler(DragOverEvent, new DragEventHandler(Composer_DragOver), true);
             AddHandler(DropEvent, new DragEventHandler(Composer_Drop), true);
 
+            Suggestions.Accepted += Suggestions_Accepted;
+
             Loaded += SocialComposer_Loaded;
         }
 
@@ -211,7 +213,7 @@ namespace Fort.ind_UWP
 
                 ApplyVisibility();
                 ApplyAcceptance();
-                HideSuggestions();
+                Suggestions.Hide();
             }
             finally
             {
@@ -379,7 +381,7 @@ namespace Fort.ind_UWP
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => { });
                 var focused = FocusManager.GetFocusedElement() as DependencyObject;
                 if (focused != null && VisualTreeSearch.IsDescendantOf(focused, this)) return;
-                if (EmojiFlyout.IsOpen || SuggestionPopup.IsOpen) return;
+                if (EmojiFlyout.IsOpen || Suggestions.IsOpen) return;
 
                 if (IsDraftEmpty()) SetExpanded(false);
             }
@@ -394,7 +396,6 @@ namespace Fort.ind_UWP
             if (_loading) return;
 
             OnEdited();
-            UpdateSuggestionsSoon();
             if (PreviewHost.IsShown()) RenderPreview();
             if (_visibility == SocialPostService.DirectVisibility && _context.Mode != SocialComposerMode.Reply)
             {
@@ -522,7 +523,7 @@ namespace Fort.ind_UWP
         {
             if (!CanPost()) return false;
 
-            HideSuggestions();
+            Suggestions.Hide();
             SetPosting(true);
             try
             {
@@ -797,8 +798,31 @@ namespace Fort.ind_UWP
 
         public void Collapse()
         {
-            HideSuggestions();
+            Suggestions.Hide();
             if (IsDraftEmpty()) SetExpanded(false);
+        }
+
+        private void Editor_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            try
+            {
+                if (e.Handled || e.Key != VirtualKey.Escape) return;
+                if (_context.Mode != SocialComposerMode.Reply || Suggestions.IsOpen || !IsDraftEmpty()) return;
+
+                SetExpanded(false);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialComposer: could not collapse the reply box - {ex.Message}");
+            }
+        }
+
+        private void Suggestions_Accepted(object sender, SocialSuggestion suggestion)
+        {
+            if (suggestion.User != null && _visibility == SocialPostService.DirectVisibility && _context.Mode != SocialComposerMode.Reply)
+            {
+                RecipientBox.Add(suggestion.User);
+            }
         }
     }
 }

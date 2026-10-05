@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Fort.ind_UWP"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -82,11 +83,14 @@
                          IsSpellCheckEnabled="True"
                          MinHeight="140"
                          TextChanged="Editor_TextChanged"
-                         SelectionChanged="Editor_SelectionChanged"
                          PreviewKeyDown="Editor_PreviewKeyDown"
                          Paste="Editor_Paste"
                          GotFocus="Editor_GotFocus"
-                         LostFocus="Editor_LostFocus"/>
+                         LostFocus="Editor_LostFocus">
+                    <i:Interaction.Behaviors>
+                        <local:SocialSuggestionsBehavior x:Name="Suggestions"/>
+                    </i:Interaction.Behaviors>
+                </TextBox>
 
                 <Border x:Name="PreviewHost"
                         Margin="0,0,0,8"
@@ -326,51 +330,5 @@
                 </Grid>
             </Button>
         </Grid>
-
-        <Popup x:Name="SuggestionPopup"
-               Grid.ColumnSpan="2"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               IsLightDismissEnabled="False">
-            <Border Background="{ThemeResource SystemControlTransientBackgroundBrush}"
-                    BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
-                    BorderThickness="{ThemeResource FlyoutBorderThemeThickness}"
-                    Width="280">
-                <ListView x:Uid="SocialComposeSuggestions"
-                          x:Name="SuggestionList"
-                          MaxHeight="240"
-                          SelectionMode="Single"
-                          IsItemClickEnabled="True"
-                          ItemClick="SuggestionList_ItemClick"
-                          AllowFocusOnInteraction="False"
-                          IsTabStop="False">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:SocialSuggestion">
-                            <Grid ColumnSpacing="10" Padding="0,4,0,4" AutomationProperties.Name="{x:Bind AutomationName}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="24"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{x:Bind Glyph}"
-                                           FontFamily="Segoe UI Emoji"
-                                           FontSize="18"
-                                           IsTextScaleFactorEnabled="False"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                                <Image Source="{x:Bind Image}" Width="24" Height="24" Stretch="Uniform"/>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Bind Title}" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{x:Bind Detail}"
-                                               Style="{StaticResource CaptionTextBlockStyle}"
-                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                               TextTrimming="CharacterEllipsis"
-                                               Visibility="{x:Bind local:SocialComposer.Shown(HasDetail)}"/>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Border>
-        </Popup>
     </Grid>
 </UserControl>

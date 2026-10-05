@@ -224,6 +224,22 @@ namespace Fort.ind_UWP
             return SocialApiResult<SocialMe>.Succeeded(new SocialMe(count.Value, MisskeyAuthService.ParseCurrentUser(me)));
         }
 
+        public static async Task<SocialApiResult<UserProfile>> UpdateProfileAsync(string token, JsonObject changes, CancellationToken cancellationToken)
+        {
+            var response = await PostAsync("i/update", token, changes ?? new JsonObject(), cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<UserProfile>.Failed(response.Status, response.ErrorCode);
+            }
+
+            var profile = response.Value.ValueType == JsonValueType.Object
+                          ? MisskeyAuthService.ParseCurrentUser(response.Value.GetObject())
+                          : null;
+            return profile == null
+                   ? SocialApiResult<UserProfile>.Failed(SocialApiStatus.Failed)
+                   : SocialApiResult<UserProfile>.Succeeded(profile);
+        }
+
         public static int? ReadUnreadCount(JsonObject me)
         {
             if (me == null || !me.ContainsKey("unreadNotificationsCount")) return null;

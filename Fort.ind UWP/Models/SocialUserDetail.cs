@@ -48,7 +48,7 @@ namespace Fort.ind_UWP
             "id", "username", "host", "name", "avatarUrl", "avatarBlurhash", "isBot", "emojis",
             "description", "location", "birthday", "createdAt", "bannerUrl", "bannerBlurhash", "fields",
             "notesCount", "followingCount", "followersCount", "followingVisibility", "followersVisibility",
-            "isLocked", "roles"
+            "isLocked", "roles", "isCat", "speakAsCat"
         };
 
         private SocialUserDetail()
@@ -92,6 +92,10 @@ namespace Fort.ind_UWP
         public bool IsSuspended { get; private set; }
 
         public bool HasMoved { get; private set; }
+
+        public bool IsCat { get; private set; }
+
+        public bool SpeaksAsCat { get; private set; }
 
         public IReadOnlyList<SocialNote> PinnedNotes { get; private set; }
 
@@ -142,6 +146,8 @@ namespace Fort.ind_UWP
                 IsLocked = SocialJson.Bool(obj, "isLocked").GetValueOrDefault(),
                 IsSuspended = SocialJson.Bool(obj, "isSuspended").GetValueOrDefault(),
                 HasMoved = !string.IsNullOrWhiteSpace(SocialJson.String(obj, "movedTo")),
+                IsCat = SocialJson.Bool(obj, "isCat").GetValueOrDefault(),
+                SpeaksAsCat = SocialJson.Bool(obj, "speakAsCat").GetValueOrDefault(),
                 PinnedNotes = SocialNote.ListFromJson(SocialJson.Array(obj, "pinnedNotes")),
                 Roles = RolesFromJson(SocialJson.Array(obj, "roles"))
             };
