@@ -13,40 +13,51 @@ namespace Fort.ind_UWP
 {
     public sealed partial class SocialPage : Page, IReleasablePage, ITrimmablePage
     {
-        private enum GateKind
-        {
-            None,
-            SignedOut
-        }
-
         private enum FeedState
         {
             Loading,
             Ready,
             Empty,
             Failed,
-            NeedsPermission
+            NeedsPermission,
+            Unavailable
         }
 
         private const int ForYouIndex = 0;
 
-        private const int NotificationsIndex = 1;
+        private const int NotificationsIndex = 4;
 
         private static int LastPivotIndex { get; set; } = ForYouIndex;
 
-        private readonly SocialFeedCollection<SocialNoteItem> _forYou;
+        private static bool LastShowedMentions { get; set; }
+
+        private readonly TimelineFeed _forYou;
+
+        private readonly TimelineFeed _following;
+
+        private readonly TimelineFeed _local;
+
+        private readonly TimelineFeed _global;
+
+        private readonly TimelineFeed[] _timelines;
+
+        private readonly PivotItem[] _signedInPivotItems;
 
         private readonly SocialFeedCollection<SocialFeedItem> _notifications;
 
         private readonly SocialFeedCollection<SocialFeedItem> _mentions;
 
-        private GateKind _gate = GateKind.None;
+        private bool _signedOut;
 
-        private bool IsGated => _gate != GateKind.None;
+        private bool IsSignedOut => _signedOut;
+
+        private bool _changingPivotItems;
+
+        private bool _showingMentions;
+
+        private bool _tabsReady;
 
         private string _shownUserId;
-
-        private bool _forYouRequested;
 
         private bool _notificationsRequested;
 
@@ -54,13 +65,9 @@ namespace Fort.ind_UWP
 
         private bool _mentionsRequested;
 
-        private int _forYouVersion;
-
         private int _notificationsVersion;
 
         private int _mentionsVersion;
-
-        private FeedState _forYouState = FeedState.Loading;
 
         private FeedState _notificationsState = FeedState.Loading;
 
@@ -88,12 +95,28 @@ namespace Fort.ind_UWP
 
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            _forYou = new SocialFeedCollection<SocialNoteItem>(LoadMoreForYouAsync, SocialFeedPaging.NonEmpty);
+            _forYou = CreateTimeline(SocialTimeline.Home, ForYouPivotItem, ForYouList, ForYouLoadingRing, ForYouStatePanel,
+                                     ForYouStateGlyph, ForYouStateText, ForYouStateButton,
+                                     "SocialForYouEmpty", "SocialForYouFailed");
+            _following = CreateTimeline(SocialTimeline.Following, FollowingPivotItem, FollowingList, FollowingLoadingRing, FollowingStatePanel,
+                                        FollowingStateGlyph, FollowingStateText, FollowingStateButton,
+                                        "SocialFollowingFeedEmpty", "SocialFollowingFeedFailed");
+            _local = CreateTimeline(SocialTimeline.Local, LocalPivotItem, LocalList, LocalLoadingRing, LocalStatePanel,
+                                    LocalStateGlyph, LocalStateText, LocalStateButton,
+                                    "SocialLocalEmpty", "SocialLocalFailed");
+            _global = CreateTimeline(SocialTimeline.Global, GlobalPivotItem, GlobalList, GlobalLoadingRing, GlobalStatePanel,
+                                     GlobalStateGlyph, GlobalStateText, GlobalStateButton,
+                                     "SocialGlobalEmpty", "SocialGlobalFailed");
+            _timelines = new[] { _forYou, _following, _local, _global };
+            _signedInPivotItems = new[] { ForYouPivotItem, FollowingPivotItem, LocalPivotItem, GlobalPivotItem, NotificationsPivotItem };
+
             _notifications = new SocialFeedCollection<SocialFeedItem>(LoadMoreNotificationsAsync, SocialFeedPaging.FullPage);
             _mentions = new SocialFeedCollection<SocialFeedItem>(LoadMoreMentionsAsync, SocialFeedPaging.FullPage);
-            ForYouList.ItemsSource = _forYou;
             NotificationsList.ItemsSource = _notifications;
             MentionsList.ItemsSource = _mentions;
+
+            ApplyNotificationsTab(LastShowedMentions);
+            _tabsReady = true;
 
             Loaded += SocialPage_Loaded;
             Unloaded += SocialPage_Unloaded;
@@ -102,7 +125,11 @@ namespace Fort.ind_UWP
         internal void ShowNotifications()
         {
             LastPivotIndex = NotificationsIndex;
-            if (_gate == GateKind.None && SocialPivot.SelectedIndex != NotificationsIndex)
+            LastShowedMentions = false;
+            if (IsSignedOut) return;
+
+            ShowNotificationsTab(false);
+            if (SocialPivot.Items.Count > NotificationsIndex && SocialPivot.SelectedIndex != NotificationsIndex)
             {
                 SocialPivot.SelectedIndex = NotificationsIndex;
             }
@@ -137,7 +164,7 @@ namespace Fort.ind_UWP
             }
 
             RefreshGate();
-            RemoveForYouRows(item => item.IsGone);
+            RemoveTimelineRows(item => item.IsGone);
             foreach (var note in SocialNoteService.PostsSince(_seenPostsVersion))
             {
                 InsertPosted(note);
@@ -167,16 +194,26 @@ namespace Fort.ind_UWP
 
         public void Trim()
         {
-            _forYou.TrimToFirstPage();
+            foreach (var feed in _timelines)
+            {
+                feed.Items.TrimToFirstPage();
+            }
             _notifications.TrimToFirstPage();
             _mentions.TrimToFirstPage();
         }
 
         private void TrimPivot(object pivotItem)
         {
-            if (pivotItem == ForYouPivotItem) _forYou.TrimToFirstPage();
-            else if (pivotItem == NotificationsPivotItem) _notifications.TrimToFirstPage();
-            else if (pivotItem == MentionsPivotItem) _mentions.TrimToFirstPage();
+            var feed = TimelineFor(pivotItem);
+            if (feed != null)
+            {
+                feed.Items.TrimToFirstPage();
+            }
+            else if (pivotItem == NotificationsPivotItem)
+            {
+                _notifications.TrimToFirstPage();
+                _mentions.TrimToFirstPage();
+            }
         }
 
         public void Release()
@@ -232,7 +269,7 @@ namespace Fort.ind_UWP
                         }
                         else
                         {
-                            RemoveForYouRows(item => SocialNoteItem.IsRemovedBy(item, change));
+                            RemoveTimelineRows(item => SocialNoteItem.IsRemovedBy(item, change));
                         }
                     }
                     catch (Exception ex)
@@ -247,31 +284,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void InsertPosted(SocialNote note)
-        {
-            if (note == null || !string.IsNullOrEmpty(note.ReplyId) || !_forYouRequested) return;
-            if (_forYouState != FeedState.Ready && _forYouState != FeedState.Empty) return;
-            if (!SocialContentService.IsCurrentAccount(note.UserId)) return;
-
-            foreach (var existing in _forYou)
-            {
-                if (string.Equals(existing.Note.Id, note.Id, StringComparison.Ordinal)) return;
-            }
-
-            var item = SocialNoteItem.Create(note, SocialContentService.CachedEmojiMap, false);
-            if (item == null) return;
-
-            _forYou.Insert(0, item);
-            if (_forYouState != FeedState.Ready) SetForYouState(FeedState.Ready);
-        }
-
-        private void RemoveForYouRows(Func<SocialNoteItem, bool> predicate)
-        {
-            if (_forYou.RemoveWhere(predicate) == 0) return;
-
-            if (_forYou.Count == 0 && _forYouState == FeedState.Ready && !_forYou.HasMoreItems) SetForYouState(FeedState.Empty);
-        }
-
         private void RefreshGate()
         {
             var user = ProfileService.CurrentUser;
@@ -282,53 +294,69 @@ namespace Fort.ind_UWP
                 ResetFeeds();
             }
 
-            if (user == null)
-            {
-                ShowSignedOutGate();
-            }
-            else
-            {
-                ShowFeeds();
-            }
+            ShowFeeds(user == null);
         }
 
-        private void ShowSignedOutGate()
+        private void ShowFeeds(bool signedOut)
         {
-            _gate = GateKind.SignedOut;
-            SocialPivot.Visibility = Visibility.Collapsed;
-            GateScrollViewer.Visibility = Visibility.Visible;
+            var modeChanged = signedOut != _signedOut || !SocialPivot.IsShown();
+            _signedOut = signedOut;
 
-            GateText.Text = LocalizedStrings.Get("SocialGateSignedOut");
-            GateButton.Content = LocalizedStrings.Get("SocialGateSignInButton");
-        }
-
-        private void ShowFeeds()
-        {
-            var wasGated = _gate != GateKind.None || !SocialPivot.IsShown();
-            _gate = GateKind.None;
-            GateScrollViewer.Visibility = Visibility.Collapsed;
+            SignedOutInfoBar.IsOpen = signedOut;
+            SignedOutInfoBar.Visibility = signedOut ? Visibility.Visible : Visibility.Collapsed;
+            NewNoteButton.Visibility = signedOut ? Visibility.Collapsed : Visibility.Visible;
+            ApplyPivotItems(signedOut);
             SocialPivot.Visibility = Visibility.Visible;
 
-            if (wasGated && SocialPivot.SelectedIndex != LastPivotIndex)
+            if (modeChanged)
             {
-                SocialPivot.SelectedIndex = LastPivotIndex;
-                return;
+                var target = signedOut ? GlobalPivotItem : PivotItemAt(LastPivotIndex);
+                if (SocialPivot.SelectedItem != target) SocialPivot.SelectedItem = target;
             }
 
             EnsureSelectedFeedLoaded();
         }
 
+        private void ApplyPivotItems(bool signedOut)
+        {
+            var wanted = signedOut ? new[] { GlobalPivotItem } : _signedInPivotItems;
+            var items = SocialPivot.Items;
+            if (items.Count == wanted.Length && wanted.Select((item, index) => items[index] == item).All(same => same)) return;
+
+            _changingPivotItems = true;
+            try
+            {
+                items.Clear();
+                foreach (var item in wanted)
+                {
+                    items.Add(item);
+                }
+            }
+            finally
+            {
+                _changingPivotItems = false;
+            }
+        }
+
+        private PivotItem PivotItemAt(int index)
+        {
+            return index >= 0 && index < _signedInPivotItems.Length ? _signedInPivotItems[index] : ForYouPivotItem;
+        }
+
         private void ResetFeeds()
         {
-            _forYouVersion++;
+            foreach (var feed in _timelines)
+            {
+                feed.Version++;
+                feed.Requested = false;
+                feed.Items.ReplaceAll(new SocialNoteItem[0], false);
+            }
             _notificationsVersion++;
             _mentionsVersion++;
-            _forYouRequested = false;
             _notificationsRequested = false;
             _notificationsStale = false;
             _mentionsRequested = false;
             _unseenLiveNotifications = false;
-            _forYou.ReplaceAll(new SocialNoteItem[0], false);
             _notifications.ReplaceAll(new SocialFeedItem[0], false);
             _mentions.ReplaceAll(new SocialFeedItem[0], false);
         }
@@ -336,7 +364,7 @@ namespace Fort.ind_UWP
         private void RefreshTimes()
         {
             var now = DateTimeOffset.Now;
-            foreach (var item in _forYou) item.RefreshTime(now);
+            foreach (var item in _timelines.SelectMany(feed => feed.Items)) item.RefreshTime(now);
             foreach (var item in _notifications) item.RefreshTime(now);
             foreach (var item in _mentions) item.RefreshTime(now);
         }
@@ -345,14 +373,14 @@ namespace Fort.ind_UWP
         {
             try
             {
-                if (_gate != GateKind.None || !_notificationsRequested) return;
+                if (IsSignedOut || !_notificationsRequested) return;
 
                 var version = _notificationsVersion;
                 var unread = await SocialNotificationService.GetUnreadCountAsync(CancellationToken.None);
                 if (version != _notificationsVersion || unread <= 0) return;
 
                 _notificationsStale = true;
-                if (!IsGated && SocialPivot.SelectedItem == NotificationsPivotItem)
+                if (!IsSignedOut && SocialPivot.SelectedItem == NotificationsPivotItem && !_showingMentions)
                 {
                     LoadNotifications();
                 }
@@ -365,14 +393,14 @@ namespace Fort.ind_UWP
 
         private void SocialPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_gate != GateKind.None) return;
+            if (_changingPivotItems) return;
 
             foreach (var removed in e.RemovedItems)
             {
                 TrimPivot(removed);
             }
 
-            LastPivotIndex = SocialPivot.SelectedIndex;
+            if (!IsSignedOut) LastPivotIndex = SocialPivot.SelectedIndex;
             EnsureSelectedFeedLoaded();
 
             if (IsViewingNotifications())
@@ -381,50 +409,58 @@ namespace Fort.ind_UWP
             }
         }
 
+        private void NotificationsTab_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!_tabsReady) return;
+
+            ShowNotificationsTab(sender == MentionsTab);
+        }
+
+        private void ShowNotificationsTab(bool mentions)
+        {
+            if (mentions == _showingMentions) return;
+
+            if (mentions) _notifications.TrimToFirstPage();
+            else _mentions.TrimToFirstPage();
+
+            LastShowedMentions = mentions;
+            ApplyNotificationsTab(mentions);
+
+            if (IsSignedOut || SocialPivot.SelectedItem != NotificationsPivotItem) return;
+
+            EnsureSelectedFeedLoaded();
+            if (IsViewingNotifications()) MarkLiveNotificationsSeen();
+        }
+
+        private void ApplyNotificationsTab(bool mentions)
+        {
+            _showingMentions = mentions;
+            AllNotificationsHost.Visibility = mentions ? Visibility.Collapsed : Visibility.Visible;
+            MentionsHost.Visibility = mentions ? Visibility.Visible : Visibility.Collapsed;
+
+            var tab = mentions ? MentionsTab : AllNotificationsTab;
+            if (!tab.IsChecked.GetValueOrDefault()) tab.IsChecked = true;
+        }
+
         private void EnsureSelectedFeedLoaded()
         {
             var selected = SocialPivot.SelectedItem;
-            if (selected == ForYouPivotItem && !_forYouRequested)
+            var feed = TimelineFor(selected);
+            if (feed != null)
             {
-                LoadForYou();
+                if (!feed.Requested) LoadTimeline(feed);
+                return;
             }
-            else if (selected == NotificationsPivotItem && (!_notificationsRequested || _notificationsStale))
+
+            if (selected != NotificationsPivotItem) return;
+
+            if (_showingMentions)
+            {
+                if (!_mentionsRequested) LoadMentions();
+            }
+            else if (!_notificationsRequested || _notificationsStale)
             {
                 LoadNotifications();
-            }
-            else if (selected == MentionsPivotItem && !_mentionsRequested)
-            {
-                LoadMentions();
-            }
-        }
-
-        private async void LoadForYou()
-        {
-            var version = ++_forYouVersion;
-            _forYouRequested = true;
-            SetForYouState(FeedState.Loading);
-
-            try
-            {
-                var emojiTask = SocialContentService.GetEmojiMapAsync();
-                var result = await SocialContentService.FetchTimelineAsync(null, CancellationToken.None);
-                var emojis = await emojiTask;
-                if (version != _forYouVersion) return;
-
-                if (result.Status != SocialApiStatus.Ok)
-                {
-                    SetForYouState(result.Status == SocialApiStatus.PermissionDenied ? FeedState.NeedsPermission : FeedState.Failed);
-                    return;
-                }
-
-                var items = SocialNoteItem.CreateAll(result.Value, emojis, false);
-                _forYou.ReplaceAll(items, result.Value.Count > 0);
-                SetForYouState(items.Count == 0 ? FeedState.Empty : FeedState.Ready);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"SocialPage: timeline load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == _forYouVersion) SetForYouState(FeedState.Failed);
             }
         }
 
@@ -501,14 +537,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        private async Task<IReadOnlyList<SocialNoteItem>> LoadMoreForYouAsync(string untilId, CancellationToken cancellationToken)
-        {
-            var result = await SocialContentService.FetchTimelineAsync(untilId, cancellationToken);
-            if (result.Status != SocialApiStatus.Ok) return null;
-
-            return SocialNoteItem.CreateAll(result.Value, SocialContentService.CachedEmojiMap, false);
-        }
-
         private async Task<IReadOnlyList<SocialFeedItem>> LoadMoreNotificationsAsync(string untilId, CancellationToken cancellationToken)
         {
             var result = await SocialNotificationService.FetchNotificationsAsync(untilId, false, cancellationToken);
@@ -530,14 +558,6 @@ namespace Fort.ind_UWP
         private static List<SocialFeedItem> FeedItemsFromNotes(IEnumerable<SocialNote> notes)
         {
             return notes.Select(SocialFeedItem.FromNote).Where(item => item != null).ToList();
-        }
-
-        private void SetForYouState(FeedState state)
-        {
-            _forYouState = state;
-            ApplyFeedState(state, ForYouList, ForYouLoadingRing, ForYouStatePanel,
-                           ForYouStateGlyph, ForYouStateText, ForYouStateButton,
-                           "SocialForYouEmpty", "SocialForYouFailed");
         }
 
         private void SetNotificationsState(FeedState state)
@@ -564,7 +584,7 @@ namespace Fort.ind_UWP
             ring.IsActive = state == FeedState.Loading;
             ring.Visibility = state == FeedState.Loading ? Visibility.Visible : Visibility.Collapsed;
 
-            var showPanel = state == FeedState.Empty || state == FeedState.Failed || state == FeedState.NeedsPermission;
+            var showPanel = state != FeedState.Loading && state != FeedState.Ready;
             panel.Visibility = showPanel ? Visibility.Visible : Visibility.Collapsed;
             if (!showPanel) return;
 
@@ -587,21 +607,14 @@ namespace Fort.ind_UWP
                     button.Content = LocalizedStrings.Get("SocialSignInAgainButton");
                     button.Visibility = Visibility.Visible;
                     break;
+                case FeedState.Unavailable:
+                    glyph.Glyph = "";
+                    text.Text = LocalizedStrings.Get("SocialTimelineUnavailable");
+                    button.Visibility = Visibility.Collapsed;
+                    break;
             }
 
             AutomationHelper.AnnounceLiveRegion(text);
-        }
-
-        private void ForYouStateButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_forYouState == FeedState.NeedsPermission)
-            {
-                OpenSignIn();
-            }
-            else
-            {
-                LoadForYou();
-            }
         }
 
         private void NotificationsStateButton_Click(object sender, RoutedEventArgs e)
@@ -630,19 +643,16 @@ namespace Fort.ind_UWP
 
         private void SocialRefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_gate != GateKind.None) return;
-
-            if (SocialPivot.SelectedItem == ForYouPivotItem)
+            var selected = SocialPivot.SelectedItem;
+            var feed = TimelineFor(selected);
+            if (feed != null)
             {
-                LoadForYou();
+                LoadTimeline(feed);
             }
-            else if (SocialPivot.SelectedItem == MentionsPivotItem)
+            else if (selected == NotificationsPivotItem && !IsSignedOut)
             {
-                LoadMentions();
-            }
-            else
-            {
-                LoadNotifications();
+                if (_showingMentions) LoadMentions();
+                else LoadNotifications();
             }
         }
 
@@ -650,6 +660,8 @@ namespace Fort.ind_UWP
         {
             try
             {
+                if (IsSignedOut) return;
+
                 await SocialWindows.ShowComposeAsync(this, SocialComposeMode.New, null);
             }
             catch (Exception ex)
@@ -658,7 +670,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void GateButton_Click(object sender, RoutedEventArgs e)
+        private void SignInButton_Click(object sender, RoutedEventArgs e)
         {
             OpenSignIn();
         }
@@ -788,13 +800,10 @@ namespace Fort.ind_UWP
 
         private void PrependLiveNotification(SocialNotification notification)
         {
-            if (_gate != GateKind.None || !_notificationsRequested) return;
+            if (IsSignedOut || !_notificationsRequested) return;
             if (_notificationsState != FeedState.Ready && _notificationsState != FeedState.Empty) return;
 
-            foreach (var existing in _notifications)
-            {
-                if (string.Equals(existing.Id, notification.Id, StringComparison.Ordinal)) return;
-            }
+            if (_notifications.Any(existing => string.Equals(existing.Id, notification.Id, StringComparison.Ordinal))) return;
 
             var item = SocialFeedItem.FromNotification(notification, true);
             if (item == null) return;
@@ -832,7 +841,7 @@ namespace Fort.ind_UWP
 
         private bool IsViewingNotifications()
         {
-            if (_gate != GateKind.None || SocialPivot.SelectedItem != NotificationsPivotItem) return false;
+            if (IsSignedOut || _showingMentions || SocialPivot.SelectedItem != NotificationsPivotItem) return false;
 
             try
             {

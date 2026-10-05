@@ -353,6 +353,9 @@
     <Compile Include="Views\SocialPage.xaml.cs">
       <DependentUpon>SocialPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SocialPage.Timelines.cs">
+      <DependentUpon>SocialPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ProfilePage.xaml.cs">
       <DependentUpon>ProfilePage.xaml</DependentUpon>
     </Compile>

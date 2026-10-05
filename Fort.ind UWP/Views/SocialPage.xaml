@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     KeyboardAcceleratorPlacementMode="Hidden"
     Background="Transparent">
@@ -108,7 +109,6 @@
                         <AdaptiveTrigger MinWindowWidth="0"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="GatePanel.Padding" Value="12"/>
                         <Setter Target="SocialPivot.Margin" Value="0,0,0,0"/>
                     </VisualState.Setters>
                 </VisualState>
@@ -117,25 +117,11 @@
                         <AdaptiveTrigger MinWindowWidth="641"/>
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="GatePanel.Padding" Value="24"/>
                         <Setter Target="SocialPivot.Margin" Value="12,12,12,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-
-        <ScrollViewer x:Name="GateScrollViewer" IsTabStop="True" Visibility="Collapsed">
-            <StackPanel x:Name="GatePanel" Padding="24" Spacing="12">
-                <TextBlock x:Name="GateText"
-                           Style="{StaticResource BodyTextBlockStyle}"
-                           TextWrapping="Wrap"
-                           MaxWidth="700"
-                           HorizontalAlignment="Left"/>
-                <Button x:Name="GateButton"
-                        Click="GateButton_Click"
-                        HorizontalAlignment="Left"/>
-            </StackPanel>
-        </ScrollViewer>
 
         <Pivot x:Uid="SocialPivot" x:Name="SocialPivot"
                Visibility="Collapsed"
@@ -212,86 +198,248 @@
                                    AutomationProperties.LiveSetting="Polite"/>
                         <Button x:Name="ForYouStateButton"
                                 HorizontalAlignment="Center"
-                                Click="ForYouStateButton_Click"/>
+                                Click="TimelineStateButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem x:Uid="SocialFollowingPivotItem" x:Name="FollowingPivotItem">
+                <Grid>
+                    <ListView x:Uid="SocialFollowingList" x:Name="FollowingList"
+                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="NoteList_ItemClick"
+                              Visibility="Collapsed">
+                        <i:Interaction.Behaviors>
+                            <local:SocialContextMenuBehavior/>
+                            <local:SocialNoteShortcutsBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ListView>
+
+                    <ProgressRing x:Uid="SocialFollowingLoading" x:Name="FollowingLoadingRing"
+                                  Width="32" Height="32"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <StackPanel x:Name="FollowingStatePanel"
+                                Style="{StaticResource SocialStatePanelStyle}"
+                                Visibility="Collapsed">
+                        <FontIcon x:Name="FollowingStateGlyph"
+                                  FontSize="32"
+                                  HorizontalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Name="FollowingStateText"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   AutomationProperties.LiveSetting="Polite"/>
+                        <Button x:Name="FollowingStateButton"
+                                HorizontalAlignment="Center"
+                                Click="TimelineStateButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem x:Uid="SocialLocalPivotItem" x:Name="LocalPivotItem">
+                <Grid>
+                    <ListView x:Uid="SocialLocalList" x:Name="LocalList"
+                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="NoteList_ItemClick"
+                              Visibility="Collapsed">
+                        <i:Interaction.Behaviors>
+                            <local:SocialContextMenuBehavior/>
+                            <local:SocialNoteShortcutsBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ListView>
+
+                    <ProgressRing x:Uid="SocialLocalLoading" x:Name="LocalLoadingRing"
+                                  Width="32" Height="32"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <StackPanel x:Name="LocalStatePanel"
+                                Style="{StaticResource SocialStatePanelStyle}"
+                                Visibility="Collapsed">
+                        <FontIcon x:Name="LocalStateGlyph"
+                                  FontSize="32"
+                                  HorizontalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Name="LocalStateText"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   AutomationProperties.LiveSetting="Polite"/>
+                        <Button x:Name="LocalStateButton"
+                                HorizontalAlignment="Center"
+                                Click="TimelineStateButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem x:Uid="SocialGlobalPivotItem" x:Name="GlobalPivotItem">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <muxc:InfoBar x:Uid="SocialSignedOutInfoBar" x:Name="SignedOutInfoBar"
+                                  Margin="0,4,0,8"
+                                  Severity="Informational"
+                                  IsOpen="False"
+                                  IsClosable="False"
+                                  Visibility="Collapsed">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialSignedOutSignInButton"
+                                    Click="SignInButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
+                    <ListView x:Uid="SocialGlobalList" x:Name="GlobalList"
+                              Grid.Row="1"
+                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="NoteList_ItemClick"
+                              Visibility="Collapsed">
+                        <i:Interaction.Behaviors>
+                            <local:SocialContextMenuBehavior/>
+                            <local:SocialNoteShortcutsBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ListView>
+
+                    <ProgressRing x:Uid="SocialGlobalLoading" x:Name="GlobalLoadingRing"
+                                  Grid.Row="1"
+                                  Width="32" Height="32"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <StackPanel x:Name="GlobalStatePanel"
+                                Grid.Row="1"
+                                Style="{StaticResource SocialStatePanelStyle}"
+                                Visibility="Collapsed">
+                        <FontIcon x:Name="GlobalStateGlyph"
+                                  FontSize="32"
+                                  HorizontalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Name="GlobalStateText"
+                                   Style="{StaticResource BodyTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   AutomationProperties.LiveSetting="Polite"/>
+                        <Button x:Name="GlobalStateButton"
+                                HorizontalAlignment="Center"
+                                Click="TimelineStateButton_Click"/>
                     </StackPanel>
                 </Grid>
             </PivotItem>
 
             <PivotItem x:Uid="SocialNotificationsPivotItem" x:Name="NotificationsPivotItem">
                 <Grid>
-                    <ListView x:Uid="SocialNotificationsList" x:Name="NotificationsList"
-                              ItemTemplate="{StaticResource SocialFeedItemTemplate}"
-                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                              SelectionMode="None"
-                              IsItemClickEnabled="True"
-                              ItemClick="FeedList_ItemClick"
-                              Visibility="Collapsed">
-                        <i:Interaction.Behaviors>
-                            <local:SocialContextMenuBehavior/>
-                        </i:Interaction.Behaviors>
-                    </ListView>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                    <ProgressRing x:Uid="SocialNotificationsLoading" x:Name="NotificationsLoadingRing"
-                                  Width="32" Height="32"
-                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <local:SocialTabStrip x:Uid="SocialNotificationsTabs"
+                                          x:Name="NotificationsTabStrip"
+                                          Margin="0,0,0,4">
+                        <local:SocialTabButton x:Name="AllNotificationsTab"
+                                               GroupName="SocialNotificationsTabs"
+                                               Style="{StaticResource SocialTabButtonStyle}"
+                                               Checked="NotificationsTab_Checked">
+                            <TextBlock x:Uid="SocialNotificationsAllTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                        </local:SocialTabButton>
+                        <local:SocialTabButton x:Name="MentionsTab"
+                                               GroupName="SocialNotificationsTabs"
+                                               Style="{StaticResource SocialTabButtonStyle}"
+                                               Checked="NotificationsTab_Checked">
+                            <TextBlock x:Uid="SocialNotificationsMentionsTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                        </local:SocialTabButton>
+                    </local:SocialTabStrip>
 
-                    <StackPanel x:Name="NotificationsStatePanel"
-                                Style="{StaticResource SocialStatePanelStyle}"
-                                Visibility="Collapsed">
-                        <FontIcon x:Name="NotificationsStateGlyph"
-                                  FontSize="32"
-                                  HorizontalAlignment="Center"
-                                  Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                                  AutomationProperties.AccessibilityView="Raw"/>
-                        <TextBlock x:Name="NotificationsStateText"
-                                   Style="{StaticResource BodyTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                                   TextWrapping="Wrap"
-                                   TextAlignment="Center"
-                                   AutomationProperties.LiveSetting="Polite"/>
-                        <Button x:Name="NotificationsStateButton"
-                                HorizontalAlignment="Center"
-                                Click="NotificationsStateButton_Click"/>
-                    </StackPanel>
-                </Grid>
-            </PivotItem>
+                    <Grid x:Name="AllNotificationsHost" Grid.Row="1">
+                        <ListView x:Uid="SocialNotificationsList" x:Name="NotificationsList"
+                                  ItemTemplate="{StaticResource SocialFeedItemTemplate}"
+                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="FeedList_ItemClick"
+                                  Visibility="Collapsed">
+                            <i:Interaction.Behaviors>
+                                <local:SocialContextMenuBehavior/>
+                            </i:Interaction.Behaviors>
+                        </ListView>
 
-            <PivotItem x:Uid="SocialMentionsPivotItem" x:Name="MentionsPivotItem">
-                <Grid>
-                    <ListView x:Uid="SocialMentionsList" x:Name="MentionsList"
-                              ItemTemplate="{StaticResource SocialFeedItemTemplate}"
-                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                              SelectionMode="None"
-                              IsItemClickEnabled="True"
-                              ItemClick="FeedList_ItemClick"
-                              Visibility="Collapsed">
-                        <i:Interaction.Behaviors>
-                            <local:SocialContextMenuBehavior/>
-                        </i:Interaction.Behaviors>
-                    </ListView>
+                        <ProgressRing x:Uid="SocialNotificationsLoading" x:Name="NotificationsLoadingRing"
+                                      Width="32" Height="32"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-                    <ProgressRing x:Uid="SocialMentionsLoading" x:Name="MentionsLoadingRing"
-                                  Width="32" Height="32"
-                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <StackPanel x:Name="NotificationsStatePanel"
+                                    Style="{StaticResource SocialStatePanelStyle}"
+                                    Visibility="Collapsed">
+                            <FontIcon x:Name="NotificationsStateGlyph"
+                                      FontSize="32"
+                                      HorizontalAlignment="Center"
+                                      Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Name="NotificationsStateText"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <Button x:Name="NotificationsStateButton"
+                                    HorizontalAlignment="Center"
+                                    Click="NotificationsStateButton_Click"/>
+                        </StackPanel>
+                    </Grid>
 
-                    <StackPanel x:Name="MentionsStatePanel"
-                                Style="{StaticResource SocialStatePanelStyle}"
-                                Visibility="Collapsed">
-                        <FontIcon x:Name="MentionsStateGlyph"
-                                  FontSize="32"
-                                  HorizontalAlignment="Center"
-                                  Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                                  AutomationProperties.AccessibilityView="Raw"/>
-                        <TextBlock x:Name="MentionsStateText"
-                                   Style="{StaticResource BodyTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                                   TextWrapping="Wrap"
-                                   TextAlignment="Center"
-                                   AutomationProperties.LiveSetting="Polite"/>
-                        <Button x:Name="MentionsStateButton"
-                                HorizontalAlignment="Center"
-                                Click="MentionsStateButton_Click"/>
-                    </StackPanel>
+                    <Grid x:Name="MentionsHost" Grid.Row="1" Visibility="Collapsed">
+                        <ListView x:Uid="SocialMentionsList" x:Name="MentionsList"
+                                  ItemTemplate="{StaticResource SocialFeedItemTemplate}"
+                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="FeedList_ItemClick"
+                                  Visibility="Collapsed">
+                            <i:Interaction.Behaviors>
+                                <local:SocialContextMenuBehavior/>
+                            </i:Interaction.Behaviors>
+                        </ListView>
+
+                        <ProgressRing x:Uid="SocialMentionsLoading" x:Name="MentionsLoadingRing"
+                                      Width="32" Height="32"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                        <StackPanel x:Name="MentionsStatePanel"
+                                    Style="{StaticResource SocialStatePanelStyle}"
+                                    Visibility="Collapsed">
+                            <FontIcon x:Name="MentionsStateGlyph"
+                                      FontSize="32"
+                                      HorizontalAlignment="Center"
+                                      Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Name="MentionsStateText"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <Button x:Name="MentionsStateButton"
+                                    HorizontalAlignment="Center"
+                                    Click="MentionsStateButton_Click"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </PivotItem>
         </Pivot>

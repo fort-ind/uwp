@@ -280,7 +280,7 @@ namespace Fort.ind_UWP
         internal bool InvokeShortcut(SocialNoteShortcut shortcut)
         {
             var item = Item;
-            if (item == null || item.IsDeleted) return false;
+            if (item == null || item.IsDeleted || item.IsReadOnly) return false;
 
             switch (shortcut)
             {

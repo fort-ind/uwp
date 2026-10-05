@@ -396,7 +396,7 @@ namespace Fort.ind_UWP
                 return;
             }
 
-            ActionBar.Visibility = Visibility.Visible;
+            ActionBar.Visibility = item.IsReadOnly ? Visibility.Collapsed : Visibility.Visible;
             ContentWarningPanel.Visibility = item.HasContentWarning ? Visibility.Visible : Visibility.Collapsed;
             ApplyContentWarning(item);
         }

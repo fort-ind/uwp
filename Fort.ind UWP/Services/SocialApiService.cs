@@ -28,6 +28,14 @@ namespace Fort.ind_UWP
         Favorites
     }
 
+    public enum SocialTimeline
+    {
+        Home,
+        Following,
+        Local,
+        Global
+    }
+
     public enum SocialFollowList
     {
         Following,
@@ -254,7 +262,7 @@ namespace Fort.ind_UWP
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetTimelineAsync(
-            string token, string untilId, int limit, CancellationToken cancellationToken)
+            string token, SocialTimeline timeline, string untilId, int limit, CancellationToken cancellationToken)
         {
             JsonObject body = new JsonObject();
             body.Add("limit", JsonValue.CreateNumberValue(limit));
@@ -263,7 +271,17 @@ namespace Fort.ind_UWP
                 body.Add("untilId", JsonValue.CreateStringValue(untilId));
             }
 
-            return NotesFrom(await PostAsync("notes/timeline", token, body, cancellationToken));
+            switch (timeline)
+            {
+                case SocialTimeline.Following:
+                    return NotesFrom(await PostAsync("notes/following", token, body, cancellationToken));
+                case SocialTimeline.Local:
+                    return NotesFrom(await PostOptionalTokenAsync("notes/local-timeline", token, body, cancellationToken));
+                case SocialTimeline.Global:
+                    return NotesFrom(await PostOptionalTokenAsync("notes/global-timeline", token, body, cancellationToken));
+                default:
+                    return NotesFrom(await PostAsync("notes/timeline", token, body, cancellationToken));
+            }
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetUserNotesAsync(
@@ -372,7 +390,7 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialCustomEmoji>>> GetEmojisAsync(
             string token, CancellationToken cancellationToken)
         {
-            var response = await PostAsync("emojis", token, new JsonObject(), cancellationToken);
+            var response = await PostOptionalTokenAsync("emojis", token, new JsonObject(), cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<IReadOnlyList<SocialCustomEmoji>>.Failed(response.Status);
@@ -854,6 +872,15 @@ namespace Fort.ind_UWP
             body.SetNamedValue("i", JsonValue.CreateStringValue(token));
             Uri uri = new Uri($"https://{MisskeyAuthService.InstanceHost}/api/{endpoint}");
 
+            return SendAsync(endpoint, uri, body.Stringify(), cancellationToken);
+        }
+
+        private static Task<SocialApiResult<IJsonValue>> PostOptionalTokenAsync(string endpoint, string token, JsonObject body,
+                                                                               CancellationToken cancellationToken)
+        {
+            if (!string.IsNullOrWhiteSpace(token)) return PostAsync(endpoint, token, body, cancellationToken);
+
+            Uri uri = new Uri($"https://{MisskeyAuthService.InstanceHost}/api/{endpoint}");
             return SendAsync(endpoint, uri, body.Stringify(), cancellationToken);
         }
 

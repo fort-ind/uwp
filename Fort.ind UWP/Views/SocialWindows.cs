@@ -10,6 +10,7 @@ namespace Fort.ind_UWP
         public static Task<bool> ShowUserAsync(SocialUser user)
         {
             if (user == null || string.IsNullOrEmpty(user.Id)) return Task.FromResult(false);
+            if (SocialContentService.CurrentAccountId() == null) return LaunchSignedOutAsync(SocialLinks.UserUrl(user));
 
             return ShowUserCoreAsync(user.Id, user.Handle, user, null);
         }
@@ -17,6 +18,10 @@ namespace Fort.ind_UWP
         public static async Task<bool> ShowMentionAsync(MfmSegment mention)
         {
             if (mention == null) return false;
+            if (SocialContentService.CurrentAccountId() == null)
+            {
+                return await LaunchSignedOutAsync(SocialLinks.UserUrl(mention.Username, mention.Host));
+            }
 
             if (!string.IsNullOrEmpty(mention.UserId))
             {
@@ -38,6 +43,12 @@ namespace Fort.ind_UWP
             }
 
             await WebLauncher.LaunchAsync(SocialLinks.UserUrl(username, host));
+            return false;
+        }
+
+        private static async Task<bool> LaunchSignedOutAsync(string url)
+        {
+            await WebLauncher.LaunchAsync(url);
             return false;
         }
 

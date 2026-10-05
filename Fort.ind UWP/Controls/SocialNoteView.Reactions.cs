@@ -33,6 +33,7 @@ namespace Fort.ind_UWP
 
             ReactionChips.SingleLine = !IsFocused;
             _overflowChip.Visibility = IsFocused ? Visibility.Collapsed : Visibility.Visible;
+            _overflowChip.IsHitTestVisible = !item.IsReadOnly;
             _shownReactions = reactions.Count;
 
             for (var i = 0; i < reactions.Count; i++)
@@ -49,7 +50,8 @@ namespace Fort.ind_UWP
                 var shown = _chips[i];
                 shown.Show(item, reactions[i]);
                 shown.Button.IsChecked = SocialReactions.AreSame(reactions[i].Key, item.MyReaction);
-                shown.Button.IsTabStop = IsFocused;
+                shown.Button.IsHitTestVisible = !item.IsReadOnly;
+                shown.Button.IsTabStop = IsFocused && !item.IsReadOnly;
                 shown.SetAccessible(IsFocused);
             }
 
@@ -101,7 +103,8 @@ namespace Fort.ind_UWP
             if (_overflowText == null) return;
 
             var hidden = Math.Max(0, _shownReactions - visible);
-            _overflowChip.IsTabStop = !IsFocused && hidden > 0;
+            var item = Item;
+            _overflowChip.IsTabStop = !IsFocused && hidden > 0 && item != null && !item.IsReadOnly;
 
             var text = LocalizedStrings.Format("SocialReactionsOverflowFormat", CountText.Format(Math.Max(1, hidden)));
             if (!string.Equals(_overflowText.Text, text, StringComparison.Ordinal)) _overflowText.Text = text;

@@ -82,6 +82,8 @@ namespace Fort.ind_UWP
 
         public bool IsPinned { get; private set; }
 
+        public bool IsReadOnly { get; private set; }
+
         public int Depth { get; private set; }
 
         public int ContinueThreadCount { get; private set; }
@@ -654,6 +656,7 @@ namespace Fort.ind_UWP
                 PagingId = pagingId ?? outer.Id,
                 Renoter = outer.IsPureRenote ? outer.User : null,
                 IsPinned = isPinned,
+                IsReadOnly = SocialContentService.CurrentAccountId() == null,
                 Depth = Math.Max(0, depth),
                 _localEmojis = localEmojis
             };
