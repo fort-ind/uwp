@@ -167,7 +167,7 @@
   </data>
   <data name="StorageFootprintFormat" xml:space="preserve">
     <value>This app is using {0}</value>
-    <comment>Settings, Data Storage. {0} is a formatted size built from one of the StorageSize*Format strings, e.g. "8.9 MB". Counts the installed app plus everything it has stored.</comment>
+    <comment>Settings, Storage. {0} is a formatted size built from one of the StorageSize*Format strings, e.g. "8.9 MB". Counts the installed app plus everything it has stored.</comment>
   </data>
   <data name="StorageFootprintMeasuring" xml:space="preserve">
     <value>Measuring storage…</value>
@@ -391,7 +391,7 @@
     <value>Settings</value>
   </data>
   <data name="SearchItemDataStorage" xml:space="preserve">
-    <value>Data Storage</value>
+    <value>Storage</value>
   </data>
   <data name="SearchItemLocalJsonStorage" xml:space="preserve">
     <value>local storage</value>
@@ -1420,7 +1420,7 @@ Open your profile and try again.</value>
     <value>Sign in for more</value>
   </data>
   <data name="SocialSignedOutInfoBar.Message" xml:space="preserve">
-    <value>Sign in with your fort.social account to see For you, Following, Local and your notifications.</value>
+    <value>Sign in with your fort.social account to view your profile, write posts, see your latest notifications, see your for you feed and much more! :) </value>
     <comment>Banner above the Global timeline while signed out. For you, Following and Local are the names of Social's other tabs.</comment>
   </data>
   <data name="SocialSignedOutSignInButton.Content" xml:space="preserve">
@@ -2093,6 +2093,15 @@ Open your profile and try again.</value>
   <data name="SocialProfileRefreshButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Refresh (F5)</value>
   </data>
+  <data name="SocialProfileBackToNewestButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Back to newest</value>
+  </data>
+  <data name="SocialProfileBackToNewestButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Back to newest</value>
+  </data>
+  <data name="SocialBackToNewest.Text" xml:space="preserve">
+    <value>Back to newest</value>
+  </data>
   <data name="ProfileJoinedWithAgeFormat" xml:space="preserve">
     <value>Joined {0} · {1} on fort.social</value>
   </data>
@@ -2176,6 +2185,30 @@ Open your profile and try again.</value>
   </data>
   <data name="MediaCacheLimitDescription.Text" xml:space="preserve">
     <value>Checked a few seconds after fort.desktop starts.</value>
+  </data>
+  <data name="LowMemoryHeading.Text" xml:space="preserve">
+    <value>Memory</value>
+  </data>
+  <data name="LowMemoryModeCombo.Header" xml:space="preserve">
+    <value>Use less memory</value>
+  </data>
+  <data name="LowMemoryModeAutomatic.Content" xml:space="preserve">
+    <value>Automatically</value>
+  </data>
+  <data name="LowMemoryModeOn.Content" xml:space="preserve">
+    <value>Always</value>
+  </data>
+  <data name="LowMemoryModeOff.Content" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="LowMemoryStatusOn" xml:space="preserve">
+    <value>On for this PC.</value>
+  </data>
+  <data name="LowMemoryStatusOff" xml:space="preserve">
+    <value>Off for this PC.</value>
+  </data>
+  <data name="LowMemoryModeDescription.Text" xml:space="preserve">
+    <value>this setting is to help lower end PCs not choke and die by putting more extreme memory saving features that save more RAM compared to what fort.desktop does usally this will automatically enable itself if you have 4 GB or less ram :3</value>
   </data>
   <data name="SocialNoteDeleted" xml:space="preserve">
     <value>This note was deleted.</value>

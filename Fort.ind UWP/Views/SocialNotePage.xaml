@@ -117,6 +117,7 @@
             <i:Interaction.Behaviors>
                 <local:SocialContextMenuBehavior/>
                 <local:SocialNoteShortcutsBehavior/>
+                <local:SocialFeedListBehavior/>
             </i:Interaction.Behaviors>
 
             <ListView.Header>

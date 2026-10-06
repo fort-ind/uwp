@@ -74,7 +74,7 @@ namespace Fort.ind_UWP
             var feed = new TimelineFeed(timeline, pivotItem, list, ring, panel, glyph, text, button, emptyKey, failedKey);
             feed.Items = new SocialFeedCollection<SocialNoteItem>(
                 (untilId, cancellationToken) => LoadMoreTimelineAsync(feed, untilId, cancellationToken),
-                SocialFeedPaging.NonEmpty);
+                SocialFeedPaging.NonEmpty, true);
             list.ItemsSource = feed.Items;
             return feed;
         }
@@ -143,6 +143,23 @@ namespace Fort.ind_UWP
                            feed.EmptyKey, feed.FailedKey);
         }
 
+        private void BackToNewestButton_Click(object sender, RoutedEventArgs e)
+        {
+            var feed = _timelines.FirstOrDefault(candidate => ReferenceEquals(candidate.List.Header, sender));
+            if (feed != null)
+            {
+                LoadTimeline(feed);
+            }
+            else if (ReferenceEquals(sender, NotificationsBackToNewestButton))
+            {
+                LoadNotifications();
+            }
+            else if (ReferenceEquals(sender, MentionsBackToNewestButton))
+            {
+                LoadMentions();
+            }
+        }
+
         private void TimelineStateButton_Click(object sender, RoutedEventArgs e)
         {
             var feed = _timelines.FirstOrDefault(candidate => candidate.Button == sender);
@@ -174,7 +191,7 @@ namespace Fort.ind_UWP
 
         private void InsertPostedInto(TimelineFeed feed, SocialNote note)
         {
-            if (!feed.CanTakePosts) return;
+            if (!feed.CanTakePosts || feed.Items.HasDroppedHead) return;
             if (feed.Items.Any(existing => string.Equals(existing.Note.Id, note.Id, StringComparison.Ordinal))) return;
 
             var item = SocialNoteItem.Create(note, SocialContentService.CachedEmojiMap, false);

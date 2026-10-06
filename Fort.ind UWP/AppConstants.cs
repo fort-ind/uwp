@@ -126,6 +126,14 @@ namespace Fort.ind_UWP
         public const int UnusedPageUnloadSeconds = 60;
         public const int HiddenWindowTrimSeconds = 60;
 
+        public const string SettingLowMemoryMode = "LowMemoryMode";
+        public const ulong LowMemoryDeviceBytes = 4608UL * 1024 * 1024;
+        public const int SocialFeedCap = 200;
+        public const int LowMemorySocialFeedCap = 100;
+        public const int LowMemoryPageUnloadSeconds = 10;
+        public const double ListCacheLength = 4.0;
+        public const double LowMemoryListCacheLength = 1.0;
+
         public const int SocialThreadReplyDepthLimit = 4;
         public const int SocialThreadPageSize = 20;
         public const int SocialThreadChildPageSize = 10;

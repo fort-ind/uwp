@@ -55,7 +55,7 @@ namespace Fort.ind_UWP
         {
             if (_unloadTimers.ContainsKey(page)) return;
 
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(AppConstants.UnusedPageUnloadSeconds) };
+            var timer = new DispatcherTimer { Interval = MemoryService.PageUnloadDelay };
             timer.Tick += (sender, args) => UnloadPage(page);
             _unloadTimers[page] = timer;
             timer.Start();
@@ -105,6 +105,7 @@ namespace Fort.ind_UWP
                     try
                     {
                         UnloadAllInactivePages();
+                        SocialEmojiPicker.TrimCurrentView();
 
                         if (e.IncludeCurrentPages)
                         {

@@ -33,10 +33,10 @@
                     Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
 
             <StackPanel x:Name="ContextPanel"
+                        x:Load="False"
                         Grid.Column="1"
                         Spacing="2"
-                        Margin="0,0,0,4"
-                        Visibility="Collapsed">
+                        Margin="0,0,0,4">
                 <StackPanel x:Name="PinnedLine" Orientation="Horizontal" Spacing="6" Visibility="Collapsed">
                     <FontIcon Glyph="&#xE718;"
                               FontSize="12"
@@ -147,12 +147,12 @@
 
                 <TextBlock x:Uid="SocialNoteDeletedLine"
                            x:Name="DeletedLine"
+                           x:Load="False"
                            Style="{StaticResource BodyTextBlockStyle}"
                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                           FontStyle="Italic"
-                           Visibility="Collapsed"/>
+                           FontStyle="Italic"/>
 
-                <StackPanel x:Name="ContentWarningPanel" Spacing="6" Visibility="Collapsed">
+                <StackPanel x:Name="ContentWarningPanel" x:Load="False" Spacing="6">
                     <TextBlock x:Name="ContentWarningText"
                                Style="{StaticResource BodyTextBlockStyle}"
                                TextWrapping="Wrap"/>
@@ -168,10 +168,10 @@
 
                     <TextBlock x:Uid="SocialHiddenNoteLine"
                                x:Name="HiddenLine"
+                               x:Load="False"
                                Style="{StaticResource BodyTextBlockStyle}"
                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                               FontStyle="Italic"
-                               Visibility="Collapsed"/>
+                               FontStyle="Italic"/>
 
                     <StackPanel x:Name="PollPanel"
                                 x:Load="False"

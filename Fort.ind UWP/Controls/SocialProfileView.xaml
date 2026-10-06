@@ -45,6 +45,7 @@
         <i:Interaction.Behaviors>
             <local:SocialContextMenuBehavior/>
             <local:SocialNoteShortcutsBehavior/>
+            <local:SocialFeedListBehavior BackToNewest="{x:Bind BackToNewestButton}"/>
         </i:Interaction.Behaviors>
 
         <ListView.Header>
@@ -191,6 +192,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <local:SocialTabStrip x:Uid="SocialProfileTabs"
@@ -215,8 +217,22 @@
                         </local:SocialTabButton>
                     </local:SocialTabStrip>
 
-                    <Button x:Uid="SocialProfileRefreshButton" x:Name="RefreshButton"
+                    <Button x:Uid="SocialProfileBackToNewestButton" x:Name="BackToNewestButton"
                             Grid.Column="1"
+                            Style="{StaticResource ButtonRevealStyle}"
+                            Background="Transparent"
+                            Width="40" Height="40"
+                            MinWidth="40" MinHeight="40"
+                            Padding="0"
+                            CornerRadius="0"
+                            VerticalAlignment="Center"
+                            Visibility="Collapsed"
+                            Click="RefreshButton_Click">
+                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    </Button>
+
+                    <Button x:Uid="SocialProfileRefreshButton" x:Name="RefreshButton"
+                            Grid.Column="2"
                             Style="{StaticResource ButtonRevealStyle}"
                             Background="Transparent"
                             Width="40" Height="40"

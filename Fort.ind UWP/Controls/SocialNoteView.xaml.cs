@@ -241,6 +241,13 @@ namespace Fort.ind_UWP
 
         private void RenderContext(SocialNoteItem item)
         {
+            if (!item.IsPinned && item.Renoter == null && !item.IsReply)
+            {
+                if (ContextPanel != null) ContextPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (ContextPanel == null) FindName("ContextPanel");
             PinnedLine.Visibility = item.IsPinned ? Visibility.Visible : Visibility.Collapsed;
 
             if (item.Renoter != null)
@@ -266,9 +273,7 @@ namespace Fort.ind_UWP
                 ReplyToButton.Visibility = Visibility.Collapsed;
             }
 
-            ContextPanel.Visibility = item.IsPinned || item.Renoter != null || item.IsReply
-                                      ? Visibility.Visible
-                                      : Visibility.Collapsed;
+            ContextPanel.Visibility = Visibility.Visible;
         }
 
         private void RenderHeader(SocialNoteItem item)
@@ -382,11 +387,12 @@ namespace Fort.ind_UWP
         private void ApplyDeleted(SocialNoteItem item)
         {
             var deleted = item.IsDeleted;
-            DeletedLine.Visibility = deleted ? Visibility.Visible : Visibility.Collapsed;
+            if (deleted && DeletedLine == null) FindName("DeletedLine");
+            if (DeletedLine != null) DeletedLine.Visibility = deleted ? Visibility.Visible : Visibility.Collapsed;
 
             if (deleted)
             {
-                ContentWarningPanel.Visibility = Visibility.Collapsed;
+                if (ContentWarningPanel != null) ContentWarningPanel.Visibility = Visibility.Collapsed;
                 ContentPanel.Visibility = Visibility.Collapsed;
                 ActionBar.Visibility = Visibility.Collapsed;
                 if (ReactionChips != null) ReactionChips.Visibility = Visibility.Collapsed;
@@ -397,7 +403,7 @@ namespace Fort.ind_UWP
             }
 
             ActionBar.Visibility = item.IsReadOnly ? Visibility.Collapsed : Visibility.Visible;
-            ContentWarningPanel.Visibility = item.HasContentWarning ? Visibility.Visible : Visibility.Collapsed;
+            ShowContentWarning(item);
             ApplyContentWarning(item);
         }
 
@@ -415,10 +421,22 @@ namespace Fort.ind_UWP
             }
         }
 
+        private void ShowContentWarning(SocialNoteItem item)
+        {
+            if (!item.HasContentWarning)
+            {
+                if (ContentWarningPanel != null) ContentWarningPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (ContentWarningPanel == null) FindName("ContentWarningPanel");
+            ContentWarningText.Text = item.ContentWarning ?? "";
+            ContentWarningPanel.Visibility = Visibility.Visible;
+        }
+
         private void RenderContent(SocialNoteItem item)
         {
-            ContentWarningText.Text = item.ContentWarning ?? "";
-            ContentWarningPanel.Visibility = item.HasContentWarning ? Visibility.Visible : Visibility.Collapsed;
+            ShowContentWarning(item);
 
             var bodyStyle = StyleOf(IsFocused ? "SocialFocusedBodyRichTextBlockStyle" : "BodyRichTextBlockStyle");
             if (bodyStyle != null && !ReferenceEquals(BodyText.Style, bodyStyle)) BodyText.Style = bodyStyle;
@@ -434,7 +452,8 @@ namespace Fort.ind_UWP
                 BodyText.Visibility = Visibility.Collapsed;
             }
 
-            HiddenLine.Visibility = item.IsHidden ? Visibility.Visible : Visibility.Collapsed;
+            if (item.IsHidden && HiddenLine == null) FindName("HiddenLine");
+            if (HiddenLine != null) HiddenLine.Visibility = item.IsHidden ? Visibility.Visible : Visibility.Collapsed;
 
             RenderPoll(item);
             RenderMedia(item);
@@ -452,6 +471,7 @@ namespace Fort.ind_UWP
 
             if (item.HasContentWarning)
             {
+                if (ContentWarningPanel == null) FindName("ContentWarningPanel");
                 ContentWarningButton.Content = LocalizedStrings.Get(item.IsContentRevealed ? "SocialHideContent" : "SocialShowContent");
                 ContentWarningButton.IsExpanded = item.IsContentRevealed;
             }

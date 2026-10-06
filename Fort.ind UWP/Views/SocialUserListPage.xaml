@@ -85,6 +85,7 @@
                   ItemClick="UsersList_ItemClick">
             <i:Interaction.Behaviors>
                 <local:SocialContextMenuBehavior/>
+                <local:SocialFeedListBehavior/>
             </i:Interaction.Behaviors>
 
             <ListView.Footer>

@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml;
@@ -307,6 +308,33 @@ namespace Fort.ind_UWP
             {
                 MediaCacheService.LimitMegabytes = limit.Value;
             }
+        }
+
+        private void LoadLowMemoryControls()
+        {
+            var choice = MemoryService.LowMemoryChoice.ToString();
+            LowMemoryModeCombo.SelectedItem = LowMemoryModeCombo.Items
+                .OfType<ComboBoxItem>()
+                .FirstOrDefault(item => string.Equals(item.Tag as string, choice, StringComparison.Ordinal));
+            UpdateLowMemoryStatus(false);
+        }
+
+        private void LowMemoryModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            var item = LowMemoryModeCombo.SelectedItem as ComboBoxItem;
+            LowMemoryModeChoice choice;
+            if (item == null || !Enum.TryParse(item.Tag as string, out choice)) return;
+
+            MemoryService.SetLowMemoryChoice(choice);
+            UpdateLowMemoryStatus(true);
+        }
+
+        private void UpdateLowMemoryStatus(bool announce)
+        {
+            LowMemoryStatusText.Text = LocalizedStrings.Get(MemoryService.IsLowMemoryMode ? "LowMemoryStatusOn" : "LowMemoryStatusOff");
+            if (announce) AutomationHelper.AnnounceLiveRegion(LowMemoryStatusText);
         }
 
         private static string FormatByteSize(long bytes)

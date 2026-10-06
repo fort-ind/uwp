@@ -374,6 +374,8 @@ namespace Fort.ind_UWP
 
         private void CreateBannerBlur(Compositor compositor)
         {
+            if (!MemoryService.AllowsBannerBlur) return;
+
             try
             {
                 _blurEffect = new GaussianBlurEffect

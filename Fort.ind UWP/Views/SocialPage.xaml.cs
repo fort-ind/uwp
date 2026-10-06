@@ -110,8 +110,8 @@ namespace Fort.ind_UWP
             _timelines = new[] { _forYou, _following, _local, _global };
             _signedInPivotItems = new[] { ForYouPivotItem, FollowingPivotItem, LocalPivotItem, GlobalPivotItem, NotificationsPivotItem };
 
-            _notifications = new SocialFeedCollection<SocialFeedItem>(LoadMoreNotificationsAsync, SocialFeedPaging.FullPage);
-            _mentions = new SocialFeedCollection<SocialFeedItem>(LoadMoreMentionsAsync, SocialFeedPaging.FullPage);
+            _notifications = new SocialFeedCollection<SocialFeedItem>(LoadMoreNotificationsAsync, SocialFeedPaging.FullPage, true);
+            _mentions = new SocialFeedCollection<SocialFeedItem>(LoadMoreMentionsAsync, SocialFeedPaging.FullPage, true);
             NotificationsList.ItemsSource = _notifications;
             MentionsList.ItemsSource = _mentions;
 
@@ -803,6 +803,7 @@ namespace Fort.ind_UWP
             if (IsSignedOut || !_notificationsRequested) return;
             if (_notificationsState != FeedState.Ready && _notificationsState != FeedState.Empty) return;
 
+            if (_notifications.HasDroppedHead) return;
             if (_notifications.Any(existing => string.Equals(existing.Id, notification.Id, StringComparison.Ordinal))) return;
 
             var item = SocialFeedItem.FromNotification(notification, true);

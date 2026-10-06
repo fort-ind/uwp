@@ -90,18 +90,31 @@ namespace Fort.ind_UWP
 
         private string _builtAcceptance;
 
+        private bool _shown;
+
         public SocialEmojiPicker()
         {
             this.InitializeComponent();
 
             _viewSource = (CollectionViewSource)Resources["EmojiViewSource"];
             BuildTonePanel();
+
+            Loaded += (sender, args) => _shown = true;
+            Unloaded += (sender, args) => _shown = false;
         }
 
         public static SocialEmojiPicker ForCurrentView()
         {
             if (t_current == null) t_current = new SocialEmojiPicker();
             return t_current;
+        }
+
+        public static void TrimCurrentView()
+        {
+            var picker = t_current;
+            if (picker == null || picker._shown) return;
+
+            ForgetCurrentView();
         }
 
         public static void ForgetCurrentView()

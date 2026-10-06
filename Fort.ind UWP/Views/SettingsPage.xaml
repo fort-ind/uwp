@@ -884,6 +884,33 @@
                                                Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                 </StackPanel>
+
+                                <Rectangle Height="1" Margin="0,16,0,12"
+                                           Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                           Opacity="0.08"/>
+
+                                <StackPanel Spacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE9F5;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                                        <TextBlock x:Uid="LowMemoryHeading"
+                                                   Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                                   AutomationProperties.HeadingLevel="Level3"/>
+                                    </StackPanel>
+                                    <ComboBox x:Uid="LowMemoryModeCombo" x:Name="LowMemoryModeCombo"
+                                              MinWidth="200"
+                                              SelectionChanged="LowMemoryModeCombo_SelectionChanged">
+                                        <ComboBoxItem x:Uid="LowMemoryModeAutomatic" Tag="Automatic"/>
+                                        <ComboBoxItem x:Uid="LowMemoryModeOn" Tag="On"/>
+                                        <ComboBoxItem x:Uid="LowMemoryModeOff" Tag="Off"/>
+                                    </ComboBox>
+                                    <TextBlock x:Name="LowMemoryStatusText"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                               AutomationProperties.LiveSetting="Polite"/>
+                                    <TextBlock x:Uid="LowMemoryModeDescription"
+                                               Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>

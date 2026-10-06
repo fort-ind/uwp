@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
@@ -15,18 +16,29 @@ namespace Fort.ind_UWP
         string PagingId { get; }
     }
 
+    public interface ISocialFeedHead : INotifyPropertyChanged
+    {
+        bool HasDroppedHead { get; }
+    }
+
     public enum SocialFeedPaging
     {
         FullPage,
         NonEmpty
     }
 
-    public sealed class SocialFeedCollection<T> : ObservableCollection<T>, ISupportIncrementalLoading
+    public sealed class SocialFeedCollection<T> : ObservableCollection<T>, ISupportIncrementalLoading, ISocialFeedHead
         where T : class, ISocialFeedEntry
     {
+        private static readonly PropertyChangedEventArgs s_hasDroppedHeadChanged = new PropertyChangedEventArgs(nameof(HasDroppedHead));
+
         private readonly Func<string, CancellationToken, Task<IReadOnlyList<T>>> _loadPageAfter;
 
         private readonly SocialFeedPaging _paging;
+
+        private readonly bool _capped;
+
+        private bool _hasDroppedHead;
 
         private bool _loading;
 
@@ -35,14 +47,39 @@ namespace Fort.ind_UWP
         private int _firstPageCount;
 
         public SocialFeedCollection(Func<string, CancellationToken, Task<IReadOnlyList<T>>> loadPageAfter, SocialFeedPaging paging)
+            : this(loadPageAfter, paging, false)
+        {
+        }
+
+        public SocialFeedCollection(Func<string, CancellationToken, Task<IReadOnlyList<T>>> loadPageAfter, SocialFeedPaging paging,
+                                    bool capped)
         {
             _loadPageAfter = loadPageAfter;
             _paging = paging;
+            _capped = capped;
         }
 
         public bool HasMoreItems { get; private set; }
 
+        public bool HasDroppedHead
+        {
+            get { return _hasDroppedHead; }
+            private set
+            {
+                if (_hasDroppedHead == value) return;
+
+                _hasDroppedHead = value;
+                OnPropertyChanged(s_hasDroppedHeadChanged);
+            }
+        }
+
         public void ReplaceAll(IReadOnlyList<T> items, bool hasMore)
+        {
+            ReplaceItems(items, hasMore);
+            HasDroppedHead = false;
+        }
+
+        private void ReplaceItems(IReadOnlyList<T> items, bool hasMore)
         {
             _generation++;
             _loading = false;
@@ -81,8 +118,24 @@ namespace Fort.ind_UWP
                 kept.Add(this[i]);
             }
 
-            ReplaceAll(kept, true);
+            ReplaceItems(kept, true);
             return true;
+        }
+
+        private void DropHeadPastCap()
+        {
+            if (!_capped) return;
+
+            var excess = Count - MemoryService.FeedCap;
+            if (excess <= 0) return;
+
+            for (var i = 0; i < excess; i++)
+            {
+                RemoveAt(0);
+            }
+
+            _firstPageCount = Math.Min(Count, AppConstants.SocialFeedPageSize);
+            HasDroppedHead = true;
         }
 
         public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
@@ -111,6 +164,7 @@ namespace Fort.ind_UWP
                 {
                     Add(item);
                 }
+                DropHeadPastCap();
 
                 HasMoreItems = _paging == SocialFeedPaging.NonEmpty || page.Count >= AppConstants.SocialFeedPageSize;
                 return new LoadMoreItemsResult { Count = (uint)page.Count };

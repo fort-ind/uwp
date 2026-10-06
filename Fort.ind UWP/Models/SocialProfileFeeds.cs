@@ -467,7 +467,7 @@ namespace Fort.ind_UWP
                 Tab = tab;
                 Collection = new SocialFeedCollection<SocialNoteItem>(
                     (untilId, token) => owner.LoadMoreAsync(tab, untilId, token),
-                    SocialFeedPaging.NonEmpty);
+                    SocialFeedPaging.NonEmpty, true);
             }
 
             public SocialUserNotesTab Tab { get; private set; }

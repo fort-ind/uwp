@@ -135,6 +135,7 @@
     </Compile>
     <Compile Include="Behaviors\GameContextMenuBehavior.cs" />
     <Compile Include="Behaviors\SocialContextMenuBehavior.cs" />
+    <Compile Include="Behaviors\SocialFeedListBehavior.cs" />
     <Compile Include="Behaviors\SocialNoteShortcutsBehavior.cs" />
     <Compile Include="Behaviors\SocialSuggestionsBehavior.cs" />
     <Compile Include="Behaviors\WindowActivationStateBehavior.cs" />

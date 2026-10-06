@@ -488,6 +488,8 @@ namespace Fort.ind_UWP
             {
                 var page = ContentFrame.Content as ITrimmablePage;
                 if (page != null) page.Trim();
+
+                SocialEmojiPicker.TrimCurrentView();
             }
             catch (Exception ex)
             {

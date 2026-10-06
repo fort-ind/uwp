@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
+using Windows.Graphics.Display;
 using Windows.System;
 using Windows.UI;
 using Windows.UI.Core;
@@ -444,6 +445,8 @@ namespace Fort.ind_UWP
 
             private readonly Image _image;
 
+            private Image _detail;
+
             private readonly ProgressRing _ring;
 
             private StackPanel _failure;
@@ -457,6 +460,8 @@ namespace Fort.ind_UWP
             private bool _requested;
 
             private bool _usedFallback;
+
+            private int _decodedWidth;
 
             public LightboxSlot(SocialMediaLightbox lightbox, SocialDriveFile file, int fileIndex, ImageSource placeholder)
             {
@@ -514,6 +519,7 @@ namespace Fort.ind_UWP
                     Content = _canvas
                 };
                 _scroller.SizeChanged += Scroller_SizeChanged;
+                _scroller.ViewChanged += Scroller_ViewChanged;
 
                 _ring = new ProgressRing
                 {
@@ -559,7 +565,7 @@ namespace Fort.ind_UWP
 
                 _ring.IsActive = true;
                 _ring.Visibility = Visibility.Visible;
-                _image.Source = CreateBitmap(uri);
+                _image.Source = CreateBitmap(uri, ScreenFitWidth());
             }
 
             public void Leave()
@@ -589,15 +595,90 @@ namespace Fort.ind_UWP
                 _ring.IsActive = false;
                 _image.Source = null;
                 _placeholder.Source = null;
+                DropDetail();
             }
 
-            private BitmapImage CreateBitmap(Uri uri)
+            private BitmapImage CreateBitmap(Uri uri, int decodeWidth)
             {
                 var bitmap = new BitmapImage();
                 bitmap.ImageOpened += Bitmap_ImageOpened;
                 bitmap.ImageFailed += Bitmap_ImageFailed;
+                if (decodeWidth > 0)
+                {
+                    bitmap.DecodePixelType = DecodePixelType.Physical;
+                    bitmap.DecodePixelWidth = decodeWidth;
+                }
+                _decodedWidth = decodeWidth;
                 bitmap.UriSource = uri;
                 return bitmap;
+            }
+
+            private int ScreenFitWidth()
+            {
+                if (File.Kind != SocialDriveFileKind.Image || _naturalWidth <= 0 || _naturalHeight <= 0) return 0;
+
+                try
+                {
+                    var display = DisplayInformation.GetForCurrentView();
+                    var screenWidth = (double)display.ScreenWidthInRawPixels;
+                    var screenHeight = (double)display.ScreenHeightInRawPixels;
+                    if (screenWidth <= 0 || screenHeight <= 0) return 0;
+
+                    var scale = Math.Min(screenWidth / _naturalWidth, screenHeight / _naturalHeight);
+                    return scale < 1 ? Math.Max(1, (int)Math.Round(_naturalWidth * scale)) : 0;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SocialMediaLightbox: could not read the screen size - {ex.Message}");
+                    return 0;
+                }
+            }
+
+            private void Scroller_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+            {
+                if (e.IsIntermediate) return;
+
+                try
+                {
+                    if (IsZoomed) LoadDetail();
+                    else DropDetail();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"SocialMediaLightbox: could not follow the zoom - {ex.Message}");
+                }
+            }
+
+            private void LoadDetail()
+            {
+                if (_detail != null || _decodedWidth <= 0 || _usedFallback || _failure != null) return;
+
+                var uri = WebLauncher.TryCreateFetchUri(File.Url);
+                if (uri == null) return;
+
+                var bitmap = new BitmapImage();
+                bitmap.ImageFailed += Detail_ImageFailed;
+                _detail = new Image { Stretch = Stretch.Uniform };
+                AutomationProperties.SetAccessibilityView(_detail, Windows.UI.Xaml.Automation.Peers.AccessibilityView.Raw);
+                Picture.Children.Add(_detail);
+                _detail.Source = bitmap;
+                bitmap.UriSource = uri;
+            }
+
+            private void DropDetail()
+            {
+                var detail = _detail;
+                _detail = null;
+                if (detail == null) return;
+
+                detail.Source = null;
+                Picture.Children.Remove(detail);
+            }
+
+            private void Detail_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+            {
+                Debug.WriteLine($"SocialMediaLightbox: full-size image failed - {e.ErrorMessage}");
+                DropDetail();
             }
 
             private void Scroller_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -672,7 +753,8 @@ namespace Fort.ind_UWP
                 if (fallback != null)
                 {
                     _usedFallback = true;
-                    _image.Source = CreateBitmap(fallback);
+                    DropDetail();
+                    _image.Source = CreateBitmap(fallback, 0);
                     return;
                 }
 

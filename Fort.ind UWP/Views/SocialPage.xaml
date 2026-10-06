@@ -175,7 +175,21 @@
                         <i:Interaction.Behaviors>
                             <local:SocialContextMenuBehavior/>
                             <local:SocialNoteShortcutsBehavior/>
+                            <local:SocialFeedListBehavior BackToNewest="{x:Bind ForYouBackToNewestButton}"/>
                         </i:Interaction.Behaviors>
+
+                        <ListView.Header>
+                            <Button x:Name="ForYouBackToNewestButton"
+                                    Margin="12,8,12,8"
+                                    HorizontalAlignment="Stretch"
+                                    Visibility="Collapsed"
+                                    Click="BackToNewestButton_Click">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                    <TextBlock x:Uid="SocialBackToNewest"/>
+                                </StackPanel>
+                            </Button>
+                        </ListView.Header>
                     </ListView>
 
                     <ProgressRing x:Uid="SocialForYouLoading" x:Name="ForYouLoadingRing"
@@ -215,7 +229,21 @@
                         <i:Interaction.Behaviors>
                             <local:SocialContextMenuBehavior/>
                             <local:SocialNoteShortcutsBehavior/>
+                            <local:SocialFeedListBehavior BackToNewest="{x:Bind FollowingBackToNewestButton}"/>
                         </i:Interaction.Behaviors>
+
+                        <ListView.Header>
+                            <Button x:Name="FollowingBackToNewestButton"
+                                    Margin="12,8,12,8"
+                                    HorizontalAlignment="Stretch"
+                                    Visibility="Collapsed"
+                                    Click="BackToNewestButton_Click">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                    <TextBlock x:Uid="SocialBackToNewest"/>
+                                </StackPanel>
+                            </Button>
+                        </ListView.Header>
                     </ListView>
 
                     <ProgressRing x:Uid="SocialFollowingLoading" x:Name="FollowingLoadingRing"
@@ -255,7 +283,21 @@
                         <i:Interaction.Behaviors>
                             <local:SocialContextMenuBehavior/>
                             <local:SocialNoteShortcutsBehavior/>
+                            <local:SocialFeedListBehavior BackToNewest="{x:Bind LocalBackToNewestButton}"/>
                         </i:Interaction.Behaviors>
+
+                        <ListView.Header>
+                            <Button x:Name="LocalBackToNewestButton"
+                                    Margin="12,8,12,8"
+                                    HorizontalAlignment="Stretch"
+                                    Visibility="Collapsed"
+                                    Click="BackToNewestButton_Click">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                    <TextBlock x:Uid="SocialBackToNewest"/>
+                                </StackPanel>
+                            </Button>
+                        </ListView.Header>
                     </ListView>
 
                     <ProgressRing x:Uid="SocialLocalLoading" x:Name="LocalLoadingRing"
@@ -313,7 +355,21 @@
                         <i:Interaction.Behaviors>
                             <local:SocialContextMenuBehavior/>
                             <local:SocialNoteShortcutsBehavior/>
+                            <local:SocialFeedListBehavior BackToNewest="{x:Bind GlobalBackToNewestButton}"/>
                         </i:Interaction.Behaviors>
+
+                        <ListView.Header>
+                            <Button x:Name="GlobalBackToNewestButton"
+                                    Margin="12,8,12,8"
+                                    HorizontalAlignment="Stretch"
+                                    Visibility="Collapsed"
+                                    Click="BackToNewestButton_Click">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                    <TextBlock x:Uid="SocialBackToNewest"/>
+                                </StackPanel>
+                            </Button>
+                        </ListView.Header>
                     </ListView>
 
                     <ProgressRing x:Uid="SocialGlobalLoading" x:Name="GlobalLoadingRing"
@@ -377,7 +433,21 @@
                                   Visibility="Collapsed">
                             <i:Interaction.Behaviors>
                                 <local:SocialContextMenuBehavior/>
+                                <local:SocialFeedListBehavior BackToNewest="{x:Bind NotificationsBackToNewestButton}"/>
                             </i:Interaction.Behaviors>
+
+                            <ListView.Header>
+                                <Button x:Name="NotificationsBackToNewestButton"
+                                        Margin="12,8,12,8"
+                                        HorizontalAlignment="Stretch"
+                                        Visibility="Collapsed"
+                                        Click="BackToNewestButton_Click">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                        <TextBlock x:Uid="SocialBackToNewest"/>
+                                    </StackPanel>
+                                </Button>
+                            </ListView.Header>
                         </ListView>
 
                         <ProgressRing x:Uid="SocialNotificationsLoading" x:Name="NotificationsLoadingRing"
@@ -414,7 +484,21 @@
                                   Visibility="Collapsed">
                             <i:Interaction.Behaviors>
                                 <local:SocialContextMenuBehavior/>
+                                <local:SocialFeedListBehavior BackToNewest="{x:Bind MentionsBackToNewestButton}"/>
                             </i:Interaction.Behaviors>
+
+                            <ListView.Header>
+                                <Button x:Name="MentionsBackToNewestButton"
+                                        Margin="12,8,12,8"
+                                        HorizontalAlignment="Stretch"
+                                        Visibility="Collapsed"
+                                        Click="BackToNewestButton_Click">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                        <TextBlock x:Uid="SocialBackToNewest"/>
+                                    </StackPanel>
+                                </Button>
+                            </ListView.Header>
                         </ListView>
 
                         <ProgressRing x:Uid="SocialMentionsLoading" x:Name="MentionsLoadingRing"

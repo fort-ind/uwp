@@ -51,6 +51,7 @@ namespace Fort.ind_UWP
                 AutoUpdateCheckToggle.IsOn = UpdateService.AutomaticChecksEnabled;
                 LoadProfileRefreshControls();
                 LoadMediaCacheControls();
+                LoadLowMemoryControls();
 
                 RestoreSettingsPanelStates();
             }
