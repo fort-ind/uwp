@@ -110,10 +110,11 @@ namespace Fort.ind_UWP
 
         public bool TrimToFirstPage()
         {
-            if (Count <= _firstPageCount) return false;
+            var keep = Math.Max(_firstPageCount, Math.Min(Count, AppConstants.SocialFeedPageSize));
+            if (Count <= keep) return false;
 
-            var kept = new List<T>(_firstPageCount);
-            for (int i = 0; i < _firstPageCount; i++)
+            var kept = new List<T>(keep);
+            for (int i = 0; i < keep; i++)
             {
                 kept.Add(this[i]);
             }

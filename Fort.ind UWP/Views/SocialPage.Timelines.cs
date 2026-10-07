@@ -208,7 +208,13 @@ namespace Fort.ind_UWP
                 var removed = feed.Items.RemoveWhere(predicate);
                 if (removed == 0) continue;
 
-                if (feed.Items.Count == 0 && feed.State == FeedState.Ready && !feed.Items.HasMoreItems)
+                if (feed.Items.Count > 0 || feed.State != FeedState.Ready) continue;
+
+                if (feed.Items.HasMoreItems)
+                {
+                    LoadTimeline(feed);
+                }
+                else
                 {
                     SetTimelineState(feed, FeedState.Empty);
                 }

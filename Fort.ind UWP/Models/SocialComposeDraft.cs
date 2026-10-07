@@ -195,6 +195,26 @@ namespace Fort.ind_UWP
                           note.ReplyId, keepIdentity ? note.Id : null);
         }
 
+        public bool MatchesNote(SocialNote note)
+        {
+            if (note == null) return false;
+
+            var original = FromNote(note, null, true);
+            return string.Equals(SocialPostService.NormalizeText(Text), SocialPostService.NormalizeText(original.Text), StringComparison.Ordinal)
+                   && string.Equals(ContentWarning, original.ContentWarning, StringComparison.Ordinal)
+                   && string.Equals(Visibility, original.Visibility, StringComparison.Ordinal)
+                   && LocalOnly == original.LocalOnly
+                   && string.Equals(ReactionAcceptance, original.ReactionAcceptance, StringComparison.Ordinal)
+                   && (Poll == null ? original.Poll == null : Poll.SameAs(original.Poll))
+                   && Files.Select(file => file.Id).SequenceEqual(original.Files.Select(file => file.Id), StringComparer.Ordinal)
+                   && string.Equals(QuoteId, original.QuoteId, StringComparison.Ordinal)
+                   && string.Equals(ReplyId, original.ReplyId, StringComparison.Ordinal)
+                   && string.Equals(EditId, original.EditId, StringComparison.Ordinal)
+                   && (Visibility != SocialPostService.DirectVisibility
+                       || new HashSet<string>(Recipients.Select(user => user.Id), StringComparer.Ordinal)
+                              .SetEquals(note.VisibleUserIds ?? new string[0]));
+        }
+
         internal JsonObject ToJson()
         {
             var obj = new JsonObject();

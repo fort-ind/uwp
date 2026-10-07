@@ -227,7 +227,14 @@ namespace Fort.ind_UWP
         {
             if (_args == null || _slot == null || _finished) return;
 
-            SocialDraftService.Save(_args.AccountId, _slot, Composer.GetDraft());
+            var draft = Composer.GetDraft();
+            if (_args.Mode == SocialComposeMode.Edit && draft.MatchesNote(_args.Note))
+            {
+                SocialDraftService.Remove(_args.AccountId, _slot);
+                return;
+            }
+
+            SocialDraftService.Save(_args.AccountId, _slot, draft);
         }
 
         private void Composer_DraftChanged(object sender, EventArgs e)

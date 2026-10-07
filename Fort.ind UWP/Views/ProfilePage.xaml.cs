@@ -351,8 +351,13 @@ namespace Fort.ind_UWP
                 var userId = _feeds.UserId;
                 if (string.IsNullOrEmpty(userId)) return;
 
+                var favorites = tab == SocialUserNotesTab.Favorites;
+                if (favorites) _feeds.Invalidate(tab);
+
                 var emojiTask = SocialContentService.GetEmojiMapAsync();
-                var notesTask = FetchFirstNotesAsync(userId, tab);
+                var notesTask = favorites
+                    ? Task.FromResult<SocialApiResult<IReadOnlyList<SocialNote>>>(null)
+                    : FetchFirstNotesAsync(userId, tab);
 
                 var result = await SocialContentService.FetchUserAsync(userId, _feeds.Token);
                 if (version != _loadVersion || IsReleased) return;
@@ -371,7 +376,7 @@ namespace Fort.ind_UWP
                     PaintDetail(_detail, false);
                 }
 
-                _feeds.ApplyFirstPage(tab, notes);
+                if (!favorites) _feeds.ApplyFirstPage(tab, notes);
             }
             catch (OperationCanceledException)
             {
@@ -380,7 +385,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 Debug.WriteLine($"ProfilePage: profile load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == _loadVersion && !IsReleased) _feeds.Fail(tab);
+                if (version == _loadVersion && !IsReleased && tab != SocialUserNotesTab.Favorites) _feeds.Fail(tab);
             }
         }
 

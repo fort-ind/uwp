@@ -228,7 +228,8 @@ namespace Fort.ind_UWP
             var reply = !string.IsNullOrEmpty(note.ReplyId);
             var emojis = Emojis ?? SocialContentService.CachedEmojiMap;
 
-            foreach (var feed in _feeds.Where(feed => feed.Requested && (feed.State == SocialFeedState.Ready || feed.State == SocialFeedState.Empty)))
+            foreach (var feed in _feeds.Where(feed => feed.Requested && !feed.Collection.HasDroppedHead
+                                                      && (feed.State == SocialFeedState.Ready || feed.State == SocialFeedState.Empty)))
             {
                 bool include;
                 switch (feed.Tab)
@@ -283,7 +284,13 @@ namespace Fort.ind_UWP
 
         private void SettleAfterRemoval(Feed feed)
         {
-            if (feed.Collection.Count == 0 && feed.State == SocialFeedState.Ready && !feed.Collection.HasMoreItems)
+            if (feed.Collection.Count > 0 || feed.State != SocialFeedState.Ready) return;
+
+            if (feed.Collection.HasMoreItems)
+            {
+                Invalidate(feed.Tab);
+            }
+            else
             {
                 SetState(feed, SocialFeedState.Empty);
             }
