@@ -106,7 +106,7 @@ namespace Fort.ind_UWP
         {
             base.OnNavigatedFrom(e);
 
-            _keepListsOnUnload = e.SourcePageType == typeof(SocialNotePage);
+            _keepListsOnUnload = SocialThreads.IsInPlacePage(e.SourcePageType);
         }
 
         private void ProfilePage_Unloaded(object sender, RoutedEventArgs e)

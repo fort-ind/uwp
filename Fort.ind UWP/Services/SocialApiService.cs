@@ -91,6 +91,51 @@ namespace Fort.ind_UWP
         }
     }
 
+    public sealed class SocialRelation
+    {
+        public SocialRelation(string userId, bool isMuted, bool isRenoteMuted, bool isBlocking)
+        {
+            UserId = userId;
+            IsMuted = isMuted;
+            IsRenoteMuted = isRenoteMuted;
+            IsBlocking = isBlocking;
+        }
+
+        public string UserId { get; private set; }
+
+        public bool IsMuted { get; private set; }
+
+        public bool IsRenoteMuted { get; private set; }
+
+        public bool IsBlocking { get; private set; }
+
+        public SocialRelation WithMuted(bool value)
+        {
+            return new SocialRelation(UserId, value, IsRenoteMuted, IsBlocking);
+        }
+
+        public SocialRelation WithRenoteMuted(bool value)
+        {
+            return new SocialRelation(UserId, IsMuted, value, IsBlocking);
+        }
+
+        public SocialRelation WithBlocking(bool value)
+        {
+            return new SocialRelation(UserId, IsMuted, IsRenoteMuted, value);
+        }
+
+        internal static SocialRelation FromJson(JsonObject obj)
+        {
+            var id = SocialJson.String(obj, "id");
+            if (string.IsNullOrEmpty(id)) return null;
+
+            return new SocialRelation(id,
+                                      SocialJson.Bool(obj, "isMuted").GetValueOrDefault(),
+                                      SocialJson.Bool(obj, "isRenoteMuted").GetValueOrDefault(),
+                                      SocialJson.Bool(obj, "isBlocking").GetValueOrDefault());
+        }
+    }
+
     public sealed class SocialApiResult<T>
     {
         private SocialApiResult()
@@ -284,6 +329,20 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetTagNotesAsync(
+            string token, string tag, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("tag", JsonValue.CreateStringValue(tag ?? ""));
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            if (!string.IsNullOrEmpty(untilId))
+            {
+                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+            }
+
+            return NotesFrom(await PostOptionalTokenAsync("notes/search-by-tag", token, body, cancellationToken));
+        }
+
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetUserNotesAsync(
             string token, string userId, SocialUserNotesTab tab, string untilId, int limit, CancellationToken cancellationToken)
         {
@@ -373,6 +432,53 @@ namespace Fort.ind_UWP
         public static Task<SocialApiResult<bool>> CancelFollowRequestAsync(string token, string userId, CancellationToken cancellationToken)
         {
             return UserActionAsync("following/requests/cancel", token, userId, cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<SocialRelation>> GetRelationAsync(string token, string userId, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+
+            var response = await PostAsync("users/relation", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<SocialRelation>.Failed(response.Status, response.ErrorCode);
+            }
+
+            var relation = response.Value.ValueType == JsonValueType.Object
+                           ? SocialRelation.FromJson(response.Value.GetObject())
+                           : null;
+
+            return relation == null
+                   ? SocialApiResult<SocialRelation>.Failed(SocialApiStatus.Failed)
+                   : SocialApiResult<SocialRelation>.Succeeded(relation);
+        }
+
+        public static Task<SocialApiResult<bool>> MuteUserAsync(string token, string userId, DateTimeOffset? expiresAt,
+                                                                CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+            body.Add("expiresAt", expiresAt.HasValue
+                                  ? JsonValue.CreateNumberValue(expiresAt.Value.ToUnixTimeMilliseconds())
+                                  : JsonValue.CreateNullValue());
+
+            return ActionAsync("mute/create", token, body, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> UnmuteUserAsync(string token, string userId, CancellationToken cancellationToken)
+        {
+            return UserActionAsync("mute/delete", token, userId, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> MuteRenotesAsync(string token, string userId, bool mute, CancellationToken cancellationToken)
+        {
+            return UserActionAsync(mute ? "renote-mute/create" : "renote-mute/delete", token, userId, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> BlockAsync(string token, string userId, bool block, CancellationToken cancellationToken)
+        {
+            return UserActionAsync(block ? "blocking/create" : "blocking/delete", token, userId, cancellationToken);
         }
 
         private static async Task<SocialApiResult<bool>> UserActionAsync(string endpoint, string token, string userId,

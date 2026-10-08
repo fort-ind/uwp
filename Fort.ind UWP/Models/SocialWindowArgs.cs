@@ -51,6 +51,19 @@ namespace Fort.ind_UWP
         public SocialThreadTab InitialTab { get; private set; }
     }
 
+    public sealed class SocialTagArgs
+    {
+        public SocialTagArgs(string accountId, string tag)
+        {
+            AccountId = accountId;
+            Tag = tag;
+        }
+
+        public string AccountId { get; private set; }
+
+        public string Tag { get; private set; }
+    }
+
     public enum SocialComposeMode
     {
         New,

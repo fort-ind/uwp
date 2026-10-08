@@ -48,7 +48,7 @@ namespace Fort.ind_UWP
 
         private static bool IsSubPage(Page page)
         {
-            return page is SocialNotePage || page is SocialUserListPage || page is LoginPage;
+            return page is SocialNotePage || page is SocialTagPage || page is SocialUserListPage || page is LoginPage;
         }
 
         private void ScheduleUnload(Page page)

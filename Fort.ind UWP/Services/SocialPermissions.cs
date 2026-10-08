@@ -18,7 +18,9 @@ namespace Fort.ind_UWP
         Delete,
         Report,
         Post,
-        Profile
+        Profile,
+        MuteUser,
+        Block
     }
 
     public static class SocialPermissions
@@ -45,10 +47,14 @@ namespace Fort.ind_UWP
 
         public const string WriteReportAbuse = "write:report-abuse";
 
+        public const string WriteMutes = "write:mutes";
+
+        public const string WriteBlocks = "write:blocks";
+
         public const string Requested = ReadAccount + "," + ReadNotifications + "," + WriteFollowing + ","
                                         + WriteNotes + "," + WriteReactions + "," + WriteVotes + ","
                                         + ReadFavorites + "," + WriteFavorites + "," + WriteDrive + ","
-                                        + WriteAccount + "," + WriteReportAbuse;
+                                        + WriteAccount + "," + WriteReportAbuse + "," + WriteMutes + "," + WriteBlocks;
 
         private static readonly string[] s_postingPermissions =
         {

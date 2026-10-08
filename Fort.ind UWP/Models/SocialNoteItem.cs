@@ -199,6 +199,19 @@ namespace Fort.ind_UWP
             get { return _isDeleted || (Renoter != null && IsMe(Renoter.Id) && !_isRenotedByMe); }
         }
 
+        public static bool IsHiddenPerson(SocialNoteItem item, string exceptUserId)
+        {
+            if (item == null) return false;
+
+            var author = item.Author == null ? null : item.Author.Id;
+            if (!string.Equals(author, exceptUserId, StringComparison.Ordinal) && SocialModerationService.IsHidden(author)) return true;
+
+            var renoter = item.Renoter == null ? null : item.Renoter.Id;
+            if (renoter == null || string.Equals(renoter, exceptUserId, StringComparison.Ordinal)) return false;
+
+            return SocialModerationService.IsHidden(renoter) || SocialModerationService.AreRenotesHidden(renoter);
+        }
+
         public static bool IsRemovedBy(SocialNoteItem item, SocialNoteChange change)
         {
             if (item == null || change == null || !string.Equals(item.Note.Id, change.NoteId, StringComparison.Ordinal)) return false;

@@ -214,6 +214,12 @@ namespace Fort.ind_UWP
                 return;
             }
 
+            if (change.Kind == SocialNoteChangeKind.RelationChanged)
+            {
+                if (change.Flag) Sweep();
+                return;
+            }
+
             foreach (var feed in _feeds)
             {
                 var removed = feed.Collection.RemoveWhere(item => SocialNoteItem.IsRemovedBy(item, change));
@@ -277,7 +283,7 @@ namespace Fort.ind_UWP
 
             foreach (var feed in _feeds)
             {
-                var removed = feed.Collection.RemoveWhere(item => item.IsGone);
+                var removed = feed.Collection.RemoveWhere(item => item.IsGone || SocialNoteItem.IsHiddenPerson(item, UserId));
                 if (removed > 0) SettleAfterRemoval(feed);
             }
         }

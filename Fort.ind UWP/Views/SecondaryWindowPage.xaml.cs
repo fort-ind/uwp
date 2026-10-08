@@ -131,7 +131,7 @@ namespace Fort.ind_UWP
             if (string.IsNullOrEmpty(title)) return;
 
             _baseTitle = title;
-            if (ContentFrame.Content is SocialNotePage) return;
+            if (ContentFrame.Content is SocialNotePage || ContentFrame.Content is SocialTagPage) return;
 
             ShowTitle(title);
         }
@@ -150,9 +150,12 @@ namespace Fort.ind_UWP
             }
         }
 
-        private void FollowContentTitle()
+        private void FollowContentTitle(object parameter)
         {
-            var title = ContentFrame.Content is SocialNotePage ? LocalizedStrings.Get("WindowTitleNote") : _baseTitle;
+            var tagArgs = ContentFrame.Content is SocialTagPage ? parameter as SocialTagArgs : null;
+            var title = ContentFrame.Content is SocialNotePage ? LocalizedStrings.Get("WindowTitleNote")
+                        : tagArgs != null ? LocalizedStrings.Format("SocialTagTitleFormat", tagArgs.Tag)
+                        : _baseTitle;
             if (string.IsNullOrEmpty(title) || string.Equals(title, WindowTitleText.Text, StringComparison.OrdinalIgnoreCase)) return;
 
             ShowTitle(title);
@@ -189,7 +192,7 @@ namespace Fort.ind_UWP
             try
             {
                 if (e.NavigationMode == NavigationMode.New) LimitBackStack();
-                FollowContentTitle();
+                FollowContentTitle(e.Parameter);
 
                 if (ContentFrame.CanGoBack && !_backButtonShown)
                 {

@@ -63,7 +63,7 @@ namespace Fort.ind_UWP
         {
             base.OnNavigatedFrom(e);
 
-            if (e.SourcePageType == typeof(SocialNotePage)) ProfileView.KeepListsOnNextUnload = true;
+            if (SocialThreads.IsInPlacePage(e.SourcePageType)) ProfileView.KeepListsOnNextUnload = true;
         }
 
         public void Reopen(object parameter)

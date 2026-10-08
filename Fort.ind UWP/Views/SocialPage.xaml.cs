@@ -164,7 +164,7 @@ namespace Fort.ind_UWP
             }
 
             RefreshGate();
-            RemoveTimelineRows(item => item.IsGone);
+            RemoveTimelineRows(item => item.IsGone || SocialNoteItem.IsHiddenPerson(item, null));
             foreach (var note in SocialNoteService.PostsSince(_seenPostsVersion))
             {
                 InsertPosted(note);
@@ -183,7 +183,7 @@ namespace Fort.ind_UWP
         {
             base.OnNavigatedFrom(e);
 
-            _keepListsOnUnload = e.SourcePageType == typeof(SocialNotePage);
+            _keepListsOnUnload = SocialThreads.IsInPlacePage(e.SourcePageType);
         }
 
         private void SocialPage_Unloaded(object sender, RoutedEventArgs e)
@@ -256,7 +256,8 @@ namespace Fort.ind_UWP
             {
                 if (change == null) return;
                 if (change.Kind != SocialNoteChangeKind.Deleted && change.Kind != SocialNoteChangeKind.Unrenoted
-                    && change.Kind != SocialNoteChangeKind.Posted) return;
+                    && change.Kind != SocialNoteChangeKind.Posted && change.Kind != SocialNoteChangeKind.RelationChanged) return;
+                if (change.Kind == SocialNoteChangeKind.RelationChanged && !change.Flag) return;
 
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
@@ -266,6 +267,10 @@ namespace Fort.ind_UWP
                         {
                             InsertPosted(change.Note);
                             _seenPostsVersion = SocialNoteService.PostsVersion;
+                        }
+                        else if (change.Kind == SocialNoteChangeKind.RelationChanged)
+                        {
+                            RemoveTimelineRows(item => SocialNoteItem.IsHiddenPerson(item, null));
                         }
                         else
                         {

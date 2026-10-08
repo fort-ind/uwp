@@ -37,6 +37,66 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static bool OpenTag(DependencyObject origin, string tag)
+        {
+            try
+            {
+                var name = tag == null ? null : tag.Trim().TrimStart('#');
+                if (string.IsNullOrEmpty(name)) return false;
+
+                var page = PageOf(origin);
+                if (page == null || page.Frame == null) return false;
+
+                var current = page as SocialTagPage;
+                if (current != null && current.Shows(name)) return true;
+
+                return page.Frame.Navigate(typeof(SocialTagPage), new SocialTagArgs(SocialContentService.CurrentAccountId(), name));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialThreads: could not open the tag - {ex.GetType().Name}: {ex.Message}"
+                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                return false;
+            }
+        }
+
+        public static bool IsInPlacePage(Type pageType)
+        {
+            return pageType == typeof(SocialNotePage) || pageType == typeof(SocialTagPage);
+        }
+
+        public static void ReturnToProfile(Page page, object parameter)
+        {
+            var args = parameter as SocialUserWindowArgs;
+            if (args == null || page.Frame == null) return;
+
+            if (!SocialContentService.IsCurrentAccount(args.AccountId))
+            {
+                WindowManagerService.CloseCurrentWindow();
+                return;
+            }
+
+            var stack = page.Frame.BackStack;
+            var target = -1;
+            for (var i = stack.Count - 1; i >= 0; i--)
+            {
+                if (stack[i].SourcePageType == typeof(SocialUserPage))
+                {
+                    target = i;
+                    break;
+                }
+            }
+
+            if (target < 0) return;
+
+            while (stack.Count - 1 > target)
+            {
+                stack.RemoveAt(stack.Count - 1);
+            }
+
+            page.Frame.GoBack();
+        }
+
         private static Page PageOf(DependencyObject origin)
         {
             var current = origin;

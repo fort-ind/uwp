@@ -95,11 +95,11 @@ namespace Fort.ind_UWP
         {
             var link = new Hyperlink();
             link.Inlines.Add(new Run { Text = segment.Text });
-            link.Click += (sender, args) => OnLinkClick(segment);
+            link.Click += (sender, args) => OnLinkClick(sender, segment);
             return link;
         }
 
-        private static async void OnLinkClick(MfmSegment segment)
+        private static async void OnLinkClick(Hyperlink link, MfmSegment segment)
         {
             try
             {
@@ -110,6 +110,10 @@ namespace Fort.ind_UWP
                 {
                     case MfmSegmentKind.Mention:
                         await SocialWindows.ShowMentionAsync(segment);
+                        break;
+                    case MfmSegmentKind.Hashtag:
+                        var origin = link == null || link.ElementStart == null ? null : link.ElementStart.VisualParent;
+                        if (!SocialThreads.OpenTag(origin, segment.Tag)) await WebLauncher.LaunchAsync(segment.Url);
                         break;
                     default:
                         await WebLauncher.LaunchAsync(segment.Url);

@@ -49,11 +49,11 @@ namespace Fort.ind_UWP
                 var item = ItemFor(target);
                 if (item == null) return;
 
-                var flyout = SocialMenus.Build(item, AssociatedObject);
+                var flyout = SocialMenus.BuildContext(item, AssociatedObject);
                 if (flyout == null) return;
 
                 Point point;
-                SocialMenus.ShowAt(flyout, target, args.TryGetPosition(target, out point) ? point : (Point?)null);
+                SocialMenus.ShowContextAt(flyout, target, args.TryGetPosition(target, out point) ? point : (Point?)null);
                 args.Handled = true;
             }
             catch (Exception ex)

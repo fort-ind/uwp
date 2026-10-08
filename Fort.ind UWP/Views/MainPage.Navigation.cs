@@ -501,9 +501,14 @@ namespace Fort.ind_UWP
                 TitleBarBackButton.IsEnabled = ContentFrame.CanGoBack;
                 TrackContentPage(e.Content as Page);
 
+                var tagArgs = e.Content is SocialTagPage ? e.Parameter as SocialTagArgs : null;
                 if (e.Content is SocialNotePage)
                 {
                     TitleSubPage(LocalizedStrings.Get("HeaderNote"));
+                }
+                else if (tagArgs != null)
+                {
+                    TitleSubPage(LocalizedStrings.Format("SocialTagTitleFormat", tagArgs.Tag));
                 }
                 else if (e.NavigationMode == NavigationMode.Back)
                 {
@@ -528,14 +533,14 @@ namespace Fort.ind_UWP
             try
             {
                 var stack = ContentFrame.BackStack;
-                var intoThread = currentPageType == typeof(SocialNotePage);
+                var intoThread = SocialThreads.IsInPlacePage(currentPageType);
 
                 for (int i = stack.Count - 1; i >= 0; i--)
                 {
                     var type = stack[i].SourcePageType;
                     if (type == typeof(LoginPage)
                         || type == typeof(SocialUserListPage)
-                        || (!intoThread && type == typeof(SocialNotePage)))
+                        || (!intoThread && SocialThreads.IsInPlacePage(type)))
                     {
                         stack.RemoveAt(i);
                     }

@@ -250,6 +250,22 @@ namespace Fort.ind_UWP
                                           state, updated, result.ErrorCode);
         }
 
+        public static async Task RereadAsync(string userId)
+        {
+            try
+            {
+                var token = await MisskeyAuthService.TryGetTokenAsync();
+                var fresh = await SocialApiService.GetUserAsync(token, userId, CancellationToken.None);
+                if (fresh.Status == SocialApiStatus.Ok) Raise(fresh.Value);
+
+                ProfileService.RefreshNow();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialFollowService: could not re-read the person - {ex.Message}");
+            }
+        }
+
         public static async Task<SocialFollowResult> ToggleWithFeedbackAsync(UIElement owner, SocialUserDetail detail)
         {
             var result = await ToggleAsync(owner, detail);

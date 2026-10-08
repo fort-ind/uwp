@@ -235,34 +235,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var args = parameter as SocialUserWindowArgs;
-                if (args == null || Frame == null) return;
-
-                if (!SocialContentService.IsCurrentAccount(args.AccountId))
-                {
-                    WindowManagerService.CloseCurrentWindow();
-                    return;
-                }
-
-                var stack = Frame.BackStack;
-                var target = -1;
-                for (var i = stack.Count - 1; i >= 0; i--)
-                {
-                    if (stack[i].SourcePageType == typeof(SocialUserPage))
-                    {
-                        target = i;
-                        break;
-                    }
-                }
-
-                if (target < 0) return;
-
-                while (stack.Count - 1 > target)
-                {
-                    stack.RemoveAt(stack.Count - 1);
-                }
-
-                Frame.GoBack();
+                SocialThreads.ReturnToProfile(this, parameter);
             }
             catch (Exception ex)
             {

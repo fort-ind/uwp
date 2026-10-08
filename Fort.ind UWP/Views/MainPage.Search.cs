@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -12,12 +13,16 @@ namespace Fort.ind_UWP
 {
     public sealed partial class MainPage : Page
     {
-        private void FocusSearchAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        private async void FocusSearchAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
             try
             {
-                NavSearchBox.Focus(FocusState.Keyboard);
                 args.Handled = true;
+                if (NavSearchBox.Focus(FocusState.Keyboard)) return;
+
+                NavView.IsPaneOpen = true;
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => { });
+                NavSearchBox.Focus(FocusState.Keyboard);
             }
             catch (Exception ex)
             {

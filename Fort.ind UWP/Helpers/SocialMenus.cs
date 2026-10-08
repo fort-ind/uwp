@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 
 namespace Fort.ind_UWP
 {
@@ -30,17 +32,29 @@ namespace Fort.ind_UWP
         private const string EditGlyph = "\uE70F";
         private const string RedraftGlyph = "\uE777";
         private const string QuoteGlyph = "\uE9B2";
+        private const string ModerateGlyph = "\uE8F8";
+        private const string MuteUserGlyph = "\uE74F";
+        private const string UnmuteUserGlyph = "\uE767";
+        private const string BlockGlyph = "\uECE4";
 
         private static readonly TimeSpan ShareRequestWindow = TimeSpan.FromSeconds(10);
 
         public static MenuFlyout Build(object item, UIElement announcer)
         {
+            return Build(SocialMenuSink.ForMenu(), item, announcer) as MenuFlyout;
+        }
+
+        public static FlyoutBase BuildContext(object item, UIElement announcer)
+        {
+            return Build(SocialMenuSink.ForCommandBar(), item, announcer);
+        }
+
+        private static FlyoutBase Build(SocialMenuSink flyout, object item, UIElement announcer)
+        {
             string url = null;
             string shareTitle = null;
             SocialUser author = null;
             SocialUser renoter = null;
-
-            var flyout = new MenuFlyout();
 
             var note = item as SocialNoteItem;
             if (note != null)
@@ -76,17 +90,18 @@ namespace Fort.ind_UWP
                 renoter = null;
             }
 
-            var linkItems = flyout.Items.Count;
+            var linkItems = flyout.SecondaryCount;
             foreach (var person in new[] { author, renoter }.Where(person => person != null && !string.IsNullOrEmpty(person.Id)))
             {
-                if (linkItems > 0 && flyout.Items.Count == linkItems) flyout.Items.Add(new MenuFlyoutSeparator());
-                flyout.Items.Add(ViewUserItem(person));
+                if (linkItems > 0 && flyout.SecondaryCount == linkItems) flyout.AddSeparator();
+                flyout.Add(LocalizedStrings.Format("SocialMenuViewUserFormat", person.Handle), PersonGlyph, person, ViewUserItem_Click, false);
+                if (SocialModerationService.CanModerate(person)) AddModerationSubmenu(flyout, person, announcer);
             }
 
             if (note != null) AddOwnerItems(flyout, note, announcer);
 
-            RemoveTrailingSeparators(flyout);
-            return flyout.Items.Count > 0 ? flyout : null;
+            flyout.TrimSeparators();
+            return flyout.IsEmpty ? null : flyout.Flyout;
         }
 
         public static MenuFlyout BuildRenote(SocialNoteItem note, UIElement owner)
@@ -141,28 +156,26 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static void AddNoteStateItems(MenuFlyout flyout, SocialNoteItem note, UIElement owner)
+        private static void AddNoteStateItems(SocialMenuSink flyout, SocialNoteItem note, UIElement owner)
         {
             if (!SocialNoteActionService.CanAct(note)) return;
 
             var noteId = note.Note.Id;
             var state = SocialNoteService.CachedState(noteId);
 
-            var favorite = MenuItem("SocialMenuFavorite", FavoriteGlyph, () =>
+            var favorite = Add(flyout, "SocialMenuFavorite", FavoriteGlyph, () =>
             {
                 var current = SocialNoteService.CachedState(noteId);
                 return SocialNoteActionService.SetFavoriteAsync(owner, note, current == null || !current.IsFavorited);
-            });
+            }, true);
 
-            var mute = MenuItem("SocialMenuMuteThread", MuteGlyph, () =>
+            var mute = Add(flyout, "SocialMenuMuteThread", MuteGlyph, () =>
             {
                 var current = SocialNoteService.CachedState(noteId);
                 return SocialNoteActionService.SetThreadMutedAsync(owner, note, current == null || !current.IsMutedThread);
-            });
+            }, false);
 
-            flyout.Items.Add(favorite);
-            flyout.Items.Add(mute);
-            flyout.Items.Add(new MenuFlyoutSeparator());
+            flyout.AddSeparator();
 
             if (state != null)
             {
@@ -176,7 +189,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async void LoadStateItems(string noteId, MenuFlyoutItem favorite, MenuFlyoutItem mute)
+        private static async void LoadStateItems(string noteId, SocialMenuEntry favorite, SocialMenuEntry mute)
         {
             try
             {
@@ -192,38 +205,37 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static void LabelStateItems(MenuFlyoutItem favorite, MenuFlyoutItem mute, SocialNoteState state)
+        private static void LabelStateItems(SocialMenuEntry favorite, SocialMenuEntry mute, SocialNoteState state)
         {
             favorite.Text = LocalizedStrings.Get(state.IsFavorited ? "SocialMenuUnfavorite" : "SocialMenuFavorite");
-            favorite.Icon = new FontIcon { Glyph = state.IsFavorited ? UnfavoriteGlyph : FavoriteGlyph };
+            favorite.Glyph = state.IsFavorited ? UnfavoriteGlyph : FavoriteGlyph;
             mute.Text = LocalizedStrings.Get(state.IsMutedThread ? "SocialMenuUnmuteThread" : "SocialMenuMuteThread");
         }
 
-        private static void AddOwnerItems(MenuFlyout flyout, SocialNoteItem note, UIElement owner)
+        private static void AddOwnerItems(SocialMenuSink flyout, SocialNoteItem note, UIElement owner)
         {
             if (!SocialNoteActionService.CanAct(note)) return;
 
-            flyout.Items.Add(new MenuFlyoutSeparator());
+            flyout.AddSeparator();
 
             if (!note.IsMine)
             {
-                flyout.Items.Add(MenuItem("SocialMenuReport", ReportGlyph, () => SocialNoteActionService.ReportAsync(owner, note)));
+                Add(flyout, "SocialMenuReport", ReportGlyph, () => SocialNoteActionService.ReportAsync(owner, note), false);
                 return;
             }
 
             var noteId = note.Note.Id;
             if (string.IsNullOrEmpty(note.Note.User == null ? null : note.Note.User.Host))
             {
-                flyout.Items.Add(MenuItem("SocialMenuEdit", EditGlyph, () => SocialWindows.ShowComposeAsync(owner, SocialComposeMode.Edit, note.Note)));
+                Add(flyout, "SocialMenuEdit", EditGlyph, () => SocialWindows.ShowComposeAsync(owner, SocialComposeMode.Edit, note.Note), false);
             }
 
             var pinned = SocialNoteService.IsPinned(noteId);
-            var pin = MenuItem("SocialMenuPin", PinGlyph, () =>
+            var pin = Add(flyout, "SocialMenuPin", PinGlyph, () =>
             {
                 var current = SocialNoteService.IsPinned(noteId);
                 return SocialNoteActionService.SetPinnedAsync(owner, note, current != true);
-            });
-            flyout.Items.Add(pin);
+            }, false);
 
             if (pinned.HasValue)
             {
@@ -235,11 +247,11 @@ namespace Fort.ind_UWP
                 LoadPinItem(noteId, pin);
             }
 
-            flyout.Items.Add(MenuItem("SocialMenuDelete", DeleteGlyph, () => SocialNoteActionService.DeleteAsync(owner, note)));
-            flyout.Items.Add(MenuItem("SocialMenuRedraft", RedraftGlyph, () => SocialNoteActionService.RedraftAsync(owner, note)));
+            Add(flyout, "SocialMenuDelete", DeleteGlyph, () => SocialNoteActionService.DeleteAsync(owner, note), false);
+            Add(flyout, "SocialMenuRedraft", RedraftGlyph, () => SocialNoteActionService.RedraftAsync(owner, note), false);
         }
 
-        private static async void LoadPinItem(string noteId, MenuFlyoutItem pin)
+        private static async void LoadPinItem(string noteId, SocialMenuEntry pin)
         {
             try
             {
@@ -253,23 +265,10 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static void LabelPinItem(MenuFlyoutItem pin, bool pinned)
+        private static void LabelPinItem(SocialMenuEntry pin, bool pinned)
         {
             pin.Text = LocalizedStrings.Get(pinned ? "SocialMenuUnpin" : "SocialMenuPin");
-            pin.Icon = new FontIcon { Glyph = pinned ? UnpinGlyph : PinGlyph };
-        }
-
-        private static void RemoveTrailingSeparators(MenuFlyout flyout)
-        {
-            while (flyout.Items.Count > 0 && flyout.Items[flyout.Items.Count - 1] is MenuFlyoutSeparator)
-            {
-                flyout.Items.RemoveAt(flyout.Items.Count - 1);
-            }
-
-            while (flyout.Items.Count > 0 && flyout.Items[0] is MenuFlyoutSeparator)
-            {
-                flyout.Items.RemoveAt(0);
-            }
+            pin.Glyph = pinned ? UnpinGlyph : PinGlyph;
         }
 
         public static MenuFlyout BuildForUser(SocialUser user, string fallbackUrl, UIElement announcer)
@@ -277,33 +276,163 @@ namespace Fort.ind_UWP
             var url = SocialLinks.UserUrl(user) ?? fallbackUrl;
             var title = user == null ? null : SocialNoteItem.DisplayNameOf(user);
 
-            var flyout = new MenuFlyout();
-            AddLinkItems(flyout, url, title, announcer);
+            var sink = SocialMenuSink.ForMenu();
+            AddLinkItems(sink, url, title, announcer);
+
+            var flyout = (MenuFlyout)sink.Flyout;
+            if (SocialModerationService.CanModerate(user))
+            {
+                if (flyout.Items.Count > 0) flyout.Items.Add(new MenuFlyoutSeparator());
+                AddModerationItems(flyout.Items, user, announcer);
+            }
 
             return flyout.Items.Count > 0 ? flyout : null;
         }
 
-        private static void AddLinkItems(MenuFlyout flyout, string url, string shareTitle, UIElement announcer)
+        private static void AddModerationSubmenu(SocialMenuSink flyout, SocialUser user, UIElement owner)
+        {
+            flyout.AddSubmenu(LocalizedStrings.Format("SocialMenuModerateUserFormat", user.Handle), ModerateGlyph,
+                              items => AddModerationItems(items, user, owner));
+        }
+
+        private static void AddModerationItems(IList<MenuFlyoutItemBase> items, SocialUser user, UIElement owner)
+        {
+            var mute = new MenuFlyoutSubItem
+            {
+                Text = LocalizedStrings.Get("SocialMenuMuteUser"),
+                Icon = new FontIcon { Glyph = MuteUserGlyph }
+            };
+            mute.Items.Add(DurationItem("SocialMenuMuteForHour", () => SocialModerationService.MuteAsync(owner, user, TimeSpan.FromHours(1))));
+            mute.Items.Add(DurationItem("SocialMenuMuteForDay", () => SocialModerationService.MuteAsync(owner, user, TimeSpan.FromDays(1))));
+            mute.Items.Add(DurationItem("SocialMenuMuteForWeek", () => SocialModerationService.MuteAsync(owner, user, TimeSpan.FromDays(7))));
+            mute.Items.Add(DurationItem("SocialMenuMuteIndefinitely", () => SocialModerationService.MuteAsync(owner, user, null)));
+
+            var unmute = MenuItem("SocialMenuUnmuteUser", UnmuteUserGlyph, () => SocialModerationService.UnmuteAsync(owner, user));
+
+            var renotes = new ToggleMenuFlyoutItem
+            {
+                Text = LocalizedStrings.Get("SocialMenuHideRenotes"),
+                Icon = new FontIcon { Glyph = RenoteGlyph }
+            };
+            renotes.Tag = new Func<Task>(() => SocialModerationService.SetRenotesHiddenAsync(owner, user, renotes.IsChecked));
+            renotes.Click += MenuItem_Click;
+
+            var block = MenuItem("SocialMenuBlock", BlockGlyph, () => SocialModerationService.BlockAsync(owner, user));
+            var unblock = MenuItem("SocialMenuUnblock", BlockGlyph, () => SocialModerationService.UnblockAsync(owner, user));
+
+            items.Add(mute);
+            items.Add(unmute);
+            items.Add(renotes);
+            items.Add(new MenuFlyoutSeparator());
+            items.Add(block);
+            items.Add(unblock);
+
+            var moderation = new ModerationItems(mute, unmute, renotes, block, unblock);
+            var relation = SocialModerationService.CachedRelation(user.Id);
+            moderation.Label(relation);
+            moderation.SetEnabled(relation != null);
+            LoadModerationItems(user.Id, moderation);
+        }
+
+        private static async void LoadModerationItems(string userId, ModerationItems moderation)
+        {
+            try
+            {
+                var relation = await SocialModerationService.GetRelationAsync(userId);
+                if (relation != null) moderation.Label(relation);
+                moderation.SetEnabled(true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialMenus: could not read the relation - {ex.Message}");
+            }
+        }
+
+        private static MenuFlyoutItem DurationItem(string textKey, Func<Task> action)
+        {
+            var menuItem = new MenuFlyoutItem
+            {
+                Text = LocalizedStrings.Get(textKey),
+                Tag = action
+            };
+            menuItem.Click += MenuItem_Click;
+            return menuItem;
+        }
+
+        private sealed class ModerationItems
+        {
+            private readonly MenuFlyoutSubItem _mute;
+
+            private readonly MenuFlyoutItem _unmute;
+
+            private readonly ToggleMenuFlyoutItem _renotes;
+
+            private readonly MenuFlyoutItem _block;
+
+            private readonly MenuFlyoutItem _unblock;
+
+            public ModerationItems(MenuFlyoutSubItem mute, MenuFlyoutItem unmute, ToggleMenuFlyoutItem renotes,
+                                   MenuFlyoutItem block, MenuFlyoutItem unblock)
+            {
+                _mute = mute;
+                _unmute = unmute;
+                _renotes = renotes;
+                _block = block;
+                _unblock = unblock;
+            }
+
+            public void Label(SocialRelation relation)
+            {
+                var muted = relation != null && relation.IsMuted;
+                var blocking = relation != null && relation.IsBlocking;
+
+                _mute.Visibility = muted ? Visibility.Collapsed : Visibility.Visible;
+                _unmute.Visibility = muted ? Visibility.Visible : Visibility.Collapsed;
+                _renotes.IsChecked = relation != null && relation.IsRenoteMuted;
+                _block.Visibility = blocking ? Visibility.Collapsed : Visibility.Visible;
+                _unblock.Visibility = blocking ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            public void SetEnabled(bool enabled)
+            {
+                _mute.IsEnabled = enabled;
+                _unmute.IsEnabled = enabled;
+                _renotes.IsEnabled = enabled;
+                _block.IsEnabled = enabled;
+                _unblock.IsEnabled = enabled;
+            }
+        }
+
+        private static void AddLinkItems(SocialMenuSink flyout, string url, string shareTitle, UIElement announcer)
         {
             var link = WebLauncher.TryCreateWebUri(url);
             if (link == null) return;
 
-            flyout.Items.Add(MenuItem("SocialMenuOpenOnFortSocial", OpenGlyph, async () => await WebLauncher.LaunchAsync(link.AbsoluteUri)));
-            flyout.Items.Add(MenuItem("SocialMenuCopyLink", CopyGlyph, () =>
+            Add(flyout, "SocialMenuOpenOnFortSocial", OpenGlyph, async () => await WebLauncher.LaunchAsync(link.AbsoluteUri), false);
+            Add(flyout, "SocialMenuCopyLink", CopyGlyph, () =>
             {
                 CopyLink(link, announcer);
                 return Task.CompletedTask;
-            }));
+            }, true);
 
             if (DataTransferManager.IsSupported())
             {
                 var title = string.IsNullOrWhiteSpace(shareTitle) ? link.AbsoluteUri : shareTitle;
-                flyout.Items.Add(MenuItem("SocialMenuShare", ShareGlyph, () =>
+                Add(flyout, "SocialMenuShare", ShareGlyph, () =>
                 {
                     Share(title, link);
                     return Task.CompletedTask;
-                }));
+                }, true);
             }
+        }
+
+        public static void ShowContextAt(FlyoutBase flyout, FrameworkElement target, Point? point)
+        {
+            if (flyout == null || target == null) return;
+
+            var options = new FlyoutShowOptions { ShowMode = FlyoutShowMode.Standard };
+            if (point.HasValue) options.Position = point.Value;
+            flyout.ShowAt(target, options);
         }
 
         public static void ShowAt(MenuFlyout flyout, FrameworkElement target, Point? point)
@@ -320,18 +449,6 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static MenuFlyoutItem ViewUserItem(SocialUser user)
-        {
-            var menuItem = new MenuFlyoutItem
-            {
-                Text = LocalizedStrings.Format("SocialMenuViewUserFormat", user.Handle),
-                Icon = new FontIcon { Glyph = PersonGlyph },
-                Tag = user
-            };
-            menuItem.Click += ViewUserItem_Click;
-            return menuItem;
-        }
-
         private static async void ViewUserItem_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -344,6 +461,11 @@ namespace Fort.ind_UWP
             {
                 Debug.WriteLine($"SocialMenus: could not open the profile - {ex.Message}");
             }
+        }
+
+        private static SocialMenuEntry Add(SocialMenuSink flyout, string textKey, string glyph, Func<Task> action, bool primary)
+        {
+            return flyout.Add(LocalizedStrings.Get(textKey), glyph, action, MenuItem_Click, primary);
         }
 
         private static MenuFlyoutItem MenuItem(string textKey, string glyph, Func<Task> action)

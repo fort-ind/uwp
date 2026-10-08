@@ -215,6 +215,7 @@
     <Compile Include="Helpers\RelativeTime.cs" />
     <Compile Include="Helpers\SocialLinks.cs" />
     <Compile Include="Helpers\SocialMenus.cs" />
+    <Compile Include="Helpers\SocialMenuSink.cs" />
     <Compile Include="Helpers\SocialReactions.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Helpers\VisibilityHelper.cs" />
@@ -260,6 +261,7 @@
     <Compile Include="Services\SocialDraftService.cs" />
     <Compile Include="Services\SocialEmojiService.cs" />
     <Compile Include="Services\SocialFollowService.cs" />
+    <Compile Include="Services\SocialModerationService.cs" />
     <Compile Include="Services\SocialNoteActionService.cs" />
     <Compile Include="Services\SocialNoteCapture.cs" />
     <Compile Include="Services\SocialNoteHub.cs" />
@@ -348,6 +350,9 @@
     </Compile>
     <Compile Include="Views\SocialNotePage.xaml.cs">
       <DependentUpon>SocialNotePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialTagPage.xaml.cs">
+      <DependentUpon>SocialTagPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SocialThreads.cs" />
     <Compile Include="Views\SocialWindows.cs" />
@@ -558,6 +563,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SocialPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialTagPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -21,7 +21,15 @@ namespace Fort.ind_UWP
         FavoriteChanged,
         ThreadMuteChanged,
         PinChanged,
-        Posted
+        Posted,
+        RelationChanged
+    }
+
+    public enum SocialRelationKind
+    {
+        Mute,
+        RenoteMute,
+        Block
     }
 
     public sealed class SocialNoteChange
@@ -51,6 +59,8 @@ namespace Fort.ind_UWP
         public string ChildId { get; private set; }
 
         public bool Flag { get; private set; }
+
+        public SocialRelationKind Relation { get; private set; }
 
         public bool IsMine
         {
@@ -143,6 +153,13 @@ namespace Fort.ind_UWP
             if (string.IsNullOrEmpty(parentId) || reply == null) return null;
 
             return new SocialNoteChange(SocialNoteChangeKind.Replied, parentId) { ChildId = reply.Id, UserId = reply.UserId, Note = reply };
+        }
+
+        public static SocialNoteChange RelationChanged(string userId, SocialRelationKind relation, bool on)
+        {
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            return new SocialNoteChange(SocialNoteChangeKind.RelationChanged, null) { UserId = userId, Relation = relation, Flag = on };
         }
 
         public static SocialNoteChange Pin(string noteId, bool pinned)

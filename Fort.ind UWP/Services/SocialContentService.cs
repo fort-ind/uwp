@@ -104,6 +104,13 @@ namespace Fort.ind_UWP
             return await SocialApiService.GetTimelineAsync(token, timeline, untilId, AppConstants.SocialFeedPageSize, cancellationToken);
         }
 
+        public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchTagNotesAsync(
+            string tag, string untilId, CancellationToken cancellationToken)
+        {
+            var token = await MisskeyAuthService.TryGetTokenAsync();
+            return await SocialApiService.GetTagNotesAsync(token, tag, untilId, AppConstants.SocialFeedPageSize, cancellationToken);
+        }
+
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchUserNotesAsync(
             string userId, SocialUserNotesTab tab, string untilId, CancellationToken cancellationToken)
         {

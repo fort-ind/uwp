@@ -1988,7 +1988,7 @@ Open your profile and try again.</value>
     <comment>{0} is the person's display name.</comment>
   </data>
   <data name="SocialFollowBlockingFormat" xml:space="preserve">
-    <value>You've blocked {0}. Unblock them on fort.social first.</value>
+    <value>You've blocked {0}. Unblock them from the ⋯ menu on their profile first.</value>
     <comment>{0} is the person's display name.</comment>
   </data>
   <data name="SocialNowFollowingAnnouncementFormat" xml:space="preserve">
@@ -3368,5 +3368,124 @@ Open your profile and try again.</value>
   </data>
   <data name="ProfileRefreshingHeading.Text" xml:space="preserve">
     <value>Refreshing</value>
+  </data>
+  <data name="SocialSignInPromptMuteUserTitle" xml:space="preserve">
+    <value>Sign in again to mute people</value>
+  </data>
+  <data name="SocialSignInPromptBlockTitle" xml:space="preserve">
+    <value>Sign in again to block people</value>
+  </data>
+  <data name="SocialMenuModerateUserFormat" xml:space="preserve">
+    <value>Mute or block {0}</value>
+    <comment>Menu item that opens a submenu. {0} is the person's handle, like @alice.</comment>
+  </data>
+  <data name="SocialMenuMuteUser" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="SocialMenuMuteForHour" xml:space="preserve">
+    <value>For 1 hour</value>
+  </data>
+  <data name="SocialMenuMuteForDay" xml:space="preserve">
+    <value>For 1 day</value>
+  </data>
+  <data name="SocialMenuMuteForWeek" xml:space="preserve">
+    <value>For 1 week</value>
+  </data>
+  <data name="SocialMenuMuteIndefinitely" xml:space="preserve">
+    <value>Until I unmute</value>
+  </data>
+  <data name="SocialMenuUnmuteUser" xml:space="preserve">
+    <value>Unmute</value>
+  </data>
+  <data name="SocialMenuHideRenotes" xml:space="preserve">
+    <value>Hide renotes</value>
+  </data>
+  <data name="SocialMenuBlock" xml:space="preserve">
+    <value>Block…</value>
+  </data>
+  <data name="SocialMenuUnblock" xml:space="preserve">
+    <value>Unblock</value>
+  </data>
+  <data name="SocialBlockDialogTitleFormat" xml:space="preserve">
+    <value>Block {0}?</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialBlockDialogBody" xml:space="preserve">
+    <value>They won't be able to follow you or react to, reply to or renote your notes, and any follows between you are removed. You can unblock them later.</value>
+  </data>
+  <data name="SocialBlockDialogConfirm" xml:space="preserve">
+    <value>Block</value>
+  </data>
+  <data name="SocialMutedUserAnnouncementFormat" xml:space="preserve">
+    <value>{0} muted</value>
+    <comment>Spoken after muting someone. {0} is the person's display name.</comment>
+  </data>
+  <data name="SocialUnmutedUserAnnouncementFormat" xml:space="preserve">
+    <value>{0} unmuted</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialRenotesHiddenAnnouncementFormat" xml:space="preserve">
+    <value>Renotes from {0} hidden</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialRenotesShownAnnouncementFormat" xml:space="preserve">
+    <value>Renotes from {0} shown</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialBlockedAnnouncementFormat" xml:space="preserve">
+    <value>{0} blocked</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialUnblockedAnnouncementFormat" xml:space="preserve">
+    <value>{0} unblocked</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialMuteUserFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't mute {0}</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialUnmuteUserFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't unmute {0}</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialHideRenotesFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't hide renotes from {0}</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialShowRenotesFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't show renotes from {0} again</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialBlockFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't block {0}</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialUnblockFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't unblock {0}</value>
+    <comment>{0} is the person's display name.</comment>
+  </data>
+  <data name="SocialTagTitleFormat" xml:space="preserve">
+    <value>#{0}</value>
+    <comment>Title of a hashtag's page, in the header and a window's title bar. {0} is the tag without its #.</comment>
+  </data>
+  <data name="SocialTagCaptionFormat" xml:space="preserve">
+    <value>Recent notes with #{0}</value>
+    <comment>{0} is the tag without its #.</comment>
+  </data>
+  <data name="SocialTagEmptyFormat" xml:space="preserve">
+    <value>No one has posted with #{0} yet.</value>
+    <comment>{0} is the tag without its #.</comment>
+  </data>
+  <data name="SocialTagFailed" xml:space="preserve">
+    <value>These notes couldn't be loaded.</value>
+  </data>
+  <data name="SocialTagRefreshButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="SocialTagRefreshButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh (F5)</value>
+  </data>
+  <data name="SocialTagLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading notes</value>
   </data>
 </root>
