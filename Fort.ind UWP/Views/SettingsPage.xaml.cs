@@ -814,6 +814,8 @@ namespace Fort.ind_UWP
                     return new SettingsRow(AppearanceHeader, AppearanceContent, AppearanceChevronRotation, AppConstants.SettingSettingsAppearanceExpanded);
                 case AppConstants.SettingsSectionTransparency:
                     return new SettingsRow(TransparencyHeader, TransparencyContent, TransparencyChevronRotation, AppConstants.SettingSettingsTransparencyExpanded);
+                case AppConstants.SettingsSectionInk:
+                    return new SettingsRow(InkHeader, InkContent, InkChevronRotation, AppConstants.SettingSettingsInkExpanded);
                 case AppConstants.SettingsSectionProfile:
                     return new SettingsRow(ProfileHeader, ProfileContent, ProfileChevronRotation, AppConstants.SettingSettingsProfileExpanded);
                 case AppConstants.SettingsSectionNotifications:
@@ -837,6 +839,7 @@ namespace Fort.ind_UWP
             {
                 RestorePanelState(AppConstants.SettingSettingsAppearanceExpanded, AppearanceHeader, AppearanceContent, AppearanceChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsTransparencyExpanded, TransparencyHeader, TransparencyContent, TransparencyChevronRotation);
+                RestorePanelState(AppConstants.SettingSettingsInkExpanded, InkHeader, InkContent, InkChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsProfileExpanded, ProfileHeader, ProfileContent, ProfileChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsNotificationsExpanded, NotificationsHeader, NotificationsContent, NotificationsChevronRotation);
                 RestorePanelState(AppConstants.SettingSettingsStorageExpanded, StorageHeader, StorageContent, StorageChevronRotation);

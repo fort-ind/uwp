@@ -147,6 +147,7 @@ namespace Fort.ind_UWP
             };
             AutomationProperties.SetName(box, box.PlaceholderText);
             box.TextChanged += PollChoice_TextChanged;
+            PenHandwritingBehavior.AttachTo(box);
 
             var remove = new Button
             {

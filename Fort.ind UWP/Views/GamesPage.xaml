@@ -154,7 +154,11 @@
                             HorizontalAlignment="Stretch"
                             QueryIcon="Find"
                             IsEnabled="False"
-                            TextChanged="FilterBox_TextChanged"/>
+                            TextChanged="FilterBox_TextChanged">
+                <i:Interaction.Behaviors>
+                    <local:PenHandwritingBehavior/>
+                </i:Interaction.Behaviors>
+            </AutoSuggestBox>
         </Grid>
 
         <TextBlock x:Name="CountText"

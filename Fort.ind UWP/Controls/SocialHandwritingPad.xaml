@@ -1,0 +1,84 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialHandwritingPad"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid RowSpacing="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="120"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="WritingArea"
+              Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+              BorderThickness="1"
+              BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+            <Rectangle Height="1"
+                       Margin="16,0,16,32"
+                       VerticalAlignment="Bottom"
+                       Fill="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                       IsHitTestVisible="False"/>
+            <TextBlock x:Uid="InkPadHint"
+                       x:Name="HintText"
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsHitTestVisible="False"/>
+            <InkCanvas x:Name="Ink"/>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnSpacing="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer HorizontalScrollMode="Enabled"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollMode="Disabled"
+                          VerticalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="AlternatesPanel"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            VerticalAlignment="Center"
+                            AutomationProperties.LiveSetting="Polite"/>
+            </ScrollViewer>
+
+            <Button x:Uid="InkPadSpace"
+                    Grid.Column="1"
+                    Style="{StaticResource SocialToolButtonStyle}"
+                    AllowFocusOnInteraction="False"
+                    Click="SpaceButton_Click">
+                <FontIcon Glyph="&#xE75D;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+            </Button>
+            <Button x:Uid="InkPadBackspace"
+                    Grid.Column="2"
+                    Style="{StaticResource SocialToolButtonStyle}"
+                    AllowFocusOnInteraction="False"
+                    Click="BackspaceButton_Click">
+                <FontIcon Glyph="&#xE750;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+            </Button>
+            <Button x:Uid="InkPadEnter"
+                    Grid.Column="3"
+                    Style="{StaticResource SocialToolButtonStyle}"
+                    AllowFocusOnInteraction="False"
+                    Click="EnterButton_Click">
+                <FontIcon Glyph="&#xE751;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+            </Button>
+            <Button x:Uid="InkPadClose"
+                    Grid.Column="4"
+                    Style="{StaticResource SocialToolButtonStyle}"
+                    Click="CloseButton_Click">
+                <FontIcon Glyph="&#xE711;" FontSize="14" IsTextScaleFactorEnabled="False"/>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

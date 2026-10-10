@@ -32,6 +32,8 @@ namespace Fort.ind_UWP
 
         private string _errorText;
 
+        private bool _markUpEnabled;
+
         private SocialAttachmentItem()
         {
         }
@@ -57,8 +59,42 @@ namespace Fort.ind_UWP
                 OnPropertyChanged("IsUploading");
                 OnPropertyChanged("HasError");
                 OnPropertyChanged("AutomationName");
+                OnPropertyChanged("CanMarkUp");
             }
         }
+
+        public bool MarkUpEnabled
+        {
+            get { return _markUpEnabled; }
+            set
+            {
+                if (_markUpEnabled == value) return;
+                _markUpEnabled = value;
+                OnPropertyChanged();
+                OnPropertyChanged("CanMarkUp");
+            }
+        }
+
+        public bool CanMarkUp
+        {
+            get { return _markUpEnabled && _state == SocialAttachmentState.Done && IsStillImage; }
+        }
+
+        public bool IsStillImage
+        {
+            get
+            {
+                if (_file != null) return _file.Kind == SocialDriveFileKind.Image;
+
+                var type = ContentType ?? "";
+                return type.StartsWith("image/", StringComparison.OrdinalIgnoreCase)
+                       && !string.Equals(type, "image/gif", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        public string PendingDescription { get; set; }
+
+        public bool PendingSensitive { get; set; }
 
         public bool IsUploading
         {
@@ -90,6 +126,7 @@ namespace Fort.ind_UWP
                 OnPropertyChanged();
                 OnPropertyChanged("HasDescription");
                 OnPropertyChanged("AutomationName");
+                OnPropertyChanged("CanMarkUp");
                 if (_thumbnail == null && value != null) Thumbnail = RemoteThumbnail(value);
             }
         }

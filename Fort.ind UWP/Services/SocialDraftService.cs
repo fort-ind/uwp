@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -23,7 +24,7 @@ namespace Fort.ind_UWP
 
         private static readonly Dictionary<string, SocialComposeDraft> s_replies = new Dictionary<string, SocialComposeDraft>(StringComparer.Ordinal);
 
-        private static JsonObject s_root = new JsonObject();
+        private static Dictionary<string, Dictionary<string, string>> s_drafts = NewStore();
 
         private static volatile bool s_loaded;
 
@@ -42,11 +43,15 @@ namespace Fort.ind_UWP
 
             await EnsureLoadedAsync();
 
+            string text;
             lock (s_lock)
             {
-                var drafts = SocialJson.Object(s_root, account);
-                return SocialComposeDraft.FromJson(SocialJson.Object(drafts, slot));
+                Dictionary<string, string> drafts;
+                if (!s_drafts.TryGetValue(account, out drafts) || !drafts.TryGetValue(slot, out text)) return null;
             }
+
+            JsonObject parsed;
+            return JsonObject.TryParse(text, out parsed) ? SocialComposeDraft.FromJson(parsed) : null;
         }
 
         public static void Save(string account, string slot, SocialComposeDraft draft)
@@ -59,16 +64,17 @@ namespace Fort.ind_UWP
                 return;
             }
 
+            var text = draft.ToJson().Stringify();
             lock (s_lock)
             {
-                var drafts = SocialJson.Object(s_root, account);
-                if (drafts == null)
+                Dictionary<string, string> drafts;
+                if (!s_drafts.TryGetValue(account, out drafts))
                 {
-                    drafts = new JsonObject();
-                    s_root.SetNamedValue(account, drafts);
+                    drafts = new Dictionary<string, string>(StringComparer.Ordinal);
+                    s_drafts[account] = drafts;
                 }
 
-                drafts.SetNamedValue(slot, draft.ToJson());
+                drafts[slot] = text;
                 s_dirty = true;
             }
 
@@ -81,11 +87,10 @@ namespace Fort.ind_UWP
 
             lock (s_lock)
             {
-                var drafts = SocialJson.Object(s_root, account);
-                if (drafts == null || !drafts.ContainsKey(slot)) return;
+                Dictionary<string, string> drafts;
+                if (!s_drafts.TryGetValue(account, out drafts) || !drafts.Remove(slot)) return;
 
-                drafts.Remove(slot);
-                if (drafts.Count == 0) s_root.Remove(account);
+                if (drafts.Count == 0) s_drafts.Remove(account);
                 s_dirty = true;
             }
 
@@ -107,9 +112,7 @@ namespace Fort.ind_UWP
                     s_replies.Remove(key);
                 }
 
-                if (!s_root.ContainsKey(account)) return;
-
-                s_root.Remove(account);
+                if (!s_drafts.Remove(account)) return;
                 s_dirty = true;
             }
 
@@ -121,7 +124,7 @@ namespace Fort.ind_UWP
             lock (s_lock)
             {
                 s_saveDebounce.Cancel();
-                s_root = new JsonObject();
+                s_drafts = NewStore();
                 s_replies.Clear();
                 s_dirty = false;
                 s_saveBlocked = false;
@@ -197,14 +200,14 @@ namespace Fort.ind_UWP
                 if (file != null)
                 {
                     var text = await FileIO.ReadTextAsync(file);
-                    var parsed = JsonObject.Parse(text);
+                    var loaded = ParseStore(JsonObject.Parse(text));
                     lock (s_lock)
                     {
-                        foreach (var pair in s_root)
+                        foreach (var pair in s_drafts)
                         {
-                            parsed.SetNamedValue(pair.Key, pair.Value);
+                            loaded[pair.Key] = pair.Value;
                         }
-                        s_root = parsed;
+                        s_drafts = loaded;
                     }
                 }
 
@@ -220,6 +223,51 @@ namespace Fort.ind_UWP
             {
                 s_fileGate.Release();
             }
+        }
+
+        private static Dictionary<string, Dictionary<string, string>> NewStore()
+        {
+            return new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
+        }
+
+        private static Dictionary<string, Dictionary<string, string>> ParseStore(JsonObject root)
+        {
+            var store = NewStore();
+            foreach (var account in root.Where(pair => pair.Value != null && pair.Value.ValueType == JsonValueType.Object))
+            {
+                var slots = new Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (var slot in account.Value.GetObject().Where(pair => pair.Value != null && pair.Value.ValueType == JsonValueType.Object))
+                {
+                    slots[slot.Key] = slot.Value.Stringify();
+                }
+
+                if (slots.Count > 0) store[account.Key] = slots;
+            }
+
+            return store;
+        }
+
+        private static string SerializeStore(Dictionary<string, Dictionary<string, string>> store)
+        {
+            var builder = new StringBuilder("{");
+            var firstAccount = true;
+            foreach (var account in store)
+            {
+                if (!firstAccount) builder.Append(',');
+                firstAccount = false;
+
+                builder.Append(JsonValue.CreateStringValue(account.Key).Stringify()).Append(":{");
+                var firstSlot = true;
+                foreach (var slot in account.Value)
+                {
+                    if (!firstSlot) builder.Append(',');
+                    firstSlot = false;
+                    builder.Append(JsonValue.CreateStringValue(slot.Key).Stringify()).Append(':').Append(slot.Value);
+                }
+                builder.Append('}');
+            }
+
+            return builder.Append('}').ToString();
         }
 
         private static async Task<bool> TryMoveAsideAsync(StorageFile file)
@@ -249,7 +297,7 @@ namespace Fort.ind_UWP
                 {
                     if (!s_dirty) return;
                     s_dirty = false;
-                    json = s_root.Stringify();
+                    json = SerializeStore(s_drafts);
                 }
 
                 if (s_saveBlocked)

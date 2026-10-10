@@ -40,6 +40,14 @@ namespace Fort.ind_UWP
 
         private void Attachments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems.OfType<SocialAttachmentItem>())
+                {
+                    item.MarkUpEnabled = InkToolsAllowed;
+                }
+            }
+
             if (!_loading) OnEdited();
             else UpdateState();
         }
@@ -161,6 +169,7 @@ namespace Fort.ind_UWP
                 {
                     item.File = result.Value;
                     item.State = SocialAttachmentState.Done;
+                    await CarryDescriptionAsync(item);
                     return;
                 }
 
@@ -276,6 +285,7 @@ namespace Fort.ind_UWP
                 MaxLength = AppConstants.SocialAltTextMaxLength,
                 IsSpellCheckEnabled = true
             };
+            PenHandwritingBehavior.AttachTo(box);
 
             var sensitive = new ToggleSwitch
             {
@@ -453,8 +463,17 @@ namespace Fort.ind_UWP
             if (_attachments.Count >= AppConstants.SocialAttachmentLimit) return;
 
             var name = DateTimeOffset.Now.ToString("yyyy-MM-dd HH.mm.ss", CultureInfo.InvariantCulture) + ".png";
-            var item = SocialAttachmentItem.ForUpload(name, "image/png", (ulong)bytes.Length, () => OpenBytesAsync(bytes));
-            _attachments.Add(item);
+            await AddBytesAsync(bytes, name, "image/png", -1, null, false);
+        }
+
+        private async Task<SocialAttachmentItem> AddBytesAsync(byte[] bytes, string name, string contentType, int index,
+                                                               string description, bool sensitive)
+        {
+            var item = SocialAttachmentItem.ForUpload(name, contentType, (ulong)bytes.Length, () => OpenBytesAsync(bytes));
+            item.PendingDescription = description;
+            item.PendingSensitive = sensitive;
+            if (index >= 0 && index <= _attachments.Count) _attachments.Insert(index, item);
+            else _attachments.Add(item);
 
             using (var preview = await OpenBytesAsync(bytes))
             {
@@ -466,10 +485,29 @@ namespace Fort.ind_UWP
                 item.ErrorText = LocalizedStrings.Format("SocialAttachmentTooLargeFormat", AppConstants.SocialUploadLimitBytes / (1024 * 1024));
                 item.State = SocialAttachmentState.TooLarge;
                 UpdateState();
-                return;
+                return item;
             }
 
             Upload(item);
+            return item;
+        }
+
+        private async Task CarryDescriptionAsync(SocialAttachmentItem item)
+        {
+            var description = item.PendingDescription;
+            var sensitive = item.PendingSensitive;
+            item.PendingDescription = null;
+            item.PendingSensitive = false;
+            if (string.IsNullOrWhiteSpace(description) && !sensitive) return;
+
+            try
+            {
+                await SaveDescriptionAsync(item, description, sensitive);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SocialComposer: could not carry the description over - {ex.Message}");
+            }
         }
 
         private static async Task<IRandomAccessStream> OpenBytesAsync(byte[] bytes)

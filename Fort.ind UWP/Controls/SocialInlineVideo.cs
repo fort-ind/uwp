@@ -15,7 +15,7 @@ namespace Fort.ind_UWP
 {
     public sealed class SocialInlineVideo
     {
-        private const double TransportButtonSize = 40;
+        private const string TransportControlsStyleKey = "SocialMediaTransportControlsStyle";
 
         [ThreadStatic]
         private static SocialInlineVideo t_playing;
@@ -99,16 +99,10 @@ namespace Fort.ind_UWP
                 AreTransportControlsEnabled = true,
                 Stretch = Stretch.Uniform
             };
-            var controls = _element.TransportControls;
-            if (controls == null)
-            {
-                controls = new MediaTransportControls();
-                _element.TransportControls = controls;
-            }
-            controls.IsCompact = true;
-            controls.IsZoomButtonVisible = false;
-            controls.Resources["MTCMediaButtonWidth"] = TransportButtonSize;
-            controls.Resources["MTCMediaButtonHeight"] = TransportButtonSize;
+            var controls = new MediaTransportControls { IsCompact = true, IsZoomButtonVisible = false };
+            var style = StyleOf(TransportControlsStyleKey);
+            if (style != null) controls.Style = style;
+            _element.TransportControls = controls;
             if (poster != null) _element.PosterSource = poster;
             AutomationProperties.SetName(_element, AutomationNameFor(file));
 

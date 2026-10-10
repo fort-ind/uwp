@@ -73,7 +73,11 @@
                          TextWrapping="Wrap"
                          IsSpellCheckEnabled="True"
                          Visibility="Collapsed"
-                         TextChanged="Field_TextChanged"/>
+                         TextChanged="Field_TextChanged">
+                    <i:Interaction.Behaviors>
+                        <local:PenHandwritingBehavior/>
+                    </i:Interaction.Behaviors>
+                </TextBox>
 
                 <TextBox x:Uid="SocialComposeEditor"
                          x:Name="Editor"
@@ -89,6 +93,7 @@
                          LostFocus="Editor_LostFocus">
                     <i:Interaction.Behaviors>
                         <local:SocialSuggestionsBehavior x:Name="Suggestions"/>
+                        <local:PenHandwritingBehavior WriteOnBox="True"/>
                     </i:Interaction.Behaviors>
                 </TextBox>
 
@@ -188,6 +193,19 @@
                                         </Border>
                                     </Grid>
                                 </Button>
+                                <Button x:Uid="SocialComposeMarkUpAttachment"
+                                        Width="28" Height="28"
+                                        MinWidth="0" MinHeight="0"
+                                        Padding="0"
+                                        Margin="2"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Background="#99000000"
+                                        Foreground="White"
+                                        Visibility="{x:Bind local:SocialComposer.Shown(CanMarkUp), Mode=OneWay}"
+                                        Click="MarkUpAttachment_Click">
+                                    <FontIcon Glyph="&#xE924;" FontSize="12" IsTextScaleFactorEnabled="False"/>
+                                </Button>
                                 <Button x:Uid="SocialComposeRemoveAttachment"
                                         Width="28" Height="28"
                                         MinWidth="0" MinHeight="0"
@@ -243,92 +261,124 @@
             </StackPanel>
         </ScrollViewer>
 
-        <Grid x:Name="Toolbar"
-              Grid.Row="1"
-              Grid.ColumnSpan="2"
-              ColumnSpacing="8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <StackPanel x:Name="BottomPanel"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2">
+            <local:SocialHandwritingPad x:Name="HandwritePad"
+                                        x:Load="False"
+                                        Margin="0,0,0,8"
+                                        Recognized="HandwritePad_Recognized"
+                                        KeyPressed="HandwritePad_KeyPressed"
+                                        AlternateChosen="HandwritePad_AlternateChosen"
+                                        CloseRequested="HandwritePad_CloseRequested"/>
+            <Grid x:Name="Toolbar"
+                  ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel x:Name="ToolButtons" Orientation="Horizontal" Spacing="2" Margin="-10,0,0,0">
-                <Button x:Uid="SocialComposeEmojiButton"
-                        x:Name="EmojiButton"
-                        Style="{StaticResource SocialToolButtonStyle}">
-                    <FontIcon Glyph="&#xE76E;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                    <Button.Flyout>
-                        <Flyout x:Name="EmojiFlyout" Opening="EmojiFlyout_Opening"/>
-                    </Button.Flyout>
-                </Button>
-                <ToggleButton x:Uid="SocialComposeWarningButton"
-                              x:Name="WarningToggle"
-                              Style="{StaticResource SocialToolToggleButtonStyle}"
-                              Click="WarningToggle_Click">
-                    <FontIcon Glyph="&#xE7BA;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                </ToggleButton>
-                <Button x:Uid="SocialComposeAttachButton"
-                        x:Name="AttachButton"
-                        Style="{StaticResource SocialToolButtonStyle}"
-                        Click="AttachButton_Click">
-                    <FontIcon Glyph="&#xE723;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                </Button>
-                <ToggleButton x:Uid="SocialComposePollButton"
-                              x:Name="PollToggle"
-                              Style="{StaticResource SocialToolToggleButtonStyle}"
-                              Click="PollToggle_Click">
-                    <FontIcon Glyph="&#xE8FD;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                </ToggleButton>
-                <ToggleButton x:Uid="SocialComposePreviewButton"
-                              x:Name="PreviewToggle"
-                              Style="{StaticResource SocialToolToggleButtonStyle}"
-                              Click="PreviewToggle_Click">
-                    <FontIcon Glyph="&#xE890;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                </ToggleButton>
-                <Button x:Uid="SocialComposeMoreButton"
-                        x:Name="MoreButton"
-                        Style="{StaticResource SocialToolButtonStyle}">
-                    <FontIcon Glyph="&#xE712;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                    <Button.Flyout>
-                        <MenuFlyout x:Name="MoreMenu">
-                            <MenuFlyoutSubItem x:Uid="SocialComposeReactionsMenu">
-                                <MenuFlyoutSubItem.Icon><FontIcon Glyph="&#xEB51;"/></MenuFlyoutSubItem.Icon>
-                                <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsAll" x:Name="AcceptAllItem" Tag="" Click="AcceptanceItem_Click"/>
-                                <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsLikeOnly" x:Name="AcceptLikeOnlyItem" Tag="likeOnly" Click="AcceptanceItem_Click"/>
-                                <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsLikeOnlyRemote" x:Name="AcceptLikeOnlyRemoteItem" Tag="likeOnlyForRemote" Click="AcceptanceItem_Click"/>
-                                <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsNonSensitive" x:Name="AcceptNonSensitiveItem" Tag="nonSensitiveOnly" Click="AcceptanceItem_Click"/>
-                                <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsNonSensitiveLikeRemote" x:Name="AcceptNonSensitiveRemoteItem" Tag="nonSensitiveOnlyForLocalLikeOnlyForRemote" Click="AcceptanceItem_Click"/>
-                            </MenuFlyoutSubItem>
-                            <MenuFlyoutSeparator/>
-                            <MenuFlyoutItem x:Uid="SocialComposeDiscard" x:Name="DiscardItem" Click="DiscardItem_Click">
-                                <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE74D;"/></MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-                <FontIcon x:Name="ReplyVisibilityGlyph"
-                          FontSize="14"
-                          Margin="10,0,0,0"
-                          VerticalAlignment="Center"
-                          Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                          IsTextScaleFactorEnabled="False"
-                          Visibility="Collapsed"/>
-            </StackPanel>
+                <StackPanel x:Name="ToolButtons" Orientation="Horizontal" Spacing="2" Margin="-10,0,0,0">
+                    <Button x:Uid="SocialComposeEmojiButton"
+                            x:Name="EmojiButton"
+                            Style="{StaticResource SocialToolButtonStyle}">
+                        <FontIcon Glyph="&#xE76E;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                        <Button.Flyout>
+                            <Flyout x:Name="EmojiFlyout" Opening="EmojiFlyout_Opening"/>
+                        </Button.Flyout>
+                    </Button>
+                    <ToggleButton x:Uid="SocialComposeWarningButton"
+                                  x:Name="WarningToggle"
+                                  Style="{StaticResource SocialToolToggleButtonStyle}"
+                                  Click="WarningToggle_Click">
+                        <FontIcon Glyph="&#xE7BA;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    </ToggleButton>
+                    <Button x:Uid="SocialComposeAttachButton"
+                            x:Name="AttachButton"
+                            Style="{StaticResource SocialToolButtonStyle}"
+                            Click="AttachButton_Click">
+                        <FontIcon Glyph="&#xE723;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    </Button>
+                    <Button x:Uid="SocialComposeInkButton"
+                            x:Name="InkButton"
+                            Style="{StaticResource SocialToolButtonStyle}">
+                        <FontIcon Glyph="&#xE76D;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                        <Button.Flyout>
+                            <MenuFlyout x:Name="InkMenu" Opening="InkMenu_Opening">
+                                <ToggleMenuFlyoutItem x:Uid="SocialComposeHandwrite" x:Name="HandwriteItem" Click="HandwriteItem_Click">
+                                    <ToggleMenuFlyoutItem.Icon><FontIcon Glyph="&#xE929;"/></ToggleMenuFlyoutItem.Icon>
+                                </ToggleMenuFlyoutItem>
+                                <MenuFlyoutItem x:Uid="SocialComposeDraw" x:Name="DrawItem" Click="DrawItem_Click">
+                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xEC87;"/></MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <ToggleButton x:Uid="SocialComposePollButton"
+                                  x:Name="PollToggle"
+                                  Style="{StaticResource SocialToolToggleButtonStyle}"
+                                  Click="PollToggle_Click">
+                        <FontIcon Glyph="&#xE8FD;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    </ToggleButton>
+                    <ToggleButton x:Uid="SocialComposePreviewButton"
+                                  x:Name="PreviewToggle"
+                                  Style="{StaticResource SocialToolToggleButtonStyle}"
+                                  Click="PreviewToggle_Click">
+                        <FontIcon Glyph="&#xE890;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    </ToggleButton>
+                    <Button x:Uid="SocialComposeMoreButton"
+                            x:Name="MoreButton"
+                            Style="{StaticResource SocialToolButtonStyle}">
+                        <FontIcon Glyph="&#xE712;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                        <Button.Flyout>
+                            <MenuFlyout x:Name="MoreMenu">
+                                <MenuFlyoutSubItem x:Uid="SocialComposeReactionsMenu">
+                                    <MenuFlyoutSubItem.Icon><FontIcon Glyph="&#xEB51;"/></MenuFlyoutSubItem.Icon>
+                                    <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsAll" x:Name="AcceptAllItem" Tag="" Click="AcceptanceItem_Click"/>
+                                    <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsLikeOnly" x:Name="AcceptLikeOnlyItem" Tag="likeOnly" Click="AcceptanceItem_Click"/>
+                                    <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsLikeOnlyRemote" x:Name="AcceptLikeOnlyRemoteItem" Tag="likeOnlyForRemote" Click="AcceptanceItem_Click"/>
+                                    <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsNonSensitive" x:Name="AcceptNonSensitiveItem" Tag="nonSensitiveOnly" Click="AcceptanceItem_Click"/>
+                                    <ToggleMenuFlyoutItem x:Uid="SocialComposeReactionsNonSensitiveLikeRemote" x:Name="AcceptNonSensitiveRemoteItem" Tag="nonSensitiveOnlyForLocalLikeOnlyForRemote" Click="AcceptanceItem_Click"/>
+                                </MenuFlyoutSubItem>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem x:Uid="SocialComposeDiscard" x:Name="DiscardItem" Click="DiscardItem_Click">
+                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE74D;"/></MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <FontIcon x:Name="ReplyVisibilityGlyph"
+                              FontSize="14"
+                              Margin="10,0,0,0"
+                              VerticalAlignment="Center"
+                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                              IsTextScaleFactorEnabled="False"
+                              Visibility="Collapsed"/>
+                </StackPanel>
 
-            <local:SocialCharacterRing x:Name="Ring" Grid.Column="1"/>
+                <local:SocialCharacterRing x:Name="Ring" Grid.Column="1"/>
 
-            <Button x:Name="PostButton"
-                    Grid.Column="2"
-                    Style="{StaticResource AccentButtonStyle}"
-                    MinWidth="88"
-                    IsEnabled="False"
-                    Click="PostButton_Click">
-                <Grid>
-                    <TextBlock x:Name="PostLabel" HorizontalAlignment="Center"/>
-                    <ProgressRing x:Name="PostRing" Width="16" Height="16" Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" Visibility="Collapsed"/>
-                </Grid>
-            </Button>
-        </Grid>
+                <Button x:Name="PostButton"
+                        Grid.Column="2"
+                        Style="{StaticResource AccentButtonStyle}"
+                        MinWidth="88"
+                        IsEnabled="False"
+                        Click="PostButton_Click">
+                    <Grid>
+                        <TextBlock x:Name="PostLabel" HorizontalAlignment="Center"/>
+                        <ProgressRing x:Name="PostRing" Width="16" Height="16" Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" Visibility="Collapsed"/>
+                    </Grid>
+                </Button>
+            </Grid>
+        </StackPanel>
+
+        <local:SocialDrawingSurface x:Name="DrawSurface"
+                                    x:Load="False"
+                                    Grid.RowSpan="2"
+                                    Grid.ColumnSpan="2"
+                                    Visibility="Collapsed"
+                                    Attached="DrawSurface_Attached"
+                                    Cancelled="DrawSurface_Cancelled"/>
     </Grid>
 </UserControl>

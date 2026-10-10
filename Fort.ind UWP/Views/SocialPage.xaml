@@ -165,38 +165,61 @@
 
             <PivotItem x:Uid="SocialForYouPivotItem" x:Name="ForYouPivotItem">
                 <Grid>
-                    <ListView x:Uid="SocialForYouList" x:Name="ForYouList"
-                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
-                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                              SelectionMode="None"
-                              IsItemClickEnabled="True"
-                              ItemClick="NoteList_ItemClick"
-                              Visibility="Collapsed">
-                        <i:Interaction.Behaviors>
-                            <local:SocialContextMenuBehavior/>
-                            <local:SocialNoteShortcutsBehavior/>
-                            <local:SocialFeedListBehavior BackToNewest="{x:Bind ForYouBackToNewestButton}"/>
-                        </i:Interaction.Behaviors>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                        <ListView.Header>
-                            <Button x:Name="ForYouBackToNewestButton"
-                                    Margin="12,8,12,8"
-                                    HorizontalAlignment="Stretch"
-                                    Visibility="Collapsed"
-                                    Click="BackToNewestButton_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                                    <TextBlock x:Uid="SocialBackToNewest"/>
-                                </StackPanel>
-                            </Button>
-                        </ListView.Header>
-                    </ListView>
+                    <muxc:InfoBar x:Uid="SocialRefreshFailedInfoBar" x:Name="ForYouRefreshFailedInfoBar"
+                                  Margin="0,4,0,8"
+                                  Severity="Warning"
+                                  IsOpen="False"
+                                  Visibility="Collapsed"
+                                  Closed="RefreshFailedInfoBar_Closed">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialRefreshFailedRetryButton"
+                                    Click="RefreshFailedRetryButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
+                    <muxc:RefreshContainer x:Name="ForYouRefreshContainer"
+                                           Grid.Row="1"
+                                           Visibility="Collapsed"
+                                           RefreshRequested="RefreshContainer_RefreshRequested">
+                        <ListView x:Uid="SocialForYouList" x:Name="ForYouList"
+                                  ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="NoteList_ItemClick">
+                            <i:Interaction.Behaviors>
+                                <local:SocialContextMenuBehavior/>
+                                <local:SocialNoteShortcutsBehavior/>
+                                <local:SocialFeedListBehavior BackToNewest="{x:Bind ForYouBackToNewestButton}"/>
+                            </i:Interaction.Behaviors>
+
+                            <ListView.Header>
+                                <Button x:Name="ForYouBackToNewestButton"
+                                        Margin="12,8,12,8"
+                                        HorizontalAlignment="Stretch"
+                                        Visibility="Collapsed"
+                                        Click="BackToNewestButton_Click">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                        <TextBlock x:Uid="SocialBackToNewest"/>
+                                    </StackPanel>
+                                </Button>
+                            </ListView.Header>
+                        </ListView>
+                    </muxc:RefreshContainer>
 
                     <ProgressRing x:Uid="SocialForYouLoading" x:Name="ForYouLoadingRing"
+                                  Grid.Row="1"
                                   Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="ForYouStatePanel"
+                                Grid.Row="1"
                                 Style="{StaticResource SocialStatePanelStyle}"
                                 Visibility="Collapsed">
                         <FontIcon x:Name="ForYouStateGlyph"
@@ -219,38 +242,61 @@
 
             <PivotItem x:Uid="SocialFollowingPivotItem" x:Name="FollowingPivotItem">
                 <Grid>
-                    <ListView x:Uid="SocialFollowingList" x:Name="FollowingList"
-                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
-                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                              SelectionMode="None"
-                              IsItemClickEnabled="True"
-                              ItemClick="NoteList_ItemClick"
-                              Visibility="Collapsed">
-                        <i:Interaction.Behaviors>
-                            <local:SocialContextMenuBehavior/>
-                            <local:SocialNoteShortcutsBehavior/>
-                            <local:SocialFeedListBehavior BackToNewest="{x:Bind FollowingBackToNewestButton}"/>
-                        </i:Interaction.Behaviors>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                        <ListView.Header>
-                            <Button x:Name="FollowingBackToNewestButton"
-                                    Margin="12,8,12,8"
-                                    HorizontalAlignment="Stretch"
-                                    Visibility="Collapsed"
-                                    Click="BackToNewestButton_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                                    <TextBlock x:Uid="SocialBackToNewest"/>
-                                </StackPanel>
-                            </Button>
-                        </ListView.Header>
-                    </ListView>
+                    <muxc:InfoBar x:Uid="SocialRefreshFailedInfoBar" x:Name="FollowingRefreshFailedInfoBar"
+                                  Margin="0,4,0,8"
+                                  Severity="Warning"
+                                  IsOpen="False"
+                                  Visibility="Collapsed"
+                                  Closed="RefreshFailedInfoBar_Closed">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialRefreshFailedRetryButton"
+                                    Click="RefreshFailedRetryButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
+                    <muxc:RefreshContainer x:Name="FollowingRefreshContainer"
+                                           Grid.Row="1"
+                                           Visibility="Collapsed"
+                                           RefreshRequested="RefreshContainer_RefreshRequested">
+                        <ListView x:Uid="SocialFollowingList" x:Name="FollowingList"
+                                  ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="NoteList_ItemClick">
+                            <i:Interaction.Behaviors>
+                                <local:SocialContextMenuBehavior/>
+                                <local:SocialNoteShortcutsBehavior/>
+                                <local:SocialFeedListBehavior BackToNewest="{x:Bind FollowingBackToNewestButton}"/>
+                            </i:Interaction.Behaviors>
+
+                            <ListView.Header>
+                                <Button x:Name="FollowingBackToNewestButton"
+                                        Margin="12,8,12,8"
+                                        HorizontalAlignment="Stretch"
+                                        Visibility="Collapsed"
+                                        Click="BackToNewestButton_Click">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                        <TextBlock x:Uid="SocialBackToNewest"/>
+                                    </StackPanel>
+                                </Button>
+                            </ListView.Header>
+                        </ListView>
+                    </muxc:RefreshContainer>
 
                     <ProgressRing x:Uid="SocialFollowingLoading" x:Name="FollowingLoadingRing"
+                                  Grid.Row="1"
                                   Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="FollowingStatePanel"
+                                Grid.Row="1"
                                 Style="{StaticResource SocialStatePanelStyle}"
                                 Visibility="Collapsed">
                         <FontIcon x:Name="FollowingStateGlyph"
@@ -273,38 +319,61 @@
 
             <PivotItem x:Uid="SocialLocalPivotItem" x:Name="LocalPivotItem">
                 <Grid>
-                    <ListView x:Uid="SocialLocalList" x:Name="LocalList"
-                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
-                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                              SelectionMode="None"
-                              IsItemClickEnabled="True"
-                              ItemClick="NoteList_ItemClick"
-                              Visibility="Collapsed">
-                        <i:Interaction.Behaviors>
-                            <local:SocialContextMenuBehavior/>
-                            <local:SocialNoteShortcutsBehavior/>
-                            <local:SocialFeedListBehavior BackToNewest="{x:Bind LocalBackToNewestButton}"/>
-                        </i:Interaction.Behaviors>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                        <ListView.Header>
-                            <Button x:Name="LocalBackToNewestButton"
-                                    Margin="12,8,12,8"
-                                    HorizontalAlignment="Stretch"
-                                    Visibility="Collapsed"
-                                    Click="BackToNewestButton_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                                    <TextBlock x:Uid="SocialBackToNewest"/>
-                                </StackPanel>
-                            </Button>
-                        </ListView.Header>
-                    </ListView>
+                    <muxc:InfoBar x:Uid="SocialRefreshFailedInfoBar" x:Name="LocalRefreshFailedInfoBar"
+                                  Margin="0,4,0,8"
+                                  Severity="Warning"
+                                  IsOpen="False"
+                                  Visibility="Collapsed"
+                                  Closed="RefreshFailedInfoBar_Closed">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialRefreshFailedRetryButton"
+                                    Click="RefreshFailedRetryButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
+                    <muxc:RefreshContainer x:Name="LocalRefreshContainer"
+                                           Grid.Row="1"
+                                           Visibility="Collapsed"
+                                           RefreshRequested="RefreshContainer_RefreshRequested">
+                        <ListView x:Uid="SocialLocalList" x:Name="LocalList"
+                                  ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="NoteList_ItemClick">
+                            <i:Interaction.Behaviors>
+                                <local:SocialContextMenuBehavior/>
+                                <local:SocialNoteShortcutsBehavior/>
+                                <local:SocialFeedListBehavior BackToNewest="{x:Bind LocalBackToNewestButton}"/>
+                            </i:Interaction.Behaviors>
+
+                            <ListView.Header>
+                                <Button x:Name="LocalBackToNewestButton"
+                                        Margin="12,8,12,8"
+                                        HorizontalAlignment="Stretch"
+                                        Visibility="Collapsed"
+                                        Click="BackToNewestButton_Click">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                        <TextBlock x:Uid="SocialBackToNewest"/>
+                                    </StackPanel>
+                                </Button>
+                            </ListView.Header>
+                        </ListView>
+                    </muxc:RefreshContainer>
 
                     <ProgressRing x:Uid="SocialLocalLoading" x:Name="LocalLoadingRing"
+                                  Grid.Row="1"
                                   Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="LocalStatePanel"
+                                Grid.Row="1"
                                 Style="{StaticResource SocialStatePanelStyle}"
                                 Visibility="Collapsed">
                         <FontIcon x:Name="LocalStateGlyph"
@@ -329,6 +398,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -344,41 +414,57 @@
                         </muxc:InfoBar.ActionButton>
                     </muxc:InfoBar>
 
-                    <ListView x:Uid="SocialGlobalList" x:Name="GlobalList"
-                              Grid.Row="1"
-                              ItemTemplate="{StaticResource SocialNoteItemTemplate}"
-                              ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                              SelectionMode="None"
-                              IsItemClickEnabled="True"
-                              ItemClick="NoteList_ItemClick"
-                              Visibility="Collapsed">
-                        <i:Interaction.Behaviors>
-                            <local:SocialContextMenuBehavior/>
-                            <local:SocialNoteShortcutsBehavior/>
-                            <local:SocialFeedListBehavior BackToNewest="{x:Bind GlobalBackToNewestButton}"/>
-                        </i:Interaction.Behaviors>
+                    <muxc:InfoBar x:Uid="SocialRefreshFailedInfoBar" x:Name="GlobalRefreshFailedInfoBar"
+                                  Grid.Row="1"
+                                  Margin="0,4,0,8"
+                                  Severity="Warning"
+                                  IsOpen="False"
+                                  Visibility="Collapsed"
+                                  Closed="RefreshFailedInfoBar_Closed">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialRefreshFailedRetryButton"
+                                    Click="RefreshFailedRetryButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
 
-                        <ListView.Header>
-                            <Button x:Name="GlobalBackToNewestButton"
-                                    Margin="12,8,12,8"
-                                    HorizontalAlignment="Stretch"
-                                    Visibility="Collapsed"
-                                    Click="BackToNewestButton_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                                    <TextBlock x:Uid="SocialBackToNewest"/>
-                                </StackPanel>
-                            </Button>
-                        </ListView.Header>
-                    </ListView>
+                    <muxc:RefreshContainer x:Name="GlobalRefreshContainer"
+                                           Grid.Row="2"
+                                           Visibility="Collapsed"
+                                           RefreshRequested="RefreshContainer_RefreshRequested">
+                        <ListView x:Uid="SocialGlobalList" x:Name="GlobalList"
+                                  ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="NoteList_ItemClick">
+                            <i:Interaction.Behaviors>
+                                <local:SocialContextMenuBehavior/>
+                                <local:SocialNoteShortcutsBehavior/>
+                                <local:SocialFeedListBehavior BackToNewest="{x:Bind GlobalBackToNewestButton}"/>
+                            </i:Interaction.Behaviors>
+
+                            <ListView.Header>
+                                <Button x:Name="GlobalBackToNewestButton"
+                                        Margin="12,8,12,8"
+                                        HorizontalAlignment="Stretch"
+                                        Visibility="Collapsed"
+                                        Click="BackToNewestButton_Click">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                        <TextBlock x:Uid="SocialBackToNewest"/>
+                                    </StackPanel>
+                                </Button>
+                            </ListView.Header>
+                        </ListView>
+                    </muxc:RefreshContainer>
 
                     <ProgressRing x:Uid="SocialGlobalLoading" x:Name="GlobalLoadingRing"
-                                  Grid.Row="1"
+                                  Grid.Row="2"
                                   Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="GlobalStatePanel"
-                                Grid.Row="1"
+                                Grid.Row="2"
                                 Style="{StaticResource SocialStatePanelStyle}"
                                 Visibility="Collapsed">
                         <FontIcon x:Name="GlobalStateGlyph"
@@ -424,37 +510,60 @@
                     </local:SocialTabStrip>
 
                     <Grid x:Name="AllNotificationsHost" Grid.Row="1">
-                        <ListView x:Uid="SocialNotificationsList" x:Name="NotificationsList"
-                                  ItemTemplate="{StaticResource SocialFeedItemTemplate}"
-                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                                  SelectionMode="None"
-                                  IsItemClickEnabled="True"
-                                  ItemClick="FeedList_ItemClick"
-                                  Visibility="Collapsed">
-                            <i:Interaction.Behaviors>
-                                <local:SocialContextMenuBehavior/>
-                                <local:SocialFeedListBehavior BackToNewest="{x:Bind NotificationsBackToNewestButton}"/>
-                            </i:Interaction.Behaviors>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                            <ListView.Header>
-                                <Button x:Name="NotificationsBackToNewestButton"
-                                        Margin="12,8,12,8"
-                                        HorizontalAlignment="Stretch"
-                                        Visibility="Collapsed"
-                                        Click="BackToNewestButton_Click">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                                        <TextBlock x:Uid="SocialBackToNewest"/>
-                                    </StackPanel>
-                                </Button>
-                            </ListView.Header>
-                        </ListView>
+                        <muxc:InfoBar x:Uid="SocialRefreshFailedInfoBar" x:Name="NotificationsRefreshFailedInfoBar"
+                                      Margin="0,4,0,8"
+                                      Severity="Warning"
+                                      IsOpen="False"
+                                      Visibility="Collapsed"
+                                      Closed="RefreshFailedInfoBar_Closed">
+                            <muxc:InfoBar.ActionButton>
+                                <Button x:Uid="SocialRefreshFailedRetryButton"
+                                        Click="RefreshFailedRetryButton_Click"/>
+                            </muxc:InfoBar.ActionButton>
+                        </muxc:InfoBar>
+
+                        <muxc:RefreshContainer x:Name="NotificationsRefreshContainer"
+                                               Grid.Row="1"
+                                               Visibility="Collapsed"
+                                               RefreshRequested="RefreshContainer_RefreshRequested">
+                            <ListView x:Uid="SocialNotificationsList" x:Name="NotificationsList"
+                                      ItemTemplate="{StaticResource SocialFeedItemTemplate}"
+                                      ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                      SelectionMode="None"
+                                      IsItemClickEnabled="True"
+                                      ItemClick="FeedList_ItemClick">
+                                <i:Interaction.Behaviors>
+                                    <local:SocialContextMenuBehavior/>
+                                    <local:SocialFeedListBehavior BackToNewest="{x:Bind NotificationsBackToNewestButton}"/>
+                                </i:Interaction.Behaviors>
+
+                                <ListView.Header>
+                                    <Button x:Name="NotificationsBackToNewestButton"
+                                            Margin="12,8,12,8"
+                                            HorizontalAlignment="Stretch"
+                                            Visibility="Collapsed"
+                                            Click="BackToNewestButton_Click">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                            <TextBlock x:Uid="SocialBackToNewest"/>
+                                        </StackPanel>
+                                    </Button>
+                                </ListView.Header>
+                            </ListView>
+                        </muxc:RefreshContainer>
 
                         <ProgressRing x:Uid="SocialNotificationsLoading" x:Name="NotificationsLoadingRing"
+                                      Grid.Row="1"
                                       Width="32" Height="32"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                         <StackPanel x:Name="NotificationsStatePanel"
+                                    Grid.Row="1"
                                     Style="{StaticResource SocialStatePanelStyle}"
                                     Visibility="Collapsed">
                             <FontIcon x:Name="NotificationsStateGlyph"
@@ -475,37 +584,60 @@
                     </Grid>
 
                     <Grid x:Name="MentionsHost" Grid.Row="1" Visibility="Collapsed">
-                        <ListView x:Uid="SocialMentionsList" x:Name="MentionsList"
-                                  ItemTemplate="{StaticResource SocialFeedItemTemplate}"
-                                  ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
-                                  SelectionMode="None"
-                                  IsItemClickEnabled="True"
-                                  ItemClick="FeedList_ItemClick"
-                                  Visibility="Collapsed">
-                            <i:Interaction.Behaviors>
-                                <local:SocialContextMenuBehavior/>
-                                <local:SocialFeedListBehavior BackToNewest="{x:Bind MentionsBackToNewestButton}"/>
-                            </i:Interaction.Behaviors>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                            <ListView.Header>
-                                <Button x:Name="MentionsBackToNewestButton"
-                                        Margin="12,8,12,8"
-                                        HorizontalAlignment="Stretch"
-                                        Visibility="Collapsed"
-                                        Click="BackToNewestButton_Click">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                                        <TextBlock x:Uid="SocialBackToNewest"/>
-                                    </StackPanel>
-                                </Button>
-                            </ListView.Header>
-                        </ListView>
+                        <muxc:InfoBar x:Uid="SocialRefreshFailedInfoBar" x:Name="MentionsRefreshFailedInfoBar"
+                                      Margin="0,4,0,8"
+                                      Severity="Warning"
+                                      IsOpen="False"
+                                      Visibility="Collapsed"
+                                      Closed="RefreshFailedInfoBar_Closed">
+                            <muxc:InfoBar.ActionButton>
+                                <Button x:Uid="SocialRefreshFailedRetryButton"
+                                        Click="RefreshFailedRetryButton_Click"/>
+                            </muxc:InfoBar.ActionButton>
+                        </muxc:InfoBar>
+
+                        <muxc:RefreshContainer x:Name="MentionsRefreshContainer"
+                                               Grid.Row="1"
+                                               Visibility="Collapsed"
+                                               RefreshRequested="RefreshContainer_RefreshRequested">
+                            <ListView x:Uid="SocialMentionsList" x:Name="MentionsList"
+                                      ItemTemplate="{StaticResource SocialFeedItemTemplate}"
+                                      ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                      SelectionMode="None"
+                                      IsItemClickEnabled="True"
+                                      ItemClick="FeedList_ItemClick">
+                                <i:Interaction.Behaviors>
+                                    <local:SocialContextMenuBehavior/>
+                                    <local:SocialFeedListBehavior BackToNewest="{x:Bind MentionsBackToNewestButton}"/>
+                                </i:Interaction.Behaviors>
+
+                                <ListView.Header>
+                                    <Button x:Name="MentionsBackToNewestButton"
+                                            Margin="12,8,12,8"
+                                            HorizontalAlignment="Stretch"
+                                            Visibility="Collapsed"
+                                            Click="BackToNewestButton_Click">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                            <TextBlock x:Uid="SocialBackToNewest"/>
+                                        </StackPanel>
+                                    </Button>
+                                </ListView.Header>
+                            </ListView>
+                        </muxc:RefreshContainer>
 
                         <ProgressRing x:Uid="SocialMentionsLoading" x:Name="MentionsLoadingRing"
+                                      Grid.Row="1"
                                       Width="32" Height="32"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                         <StackPanel x:Name="MentionsStatePanel"
+                                    Grid.Row="1"
                                     Style="{StaticResource SocialStatePanelStyle}"
                                     Visibility="Collapsed">
                             <FontIcon x:Name="MentionsStateGlyph"

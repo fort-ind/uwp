@@ -49,19 +49,34 @@ namespace Fort.ind_UWP
 
         private void NavSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) UpdateSearchSuggestions(sender);
+        }
+
+        private void NavSearchInk_TextWritten(object sender, EventArgs e)
+        {
+            try
             {
-                var query = sender.Text.Trim();
-
-                if (string.IsNullOrEmpty(query))
-                {
-                    _searchDebounce.Cancel();
-                    sender.ItemsSource = null;
-                    return;
-                }
-
-                ApplySearchSuggestions(sender, query, _searchDebounce.Restart());
+                UpdateSearchSuggestions(NavSearchBox);
+                NavSearchBox.IsSuggestionListOpen = true;
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"MainPage: could not search what was written - {ex.Message}");
+            }
+        }
+
+        private void UpdateSearchSuggestions(AutoSuggestBox sender)
+        {
+            var query = sender.Text.Trim();
+
+            if (string.IsNullOrEmpty(query))
+            {
+                _searchDebounce.Cancel();
+                sender.ItemsSource = null;
+                return;
+            }
+
+            ApplySearchSuggestions(sender, query, _searchDebounce.Restart());
         }
 
         private async void ApplySearchSuggestions(AutoSuggestBox sender, string query, CancellationToken cancellationToken)

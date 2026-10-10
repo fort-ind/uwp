@@ -84,10 +84,12 @@ namespace Fort.ind_UWP
         public const string SettingSettingsAboutExpanded = "SettingsAboutExpanded";
         public const string SettingSettingsProfileExpanded = "SettingsProfileExpanded";
         public const string SettingSettingsNotificationsExpanded = "SettingsNotificationsExpanded";
+        public const string SettingSettingsInkExpanded = "SettingsInkExpanded";
         public const string SettingLastNavTag = "LastNavTag";
 
         public const string SettingsSectionAppearance = "Appearance";
         public const string SettingsSectionTransparency = "Transparency";
+        public const string SettingsSectionInk = "Ink";
         public const string SettingsSectionProfile = "Profile";
         public const string SettingsSectionNotifications = "Notifications";
         public const string SettingsSectionStorage = "Storage";
@@ -173,6 +175,14 @@ namespace Fort.ind_UWP
         public const string SettingSocialWriteSignInDismissed = "SocialWriteSignInDismissed";
 
         public const string SettingSocialRemoteListNotice = "SocialRemoteListNotice";
+
+        public const string SettingInkWithMouse = "InkWithMouse";
+        public const string SettingInkPenTextMode = "InkPenTextMode";
+        public const string SettingInkHandwritingFont = "InkHandwritingFont";
+        public const string SettingInkTouchPansAfterPen = "InkTouchPansAfterPen";
+        public const string SettingInkDrawingAspect = "InkDrawingAspect";
+        public const string SettingInkDrawingBackground = "InkDrawingBackground";
+        public const int InkCommitDelayMilliseconds = 1000;
 
         public const string WindowKeyUserPrefix = "user:";
         public const double SocialUserWindowWidth = 480;

@@ -550,6 +550,272 @@
                                 </Setter>
                             </Style>
 
+                            <Style x:Key="SocialMediaIconButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="{ThemeResource ButtonForeground}"/>
+                                <Setter Property="BorderBrush" Value="{ThemeResource ButtonRevealBorderBrush}"/>
+                                <Setter Property="BorderThickness" Value="{ThemeResource ButtonRevealBorderThemeThickness}"/>
+                                <Setter Property="FontFamily" Value="{ThemeResource SymbolThemeFontFamily}"/>
+                                <Setter Property="FontSize" Value="16"/>
+                                <Setter Property="MinWidth" Value="40"/>
+                                <Setter Property="MinHeight" Value="40"/>
+                                <Setter Property="Padding" Value="8"/>
+                            </Style>
+
+                            <Style x:Key="SocialMediaTextBlockStyle" TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+                                <Setter Property="FontSize" Value="{ThemeResource MTCMediaFontSize}"/>
+                                <Setter Property="FontFamily" Value="{ThemeResource MTCMediaFontFamily}"/>
+                                <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
+                            </Style>
+
+                            <Style x:Key="SocialMediaSymbolTextBlockStyle" TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="{ThemeResource SymbolThemeFontFamily}"/>
+                                <Setter Property="FontSize" Value="16"/>
+                                <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
+                            </Style>
+
+                            <Style x:Key="SocialMediaTransportControlsStyle" TargetType="MediaTransportControls">
+                                <Setter Property="IsTabStop" Value="False"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                                <Setter Property="IsTextScaleFactorEnabled" Value="False"/>
+                                <Setter Property="IsCompact" Value="True"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="MediaTransportControls">
+                                            <Grid x:Name="RootGrid" Background="Transparent">
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup x:Name="ControlPanelVisibilityStates">
+                                                        <VisualState x:Name="ControlPanelFadeIn">
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0:0:0.3" Storyboard.TargetName="TranslateVertical" Storyboard.TargetProperty="Y" To="0">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <ExponentialEase Exponent="7" EasingMode="EaseOut"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                                <DoubleAnimation Duration="0:0:0.3" Storyboard.TargetName="ControlPanel_ControlPanelVisibilityStates_Border" Storyboard.TargetProperty="Opacity" To="1">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <ExponentialEase Exponent="7" EasingMode="EaseOut"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                        <VisualState x:Name="ControlPanelFadeOut">
+                                                            <Storyboard>
+                                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ControlPanel_ControlPanelVisibilityStates_Border" Storyboard.TargetProperty="IsHitTestVisible">
+                                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="False"/>
+                                                                </ObjectAnimationUsingKeyFrames>
+                                                                <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetName="TranslateVertical" Storyboard.TargetProperty="Y" To="100">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <ExponentialEase Exponent="4.5" EasingMode="EaseIn"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                                <DoubleAnimation Duration="0:0:0.300" Storyboard.TargetName="ControlPanel_ControlPanelVisibilityStates_Border" Storyboard.TargetProperty="Opacity" To="0">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <ExponentialEase Exponent="4.5" EasingMode="EaseIn"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="MediaStates">
+                                                        <VisualState x:Name="Normal"/>
+                                                        <VisualState x:Name="Buffering">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="BufferingProgressBar.Visibility" Value="Visible"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Loading">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="BufferingProgressBar.Visibility" Value="Visible"/>
+                                                            </VisualState.Setters>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Duration="0" Storyboard.TargetName="ProgressSlider" Storyboard.TargetProperty="Opacity" To="0"/>
+                                                                <DoubleAnimation Duration="0" Storyboard.TargetName="MediaControlsCommandBar" Storyboard.TargetProperty="Opacity" To="0"/>
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Error">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="ErrorBorder.Visibility" Value="Visible"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Disabled">
+                                                            <Storyboard/>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="MediaTransportControlMode">
+                                                        <VisualState x:Name="NormalMode"/>
+                                                        <VisualState x:Name="CompactMode">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="LeftSidePlayBorder.Visibility" Value="Visible"/>
+                                                                <Setter Target="MediaTransportControls_Command_Border.(Grid.Column)" Value="2"/>
+                                                                <Setter Target="MediaTransportControls_Command_Border.(Grid.Row)" Value="1"/>
+                                                                <Setter Target="MediaControlsCommandBar.Margin" Value="0"/>
+                                                                <Setter Target="PlayPauseButton.Visibility" Value="Collapsed"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="PlayPauseStates">
+                                                        <VisualState x:Name="PlayState"/>
+                                                        <VisualState x:Name="PauseState">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="PlayPauseSymbolLeft.Text" Value="&#xE769;"/>
+                                                                <Setter Target="PlayPauseSymbol.Text" Value="&#xE769;"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="VolumeMuteStates">
+                                                        <VisualState x:Name="VolumeState"/>
+                                                        <VisualState x:Name="MuteState">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="AudioMuteSymbol.Text" Value="&#xE74F;"/>
+                                                                <Setter Target="VolumeMuteSymbol.Text" Value="&#xE74F;"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="FullWindowStates">
+                                                        <VisualState x:Name="NonFullWindowState"/>
+                                                        <VisualState x:Name="FullWindowState">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="FullWindowSymbol.Text" Value="&#xE92C;"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="AudioSelectionAvailablityStates">
+                                                        <VisualState x:Name="AudioSelectionAvailable">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="AudioTracksSelectionButton.Visibility" Value="Visible"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                        <VisualState x:Name="AudioSelectionUnavailable"/>
+                                                    </VisualStateGroup>
+                                                    <VisualStateGroup x:Name="CCSelectionAvailablityStates">
+                                                        <VisualState x:Name="CCSelectionAvailable">
+                                                            <VisualState.Setters>
+                                                                <Setter Target="CCSelectionButton.Visibility" Value="Visible"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                        <VisualState x:Name="CCSelectionUnavailable"/>
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                                <Border x:Name="ControlPanel_ControlPanelVisibilityStates_Border" RequestedTheme="Dark">
+                                                    <Grid x:Name="ControlPanelGrid" Height="100" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Bottom">
+                                                        <Grid.Background>
+                                                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                                                <GradientStop Color="#00000000"/>
+                                                                <GradientStop Color="#60000000" Offset="0.66"/>
+                                                                <GradientStop Color="#A0000000" Offset="1"/>
+                                                            </LinearGradientBrush>
+                                                        </Grid.Background>
+                                                        <Grid VerticalAlignment="Bottom">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            <Grid.RenderTransform>
+                                                                <TranslateTransform x:Name="TranslateVertical"/>
+                                                            </Grid.RenderTransform>
+                                                            <Border x:Name="ErrorBorder"
+                                                                    Grid.ColumnSpan="3"
+                                                                    Width="320" MinHeight="42"
+                                                                    HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                                                                    Background="{ThemeResource MediaTransportControlsPanelBackground}"
+                                                                    Visibility="Collapsed">
+                                                                <TextBlock x:Name="ErrorTextBlock" Margin="12" Style="{StaticResource SocialMediaTextBlockStyle}" TextWrapping="WrapWholeWords"/>
+                                                            </Border>
+                                                            <Border x:Name="MediaTransportControls_Timeline_Border" Grid.Column="1" Grid.Row="1" Margin="12,0">
+                                                                <Grid x:Name="MediaTransportControls_Timeline_Grid">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Slider x:Name="ProgressSlider"
+                                                                            Grid.Column="1"
+                                                                            MinWidth="80"
+                                                                            VerticalAlignment="Center"
+                                                                            IsThumbToolTipEnabled="False"
+                                                                            ManipulationMode="None"
+                                                                            FocusVisualMargin="-7,0,-7,0"
+                                                                            IsFocusEngagementEnabled="True"/>
+                                                                    <ProgressBar x:Name="BufferingProgressBar"
+                                                                                 Grid.Column="1"
+                                                                                 Height="4" Margin="0,2,0,0"
+                                                                                 VerticalAlignment="Top"
+                                                                                 IsIndeterminate="True"
+                                                                                 IsHitTestVisible="False"
+                                                                                 Visibility="Collapsed"/>
+                                                                    <TextBlock x:Name="TimeElapsedElement" HorizontalAlignment="Left" Style="{StaticResource SocialMediaTextBlockStyle}" Text="00:00" Visibility="Collapsed"/>
+                                                                    <TextBlock x:Name="TimeRemainingElement" Grid.Column="2" HorizontalAlignment="Right" Style="{StaticResource SocialMediaTextBlockStyle}" Text="00:00" Visibility="Collapsed"/>
+                                                                </Grid>
+                                                            </Border>
+                                                            <Border x:Name="LeftSidePlayBorder" Grid.Column="0" Grid.Row="1" Visibility="Collapsed">
+                                                                <Button x:Name="PlayPauseButtonOnLeft" Style="{StaticResource SocialMediaIconButtonStyle}" VerticalAlignment="Center">
+                                                                    <TextBlock x:Name="PlayPauseSymbolLeft" Text="&#xE768;" Style="{StaticResource SocialMediaSymbolTextBlockStyle}"/>
+                                                                </Button>
+                                                            </Border>
+                                                            <Border x:Name="MediaTransportControls_Command_Border" Grid.Column="1" Grid.Row="2">
+                                                                <Grid x:Name="MediaControlsCommandBar">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Button x:Name="VolumeMuteButton" Margin="2,0,0,0" Style="{StaticResource SocialMediaIconButtonStyle}">
+                                                                        <Button.Flyout>
+                                                                            <Flyout x:Name="VolumeFlyout">
+                                                                                <StackPanel Orientation="Horizontal">
+                                                                                    <Button x:Name="AudioMuteButton" Margin="0,0,12,0" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SocialMediaIconButtonStyle}">
+                                                                                        <TextBlock x:Name="AudioMuteSymbol" Text="&#xE767;" Style="{StaticResource SocialMediaSymbolTextBlockStyle}"/>
+                                                                                    </Button>
+                                                                                    <Slider x:Name="VolumeSlider"
+                                                                                            Width="{ThemeResource MTCHorizontalVolumeSliderWidth}"
+                                                                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                                            IsThumbToolTipEnabled="False"
+                                                                                            Value="50"/>
+                                                                                    <TextBlock x:Name="VolumeValue" Width="32" Margin="12,0,0,0" HorizontalAlignment="Center" Style="{StaticResource SocialMediaTextBlockStyle}">
+                                                                                        <Run Text="{Binding Value, ElementName=VolumeSlider}"/>%
+                                                                                    </TextBlock>
+                                                                                </StackPanel>
+                                                                            </Flyout>
+                                                                        </Button.Flyout>
+                                                                        <TextBlock x:Name="VolumeMuteSymbol" Text="&#xE767;" Style="{StaticResource SocialMediaSymbolTextBlockStyle}"/>
+                                                                    </Button>
+                                                                    <Button x:Name="PlayPauseButton" Grid.Column="2" Style="{StaticResource SocialMediaIconButtonStyle}">
+                                                                        <TextBlock x:Name="PlayPauseSymbol" Text="&#xE768;" Style="{StaticResource SocialMediaSymbolTextBlockStyle}"/>
+                                                                    </Button>
+                                                                    <Button x:Name="AudioTracksSelectionButton" Grid.Column="4" Margin="2,0,0,0" Style="{StaticResource SocialMediaIconButtonStyle}" Visibility="Collapsed">
+                                                                        <TextBlock Text="&#xED1F;" Style="{StaticResource SocialMediaSymbolTextBlockStyle}"/>
+                                                                    </Button>
+                                                                    <Button x:Name="CCSelectionButton" Grid.Column="5" Margin="2,0,0,0" Style="{StaticResource SocialMediaIconButtonStyle}" Visibility="Collapsed">
+                                                                        <TextBlock Text="&#xED1E;" Style="{StaticResource SocialMediaSymbolTextBlockStyle}"/>
+                                                                    </Button>
+                                                                    <Button x:Name="FullWindowButton" Grid.Column="6" Margin="2,0,0,0" Style="{StaticResource SocialMediaIconButtonStyle}">
+                                                                        <TextBlock x:Name="FullWindowSymbol" Text="&#xE740;" Style="{StaticResource SocialMediaSymbolTextBlockStyle}"/>
+                                                                    </Button>
+                                                                </Grid>
+                                                            </Border>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+
                             <ResourceDictionary.ThemeDictionaries>
                                 <ResourceDictionary x:Key="Default">
                                     <AcrylicBrush x:Key="NavigationViewExpandedPaneBackground"

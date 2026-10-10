@@ -138,8 +138,10 @@
     <Compile Include="Behaviors\SocialFeedListBehavior.cs" />
     <Compile Include="Behaviors\SocialNoteShortcutsBehavior.cs" />
     <Compile Include="Behaviors\SocialSuggestionsBehavior.cs" />
+    <Compile Include="Behaviors\PenHandwritingBehavior.cs" />
     <Compile Include="Behaviors\WindowActivationStateBehavior.cs" />
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
+    <Compile Include="Controls\InlineInkLayer.cs" />
     <Compile Include="Controls\SocialCharacterRing.xaml.cs">
       <DependentUpon>SocialCharacterRing.xaml</DependentUpon>
     </Compile>
@@ -147,6 +149,9 @@
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\SocialComposer.Attachments.cs">
+      <DependentUpon>SocialComposer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialComposer.Ink.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\SocialProfileEditor.xaml.cs">
@@ -166,6 +171,12 @@
     </Compile>
     <Compile Include="Controls\SocialEmojiPicker.xaml.cs">
       <DependentUpon>SocialEmojiPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialDrawingSurface.xaml.cs">
+      <DependentUpon>SocialDrawingSurface.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialHandwritingPad.xaml.cs">
+      <DependentUpon>SocialHandwritingPad.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\SocialInlineVideo.cs" />
     <Compile Include="Controls\SocialMediaLightbox.xaml.cs">
@@ -220,6 +231,9 @@
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Helpers\VisibilityHelper.cs" />
     <Compile Include="Helpers\VisualTreeSearch.cs" />
+    <Compile Include="Helpers\InkRecognition.cs" />
+    <Compile Include="Helpers\InkExport.cs" />
+    <Compile Include="Helpers\InkHistory.cs" />
     <Compile Include="Helpers\WebLauncher.cs" />
     <Compile Include="Models\GameGroup.cs" />
     <Compile Include="Models\SearchItem.cs" />
@@ -261,6 +275,7 @@
     <Compile Include="Services\SocialDraftService.cs" />
     <Compile Include="Services\SocialEmojiService.cs" />
     <Compile Include="Services\SocialFollowService.cs" />
+    <Compile Include="Services\InkSettingsService.cs" />
     <Compile Include="Services\SocialModerationService.cs" />
     <Compile Include="Services\SocialNoteActionService.cs" />
     <Compile Include="Services\SocialNoteCapture.cs" />
@@ -333,6 +348,9 @@
     <Compile Include="Views\SettingsPage.Appearance.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SettingsPage.Ink.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SecondaryWindowPage.xaml.cs">
       <DependentUpon>SecondaryWindowPage.xaml</DependentUpon>
     </Compile>
@@ -357,6 +375,9 @@
     <Compile Include="Views\SocialThreads.cs" />
     <Compile Include="Views\SocialWindows.cs" />
     <Compile Include="Views\SocialPage.xaml.cs">
+      <DependentUpon>SocialPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialPage.Refresh.cs">
       <DependentUpon>SocialPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SocialPage.Timelines.cs">
@@ -599,6 +620,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\SocialEmojiPicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialDrawingSurface.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialHandwritingPad.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

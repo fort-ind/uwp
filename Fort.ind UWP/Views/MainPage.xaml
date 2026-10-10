@@ -158,6 +158,9 @@
                                 TextChanged="NavSearchBox_TextChanged"
                                 QuerySubmitted="NavSearchBox_QuerySubmitted"
                                 SuggestionChosen="NavSearchBox_SuggestionChosen">
+                    <i:Interaction.Behaviors>
+                        <local:PenHandwritingBehavior x:Name="NavSearchInk" WriteOnBox="True"/>
+                    </i:Interaction.Behaviors>
                     <AutoSuggestBox.ItemTemplate>
                         <DataTemplate x:DataType="local:SearchItem">
                             <StackPanel Orientation="Horizontal" Spacing="10" Padding="0,4">

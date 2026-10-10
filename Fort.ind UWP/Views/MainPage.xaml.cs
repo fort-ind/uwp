@@ -48,6 +48,7 @@ namespace Fort.ind_UWP
             SetupTitleBar();
             UpdateProfileNavItem();
             AttachOpenInNewWindowMenus();
+            NavSearchInk.TextWritten += NavSearchInk_TextWritten;
 
             var ignored = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low,
                                               () => LoadSitemapItems());

@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using MuxcInfoBar = Microsoft.UI.Xaml.Controls.InfoBar;
+using MuxcRefreshContainer = Microsoft.UI.Xaml.Controls.RefreshContainer;
 
 namespace Fort.ind_UWP
 {
@@ -17,13 +19,14 @@ namespace Fort.ind_UWP
 
         private sealed class TimelineFeed
         {
-            public TimelineFeed(SocialTimeline timeline, PivotItem pivotItem, ListView list, ProgressRing ring,
+            public TimelineFeed(SocialTimeline timeline, PivotItem pivotItem, ListRefresh refresh, ProgressRing ring,
                                 StackPanel panel, FontIcon glyph, TextBlock text, Button button,
                                 string emptyKey, string failedKey)
             {
                 Timeline = timeline;
                 PivotItem = pivotItem;
-                List = list;
+                Refresh = refresh;
+                List = refresh.List;
                 Ring = ring;
                 Panel = panel;
                 Glyph = glyph;
@@ -36,6 +39,8 @@ namespace Fort.ind_UWP
             public SocialTimeline Timeline { get; }
 
             public PivotItem PivotItem { get; }
+
+            public ListRefresh Refresh { get; }
 
             public ListView List { get; }
 
@@ -67,11 +72,13 @@ namespace Fort.ind_UWP
             }
         }
 
-        private TimelineFeed CreateTimeline(SocialTimeline timeline, PivotItem pivotItem, ListView list, ProgressRing ring,
+        private TimelineFeed CreateTimeline(SocialTimeline timeline, PivotItem pivotItem, ListView list,
+                                            MuxcRefreshContainer container, MuxcInfoBar failedBar, ProgressRing ring,
                                             StackPanel panel, FontIcon glyph, TextBlock text, Button button,
                                             string emptyKey, string failedKey)
         {
-            var feed = new TimelineFeed(timeline, pivotItem, list, ring, panel, glyph, text, button, emptyKey, failedKey);
+            var refresh = new ListRefresh(container, failedBar, list);
+            var feed = new TimelineFeed(timeline, pivotItem, refresh, ring, panel, glyph, text, button, emptyKey, failedKey);
             feed.Items = new SocialFeedCollection<SocialNoteItem>(
                 (untilId, cancellationToken) => LoadMoreTimelineAsync(feed, untilId, cancellationToken),
                 SocialFeedPaging.NonEmpty, true);
@@ -84,33 +91,46 @@ namespace Fort.ind_UWP
             return _timelines.FirstOrDefault(feed => feed.PivotItem == pivotItem);
         }
 
-        private async void LoadTimeline(TimelineFeed feed)
+        private void LoadTimeline(TimelineFeed feed)
+        {
+            var ignored = LoadTimelineAsync(feed, false);
+        }
+
+        private async Task<bool> LoadTimelineAsync(TimelineFeed feed, bool keepList)
         {
             var version = ++feed.Version;
             feed.Requested = true;
-            SetTimelineState(feed, FeedState.Loading);
+            if (!keepList) SetTimelineState(feed, FeedState.Loading);
 
             try
             {
                 var emojiTask = SocialContentService.GetEmojiMapAsync();
                 var result = await SocialContentService.FetchTimelineAsync(feed.Timeline, null, CancellationToken.None);
                 var emojis = await emojiTask;
-                if (version != feed.Version) return;
+                if (version != feed.Version) return true;
 
                 if (result.Status != SocialApiStatus.Ok)
                 {
-                    SetTimelineState(feed, FailureStateOf(result));
-                    return;
+                    var failure = FailureStateOf(result);
+                    if (keepList && failure == FeedState.Failed) return false;
+
+                    SetTimelineState(feed, failure);
+                    return true;
                 }
 
                 var items = SocialNoteItem.CreateAll(result.Value, emojis, false);
                 feed.Items.ReplaceAll(items, result.Value.Count > 0);
                 SetTimelineState(feed, items.Count == 0 ? FeedState.Empty : FeedState.Ready);
+                return true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialPage: {feed.Timeline} timeline load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == feed.Version) SetTimelineState(feed, FeedState.Failed);
+                if (version != feed.Version) return true;
+                if (keepList) return false;
+
+                SetTimelineState(feed, FeedState.Failed);
+                return true;
             }
         }
 
@@ -139,7 +159,7 @@ namespace Fort.ind_UWP
         private void SetTimelineState(TimelineFeed feed, FeedState state)
         {
             feed.State = state;
-            ApplyFeedState(state, feed.List, feed.Ring, feed.Panel, feed.Glyph, feed.Text, feed.Button,
+            ApplyFeedState(state, feed.Refresh, feed.Ring, feed.Panel, feed.Glyph, feed.Text, feed.Button,
                            feed.EmptyKey, feed.FailedKey);
         }
 
@@ -148,15 +168,15 @@ namespace Fort.ind_UWP
             var feed = _timelines.FirstOrDefault(candidate => ReferenceEquals(candidate.List.Header, sender));
             if (feed != null)
             {
-                LoadTimeline(feed);
+                if (!TryRequestRefresh(feed.Refresh)) LoadTimeline(feed);
             }
             else if (ReferenceEquals(sender, NotificationsBackToNewestButton))
             {
-                LoadNotifications();
+                if (!TryRequestRefresh(_notificationsRefresh)) LoadNotifications();
             }
             else if (ReferenceEquals(sender, MentionsBackToNewestButton))
             {
-                LoadMentions();
+                if (!TryRequestRefresh(_mentionsRefresh)) LoadMentions();
             }
         }
 

@@ -95,19 +95,24 @@ namespace Fort.ind_UWP
 
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            _forYou = CreateTimeline(SocialTimeline.Home, ForYouPivotItem, ForYouList, ForYouLoadingRing, ForYouStatePanel,
+            _forYou = CreateTimeline(SocialTimeline.Home, ForYouPivotItem, ForYouList,
+                                    ForYouRefreshContainer, ForYouRefreshFailedInfoBar, ForYouLoadingRing, ForYouStatePanel,
                                      ForYouStateGlyph, ForYouStateText, ForYouStateButton,
                                      "SocialForYouEmpty", "SocialForYouFailed");
-            _following = CreateTimeline(SocialTimeline.Following, FollowingPivotItem, FollowingList, FollowingLoadingRing, FollowingStatePanel,
+            _following = CreateTimeline(SocialTimeline.Following, FollowingPivotItem, FollowingList,
+                                    FollowingRefreshContainer, FollowingRefreshFailedInfoBar, FollowingLoadingRing, FollowingStatePanel,
                                         FollowingStateGlyph, FollowingStateText, FollowingStateButton,
                                         "SocialFollowingFeedEmpty", "SocialFollowingFeedFailed");
-            _local = CreateTimeline(SocialTimeline.Local, LocalPivotItem, LocalList, LocalLoadingRing, LocalStatePanel,
+            _local = CreateTimeline(SocialTimeline.Local, LocalPivotItem, LocalList,
+                                    LocalRefreshContainer, LocalRefreshFailedInfoBar, LocalLoadingRing, LocalStatePanel,
                                     LocalStateGlyph, LocalStateText, LocalStateButton,
                                     "SocialLocalEmpty", "SocialLocalFailed");
-            _global = CreateTimeline(SocialTimeline.Global, GlobalPivotItem, GlobalList, GlobalLoadingRing, GlobalStatePanel,
+            _global = CreateTimeline(SocialTimeline.Global, GlobalPivotItem, GlobalList,
+                                    GlobalRefreshContainer, GlobalRefreshFailedInfoBar, GlobalLoadingRing, GlobalStatePanel,
                                      GlobalStateGlyph, GlobalStateText, GlobalStateButton,
                                      "SocialGlobalEmpty", "SocialGlobalFailed");
             _timelines = new[] { _forYou, _following, _local, _global };
+            InitializeRefreshes();
             _signedInPivotItems = new[] { ForYouPivotItem, FollowingPivotItem, LocalPivotItem, GlobalPivotItem, NotificationsPivotItem };
 
             _notifications = new SocialFeedCollection<SocialFeedItem>(LoadMoreNotificationsAsync, SocialFeedPaging.FullPage, true);
@@ -469,32 +474,39 @@ namespace Fort.ind_UWP
             }
         }
 
-        private async void LoadNotifications()
+        private void LoadNotifications()
+        {
+            var ignored = LoadNotificationsAsync(false);
+        }
+
+        private async Task<bool> LoadNotificationsAsync(bool keepList)
         {
             var version = ++_notificationsVersion;
             _notificationsRequested = true;
             _notificationsStale = false;
             _unseenLiveNotifications = false;
-            SetNotificationsState(FeedState.Loading);
+            if (!keepList) SetNotificationsState(FeedState.Loading);
 
             try
             {
                 var unreadAtOpen = await SocialNotificationService.GetUnreadCountAsync(CancellationToken.None);
-                if (version != _notificationsVersion) return;
+                if (version != _notificationsVersion) return true;
 
                 var result = await SocialNotificationService.FetchNotificationsAsync(null, true, CancellationToken.None);
-                if (version != _notificationsVersion) return;
+                if (version != _notificationsVersion) return true;
 
                 if (result.Status == SocialApiStatus.PermissionDenied)
                 {
                     SetNotificationsState(FeedState.NeedsPermission);
-                    return;
+                    return true;
                 }
 
                 if (result.Status != SocialApiStatus.Ok)
                 {
+                    if (keepList) return false;
+
                     SetNotificationsState(FeedState.Failed);
-                    return;
+                    return true;
                 }
 
                 var items = new List<SocialFeedItem>();
@@ -506,39 +518,57 @@ namespace Fort.ind_UWP
 
                 _notifications.ReplaceAll(items, result.Value.Count >= AppConstants.SocialFeedPageSize);
                 SetNotificationsState(items.Count == 0 ? FeedState.Empty : FeedState.Ready);
+                return true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialPage: notifications load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == _notificationsVersion) SetNotificationsState(FeedState.Failed);
+                if (version != _notificationsVersion) return true;
+                if (keepList) return false;
+
+                SetNotificationsState(FeedState.Failed);
+                return true;
             }
         }
 
-        private async void LoadMentions()
+        private void LoadMentions()
+        {
+            var ignored = LoadMentionsAsync(false);
+        }
+
+        private async Task<bool> LoadMentionsAsync(bool keepList)
         {
             var version = ++_mentionsVersion;
             _mentionsRequested = true;
-            SetMentionsState(FeedState.Loading);
+            if (!keepList) SetMentionsState(FeedState.Loading);
 
             try
             {
                 var result = await SocialNotificationService.FetchMentionsAsync(null, CancellationToken.None);
-                if (version != _mentionsVersion) return;
+                if (version != _mentionsVersion) return true;
 
                 if (result.Status != SocialApiStatus.Ok)
                 {
-                    SetMentionsState(result.Status == SocialApiStatus.PermissionDenied ? FeedState.NeedsPermission : FeedState.Failed);
-                    return;
+                    var denied = result.Status == SocialApiStatus.PermissionDenied;
+                    if (keepList && !denied) return false;
+
+                    SetMentionsState(denied ? FeedState.NeedsPermission : FeedState.Failed);
+                    return true;
                 }
 
                 var items = FeedItemsFromNotes(result.Value);
                 _mentions.ReplaceAll(items, result.Value.Count >= AppConstants.SocialFeedPageSize);
                 SetMentionsState(items.Count == 0 ? FeedState.Empty : FeedState.Ready);
+                return true;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"SocialPage: mentions load failed - {ex.GetType().Name}: {ex.Message}");
-                if (version == _mentionsVersion) SetMentionsState(FeedState.Failed);
+                if (version != _mentionsVersion) return true;
+                if (keepList) return false;
+
+                SetMentionsState(FeedState.Failed);
+                return true;
             }
         }
 
@@ -568,7 +598,7 @@ namespace Fort.ind_UWP
         private void SetNotificationsState(FeedState state)
         {
             _notificationsState = state;
-            ApplyFeedState(state, NotificationsList, NotificationsLoadingRing, NotificationsStatePanel,
+            ApplyFeedState(state, _notificationsRefresh, NotificationsLoadingRing, NotificationsStatePanel,
                            NotificationsStateGlyph, NotificationsStateText, NotificationsStateButton,
                            "SocialNotificationsEmpty", "SocialNotificationsFailed");
         }
@@ -576,16 +606,17 @@ namespace Fort.ind_UWP
         private void SetMentionsState(FeedState state)
         {
             _mentionsState = state;
-            ApplyFeedState(state, MentionsList, MentionsLoadingRing, MentionsStatePanel,
+            ApplyFeedState(state, _mentionsRefresh, MentionsLoadingRing, MentionsStatePanel,
                            MentionsStateGlyph, MentionsStateText, MentionsStateButton,
                            "SocialMentionsEmpty", "SocialMentionsFailed");
         }
 
-        private static void ApplyFeedState(FeedState state, ListView list, ProgressRing ring, StackPanel panel,
+        private static void ApplyFeedState(FeedState state, ListRefresh refresh, ProgressRing ring, StackPanel panel,
                                            FontIcon glyph, TextBlock text, Button button,
                                            string emptyKey, string failedKey)
         {
-            list.Visibility = state == FeedState.Ready ? Visibility.Visible : Visibility.Collapsed;
+            refresh.Container.Visibility = state == FeedState.Ready ? Visibility.Visible : Visibility.Collapsed;
+            if (state != FeedState.Ready) HideRefreshFailed(refresh.FailedBar);
             ring.IsActive = state == FeedState.Loading;
             ring.Visibility = state == FeedState.Loading ? Visibility.Visible : Visibility.Collapsed;
 
@@ -648,6 +679,8 @@ namespace Fort.ind_UWP
 
         private void SocialRefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            if (TryRequestRefresh(SelectedRefresh())) return;
+
             var selected = SocialPivot.SelectedItem;
             var feed = TimelineFor(selected);
             if (feed != null)

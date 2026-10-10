@@ -24,6 +24,25 @@ namespace Fort.ind_UWP
             return null;
         }
 
+        public static T FindDescendant<T>(DependencyObject root) where T : DependencyObject
+        {
+            if (root == null) return null;
+
+            int count = VisualTreeHelper.GetChildrenCount(root);
+            for (int i = 0; i < count; i++)
+            {
+                var child = VisualTreeHelper.GetChild(root, i);
+
+                var match = child as T;
+                if (match != null) return match;
+
+                var found = FindDescendant<T>(child);
+                if (found != null) return found;
+            }
+
+            return null;
+        }
+
         public static T FindAncestor<T>(DependencyObject element) where T : DependencyObject
         {
             var current = element == null ? null : VisualTreeHelper.GetParent(element);

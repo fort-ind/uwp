@@ -52,6 +52,7 @@ namespace Fort.ind_UWP
                 LoadProfileRefreshControls();
                 LoadMediaCacheControls();
                 LoadLowMemoryControls();
+                LoadInkControls();
 
                 RestoreSettingsPanelStates();
             }

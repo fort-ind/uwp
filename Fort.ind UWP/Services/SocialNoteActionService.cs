@@ -523,6 +523,7 @@ namespace Fort.ind_UWP
                 IsSpellCheckEnabled = true
             };
             Windows.UI.Xaml.Automation.AutomationProperties.SetName(box, LocalizedStrings.Get("SocialReportDialogBoxName"));
+            PenHandwritingBehavior.AttachTo(box);
 
             var body = new StackPanel { Spacing = 12 };
             body.Children.Add(new TextBlock

@@ -206,6 +206,15 @@ namespace Fort.ind_UWP
             return client;
         }
 
+        public static async Task<IBuffer> DownloadMediaAsync(Uri uri, CancellationToken cancellationToken)
+        {
+            using (var response = await s_client.Value.GetAsync(uri).AsTask(cancellationToken))
+            {
+                if (!response.IsSuccessStatusCode) return null;
+                return await response.Content.ReadAsBufferAsync().AsTask(cancellationToken);
+            }
+        }
+
         public static async Task<SocialApiResult<IReadOnlyList<SocialNotification>>> GetNotificationsAsync(
             string token, string untilId, int limit, bool markAsRead, CancellationToken cancellationToken)
         {

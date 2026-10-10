@@ -324,6 +324,8 @@ namespace Fort.ind_UWP
             VisibilityButton.Visibility = Shown(!reply);
             VisibilityButton.IsEnabled = !editing;
             AttachButton.Visibility = Shown(_context.Mode != SocialComposerMode.Share);
+            InkButton.Visibility = Shown(InkToolsAllowed);
+            if (!InkToolsAllowed) CloseInkTools();
             PollToggle.Visibility = Shown(!reply);
             PreviewToggle.Visibility = Shown(!reply);
             MoreButton.Visibility = Shown(!reply);
@@ -472,6 +474,7 @@ namespace Fort.ind_UWP
             PostButton.IsEnabled = CanPost();
             AttachmentList.Visibility = Shown(_attachments.Count > 0);
             AttachButton.IsEnabled = _attachments.Count < AppConstants.SocialAttachmentLimit && !_posting;
+            InkButton.IsEnabled = !_posting;
             UpdatePollWarning();
         }
 

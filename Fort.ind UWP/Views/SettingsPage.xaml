@@ -594,6 +594,90 @@
                     <Border BorderThickness="0,0,0,1"
                             BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
                         <StackPanel>
+                            <local:ExpanderHeaderButton x:Uid="MainInk" x:Name="InkHeader"
+                                    Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    MinWidth="0"
+                                    CornerRadius="0"
+                                    Padding="16,12"
+                                    AutomationProperties.HeadingLevel="Level2"
+                                    Click="InkHeader_Tapped">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Width="36" Height="36"
+                                          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                        <FontIcon Glyph="&#xEDC6;" FontSize="16"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  AutomationProperties.AccessibilityView="Raw"/>
+                                    </Grid>
+                                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock x:Uid="MainInk2" Style="{StaticResource BaseTextBlockStyle}"/>
+                                        <TextBlock x:Uid="MainInkCaption"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </StackPanel>
+                                    <FontIcon x:Name="InkChevron" Grid.Column="2" Glyph="&#xE76C;"
+                                              FontSize="12" VerticalAlignment="Center"
+                                              AutomationProperties.AccessibilityView="Raw"
+                                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                              RenderTransformOrigin="0.5,0.5">
+                                        <FontIcon.RenderTransform>
+                                            <RotateTransform x:Name="InkChevronRotation" Angle="0"/>
+                                        </FontIcon.RenderTransform>
+                                    </FontIcon>
+                                </Grid>
+                            </local:ExpanderHeaderButton>
+                            <StackPanel x:Name="InkContent" Visibility="Collapsed"
+                                        Padding="20,0,20,16">
+                                <StackPanel.ChildrenTransitions>
+                                    <TransitionCollection>
+                                        <EntranceThemeTransition FromVerticalOffset="20"/>
+                                    </TransitionCollection>
+                                </StackPanel.ChildrenTransitions>
+                                <Rectangle Height="1" Margin="0,0,0,14"
+                                           Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                           Opacity="0.08"/>
+                                <ToggleSwitch x:Uid="InkMouseToggle" x:Name="InkMouseToggle"
+                                              Toggled="InkMouseToggle_Toggled"/>
+                                <TextBlock x:Uid="InkMouseDescription"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <ToggleSwitch x:Uid="InkTouchPanToggle" x:Name="InkTouchPanToggle"
+                                              Margin="0,14,0,0"
+                                              Toggled="InkTouchPanToggle_Toggled"/>
+                                <TextBlock x:Uid="InkTouchPanDescription"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <ComboBox x:Uid="InkPenTextModeCombo" x:Name="InkPenTextModeCombo"
+                                          Margin="0,14,0,8"
+                                          MinWidth="200"
+                                          SelectionChanged="InkPenTextModeCombo_SelectionChanged">
+                                    <ComboBoxItem x:Uid="InkPenTextModeWriteOnBox" Tag="WriteOnBox"/>
+                                    <ComboBoxItem x:Uid="InkPenTextModeWindowsView" Tag="WindowsView"/>
+                                    <ComboBoxItem x:Uid="InkPenTextModeOff" Tag="Off"/>
+                                </ComboBox>
+                                <TextBlock x:Uid="InkPenTextBoxDescription"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <ToggleSwitch x:Uid="InkHandwritingFontToggle" x:Name="InkHandwritingFontToggle"
+                                              Margin="0,14,0,0"
+                                              Toggled="InkHandwritingFontToggle_Toggled"/>
+                                <TextBlock x:Uid="InkHandwritingFontDescription"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border BorderThickness="0,0,0,1"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+                        <StackPanel>
                             <local:ExpanderHeaderButton x:Uid="MainProfileSettings" x:Name="ProfileHeader"
                                     Style="{StaticResource ButtonRevealStyle}"
                                     Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
