@@ -81,7 +81,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 ClearPending(session);
-                Debug.WriteLine($"MisskeyAuthService: launch failed - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: launch failed", ex);
                 return MisskeyAuthResult.Failed("SignInErrorBrowserLaunch");
             }
 
@@ -204,7 +204,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: no view on this thread - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: no view on this thread", ex);
                 return NoViewId;
             }
         }
@@ -295,7 +295,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: failed to parse callback URI - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: failed to parse callback URI", ex);
             }
             return null;
         }
@@ -339,7 +339,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: check failed - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: check failed", ex);
                 return MisskeyAuthResult.Failed("SignInErrorUnreachable");
             }
         }
@@ -364,11 +364,11 @@ namespace Fort.ind_UWP
                             var status = (int)response.StatusCode;
                             if (status == 401 || status == 403)
                             {
-                                Debug.WriteLine($"MisskeyAuthService: /api/i rejected the token ({status})");
+                                AppLog.Warning($"MisskeyAuthService: /api/i rejected the token ({status})");
                                 return MisskeyUserFetchResult.Rejected();
                             }
 
-                            Debug.WriteLine($"MisskeyAuthService: /api/i unavailable ({status})");
+                            AppLog.Warning($"MisskeyAuthService: /api/i unavailable ({status})");
                             return MisskeyUserFetchResult.Unavailable();
                         }
 
@@ -383,7 +383,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: /api/i failed - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: /api/i failed", ex);
                 return MisskeyUserFetchResult.Unavailable();
             }
         }
@@ -488,7 +488,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: could not read the granted permissions - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: could not read the granted permissions", ex);
                 return false;
             }
         }
@@ -509,7 +509,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: could not update the granted permissions - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: could not update the granted permissions", ex);
             }
         }
 
@@ -521,7 +521,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: could not record the granted permissions - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: could not record the granted permissions", ex);
             }
         }
 
@@ -553,7 +553,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: could not forget the granted permissions - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: could not forget the granted permissions", ex);
             }
 
             try
@@ -564,7 +564,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MisskeyAuthService: no stored token removed - {ex.Message}");
+                AppLog.Error("MisskeyAuthService: no stored token removed", ex);
             }
         }
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -83,7 +82,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"HomePage: Failed to initialize favorites - {ex.Message}");
+                AppLog.Error("HomePage: Failed to initialize favorites", ex);
                 RefreshFavoritesSection();
             }
         }
@@ -102,7 +101,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"HomePage: Favorites change handler failed - {ex.Message}");
+                AppLog.Error("HomePage: Favorites change handler failed", ex);
             }
         }
 
@@ -115,7 +114,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"HomePage: Failed to refresh favorites - {ex.Message}");
+                AppLog.Error("HomePage: Failed to refresh favorites", ex);
             }
         }
 
@@ -163,7 +162,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"HomePage: Failed to launch favorite - {ex.Message}");
+                AppLog.Error("HomePage: Failed to launch favorite", ex);
             }
         }
 
@@ -198,7 +197,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"HomePage: Failed to toggle favorite - {ex.Message}");
+                AppLog.Error("HomePage: Failed to toggle favorite", ex);
             }
         }
 
@@ -219,7 +218,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"HomePage: Failed to navigate to Games from favorites - {ex.Message}");
+                AppLog.Error("HomePage: Failed to navigate to Games from favorites", ex);
             }
         }
     }

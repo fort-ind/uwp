@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -148,7 +147,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialDrawingSurface: shortcut failed - {ex.Message}");
+                    AppLog.Error("SocialDrawingSurface: shortcut failed", ex);
                 }
             };
             KeyboardAccelerators.Add(accelerator);
@@ -165,7 +164,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: could not set up the toolbar - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: could not set up the toolbar", ex);
             }
         }
 
@@ -249,7 +248,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: could not refresh the input types - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: could not refresh the input types", ex);
             }
         }
 
@@ -328,7 +327,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: could not switch tools - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: could not switch tools", ex);
             }
         }
 
@@ -361,7 +360,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: could not start a selection - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: could not start a selection", ex);
             }
         }
 
@@ -387,7 +386,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: could not follow the selection - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: could not follow the selection", ex);
             }
         }
 
@@ -419,7 +418,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: could not finish the selection - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: could not finish the selection", ex);
             }
         }
 
@@ -586,7 +585,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: cancel failed - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: cancel failed", ex);
             }
         }
 
@@ -598,7 +597,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: cancel failed - {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: cancel failed", ex);
             }
         }
 
@@ -630,7 +629,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDrawingSurface: could not attach the drawing - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialDrawingSurface: could not attach the drawing", ex);
                 SetExporting(false);
                 await DialogService.ShowMessageAsync(this,
                                                      LocalizedStrings.Get("InkDrawFailedTitle"),

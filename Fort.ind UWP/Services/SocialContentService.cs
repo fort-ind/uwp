@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Globalization;
@@ -81,7 +80,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContentService: account change handling failed - {ex.Message}");
+                AppLog.Error("SocialContentService: account change handling failed", ex);
             }
         }
 
@@ -93,7 +92,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContentService: could not close the account's windows - {ex.Message}");
+                AppLog.Error("SocialContentService: could not close the account's windows", ex);
             }
         }
 
@@ -233,7 +232,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContentService: could not load the emoji list - {ex.Message}");
+                AppLog.Error("SocialContentService: could not load the emoji list", ex);
                 ForgetEmojiTask(generation);
                 return s_noEmojis;
             }
@@ -304,7 +303,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContentService: link preview failed - {ex.Message}");
+                AppLog.Error("SocialContentService: link preview failed", ex);
                 ForgetPreview(url, pending.Task);
             }
 
@@ -332,7 +331,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContentService: could not read the app language - {ex.Message}");
+                AppLog.Error("SocialContentService: could not read the app language", ex);
                 return null;
             }
         }

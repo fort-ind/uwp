@@ -405,7 +405,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"SocialNoteItem: link preview failed - {ex.Message}");
+                AppLog.Error("SocialNoteItem: link preview failed", ex);
             }
         }
 

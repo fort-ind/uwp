@@ -79,7 +79,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: Initialize failed - {ex.Message}");
+                AppLog.Error("AppearanceService: Initialize failed", ex);
             }
 
             try
@@ -88,7 +88,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not apply the theme - {ex.Message}");
+                AppLog.Error("AppearanceService: could not apply the theme", ex);
             }
 
             s_acrylicUnsaved = false;
@@ -108,7 +108,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not load the appearance for a window - {ex.Message}");
+                AppLog.Error("AppearanceService: could not load the appearance for a window", ex);
             }
         }
 
@@ -161,7 +161,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not save the theme - {ex.Message}");
+                AppLog.Error("AppearanceService: could not save the theme", ex);
             }
 
             RepaintThemeDependentChrome();
@@ -187,7 +187,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not save the tint - {ex.Message}");
+                AppLog.Error("AppearanceService: could not save the tint", ex);
             }
         }
 
@@ -203,7 +203,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not save the tint scope - {ex.Message}");
+                AppLog.Error("AppearanceService: could not save the tint scope", ex);
             }
 
             RepaintSurfaces();
@@ -229,7 +229,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not flush the acrylic opacities - {ex.Message}");
+                AppLog.Error("AppearanceService: could not flush the acrylic opacities", ex);
             }
         }
 
@@ -246,7 +246,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not save the acrylic opacities - {ex.Message}");
+                AppLog.Error("AppearanceService: could not save the acrylic opacities", ex);
             }
         }
 
@@ -285,7 +285,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: a Changed subscriber threw - {ex.Message}");
+                AppLog.Error("AppearanceService: a Changed subscriber threw", ex);
             }
         }
 
@@ -310,7 +310,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: RepaintSurfaces failed - {ex.Message}");
+                AppLog.Error("AppearanceService: RepaintSurfaces failed", ex);
             }
         }
 
@@ -395,7 +395,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not paint a secondary window - {ex.Message}");
+                AppLog.Error("AppearanceService: could not paint a secondary window", ex);
             }
         }
 
@@ -419,7 +419,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not paint an in-app surface - {ex.Message}");
+                AppLog.Error("AppearanceService: could not paint an in-app surface", ex);
             }
 
             return brush;
@@ -461,7 +461,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not reach a secondary window - {ex.Message}");
+                AppLog.Error("AppearanceService: could not reach a secondary window", ex);
             }
         }
 
@@ -495,7 +495,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not reach the pane acrylic brushes - {ex.Message}");
+                AppLog.Error("AppearanceService: could not reach the pane acrylic brushes", ex);
             }
 
             if (found.Count > 0) s_paneBrushes = found;
@@ -539,7 +539,7 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"AppearanceService: could not theme a secondary window - {ex.Message}");
+                        AppLog.Error("AppearanceService: could not theme a secondary window", ex);
                     }
                 });
             }
@@ -619,7 +619,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AppearanceService: could not read {key} - {ex.Message}");
+                AppLog.Error($"AppearanceService: could not read {key}", ex);
                 return fallback;
             }
         }

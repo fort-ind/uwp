@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -174,7 +173,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteCapture: could not send {type} - {ex.Message}");
+                AppLog.Error($"SocialNoteCapture: could not send {type}", ex);
             }
         }
 
@@ -193,7 +192,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteCapture: could not close the idle stream - {ex.Message}");
+                AppLog.Error("SocialNoteCapture: could not close the idle stream", ex);
             }
         }
 
@@ -261,7 +260,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteCapture: connect failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNoteCapture: connect failed", ex);
             }
         }
 
@@ -308,7 +307,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteCapture: reconnect failed - {ex.Message}");
+                AppLog.Error("SocialNoteCapture: reconnect failed", ex);
             }
         }
 
@@ -331,7 +330,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteCapture: account change handling failed - {ex.Message}");
+                AppLog.Error("SocialNoteCapture: account change handling failed", ex);
             }
         }
 
@@ -349,7 +348,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteCapture: could not handle a note update - {ex.Message}");
+                AppLog.Error("SocialNoteCapture: could not handle a note update", ex);
             }
         }
 
@@ -365,7 +364,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteCapture: could not refresh an edited note - {ex.Message}");
+                AppLog.Error("SocialNoteCapture: could not refresh an edited note", ex);
             }
         }
     }

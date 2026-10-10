@@ -58,7 +58,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: LoadSettingsControls failed - {ex.Message}");
+                AppLog.Error("SettingsPage: LoadSettingsControls failed", ex);
             }
             finally
             {
@@ -227,7 +227,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: SwatchGroup_GettingFocus failed - {ex.Message}");
+                AppLog.Error("SettingsPage: SwatchGroup_GettingFocus failed", ex);
             }
         }
 
@@ -250,7 +250,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: SwatchGroup_KeyDown failed - {ex.Message}");
+                AppLog.Error("SettingsPage: SwatchGroup_KeyDown failed", ex);
             }
         }
 
@@ -270,7 +270,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: ShowCustomSwatchColor failed - {ex.Message}");
+                AppLog.Error("SettingsPage: ShowCustomSwatchColor failed", ex);
             }
         }
 
@@ -313,7 +313,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Custom tint flow failed - {ex.Message}");
+                AppLog.Error("SettingsPage: Custom tint flow failed", ex);
             }
         }
 
@@ -378,7 +378,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SettingsPage: Custom tint dialog failed - {ex.Message}");
+                    AppLog.Error("SettingsPage: Custom tint dialog failed", ex);
                     AppearanceService.SetTint(previousTag, true);
                     UpdateTintSelection(previousTag);
                 }
@@ -422,7 +422,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: percent formatting failed - {ex.Message}");
+                AppLog.Error("SettingsPage: percent formatting failed", ex);
                 return string.Empty;
             }
         }
@@ -473,7 +473,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: UpdateAcrylicLegibilityWarnings failed - {ex.Message}");
+                AppLog.Error("SettingsPage: UpdateAcrylicLegibilityWarnings failed", ex);
             }
         }
 
@@ -488,7 +488,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: BodyAcrylicSlider_ValueChanged failed - {ex.Message}");
+                AppLog.Error("SettingsPage: BodyAcrylicSlider_ValueChanged failed", ex);
             }
         }
 
@@ -503,7 +503,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: PaneAcrylicSlider_ValueChanged failed - {ex.Message}");
+                AppLog.Error("SettingsPage: PaneAcrylicSlider_ValueChanged failed", ex);
             }
         }
 
@@ -532,7 +532,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: TintScopeRadio_Checked failed - {ex.Message}");
+                AppLog.Error("SettingsPage: TintScopeRadio_Checked failed", ex);
             }
         }
     }

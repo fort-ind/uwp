@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -31,8 +30,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialThreads: could not open the note - {ex.GetType().Name}: {ex.Message}"
-                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                AppLog.Error("SocialThreads: could not open the note", ex);
                 return false;
             }
         }
@@ -54,8 +52,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialThreads: could not open the tag - {ex.GetType().Name}: {ex.Message}"
-                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                AppLog.Error("SocialThreads: could not open the tag", ex);
                 return false;
             }
         }

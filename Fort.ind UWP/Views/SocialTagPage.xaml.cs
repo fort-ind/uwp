@@ -69,7 +69,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: could not show the tag - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialTagPage: could not show the tag", ex);
             }
         }
 
@@ -88,7 +88,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: could not return to the profile - {ex.Message}");
+                AppLog.Error("SocialTagPage: could not return to the profile", ex);
             }
         }
 
@@ -106,7 +106,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: could not cancel pending loads - {ex.Message}");
+                AppLog.Error("SocialTagPage: could not cancel pending loads", ex);
             }
 
             _notes.ReplaceAll(new SocialNoteItem[0], false);
@@ -135,7 +135,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: could not watch note changes - {ex.Message}");
+                AppLog.Error("SocialTagPage: could not watch note changes", ex);
             }
         }
 
@@ -192,13 +192,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialTagPage: could not apply a note change - {ex.Message}");
+                        AppLog.Error("SocialTagPage: could not apply a note change", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: note change handler failed - {ex.Message}");
+                AppLog.Error("SocialTagPage: note change handler failed", ex);
             }
         }
 
@@ -248,7 +248,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: tag load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialTagPage: tag load failed", ex);
                 if (version == _version && !IsReleased) SetState(ListState.Failed);
             }
         }
@@ -300,7 +300,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: retry failed - {ex.Message}");
+                AppLog.Error("SocialTagPage: retry failed", ex);
             }
         }
 
@@ -312,7 +312,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: refresh failed - {ex.Message}");
+                AppLog.Error("SocialTagPage: refresh failed", ex);
             }
         }
 
@@ -333,7 +333,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTagPage: could not open the note - {ex.Message}");
+                AppLog.Error("SocialTagPage: could not open the note", ex);
             }
         }
     }

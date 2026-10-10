@@ -28,13 +28,13 @@ namespace Fort.ind_UWP
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"MainPage: UpdateProfileNavItem failed - {ex.Message}");
+                            AppLog.Error("MainPage: UpdateProfileNavItem failed", ex);
                         }
                     });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Auth state change handler failed - {ex.Message}");
+                AppLog.Error("MainPage: Auth state change handler failed", ex);
             }
         }
 
@@ -96,7 +96,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: nav avatar update failed - {ex.Message}");
+                AppLog.Error("MainPage: nav avatar update failed", ex);
             }
         }
 
@@ -143,7 +143,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: NavView_Loaded failed - {ex.Message}");
+                AppLog.Error("MainPage: NavView_Loaded failed", ex);
             }
         }
 
@@ -245,7 +245,7 @@ namespace Fort.ind_UWP
                 {
                     if (!ContentFrame.Navigate(pageType, tag))
                     {
-                        Debug.WriteLine($"MainPage: navigation to {pageType.Name} returned false");
+                        AppLog.Warning($"MainPage: navigation to {pageType.Name} returned false");
                         FallBackToHome(pageType);
                         return;
                     }
@@ -258,8 +258,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: navigation to {pageType.Name} failed - {ex.GetType().Name}: {ex.Message}"
-                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                AppLog.Error($"MainPage: navigation to {pageType.Name} failed", ex);
                 FallBackToHome(pageType);
                 return;
             }
@@ -316,7 +315,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to focus content region - {ex.Message}");
+                AppLog.Error("MainPage: Failed to focus content region", ex);
             }
         }
 
@@ -336,7 +335,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to mark navigation landmark - {ex.Message}");
+                AppLog.Error("MainPage: Failed to mark navigation landmark", ex);
             }
         }
 
@@ -367,7 +366,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: NavigateToTag failed - {ex.Message}");
+                AppLog.Error("MainPage: NavigateToTag failed", ex);
             }
         }
 
@@ -401,7 +400,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not open the note from a toast - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("MainPage: could not open the note from a toast", ex);
             }
         }
 
@@ -417,7 +416,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to align pane toggle button - {ex.Message}");
+                AppLog.Error("MainPage: Failed to align pane toggle button", ex);
             }
         }
 
@@ -430,7 +429,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to record last nav tag - {ex.Message}");
+                AppLog.Error("MainPage: Failed to record last nav tag", ex);
             }
         }
 
@@ -460,7 +459,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to resolve startup nav tag - {ex.Message}");
+                AppLog.Error("MainPage: Failed to resolve startup nav tag", ex);
                 return AppConstants.NavigationLatestNews;
             }
         }
@@ -517,7 +516,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: content navigation bookkeeping failed - {ex.Message}");
+                AppLog.Error("MainPage: content navigation bookkeeping failed", ex);
             }
         }
 
@@ -558,7 +557,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to prune content back stack - {ex.Message}");
+                AppLog.Error("MainPage: Failed to prune content back stack", ex);
             }
         }
 
@@ -627,7 +626,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Back navigation failed - {ex.Message}");
+                AppLog.Error("MainPage: Back navigation failed", ex);
                 return false;
             }
         }

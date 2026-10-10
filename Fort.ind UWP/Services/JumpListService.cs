@@ -51,7 +51,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"JumpListService: could not read the current language - {ex.Message}");
+                AppLog.Error("JumpListService: could not read the current language", ex);
                 language = "";
             }
 
@@ -105,7 +105,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"JumpListService: EnsureTasksAsync failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("JumpListService: EnsureTasksAsync failed", ex);
             }
         }
 

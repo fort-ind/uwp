@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -240,7 +239,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteActionService: could not check the renote - {ex.Message}");
+                AppLog.Error("SocialNoteActionService: could not check the renote", ex);
                 return null;
             }
         }
@@ -261,7 +260,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteActionService: could not read the note's state - {ex.Message}");
+                AppLog.Error("SocialNoteActionService: could not read the note's state", ex);
                 return null;
             }
         }
@@ -290,7 +289,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteActionService: could not read the pinned notes - {ex.Message}");
+                AppLog.Error("SocialNoteActionService: could not read the pinned notes", ex);
                 return null;
             }
         }
@@ -502,7 +501,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteActionService: could not refresh the note - {ex.Message}");
+                AppLog.Error("SocialNoteActionService: could not refresh the note", ex);
             }
         }
 
@@ -601,7 +600,10 @@ namespace Fort.ind_UWP
             }
 
             string messageKey;
-            if (errorCode == null || !s_errorMessages.TryGetValue(errorCode, out messageKey)) messageKey = "SocialActionErrorGeneric";
+            if (errorCode == null || !s_errorMessages.TryGetValue(errorCode, out messageKey))
+            {
+                messageKey = SocialApiService.ConnectionMessageKey(status) ?? "SocialActionErrorGeneric";
+            }
 
             var message = messageKey == "SocialActionErrorBlocked"
                           ? LocalizedStrings.Format("SocialActionErrorBlockedFormat", item == null ? "" : item.AuthorName)
@@ -625,7 +627,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteActionService: could not announce - {ex.Message}");
+                AppLog.Error("SocialNoteActionService: could not announce", ex);
             }
         }
 

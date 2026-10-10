@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -62,7 +61,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"UpdateService: AutomaticChecksEnabled read failed - {ex.Message}");
+                    AppLog.Error("UpdateService: AutomaticChecksEnabled read failed", ex);
                     return true;
                 }
             }
@@ -74,7 +73,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"UpdateService: AutomaticChecksEnabled write failed - {ex.Message}");
+                    AppLog.Error("UpdateService: AutomaticChecksEnabled write failed", ex);
                 }
             }
         }
@@ -140,7 +139,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"UpdateService: could not record the dismissed version - {ex.Message}");
+                AppLog.Error("UpdateService: could not record the dismissed version", ex);
             }
         }
 
@@ -159,7 +158,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"UpdateService: could not read the installed version - {ex.Message}");
+                AppLog.Error("UpdateService: could not read the installed version", ex);
                 return null;
             }
         }
@@ -173,7 +172,7 @@ namespace Fort.ind_UWP
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        Debug.WriteLine($"UpdateService: latest release request returned {(int)response.StatusCode}");
+                        AppLog.Warning($"UpdateService: latest release request returned {(int)response.StatusCode}");
                         return null;
                     }
 
@@ -189,7 +188,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"UpdateService: latest release check failed - {ex.Message}");
+                AppLog.Error("UpdateService: latest release check failed", ex);
                 return null;
             }
         }
@@ -261,7 +260,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"UpdateService: could not read the last check time - {ex.Message}");
+                AppLog.Error("UpdateService: could not read the last check time", ex);
             }
 
             DateTimeOffset lastChecked;
@@ -285,7 +284,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"UpdateService: could not record the check - {ex.Message}");
+                AppLog.Error("UpdateService: could not record the check", ex);
             }
         }
 
@@ -300,7 +299,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"UpdateService: could not read {key} - {ex.Message}");
+                AppLog.Error($"UpdateService: could not read {key}", ex);
                 return null;
             }
         }

@@ -29,7 +29,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MediaCacheService: could not read the cache limit - {ex.Message}");
+                    AppLog.Error("MediaCacheService: could not read the cache limit", ex);
                     return AppConstants.DefaultMediaCacheLimitMegabytes;
                 }
             }
@@ -41,7 +41,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MediaCacheService: could not save the cache limit - {ex.Message}");
+                    AppLog.Error("MediaCacheService: could not save the cache limit", ex);
                 }
             }
         }
@@ -55,7 +55,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MediaCacheService: could not resolve the cache folders - {ex.Message}");
+                AppLog.Error("MediaCacheService: could not resolve the cache folders", ex);
                 return Task.FromResult<long?>(null);
             }
 
@@ -76,7 +76,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MediaCacheService: could not resolve the web cache - {ex.Message}");
+                    AppLog.Error("MediaCacheService: could not resolve the web cache", ex);
                 }
 
                 if (webCache != null)
@@ -118,7 +118,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MediaCacheService: automatic trim failed - {ex.Message}");
+                AppLog.Error("MediaCacheService: automatic trim failed", ex);
             }
         }
 
@@ -155,7 +155,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is System.Security.SecurityException)
                 {
-                    Debug.WriteLine($"MediaCacheService: could not list {container.Name} - {ex.Message}");
+                    AppLog.Error($"MediaCacheService: could not list {container.Name}", ex);
                     continue;
                 }
 

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -33,7 +32,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"ProfileService: AutoRefreshEnabled read failed - {ex.Message}");
+                    AppLog.Error("ProfileService: AutoRefreshEnabled read failed", ex);
                     return true;
                 }
             }
@@ -45,7 +44,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"ProfileService: AutoRefreshEnabled write failed - {ex.Message}");
+                    AppLog.Error("ProfileService: AutoRefreshEnabled write failed", ex);
                 }
             }
         }
@@ -66,7 +65,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"ProfileService: AutoRefreshMinutes read failed - {ex.Message}");
+                    AppLog.Error("ProfileService: AutoRefreshMinutes read failed", ex);
                     return AppConstants.DefaultProfileRefreshMinutes;
                 }
             }
@@ -78,7 +77,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"ProfileService: AutoRefreshMinutes write failed - {ex.Message}");
+                    AppLog.Error("ProfileService: AutoRefreshMinutes write failed", ex);
                 }
             }
         }
@@ -149,7 +148,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"ProfileService: could not forget the account's drafts - {ex.Message}");
+                    AppLog.Error("ProfileService: could not forget the account's drafts", ex);
                 }
             }
         }
@@ -174,7 +173,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfileService: media cache clear during reset failed - {ex.Message}");
+                AppLog.Error("ProfileService: media cache clear during reset failed", ex);
             }
 
             AvatarIconService.InvalidateCache();
@@ -224,7 +223,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"TryRestoreSessionAsync failed: {ex}");
+                AppLog.Error("TryRestoreSessionAsync failed", ex);
                 return false;
             }
         }
@@ -248,7 +247,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfileService: profile visit refresh failed - {ex.Message}");
+                AppLog.Error("ProfileService: profile visit refresh failed", ex);
             }
         }
 
@@ -265,7 +264,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfileService: immediate refresh failed - {ex.Message}");
+                AppLog.Error("ProfileService: immediate refresh failed", ex);
             }
         }
 
@@ -277,7 +276,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"RefreshCurrentUserInBackground failed: {ex.Message}");
+                AppLog.Error("RefreshCurrentUserInBackground failed", ex);
             }
         }
 
@@ -308,7 +307,7 @@ namespace Fort.ind_UWP
 
             if (fetched.TokenRejected)
             {
-                Debug.WriteLine("ProfileService: stored token was rejected; signing out");
+                AppLog.Warning("ProfileService: stored token was rejected; signing out");
                 await LogoutAsync(true);
                 return;
             }

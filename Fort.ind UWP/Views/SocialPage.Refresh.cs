@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -106,7 +105,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: pull to refresh failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialPage: pull to refresh failed", ex);
             }
             finally
             {
@@ -125,7 +124,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not complete the refresh - {ex.Message}");
+                AppLog.Error("SocialPage: could not complete the refresh", ex);
             }
         }
 
@@ -138,7 +137,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not scroll to the newest - {ex.Message}");
+                AppLog.Error("SocialPage: could not scroll to the newest", ex);
             }
         }
 

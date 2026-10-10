@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
@@ -150,7 +149,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the reply - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the reply", ex);
             }
         }
 
@@ -171,7 +170,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the renote menu - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the renote menu", ex);
             }
         }
 
@@ -185,7 +184,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: like failed - {ex.Message}");
+                AppLog.Error("SocialNoteView: like failed", ex);
             }
         }
 
@@ -205,7 +204,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the emoji picker - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the emoji picker", ex);
             }
         }
 
@@ -217,7 +216,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: reaction failed - {ex.Message}");
+                AppLog.Error("SocialNoteView: reaction failed", ex);
             }
         }
 
@@ -229,7 +228,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not remove the reaction - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not remove the reaction", ex);
             }
         }
 
@@ -248,7 +247,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: chip reaction failed - {ex.Message}");
+                AppLog.Error("SocialNoteView: chip reaction failed", ex);
             }
         }
 
@@ -260,7 +259,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the quote - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the quote", ex);
             }
         }
 
@@ -273,7 +272,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: delete failed - {ex.Message}");
+                AppLog.Error("SocialNoteView: delete failed", ex);
             }
         }
 

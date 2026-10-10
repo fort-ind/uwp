@@ -185,7 +185,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: profile load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileView: profile load failed", ex);
                 if (version == _profileVersion && !IsReleased)
                 {
                     if (_detail != null && !IsUnavailable(_detail))
@@ -212,7 +212,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: first notes fetch failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileView: first notes fetch failed", ex);
                 return null;
             }
         }
@@ -355,7 +355,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: banner layout failed - {ex.Message}");
+                AppLog.Error("SocialProfileView: banner layout failed", ex);
             }
         }
 
@@ -479,7 +479,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: state action failed - {ex.Message}");
+                AppLog.Error("SocialProfileView: state action failed", ex);
             }
         }
 
@@ -513,7 +513,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not open the note - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not open the note", ex);
             }
         }
 

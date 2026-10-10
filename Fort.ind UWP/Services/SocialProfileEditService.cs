@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -130,7 +129,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditService: saving the profile failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileEditService: saving the profile failed", ex);
                 return await ReportAsync(owner, SocialApiStatus.Failed, null, SocialPermissions.WriteAccount);
             }
         }
@@ -150,7 +149,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditService: changing {field} failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error($"SocialProfileEditService: changing {field} failed", ex);
                 result = SocialApiResult<UserProfile>.Failed(SocialApiStatus.Failed);
             }
 
@@ -168,7 +167,7 @@ namespace Fort.ind_UWP
             {
                 await DialogService.ShowMessageAsync(owner,
                                                      LocalizedStrings.Get("SocialProfileFlagFailedTitle"),
-                                                     MessageFor(result.ErrorCode),
+                                                     MessageFor(result.Status, result.ErrorCode),
                                                      LocalizedStrings.Get("DialogOk"));
             }
 
@@ -206,15 +205,20 @@ namespace Fort.ind_UWP
 
             await DialogService.ShowMessageAsync(owner,
                                                  LocalizedStrings.Get("SocialProfileSaveFailedTitle"),
-                                                 MessageFor(errorCode),
+                                                 MessageFor(status, errorCode),
                                                  LocalizedStrings.Get("DialogOk"));
             return false;
         }
 
-        public static string MessageFor(string errorCode)
+        public static string MessageFor(SocialApiStatus status, string errorCode)
         {
             string key;
-            if (errorCode == null || !s_errorMessages.TryGetValue(errorCode, out key)) key = "SocialProfileErrorGeneric";
+            if (errorCode == null || !s_errorMessages.TryGetValue(errorCode, out key))
+            {
+                key = status == SocialApiStatus.Unreachable ? "SocialProfileErrorUnreachable"
+                      : status == SocialApiStatus.RateLimited ? "SocialProfileErrorRateLimit"
+                      : "SocialProfileErrorGeneric";
+            }
 
             return LocalizedStrings.Get(key);
         }

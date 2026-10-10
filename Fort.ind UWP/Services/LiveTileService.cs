@@ -25,7 +25,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: UpdateTileWithNews failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: UpdateTileWithNews failed", ex);
             }
         }
 
@@ -53,7 +53,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: UpdateTileWithMultipleNews failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: UpdateTileWithMultipleNews failed", ex);
             }
         }
 
@@ -94,7 +94,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: ShowPreviewTiles failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: ShowPreviewTiles failed", ex);
                 return false;
             }
         }
@@ -362,7 +362,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"LiveTileService: BadgeEnabled read failed – {ex.GetType().Name}: {ex.Message}");
+                    AppLog.Error("LiveTileService: BadgeEnabled read failed", ex);
                     return true;
                 }
             }
@@ -374,7 +374,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"LiveTileService: BadgeEnabled write failed – {ex.GetType().Name}: {ex.Message}");
+                    AppLog.Error("LiveTileService: BadgeEnabled write failed", ex);
                 }
 
                 if (!value) ClearBadge();
@@ -391,7 +391,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"LiveTileService: TileCleared read failed – {ex.GetType().Name}: {ex.Message}");
+                    AppLog.Error("LiveTileService: TileCleared read failed", ex);
                     return false;
                 }
             }
@@ -403,7 +403,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"LiveTileService: TileCleared write failed – {ex.GetType().Name}: {ex.Message}");
+                    AppLog.Error("LiveTileService: TileCleared write failed", ex);
                 }
             }
         }
@@ -430,7 +430,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: UpdateBadge failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: UpdateBadge failed", ex);
             }
         }
 
@@ -458,7 +458,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: UpdateBadgeGlyph failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: UpdateBadgeGlyph failed", ex);
             }
         }
 
@@ -485,7 +485,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: SendToast failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: SendToast failed", ex);
                 return false;
             }
         }
@@ -541,7 +541,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: ShowGroupedToast failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: ShowGroupedToast failed", ex);
                 return false;
             }
         }
@@ -584,7 +584,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: RemoveToastGroup failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: RemoveToastGroup failed", ex);
             }
         }
 
@@ -596,7 +596,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: ClearTile failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: ClearTile failed", ex);
             }
         }
 
@@ -608,7 +608,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LiveTileService: ClearBadge failed – {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("LiveTileService: ClearBadge failed", ex);
             }
         }
 

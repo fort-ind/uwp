@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
@@ -19,7 +18,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"BlurhashImage: decode failed - {ex.Message}");
+                AppLog.Error("BlurhashImage: decode failed", ex);
                 return null;
             }
         }
@@ -45,7 +44,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"BlurhashImage: placeholder failed - {ex.Message}");
+                AppLog.Error("BlurhashImage: placeholder failed", ex);
                 return null;
             }
         }

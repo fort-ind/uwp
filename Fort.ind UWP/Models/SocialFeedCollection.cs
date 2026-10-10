@@ -177,7 +177,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFeedCollection: could not load more - {ex.Message}");
+                AppLog.Error("SocialFeedCollection: could not load more", ex);
                 if (generation == _generation) HasMoreItems = false;
                 return new LoadMoreItemsResult { Count = 0 };
             }

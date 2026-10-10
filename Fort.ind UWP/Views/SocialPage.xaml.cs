@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -243,7 +242,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialPage: could not remove the activation handler - {ex.Message}");
+                    AppLog.Error("SocialPage: could not remove the activation handler", ex);
                 }
                 _activationHandlerAttached = false;
             }
@@ -284,13 +283,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialPage: could not remove a note - {ex.Message}");
+                        AppLog.Error("SocialPage: could not remove a note", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: note change handler failed - {ex.Message}");
+                AppLog.Error("SocialPage: note change handler failed", ex);
             }
         }
 
@@ -397,7 +396,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: notifications catch-up failed - {ex.Message}");
+                AppLog.Error("SocialPage: notifications catch-up failed", ex);
             }
         }
 
@@ -522,7 +521,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: notifications load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialPage: notifications load failed", ex);
                 if (version != _notificationsVersion) return true;
                 if (keepList) return false;
 
@@ -563,7 +562,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: mentions load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialPage: mentions load failed", ex);
                 if (version != _mentionsVersion) return true;
                 if (keepList) return false;
 
@@ -704,7 +703,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not open the composer - {ex.Message}");
+                AppLog.Error("SocialPage: could not open the composer", ex);
             }
         }
 
@@ -724,7 +723,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not open sign-in - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialPage: could not open sign-in", ex);
             }
         }
 
@@ -751,7 +750,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not open the item - {ex.Message}");
+                AppLog.Error("SocialPage: could not open the item", ex);
             }
         }
 
@@ -772,7 +771,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not open the note - {ex.Message}");
+                AppLog.Error("SocialPage: could not open the note", ex);
             }
         }
 
@@ -788,7 +787,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not open the profile - {ex.Message}");
+                AppLog.Error("SocialPage: could not open the profile", ex);
             }
         }
 
@@ -804,13 +803,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialPage: gate refresh failed - {ex.Message}");
+                        AppLog.Error("SocialPage: gate refresh failed", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: auth state handler failed - {ex.Message}");
+                AppLog.Error("SocialPage: auth state handler failed", ex);
             }
         }
 
@@ -826,13 +825,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialPage: live notification failed - {ex.Message}");
+                        AppLog.Error("SocialPage: live notification failed", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: notification handler failed - {ex.Message}");
+                AppLog.Error("SocialPage: notification handler failed", ex);
             }
         }
 
@@ -890,7 +889,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: could not read the window state - {ex.Message}");
+                AppLog.Error("SocialPage: could not read the window state", ex);
                 return false;
             }
         }

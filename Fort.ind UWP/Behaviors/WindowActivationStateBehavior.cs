@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Microsoft.Xaml.Interactivity;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -31,7 +30,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowActivationStateBehavior: Failed to attach - {ex.Message}");
+                AppLog.Error("WindowActivationStateBehavior: Failed to attach", ex);
             }
         }
 
@@ -48,7 +47,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowActivationStateBehavior: Failed to detach - {ex.Message}");
+                AppLog.Error("WindowActivationStateBehavior: Failed to detach", ex);
             }
 
             _window = null;
@@ -63,7 +62,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowActivationStateBehavior: Failed to sync on load - {ex.Message}");
+                AppLog.Error("WindowActivationStateBehavior: Failed to sync on load", ex);
             }
         }
 
@@ -75,7 +74,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowActivationStateBehavior: Failed to follow window activation - {ex.Message}");
+                AppLog.Error("WindowActivationStateBehavior: Failed to follow window activation", ex);
             }
         }
 

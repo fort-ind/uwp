@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Windows.Storage;
@@ -40,7 +39,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: could not change the avatar - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileEditor: could not change the avatar", ex);
             }
         }
 
@@ -52,7 +51,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: could not change the banner - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileEditor: could not change the banner", ex);
             }
         }
 
@@ -73,7 +72,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialProfileEditor: could not read the image's size - {ex.Message}");
+                    AppLog.Error("SocialProfileEditor: could not read the image's size", ex);
                 }
 
                 if (size > AppConstants.SocialUploadLimitBytes)
@@ -115,7 +114,7 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialProfileEditor: the cropper could not open the image - {ex.GetType().Name}: {ex.Message}");
+                        AppLog.Error("SocialProfileEditor: the cropper could not open the image", ex);
                         unreadable = true;
                         return;
                     }
@@ -199,7 +198,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: the crop could not be saved - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileEditor: the crop could not be saved", ex);
                 return null;
             }
         }
@@ -241,7 +240,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: no preview for the new image - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileEditor: no preview for the new image", ex);
                 preview = null;
             }
 

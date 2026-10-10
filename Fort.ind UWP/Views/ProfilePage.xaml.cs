@@ -162,13 +162,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"ProfilePage: could not apply a note change - {ex.Message}");
+                        AppLog.Error("ProfilePage: could not apply a note change", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: note change handler failed - {ex.Message}");
+                AppLog.Error("ProfilePage: note change handler failed", ex);
             }
         }
 
@@ -229,13 +229,13 @@ namespace Fort.ind_UWP
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"ProfilePage: RefreshUI failed - {ex.Message}");
+                            AppLog.Error("ProfilePage: RefreshUI failed", ex);
                         }
                     });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: Auth state change handler failed - {ex.Message}");
+                AppLog.Error("ProfilePage: Auth state change handler failed", ex);
             }
         }
 
@@ -384,7 +384,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: profile load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("ProfilePage: profile load failed", ex);
                 if (version == _loadVersion && !IsReleased && tab != SocialUserNotesTab.Favorites) _feeds.Fail(tab);
             }
         }
@@ -401,7 +401,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: first notes fetch failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("ProfilePage: first notes fetch failed", ex);
                 return null;
             }
         }
@@ -546,7 +546,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not lay out the dashboard - {ex.Message}");
+                AppLog.Error("ProfilePage: could not lay out the dashboard", ex);
             }
         }
 
@@ -594,7 +594,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: the tabs could not be made sticky - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("ProfilePage: the tabs could not be made sticky", ex);
             }
         }
 
@@ -679,7 +679,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not keep the tabs pinned - {ex.Message}");
+                AppLog.Error("ProfilePage: could not keep the tabs pinned", ex);
             }
         }
 
@@ -691,7 +691,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not scroll back to the top - {ex.Message}");
+                AppLog.Error("ProfilePage: could not scroll back to the top", ex);
             }
         }
 
@@ -805,7 +805,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not open the note - {ex.Message}");
+                AppLog.Error("ProfilePage: could not open the note", ex);
             }
         }
 
@@ -824,7 +824,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not open the profile editor - {ex.Message}");
+                AppLog.Error("ProfilePage: could not open the profile editor", ex);
             }
         }
 
@@ -856,7 +856,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not show the profile menu - {ex.Message}");
+                AppLog.Error("ProfilePage: could not show the profile menu", ex);
             }
         }
 
@@ -868,7 +868,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not open the profile settings - {ex.Message}");
+                AppLog.Error("ProfilePage: could not open the profile settings", ex);
             }
         }
 
@@ -891,7 +891,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: Logout failed – {ex.Message}");
+                AppLog.Error("ProfilePage: Logout failed", ex);
             }
         }
 
@@ -908,8 +908,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: could not open the follow list - {ex.GetType().Name}: {ex.Message}"
-                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                AppLog.Error("ProfilePage: could not open the follow list", ex);
             }
         }
 
@@ -923,8 +922,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ProfilePage: Sign-in navigation failed - {ex.GetType().Name}: {ex.Message}"
-                                + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                AppLog.Error("ProfilePage: Sign-in navigation failed", ex);
                 showNavigationError = true;
             }
 
@@ -939,7 +937,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"ProfilePage: could not report the navigation failure - {ex.Message}");
+                    AppLog.Error("ProfilePage: could not report the navigation failure", ex);
                 }
             }
         }

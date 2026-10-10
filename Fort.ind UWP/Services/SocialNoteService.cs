@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Windows.Data.Json;
 
@@ -284,7 +283,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteService: a note change handler failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNoteService: a note change handler failed", ex);
             }
         }
 

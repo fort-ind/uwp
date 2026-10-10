@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 
@@ -45,7 +44,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteHub: could not register a note - {ex.Message}");
+                AppLog.Error("SocialNoteHub: could not register a note", ex);
             }
         }
 
@@ -137,7 +136,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteHub: could not forward a note change - {ex.Message}");
+                AppLog.Error("SocialNoteHub: could not forward a note change", ex);
             }
         }
 
@@ -166,7 +165,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteHub: could not apply a note change - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNoteHub: could not apply a note change", ex);
             }
         }
     }

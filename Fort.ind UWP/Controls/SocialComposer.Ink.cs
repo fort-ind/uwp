@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -106,7 +105,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not insert the handwriting - {ex.Message}");
+                AppLog.Error("SocialComposer: could not insert the handwriting", ex);
             }
         }
 
@@ -134,7 +133,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not swap the word - {ex.Message}");
+                AppLog.Error("SocialComposer: could not swap the word", ex);
             }
         }
 
@@ -160,7 +159,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: pad key failed - {ex.Message}");
+                AppLog.Error("SocialComposer: pad key failed", ex);
             }
         }
 
@@ -204,7 +203,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not open the drawing - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposer: could not open the drawing", ex);
                 HideDrawing();
             }
         }
@@ -235,7 +234,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not open the image to mark up - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposer: could not open the image to mark up", ex);
                 _markUpTarget = null;
                 HideDrawing();
             }
@@ -305,7 +304,7 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialComposer: could not cancel the replaced upload - {ex.Message}");
+                        AppLog.Error("SocialComposer: could not cancel the replaced upload", ex);
                     }
 
                     _attachments.Remove(target);
@@ -323,7 +322,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not attach the drawing - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposer: could not attach the drawing", ex);
             }
 
             Editor.Focus(FocusState.Programmatic);

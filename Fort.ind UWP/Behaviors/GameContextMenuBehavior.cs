@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xaml.Interactivity;
 using Windows.ApplicationModel.DataTransfer;
@@ -36,7 +35,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameContextMenuBehavior: Failed to attach - {ex.Message}");
+                AppLog.Error("GameContextMenuBehavior: Failed to attach", ex);
             }
         }
 
@@ -53,7 +52,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameContextMenuBehavior: Failed to detach - {ex.Message}");
+                AppLog.Error("GameContextMenuBehavior: Failed to detach", ex);
             }
 
             _shareManager = null;
@@ -88,7 +87,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameContextMenuBehavior: Failed to open the game menu - {ex.Message}");
+                AppLog.Error("GameContextMenuBehavior: Failed to open the game menu", ex);
             }
         }
 
@@ -153,7 +152,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameContextMenuBehavior: Pin to Start failed - {ex.Message}");
+                AppLog.Error("GameContextMenuBehavior: Pin to Start failed", ex);
             }
         }
 
@@ -171,7 +170,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameContextMenuBehavior: Unpin from Start failed - {ex.Message}");
+                AppLog.Error("GameContextMenuBehavior: Unpin from Start failed", ex);
             }
         }
 
@@ -190,7 +189,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameContextMenuBehavior: Share failed - {ex.Message}");
+                AppLog.Error("GameContextMenuBehavior: Share failed", ex);
             }
         }
 
@@ -211,7 +210,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameContextMenuBehavior: Filling the share request failed - {ex.Message}");
+                AppLog.Error("GameContextMenuBehavior: Filling the share request failed", ex);
             }
         }
 

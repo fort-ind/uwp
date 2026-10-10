@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading;
 using Windows.Storage;
 using Windows.UI.Core;
@@ -38,7 +37,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"InkSettingsService: could not read the pen text mode - {ex.Message}");
+                    AppLog.Error("InkSettingsService: could not read the pen text mode", ex);
                     return PenTextMode.WriteOnBox;
                 }
             }
@@ -50,7 +49,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"InkSettingsService: could not save the pen text mode - {ex.Message}");
+                    AppLog.Error("InkSettingsService: could not save the pen text mode", ex);
                 }
 
                 Interlocked.Increment(ref s_version);
@@ -121,7 +120,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"InkSettingsService: could not read the handwriting font - {ex.Message}");
+                    AppLog.Error("InkSettingsService: could not read the handwriting font", ex);
                     return null;
                 }
             }
@@ -137,7 +136,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InkSettingsService: could not read {key} - {ex.Message}");
+                AppLog.Error($"InkSettingsService: could not read {key}", ex);
                 return fallback;
             }
         }
@@ -150,7 +149,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InkSettingsService: could not save {key} - {ex.Message}");
+                AppLog.Error($"InkSettingsService: could not save {key}", ex);
             }
         }
 
@@ -163,7 +162,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InkSettingsService: could not read {key} - {ex.Message}");
+                AppLog.Error($"InkSettingsService: could not read {key}", ex);
                 return fallback;
             }
         }
@@ -176,7 +175,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InkSettingsService: could not save {key} - {ex.Message}");
+                AppLog.Error($"InkSettingsService: could not save {key}", ex);
             }
 
             Interlocked.Increment(ref s_version);

@@ -234,7 +234,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"SocialAttachmentItem: no local preview - {ex.Message}");
+                AppLog.Error("SocialAttachmentItem: no local preview", ex);
             }
         }
 

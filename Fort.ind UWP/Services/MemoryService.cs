@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.Storage;
 using Windows.System;
 using Windows.System.Diagnostics;
@@ -91,7 +90,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MemoryService: could not save the low-memory choice - {ex.Message}");
+                AppLog.Error("MemoryService: could not save the low-memory choice", ex);
             }
         }
 
@@ -110,7 +109,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MemoryService: could not read the low-memory choice - {ex.Message}");
+                AppLog.Error("MemoryService: could not read the low-memory choice", ex);
             }
 
             return LowMemoryModeChoice.Automatic;
@@ -125,7 +124,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MemoryService: could not read the installed memory - {ex.Message}");
+                AppLog.Error("MemoryService: could not read the installed memory", ex);
                 return false;
             }
         }
@@ -145,7 +144,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MemoryService: could not watch the memory limit - {ex.Message}");
+                AppLog.Error("MemoryService: could not watch the memory limit", ex);
             }
         }
 
@@ -162,7 +161,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MemoryService: memory limit handler failed - {ex.Message}");
+                AppLog.Error("MemoryService: memory limit handler failed", ex);
             }
         }
 
@@ -175,7 +174,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MemoryService: memory usage handler failed - {ex.Message}");
+                AppLog.Error("MemoryService: memory usage handler failed", ex);
             }
         }
 
@@ -190,7 +189,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MemoryService: a trim handler failed - {ex.Message}");
+                AppLog.Error("MemoryService: a trim handler failed", ex);
             }
         }
     }

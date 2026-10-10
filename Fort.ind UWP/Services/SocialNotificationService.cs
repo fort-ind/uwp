@@ -69,7 +69,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialNotificationService: could not read the notifications setting - {ex.Message}");
+                    AppLog.Error("SocialNotificationService: could not read the notifications setting", ex);
                     return true;
                 }
             }
@@ -81,7 +81,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialNotificationService: could not save the notifications setting - {ex.Message}");
+                    AppLog.Error("SocialNotificationService: could not save the notifications setting", ex);
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialNotificationService: could not read the background check setting - {ex.Message}");
+                    AppLog.Error("SocialNotificationService: could not read the background check setting", ex);
                     return true;
                 }
             }
@@ -109,7 +109,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialNotificationService: could not save the background check setting - {ex.Message}");
+                    AppLog.Error("SocialNotificationService: could not save the background check setting", ex);
                 }
             }
         }
@@ -162,7 +162,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: reconcile failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotificationService: reconcile failed", ex);
             }
         }
 
@@ -235,7 +235,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: background check update failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotificationService: background check update failed", ex);
             }
         }
 
@@ -301,7 +301,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: tile refresh failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotificationService: tile refresh failed", ex);
             }
         }
 
@@ -367,7 +367,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: mark read failed - {ex.Message}");
+                AppLog.Error("SocialNotificationService: mark read failed", ex);
             }
         }
 
@@ -383,7 +383,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: permission probe failed - {ex.Message}");
+                AppLog.Error("SocialNotificationService: permission probe failed", ex);
             }
         }
 
@@ -452,11 +452,11 @@ namespace Fort.ind_UWP
                 }
                 catch (OperationCanceledException)
                 {
-                    Debug.WriteLine("SocialNotificationService: background check ran out of time");
+                    AppLog.Warning("SocialNotificationService: background check ran out of time");
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialNotificationService: background check failed - {ex.GetType().Name}: {ex.Message}");
+                    AppLog.Error("SocialNotificationService: background check failed", ex);
                 }
                 finally
                 {
@@ -490,7 +490,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: could not register the background check - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotificationService: could not register the background check", ex);
             }
         }
 
@@ -544,7 +544,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: could not read the check interval - {ex.Message}");
+                AppLog.Error("SocialNotificationService: could not read the check interval", ex);
                 return 0;
             }
         }
@@ -576,7 +576,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: could not unregister the background check - {ex.Message}");
+                AppLog.Error("SocialNotificationService: could not unregister the background check", ex);
             }
         }
 
@@ -705,7 +705,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: unread count refresh failed - {ex.Message}");
+                AppLog.Error("SocialNotificationService: unread count refresh failed", ex);
             }
         }
 
@@ -728,7 +728,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: scheduled count refresh failed - {ex.Message}");
+                AppLog.Error("SocialNotificationService: scheduled count refresh failed", ex);
             }
         }
 
@@ -849,7 +849,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: could not read the toasted notifications - {ex.Message}");
+                AppLog.Error("SocialNotificationService: could not read the toasted notifications", ex);
             }
 
             return toasted;
@@ -880,7 +880,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: could not read the toast watermark - {ex.Message}");
+                AppLog.Error("SocialNotificationService: could not read the toast watermark", ex);
             }
 
             return null;
@@ -915,7 +915,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: could not read {key} - {ex.Message}");
+                AppLog.Error($"SocialNotificationService: could not read {key}", ex);
                 return null;
             }
         }
@@ -936,7 +936,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: could not write {key} - {ex.Message}");
+                AppLog.Error($"SocialNotificationService: could not write {key}", ex);
             }
         }
 
@@ -1011,7 +1011,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: live toast failed - {ex.Message}");
+                AppLog.Error("SocialNotificationService: live toast failed", ex);
             }
         }
 
@@ -1076,7 +1076,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: stream connect failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotificationService: stream connect failed", ex);
             }
         }
 
@@ -1103,7 +1103,7 @@ namespace Fort.ind_UWP
 
             if (stream.Unauthorized)
             {
-                Debug.WriteLine("SocialNotificationService: the stream refused the token; not reconnecting");
+                AppLog.Warning("SocialNotificationService: the stream refused the token; not reconnecting");
                 return;
             }
 
@@ -1125,7 +1125,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotificationService: reconnect failed - {ex.Message}");
+                AppLog.Error("SocialNotificationService: reconnect failed", ex);
             }
         }
 

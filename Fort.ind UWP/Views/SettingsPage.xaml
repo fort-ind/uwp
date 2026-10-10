@@ -1218,6 +1218,7 @@
                                         <StackPanel VerticalAlignment="Center" Spacing="4">
                                             <TextBlock x:Uid="MainFortInd" Style="{StaticResource SubtitleTextBlockStyle}"/>
                                             <TextBlock x:Uid="AboutVersionText" x:Name="AboutVersionText"
+                                                       Tapped="AboutVersionText_Tapped"
                                                        Style="{StaticResource CaptionTextBlockStyle}"
                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                         </StackPanel>
@@ -1299,6 +1300,54 @@
                                     </StackPanel>
 
                                 </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border x:Name="DiagnosticsSection" x:Load="False"
+                            BorderThickness="0,0,0,1"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+                        <StackPanel>
+                            <Grid Padding="16,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Width="36" Height="36"
+                                      Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                    <FontIcon Glyph="&#xE9D9;" FontSize="16"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              AutomationProperties.AccessibilityView="Raw"/>
+                                </Grid>
+                                <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Uid="DiagnosticsTitle" Style="{StaticResource BaseTextBlockStyle}"
+                                               AutomationProperties.HeadingLevel="Level2"/>
+                                    <TextBlock x:Uid="DiagnosticsCaption"
+                                               Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Padding="20,0,20,16" Spacing="10">
+                                <Rectangle Height="1" Margin="0,0,0,2"
+                                           Fill="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                           Opacity="0.08"/>
+                                <TextBlock x:Uid="DiagnosticsDescription"
+                                           Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <Button x:Name="CopyDiagnosticsButton"
+                                        Click="CopyDiagnosticsButton_Click"
+                                        Style="{StaticResource ButtonRevealStyle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE8C8;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                                        <TextBlock x:Uid="CopyDiagnosticsButtonText"/>
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock x:Name="DiagnosticsStatusText"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           Visibility="Collapsed"
+                                           AutomationProperties.LiveSetting="Polite"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>

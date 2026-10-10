@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -174,7 +173,8 @@ namespace Fort.ind_UWP
 
                 await DialogService.ShowMessageAsync(owner,
                                                      LocalizedStrings.Format(failureTitleKey, name),
-                                                     LocalizedStrings.Get("SocialActionErrorGeneric"),
+                                                     LocalizedStrings.Get(SocialApiService.ConnectionMessageKey(result.Status)
+                                                                          ?? "SocialActionErrorGeneric"),
                                                      LocalizedStrings.Get("DialogOk"));
                 return false;
             }
@@ -250,7 +250,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialModerationService: could not announce - {ex.Message}");
+                AppLog.Error("SocialModerationService: could not announce", ex);
             }
         }
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -158,7 +157,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GamesPage: Failed to load games - {ex.Message}");
+                AppLog.Error("GamesPage: Failed to load games", ex);
                 SetState(GamesPageState.Failed);
             }
             finally
@@ -198,7 +197,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GamesPage: Filter failed - {ex.Message}");
+                AppLog.Error("GamesPage: Filter failed", ex);
             }
         }
 
@@ -334,7 +333,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GamesPage: Failed to launch game - {ex.Message}");
+                AppLog.Error("GamesPage: Failed to launch game", ex);
             }
         }
 
@@ -369,7 +368,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GamesPage: Failed to toggle favorite - {ex.Message}");
+                AppLog.Error("GamesPage: Failed to toggle favorite", ex);
             }
         }
 
@@ -399,7 +398,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GamesPage: Semantic zoom accelerator failed - {ex.Message}");
+                AppLog.Error("GamesPage: Semantic zoom accelerator failed", ex);
             }
         }
     }

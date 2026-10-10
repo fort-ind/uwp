@@ -76,12 +76,13 @@ namespace Fort.ind_UWP
                 UpdateTileNotificationsVisibility();
                 UpdateBackgroundDeniedNotice(false);
                 RefreshProfileEditorIfShown();
+                RestoreDiagnosticsSection();
 
                 RevealPendingSection();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Loaded failed - {ex.Message}");
+                AppLog.Error("SettingsPage: Loaded failed", ex);
             }
         }
 
@@ -115,13 +116,13 @@ namespace Fort.ind_UWP
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"SettingsPage: UpdateStorageInfo failed - {ex.Message}");
+                            AppLog.Error("SettingsPage: UpdateStorageInfo failed", ex);
                         }
                     });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Auth state change handler failed - {ex.Message}");
+                AppLog.Error("SettingsPage: Auth state change handler failed", ex);
             }
         }
 
@@ -134,7 +135,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: appearance refresh failed - {ex.Message}");
+                AppLog.Error("SettingsPage: appearance refresh failed", ex);
             }
         }
 
@@ -164,7 +165,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: UpdateStorageInfo failed - {ex.Message}");
+                AppLog.Error("SettingsPage: UpdateStorageInfo failed", ex);
                 StoragePathText.Text = "";
                 CacheDescriptionText.Text = "";
                 UserCountText.Text = "";
@@ -194,7 +195,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: storage footprint failed - {ex.Message}");
+                AppLog.Error("SettingsPage: storage footprint failed", ex);
 
                 if (generation == _footprintGeneration)
                 {
@@ -225,7 +226,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: media cache size failed - {ex.Message}");
+                AppLog.Error("SettingsPage: media cache size failed", ex);
 
                 if (generation == _mediaCacheGeneration)
                 {
@@ -261,7 +262,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: media cache clear failed - {ex.Message}");
+                AppLog.Error("SettingsPage: media cache clear failed", ex);
                 ShowMediaCacheStatus(LocalizedStrings.Get("MediaCacheClearFailed"));
             }
             finally
@@ -380,7 +381,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: size formatting failed - {ex.Message}");
+                AppLog.Error("SettingsPage: size formatting failed", ex);
                 return value.ToString(System.Globalization.CultureInfo.CurrentCulture);
             }
         }
@@ -404,7 +405,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Clear login info failed - {ex.Message}");
+                AppLog.Error("SettingsPage: Clear login info failed", ex);
             }
         }
 
@@ -456,7 +457,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: App reset flow failed - {ex.Message}");
+                AppLog.Error("SettingsPage: App reset flow failed", ex);
             }
         }
 
@@ -465,11 +466,11 @@ namespace Fort.ind_UWP
             try
             {
                 var failureReason = await Windows.ApplicationModel.Core.CoreApplication.RequestRestartAsync("");
-                Debug.WriteLine($"SettingsPage: App restart request did not restart the app - {failureReason}");
+                AppLog.Warning($"SettingsPage: App restart request did not restart the app - {failureReason}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: App restart request threw - {ex.Message}");
+                AppLog.Error("SettingsPage: App restart request threw", ex);
             }
         }
 
@@ -512,7 +513,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: could not apply the notifications setting - {ex.Message}");
+                AppLog.Error("SettingsPage: could not apply the notifications setting", ex);
             }
         }
 
@@ -529,7 +530,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: could not apply the background check setting - {ex.Message}");
+                AppLog.Error("SettingsPage: could not apply the background check setting", ex);
             }
         }
 
@@ -555,7 +556,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: could not open lock screen settings - {ex.Message}");
+                AppLog.Error("SettingsPage: could not open lock screen settings", ex);
             }
         }
 
@@ -686,7 +687,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: could not refresh the profile editor - {ex.Message}");
+                AppLog.Error("SettingsPage: could not refresh the profile editor", ex);
             }
         }
 
@@ -741,7 +742,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SettingsPage: Failed to save panel state - {ex.Message}");
+                    AppLog.Error("SettingsPage: Failed to save panel state", ex);
                 }
             }
         }
@@ -786,7 +787,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Failed to reveal section {section} - {ex.Message}");
+                AppLog.Error($"SettingsPage: Failed to reveal section {section}", ex);
             }
         }
 
@@ -849,7 +850,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Failed to restore panel states - {ex.Message}");
+                AppLog.Error("SettingsPage: Failed to restore panel states", ex);
             }
         }
 
@@ -881,7 +882,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Failed to restore {settingKey} - {ex.Message}");
+                AppLog.Error($"SettingsPage: Failed to restore {settingKey}", ex);
             }
         }
 
@@ -915,7 +916,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: update check failed - {ex.Message}");
+                AppLog.Error("SettingsPage: update check failed", ex);
                 ShowUpdateStatus(LocalizedStrings.Get("UpdateStatusFailed"));
             }
             finally
@@ -941,7 +942,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: could not open the release page - {ex.Message}");
+                AppLog.Error("SettingsPage: could not open the release page", ex);
             }
         }
 
@@ -962,7 +963,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Reset welcome failed - {ex.Message}");
+                AppLog.Error("SettingsPage: Reset welcome failed", ex);
             }
         }
     }

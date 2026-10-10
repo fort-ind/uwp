@@ -666,7 +666,7 @@ Open your profile and try again.</value>
     <value>Waiting for sign-in</value>
   </data>
   <data name="LoginYouLlBeTaken.Text" xml:space="preserve">
-    <value>You'll be taken to fort.social to login to your account you will be taken back here after signing in!</value>
+    <value>You'll be taken to fort.social to login to your account. you will be taken back here after signing in!</value>
   </data>
   <data name="MainAbout.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
     <value>Version info, credits, and more</value>
@@ -729,10 +729,10 @@ Open your profile and try again.</value>
     <value>Manage local storage and view account data</value>
   </data>
   <data name="MainDataStorage.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Data Storage</value>
+    <value>Storage</value>
   </data>
   <data name="MainDataStorage2.Text" xml:space="preserve">
-    <value>Data Storage</value>
+    <value>Storage</value>
   </data>
   <data name="MainFortInd.Text" xml:space="preserve">
     <value>Fort.ind</value>
@@ -3532,10 +3532,10 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="InkTouchPanDescription.Text" xml:space="preserve">
-    <value>After fort.desktop sees your pen, fingers scroll and move the canvas instead of drawing, so your palm doesn't leave marks. Until then, touch draws</value>
+    <value>After fort.desktop sees your pen, fingers scroll and move the canvas instead of drawing</value>
   </data>
   <data name="InkPenTextBoxDescription.Text" xml:space="preserve">
-    <value>Write on the box: your ink turns into text right where you write in the post box and the search box, about a second after you lift the pen. Strike through words to delete them, or draw ^ to add a space. Other text boxes use Windows' writing view. Off opens Windows' handwriting panel instead</value>
+    <value>here you can choose the behavior thats used when writing in notes, search and replies </value>
   </data>
   <data name="InkHandwritingFontToggle.Header" xml:space="preserve">
     <value>Show my writing in my handwriting font</value>
@@ -3547,7 +3547,7 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="InkHandwritingFontDescription.Text" xml:space="preserve">
-    <value>While you write in Windows' writing view, the text uses the font picked in Windows Settings under Devices &gt; Pen &amp; Windows Ink</value>
+    <value>While you write in the writing view, the text uses the font picked in Windows Settings under Devices &gt; Pen &amp; Windows Ink</value>
   </data>
   <data name="SearchItemPenInk" xml:space="preserve">
     <value>Pen &amp; ink</value>
@@ -3565,7 +3565,7 @@ Open your profile and try again.</value>
     <value>Write on the box</value>
   </data>
   <data name="InkPenTextModeWindowsView.Content" xml:space="preserve">
-    <value>Windows' writing view</value>
+    <value>default inline view</value>
   </data>
   <data name="InkPenTextModeOff.Content" xml:space="preserve">
     <value>Off (handwriting panel)</value>
@@ -3646,7 +3646,7 @@ Open your profile and try again.</value>
     <value>Discard your markup?</value>
   </data>
   <data name="InkDrawDiscardBody" xml:space="preserve">
-    <value>What you've drawn will be lost.</value>
+    <value>What you've drawn will be lost :(</value>
   </data>
   <data name="InkDrawDiscardConfirm" xml:space="preserve">
     <value>Discard</value>
@@ -3719,5 +3719,41 @@ Open your profile and try again.</value>
   </data>
   <data name="SocialComposeMarkUpAttachment.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Mark up</value>
+  </data>
+  <data name="SocialErrorUnreachable" xml:space="preserve">
+    <value>fort.desktop couldn't reach fort.social. Check your connection and try again.</value>
+  </data>
+  <data name="SocialErrorRateLimited" xml:space="preserve">
+    <value>woah there!!! slow down </value>
+  </data>
+  <data name="SocialPostErrorUnreachable" xml:space="preserve">
+    <value>fort.desktop couldn't reach fort.social. Check your connection and try again; your draft is saved.</value>
+  </data>
+  <data name="SocialPostErrorRateLimited" xml:space="preserve">
+    <value>woah there! your going a little too fast.. slow down</value>
+  </data>
+  <data name="SocialProfileErrorUnreachable" xml:space="preserve">
+    <value>fort.desktop couldn't reach fort.social. Check your connection and try again; your edits are kept.</value>
+  </data>
+  <data name="DiagnosticsTitle.Text" xml:space="preserve">
+    <value>Diagnostics</value>
+  </data>
+  <data name="DiagnosticsCaption.Text" xml:space="preserve">
+    <value>For bug reports</value>
+  </data>
+  <data name="DiagnosticsDescription.Text" xml:space="preserve">
+    <value>AAAAAAAAA a easter egg :) this is only for diagnostic and debugging purposes. use this if your filing a bug report </value>
+  </data>
+  <data name="CopyDiagnosticsButtonText.Text" xml:space="preserve">
+    <value>copy diagnostics</value>
+  </data>
+  <data name="DiagnosticsCopied" xml:space="preserve">
+    <value>Copied!</value>
+  </data>
+  <data name="DiagnosticsCopyFailed" xml:space="preserve">
+    <value>Couldn't copy the diagnostics. Try again in a moment.</value>
+  </data>
+  <data name="DiagnosticsUnlockedAnnouncement" xml:space="preserve">
+    <value>Diagnostics are now shown at the end of Settings.</value>
   </data>
 </root>

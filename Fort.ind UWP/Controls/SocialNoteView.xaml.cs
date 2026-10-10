@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
@@ -97,7 +96,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not show a note - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNoteView: could not show a note", ex);
             }
         }
 
@@ -112,7 +111,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not catch up with a note - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNoteView: could not catch up with a note", ex);
             }
         }
 
@@ -130,7 +129,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not stop the note's media - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not stop the note's media", ex);
             }
         }
 
@@ -235,7 +234,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not update a note - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not update a note", ex);
             }
         }
 
@@ -416,7 +415,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: style {key} unavailable - {ex.Message}");
+                AppLog.Error($"SocialNoteView: style {key} unavailable", ex);
                 return null;
             }
         }
@@ -611,7 +610,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: media layout failed - {ex.Message}");
+                AppLog.Error("SocialNoteView: media layout failed", ex);
             }
         }
 
@@ -671,7 +670,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the attachment - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the attachment", ex);
             }
         }
 
@@ -779,7 +778,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the author's profile - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the author's profile", ex);
             }
         }
 
@@ -792,7 +791,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the renoter's profile - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the renoter's profile", ex);
             }
         }
 
@@ -805,7 +804,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the replied-to profile - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the replied-to profile", ex);
             }
         }
 
@@ -825,7 +824,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the link - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the link", ex);
             }
         }
 
@@ -843,7 +842,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the quoted note - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the quoted note", ex);
             }
         }
 
@@ -856,7 +855,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not continue the thread - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not continue the thread", ex);
             }
         }
 
@@ -869,7 +868,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the note menu - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the note menu", ex);
             }
         }
 

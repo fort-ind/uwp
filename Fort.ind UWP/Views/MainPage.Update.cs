@@ -35,7 +35,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: update check failed - {ex.Message}");
+                AppLog.Error("MainPage: update check failed", ex);
             }
         }
 
@@ -52,7 +52,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not open the release page - {ex.Message}");
+                AppLog.Error("MainPage: could not open the release page", ex);
             }
         }
     }

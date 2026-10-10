@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using Windows.Storage;
 using Windows.UI;
@@ -47,7 +46,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"AccentColorService: could not read the saved accent - {ex.Message}");
+                    AppLog.Error("AccentColorService: could not read the saved accent", ex);
                     return AppConstants.ThemeDefault;
                 }
             }
@@ -84,7 +83,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AccentColorService: could not resolve the saved accent - {ex.Message}");
+                AppLog.Error("AccentColorService: could not resolve the saved accent", ex);
                 s_activeAccentHex = null;
             }
         }
@@ -103,7 +102,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AccentColorService: could not read this view's accent - {ex.Message}");
+                AppLog.Error("AccentColorService: could not read this view's accent", ex);
                 return;
             }
 
@@ -126,7 +125,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AccentColorService: could not apply the accent - {ex.Message}");
+                AppLog.Error("AccentColorService: could not apply the accent", ex);
                 if (resources != null)
                 {
                     foreach (var key in s_shadeKeys)
@@ -137,7 +136,7 @@ namespace Fort.ind_UWP
                         }
                         catch (Exception removeEx)
                         {
-                            Debug.WriteLine($"AccentColorService: could not roll back {key} - {removeEx.Message}");
+                            AppLog.Error($"AccentColorService: could not roll back {key}", removeEx);
                         }
                     }
                 }
@@ -175,7 +174,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"AccentColorService: could not read the tint to match - {ex.Message}");
+                    AppLog.Error("AccentColorService: could not read the tint to match", ex);
                 }
 
                 return ColorHelper.AccentForTint(tint);

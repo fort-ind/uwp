@@ -135,7 +135,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: could not build nav avatar - {ex.Message}");
+                AppLog.Error("AvatarIconService: could not build nav avatar", ex);
                 return null;
             }
             finally
@@ -175,7 +175,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: could not build toast avatar - {ex.Message}");
+                AppLog.Error("AvatarIconService: could not build toast avatar", ex);
                 return null;
             }
             finally
@@ -217,7 +217,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: could not build tile avatar - {ex.Message}");
+                AppLog.Error("AvatarIconService: could not build tile avatar", ex);
                 return null;
             }
             finally
@@ -249,13 +249,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"AvatarIconService: could not delete tile avatar {file.Name} - {ex.Message}");
+                        AppLog.Error($"AvatarIconService: could not delete tile avatar {file.Name}", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: tile avatar prune failed - {ex.Message}");
+                AppLog.Error("AvatarIconService: tile avatar prune failed", ex);
             }
             finally
             {
@@ -279,13 +279,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"AvatarIconService: could not delete toast avatar {file.Name} - {ex.Message}");
+                        AppLog.Error($"AvatarIconService: could not delete toast avatar {file.Name}", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: toast avatar clear failed - {ex.Message}");
+                AppLog.Error("AvatarIconService: toast avatar clear failed", ex);
             }
             finally
             {
@@ -310,13 +310,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"AvatarIconService: could not delete toast avatar {file.Name} - {ex.Message}");
+                        AppLog.Error($"AvatarIconService: could not delete toast avatar {file.Name}", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: toast avatar prune failed - {ex.Message}");
+                AppLog.Error("AvatarIconService: toast avatar prune failed", ex);
             }
         }
 
@@ -332,7 +332,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: avatar fetch/decode failed - {ex.Message}");
+                AppLog.Error("AvatarIconService: avatar fetch/decode failed", ex);
                 return null;
             }
         }
@@ -514,7 +514,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception cleanupEx)
                 {
-                    Debug.WriteLine($"AvatarIconService: could not remove the temp avatar - {cleanupEx.Message}");
+                    AppLog.Error("AvatarIconService: could not remove the temp avatar", cleanupEx);
                 }
 
                 throw;
@@ -541,7 +541,7 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"AvatarIconService: could not delete stale avatar {file.Name} - {ex.Message}");
+                        AppLog.Error($"AvatarIconService: could not delete stale avatar {file.Name}", ex);
                     }
                 }
 
@@ -549,7 +549,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: avatar prune failed - {ex.Message}");
+                AppLog.Error("AvatarIconService: avatar prune failed", ex);
                 return false;
             }
         }
@@ -568,7 +568,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AvatarIconService: legacy avatar sweep failed - {ex.Message}");
+                AppLog.Error("AvatarIconService: legacy avatar sweep failed", ex);
             }
         }
 

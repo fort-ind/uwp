@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -91,7 +90,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPermissions: a permission change handler failed - {ex.Message}");
+                AppLog.Error("SocialPermissions: a permission change handler failed", ex);
             }
         }
 

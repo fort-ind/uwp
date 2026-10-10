@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -50,13 +49,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"MainPage: sign-in-again banner update failed - {ex.Message}");
+                        AppLog.Error("MainPage: sign-in-again banner update failed", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: sign-in-again handler failed - {ex.Message}");
+                AppLog.Error("MainPage: sign-in-again handler failed", ex);
             }
         }
 
@@ -86,7 +85,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not read the permission banner dismissal - {ex.Message}");
+                AppLog.Error("MainPage: could not read the permission banner dismissal", ex);
                 return false;
             }
         }
@@ -108,7 +107,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not remember the permission banner dismissal - {ex.Message}");
+                AppLog.Error("MainPage: could not remember the permission banner dismissal", ex);
             }
         }
 
@@ -120,7 +119,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not open sign-in from the banner - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("MainPage: could not open sign-in from the banner", ex);
             }
         }
 

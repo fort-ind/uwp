@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -61,7 +60,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"FavoritesService: Failed to load favorites - {ex.Message}");
+                AppLog.Error("FavoritesService: Failed to load favorites", ex);
                 lock (s_stateLock)
                 {
                     s_order.Clear();
@@ -88,12 +87,12 @@ namespace Fort.ind_UWP
             try
             {
                 await file.RenameAsync(AppConstants.FavoritesFileName + ".bak", NameCollisionOption.ReplaceExisting);
-                Debug.WriteLine("FavoritesService: moved the unreadable favorites file aside as favorites.json.bak");
+                AppLog.Warning("FavoritesService: moved the unreadable favorites file aside as favorites.json.bak");
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"FavoritesService: could not move the unreadable favorites file aside - {ex.Message}");
+                AppLog.Error("FavoritesService: could not move the unreadable favorites file aside", ex);
                 return false;
             }
         }
@@ -211,7 +210,7 @@ namespace Fort.ind_UWP
             {
                 if (s_saveBlocked)
                 {
-                    Debug.WriteLine("FavoritesService: not saving - the existing favorites file could not be read or moved aside");
+                    AppLog.Warning("FavoritesService: not saving - the existing favorites file could not be read or moved aside");
                     return;
                 }
 
@@ -231,7 +230,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"FavoritesService: Failed to save favorites - {ex.Message}");
+                AppLog.Error("FavoritesService: Failed to save favorites", ex);
             }
             finally
             {
@@ -250,7 +249,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"FavoritesService: FavoritesChanged handler threw - {ex.Message}");
+                AppLog.Error("FavoritesService: FavoritesChanged handler threw", ex);
             }
         }
 

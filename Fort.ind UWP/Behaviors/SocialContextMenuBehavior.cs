@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Microsoft.Xaml.Interactivity;
 using Windows.Foundation;
 using Windows.UI.Xaml;
@@ -21,7 +20,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContextMenuBehavior: Failed to attach - {ex.Message}");
+                AppLog.Error("SocialContextMenuBehavior: Failed to attach", ex);
             }
         }
 
@@ -33,7 +32,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContextMenuBehavior: Failed to detach - {ex.Message}");
+                AppLog.Error("SocialContextMenuBehavior: Failed to detach", ex);
             }
 
             base.OnDetaching();
@@ -58,7 +57,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialContextMenuBehavior: Failed to open the menu - {ex.Message}");
+                AppLog.Error("SocialContextMenuBehavior: Failed to open the menu", ex);
             }
         }
 

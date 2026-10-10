@@ -37,7 +37,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameTileService: could not check the tile for {game.Url} - {ex.Message}");
+                AppLog.Error($"GameTileService: could not check the tile for {game.Url}", ex);
                 return false;
             }
         }
@@ -60,7 +60,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameTileService: pinning {game.Url} failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error($"GameTileService: pinning {game.Url} failed", ex);
                 return false;
             }
         }
@@ -75,7 +75,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameTileService: unpinning {game.Url} failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error($"GameTileService: unpinning {game.Url} failed", ex);
                 return false;
             }
         }
@@ -91,7 +91,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameTileService: unpinning tile {tileId} failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error($"GameTileService: unpinning tile {tileId} failed", ex);
                 return false;
             }
         }
@@ -106,7 +106,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameTileService: could not match tile {tileId} to its URL - {ex.Message}");
+                AppLog.Error($"GameTileService: could not match tile {tileId} to its URL", ex);
                 return false;
             }
         }
@@ -168,7 +168,7 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"GameTileService: updating tile {tile.TileId} failed - {ex.GetType().Name}: {ex.Message}");
+                        AppLog.Error($"GameTileService: updating tile {tile.TileId} failed", ex);
                     }
                 }
 
@@ -176,7 +176,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"GameTileService: RefreshPinnedTilesAsync failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("GameTileService: RefreshPinnedTilesAsync failed", ex);
             }
         }
 

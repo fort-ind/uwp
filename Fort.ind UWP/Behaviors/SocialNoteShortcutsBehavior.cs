@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Microsoft.Xaml.Interactivity;
 using Windows.System;
 using Windows.UI.Xaml;
@@ -23,7 +22,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteShortcutsBehavior: Failed to attach - {ex.Message}");
+                AppLog.Error("SocialNoteShortcutsBehavior: Failed to attach", ex);
             }
         }
 
@@ -35,7 +34,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteShortcutsBehavior: Failed to detach - {ex.Message}");
+                AppLog.Error("SocialNoteShortcutsBehavior: Failed to detach", ex);
             }
 
             base.OnDetaching();
@@ -54,7 +53,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteShortcutsBehavior: could not add the shortcuts - {ex.Message}");
+                AppLog.Error("SocialNoteShortcutsBehavior: could not add the shortcuts", ex);
             }
         }
 
@@ -106,7 +105,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteShortcutsBehavior: shortcut failed - {ex.Message}");
+                AppLog.Error("SocialNoteShortcutsBehavior: shortcut failed", ex);
             }
         }
 

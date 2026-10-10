@@ -130,7 +130,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not follow the title bar inset - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not follow the title bar inset", ex);
             }
         }
 
@@ -154,7 +154,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: the reveal animation could not be set up - {ex.Message}");
+                AppLog.Error("SocialProfileView: the reveal animation could not be set up", ex);
             }
         }
 
@@ -174,7 +174,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not watch the effects settings - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not watch the effects settings", ex);
             }
         }
 
@@ -213,7 +213,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not stop watching the effects settings - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not stop watching the effects settings", ex);
             }
         }
 
@@ -244,13 +244,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialProfileView: could not switch the banner effect - {ex.Message}");
+                        AppLog.Error("SocialProfileView: could not switch the banner effect", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not queue the banner effect switch - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not queue the banner effect switch", ex);
             }
         }
 
@@ -280,7 +280,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: the collapsing header could not start - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileView: the collapsing header could not start", ex);
                 _collapseUnavailable = true;
                 RaiseTitleBarChanged();
             }
@@ -406,7 +406,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: the banner blur could not start, using the veil - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileView: the banner blur could not start, using the veil", ex);
                 _blurBrush = null;
                 _blurVisual = null;
                 _blurEffect = null;
@@ -442,7 +442,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not measure the collapsing header - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not measure the collapsing header", ex);
             }
         }
 
@@ -542,7 +542,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not follow the window width - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not follow the window width", ex);
             }
         }
 
@@ -593,7 +593,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not size the list footer - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not size the list footer", ex);
             }
         }
 
@@ -619,7 +619,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not update the header's input - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not update the header's input", ex);
             }
         }
 
@@ -662,7 +662,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not keep the header pinned - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not keep the header pinned", ex);
             }
         }
 
@@ -675,7 +675,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not scroll back to the top - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not scroll back to the top", ex);
             }
         }
     }

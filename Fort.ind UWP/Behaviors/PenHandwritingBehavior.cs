@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Microsoft.Xaml.Interactivity;
 using Windows.Devices.Input;
 using Windows.UI.Xaml;
@@ -39,7 +38,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not attach - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not attach", ex);
             }
         }
 
@@ -57,7 +56,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not attach - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not attach", ex);
             }
         }
 
@@ -73,7 +72,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not detach - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not detach", ex);
             }
 
             base.OnDetaching();
@@ -88,7 +87,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not sync on load - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not sync on load", ex);
             }
         }
 
@@ -102,7 +101,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not sync on pointer - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not sync on pointer", ex);
             }
         }
 
@@ -114,7 +113,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not open the ink layer - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not open the ink layer", ex);
             }
         }
 
@@ -140,7 +139,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not sync on focus - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not sync on focus", ex);
             }
         }
 
@@ -218,7 +217,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not apply the handwriting font - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not apply the handwriting font", ex);
             }
         }
 
@@ -230,7 +229,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not restore the font - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not restore the font", ex);
             }
         }
 
@@ -242,7 +241,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"PenHandwritingBehavior: could not follow the handwriting view - {ex.Message}");
+                AppLog.Error("PenHandwritingBehavior: could not follow the handwriting view", ex);
             }
         }
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Windows.Globalization.DateTimeFormatting;
@@ -126,7 +125,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileDetails: could not watch high contrast - {ex.Message}");
+                AppLog.Error("SocialProfileDetails: could not watch high contrast", ex);
             }
         }
 
@@ -150,13 +149,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialProfileDetails: could not repaint the role tags - {ex.Message}");
+                        AppLog.Error("SocialProfileDetails: could not repaint the role tags", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileDetails: high contrast handler failed - {ex.Message}");
+                AppLog.Error("SocialProfileDetails: high contrast handler failed", ex);
             }
         }
 
@@ -371,7 +370,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileDetails: could not format a birthday - {ex.Message}");
+                AppLog.Error("SocialProfileDetails: could not format a birthday", ex);
                 return null;
             }
         }

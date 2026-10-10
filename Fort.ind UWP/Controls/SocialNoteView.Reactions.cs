@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Controls;
@@ -94,7 +93,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not count the hidden reactions - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not count the hidden reactions", ex);
             }
         }
 
@@ -125,7 +124,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not open the reactions - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not open the reactions", ex);
             }
         }
     }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
@@ -57,7 +56,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"DialogService: no view on this thread, using the shared gate - {ex.Message}");
+                AppLog.Error("DialogService: no view on this thread, using the shared gate", ex);
                 return UnknownViewId;
             }
         }
@@ -182,7 +181,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"DialogService: dialog failed - {ex.Message}");
+                AppLog.Error("DialogService: dialog failed", ex);
                 return false;
             }
             finally

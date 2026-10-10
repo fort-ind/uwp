@@ -177,7 +177,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialRecipientBox: search failed - {ex.Message}");
+                AppLog.Error("SocialRecipientBox: search failed", ex);
             }
         }
 

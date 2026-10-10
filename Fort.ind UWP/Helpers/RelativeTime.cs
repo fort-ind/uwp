@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.Globalization.DateTimeFormatting;
 
 namespace Fort.ind_UWP
@@ -49,7 +48,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"RelativeTime: could not format a full timestamp - {ex.Message}");
+                AppLog.Error("RelativeTime: could not format a full timestamp", ex);
                 return "";
             }
         }
@@ -64,7 +63,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"RelativeTime: could not format a date - {ex.Message}");
+                AppLog.Error("RelativeTime: could not format a date", ex);
                 return "";
             }
         }

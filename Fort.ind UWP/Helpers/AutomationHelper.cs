@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation.Peers;
 
@@ -24,7 +23,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AutomationHelper: notification failed - {ex.Message}");
+                AppLog.Error("AutomationHelper: notification failed", ex);
             }
         }
 
@@ -41,7 +40,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"AutomationHelper: live region event failed - {ex.Message}");
+                AppLog.Error("AutomationHelper: live region event failed", ex);
             }
         }
     }

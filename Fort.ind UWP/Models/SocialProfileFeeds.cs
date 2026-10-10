@@ -83,7 +83,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileFeeds: could not cancel the previous loads - {ex.Message}");
+                AppLog.Error("SocialProfileFeeds: could not cancel the previous loads", ex);
             }
             _cancellation = new CancellationTokenSource();
 
@@ -324,7 +324,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileFeeds: could not cancel pending loads - {ex.Message}");
+                AppLog.Error("SocialProfileFeeds: could not cancel pending loads", ex);
             }
 
             foreach (var feed in _feeds)
@@ -359,7 +359,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileFeeds: notes load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileFeeds: notes load failed", ex);
                 if (version == feed.Version && !_released) SetState(feed, SocialFeedState.Failed);
             }
         }
@@ -404,7 +404,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileFeeds: favorites load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileFeeds: favorites load failed", ex);
                 if (version == feed.Version && !_released) SetState(feed, SocialFeedState.Failed);
             }
         }

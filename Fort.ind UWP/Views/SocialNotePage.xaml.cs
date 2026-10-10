@@ -122,7 +122,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not restore the reply - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not restore the reply", ex);
             }
         }
 
@@ -135,7 +135,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not focus the reply box - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not focus the reply box", ex);
             }
         }
 
@@ -162,7 +162,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not keep the reply draft - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not keep the reply draft", ex);
             }
         }
 
@@ -188,7 +188,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not reset the reply box - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not reset the reply box", ex);
             }
         }
 
@@ -220,7 +220,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not show the note - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotePage: could not show the note", ex);
             }
         }
 
@@ -239,7 +239,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not return to the profile - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not return to the profile", ex);
             }
         }
 
@@ -258,7 +258,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not keep the reply draft - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not keep the reply draft", ex);
             }
 
             try
@@ -268,7 +268,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not cancel pending loads - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not cancel pending loads", ex);
             }
 
             if (_watch != null)
@@ -309,7 +309,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not watch note changes - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not watch note changes", ex);
             }
         }
 
@@ -334,7 +334,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not leave - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not leave", ex);
             }
         }
 
@@ -396,7 +396,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not follow the note's changes - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not follow the note's changes", ex);
             }
         }
 
@@ -492,7 +492,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: note load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotePage: note load failed", ex);
                 if (version == _noteVersion && !IsReleased)
                 {
                     AncestorsLoading.Visibility = Visibility.Collapsed;
@@ -528,7 +528,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: retry failed - {ex.Message}");
+                AppLog.Error("SocialNotePage: retry failed", ex);
             }
         }
 
@@ -560,7 +560,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not keep the note in view - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not keep the note in view", ex);
             }
         }
 
@@ -582,7 +582,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: refresh failed - {ex.Message}");
+                AppLog.Error("SocialNotePage: refresh failed", ex);
             }
         }
 
@@ -691,7 +691,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: replies load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotePage: replies load failed", ex);
                 if (version == feed.Version && !IsReleased) SetFeedState(feed, SocialThreadTab.Replies, ListState.Failed);
             }
         }
@@ -909,7 +909,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not filter the reactions - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not filter the reactions", ex);
             }
         }
 
@@ -996,7 +996,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: list load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialNotePage: list load failed", ex);
                 if (version == feed.Version && !IsReleased) SetFeedState(feed, tab, ListState.Failed);
             }
         }
@@ -1067,7 +1067,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: retry failed - {ex.Message}");
+                AppLog.Error("SocialNotePage: retry failed", ex);
             }
         }
 
@@ -1095,7 +1095,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not open the item - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not open the item", ex);
             }
         }
 
@@ -1124,13 +1124,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialNotePage: could not show a note change - {ex.Message}");
+                        AppLog.Error("SocialNotePage: could not show a note change", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: note change handler failed - {ex.Message}");
+                AppLog.Error("SocialNotePage: note change handler failed", ex);
             }
         }
 
@@ -1223,7 +1223,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNotePage: could not insert a live reply - {ex.Message}");
+                AppLog.Error("SocialNotePage: could not insert a live reply", ex);
             }
             finally
             {

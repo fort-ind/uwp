@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml;
@@ -42,7 +41,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Reset welcome failed - {ex.Message}");
+                AppLog.Error("MainPage: Reset welcome failed", ex);
             }
         }
     }

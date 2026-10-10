@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Storage.Streams;
+using Windows.Web;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 
@@ -17,6 +18,8 @@ namespace Fort.ind_UWP
         PermissionDenied,
         TokenRejected,
         Refused,
+        Unreachable,
+        RateLimited,
         Failed
     }
 
@@ -185,7 +188,36 @@ namespace Fort.ind_UWP
 
         private static readonly TimeSpan UploadTimeout = TimeSpan.FromMinutes(5);
 
+        private static readonly TimeSpan DownloadTimeout = TimeSpan.FromMinutes(2);
+
+        private const string RateLimitCode = "RATE_LIMIT_EXCEEDED";
+
+        private const string RateLimitClearHeader = "X-RateLimit-Clear";
+
+        private static readonly TimeSpan DefaultHoldOff = TimeSpan.FromSeconds(5);
+
+        private static readonly TimeSpan MinimumHoldOff = TimeSpan.FromSeconds(1);
+
+        private static readonly TimeSpan MaximumHoldOff = TimeSpan.FromMinutes(2);
+
+        private static readonly object s_holdOffGate = new object();
+
+        private static readonly Dictionary<string, DateTime> s_heldOffUntil = new Dictionary<string, DateTime>(StringComparer.Ordinal);
+
         private static readonly Lazy<HttpClient> s_client = new Lazy<HttpClient>(CreateClient);
+
+        public static string ConnectionMessageKey(SocialApiStatus status)
+        {
+            switch (status)
+            {
+                case SocialApiStatus.Unreachable:
+                    return "SocialErrorUnreachable";
+                case SocialApiStatus.RateLimited:
+                    return "SocialErrorRateLimited";
+                default:
+                    return null;
+            }
+        }
 
         private static HttpClient CreateClient()
         {
@@ -208,10 +240,27 @@ namespace Fort.ind_UWP
 
         public static async Task<IBuffer> DownloadMediaAsync(Uri uri, CancellationToken cancellationToken)
         {
-            using (var response = await s_client.Value.GetAsync(uri).AsTask(cancellationToken))
+            try
             {
-                if (!response.IsSuccessStatusCode) return null;
-                return await response.Content.ReadAsBufferAsync().AsTask(cancellationToken);
+                using (var timeout = new CancellationTokenSource(DownloadTimeout))
+                using (var linked = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, cancellationToken))
+                using (var response = await s_client.Value.GetAsync(uri).AsTask(linked.Token))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        AppLog.Warning($"SocialApiService: a media download answered {(int)response.StatusCode}");
+                        return null;
+                    }
+
+                    return await response.Content.ReadAsBufferAsync().AsTask(linked.Token);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (cancellationToken.IsCancellationRequested) throw;
+
+                AppLog.Error("SocialApiService: a media download failed", ex);
+                return null;
             }
         }
 
@@ -1015,49 +1064,119 @@ namespace Fort.ind_UWP
                                                                                TimeSpan deadline, IProgress<HttpProgress> progress,
                                                                                CancellationToken cancellationToken)
         {
+            if (IsHeldOff(endpoint))
+            {
+                AppLog.Warning($"SocialApiService: {endpoint} not sent; fort.social asked to wait");
+                return SocialApiResult<IJsonValue>.Failed(SocialApiStatus.RateLimited, RateLimitCode);
+            }
+
+            using (var timeout = new CancellationTokenSource(deadline))
+            {
+                try
+                {
+                    using (var linked = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, cancellationToken))
+                    using (var content = contentFactory == null ? null : contentFactory())
+                    using (var response = content == null
+                                          ? await s_client.Value.GetAsync(uri).AsTask(linked.Token)
+                                          : progress == null
+                                            ? await s_client.Value.PostAsync(uri, content).AsTask(linked.Token)
+                                            : await s_client.Value.PostAsync(uri, content).AsTask(linked.Token, progress))
+                    {
+                        var text = await response.Content.ReadAsStringAsync().AsTask(linked.Token);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            var errorCode = ReadErrorCode(text);
+                            var status = ClassifyFailure((int)response.StatusCode, errorCode);
+                            if (status == SocialApiStatus.RateLimited) HoldOff(endpoint, RetryDelay(response));
+
+                            AppLog.Warning($"SocialApiService: {endpoint} answered {(int)response.StatusCode} {errorCode} ({status})");
+                            return SocialApiResult<IJsonValue>.Failed(status, errorCode);
+                        }
+
+                        if (string.IsNullOrWhiteSpace(text))
+                        {
+                            return SocialApiResult<IJsonValue>.Succeeded(JsonValue.CreateNullValue());
+                        }
+
+                        JsonValue parsed;
+                        if (!JsonValue.TryParse(text, out parsed))
+                        {
+                            AppLog.Warning($"SocialApiService: {endpoint} returned something that is not JSON");
+                            return SocialApiResult<IJsonValue>.Failed(SocialApiStatus.Failed);
+                        }
+
+                        return SocialApiResult<IJsonValue>.Succeeded(parsed);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (cancellationToken.IsCancellationRequested) throw;
+
+                    var status = timeout.IsCancellationRequested || WebError.GetStatus(ex.HResult) != WebErrorStatus.Unknown
+                                 ? SocialApiStatus.Unreachable
+                                 : SocialApiStatus.Failed;
+                    AppLog.Error($"SocialApiService: {endpoint} failed ({status})", ex);
+                    return SocialApiResult<IJsonValue>.Failed(status);
+                }
+            }
+        }
+
+        private static bool IsHeldOff(string endpoint)
+        {
+            lock (s_holdOffGate)
+            {
+                DateTime until;
+                if (!s_heldOffUntil.TryGetValue(endpoint, out until)) return false;
+                if (DateTime.UtcNow < until) return true;
+
+                s_heldOffUntil.Remove(endpoint);
+                return false;
+            }
+        }
+
+        private static void HoldOff(string endpoint, TimeSpan delay)
+        {
+            lock (s_holdOffGate)
+            {
+                s_heldOffUntil[endpoint] = DateTime.UtcNow + delay;
+            }
+        }
+
+        private static TimeSpan RetryDelay(HttpResponseMessage response)
+        {
+            TimeSpan? delay = null;
             try
             {
-                using (var timeout = new CancellationTokenSource(deadline))
-                using (var linked = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, cancellationToken))
-                using (var content = contentFactory == null ? null : contentFactory())
-                using (var response = content == null
-                                      ? await s_client.Value.GetAsync(uri).AsTask(linked.Token)
-                                      : progress == null
-                                        ? await s_client.Value.PostAsync(uri, content).AsTask(linked.Token)
-                                        : await s_client.Value.PostAsync(uri, content).AsTask(linked.Token, progress))
+                var retryAfter = response.Headers.RetryAfter;
+                if (retryAfter != null && retryAfter.Delta.HasValue)
                 {
-                    var text = await response.Content.ReadAsStringAsync().AsTask(linked.Token);
+                    delay = retryAfter.Delta.Value;
+                }
+                else if (retryAfter != null && retryAfter.Date.HasValue)
+                {
+                    delay = retryAfter.Date.Value - DateTimeOffset.UtcNow;
+                }
 
-                    if (!response.IsSuccessStatusCode)
+                if (delay == null)
+                {
+                    var clear = response.Headers.FirstOrDefault(header => string.Equals(header.Key, RateLimitClearHeader,
+                                                                                        StringComparison.OrdinalIgnoreCase)).Value;
+                    double seconds;
+                    if (clear != null && double.TryParse(clear, NumberStyles.Float, CultureInfo.InvariantCulture, out seconds))
                     {
-                        var errorCode = ReadErrorCode(text);
-                        var status = ClassifyFailure((int)response.StatusCode, errorCode);
-                        Debug.WriteLine($"SocialApiService: {endpoint} answered {(int)response.StatusCode} {errorCode} ({status})");
-                        return SocialApiResult<IJsonValue>.Failed(status, errorCode);
+                        delay = TimeSpan.FromSeconds(seconds);
                     }
-
-                    if (string.IsNullOrWhiteSpace(text))
-                    {
-                        return SocialApiResult<IJsonValue>.Succeeded(JsonValue.CreateNullValue());
-                    }
-
-                    JsonValue parsed;
-                    if (!JsonValue.TryParse(text, out parsed))
-                    {
-                        Debug.WriteLine($"SocialApiService: {endpoint} returned something that is not JSON");
-                        return SocialApiResult<IJsonValue>.Failed(SocialApiStatus.Failed);
-                    }
-
-                    return SocialApiResult<IJsonValue>.Succeeded(parsed);
                 }
             }
             catch (Exception ex)
             {
-                if (cancellationToken.IsCancellationRequested) throw;
-
-                Debug.WriteLine($"SocialApiService: {endpoint} failed - {ex.GetType().Name}: {ex.Message}");
-                return SocialApiResult<IJsonValue>.Failed(SocialApiStatus.Failed);
+                AppLog.Error("SocialApiService: could not read the rate limit headers", ex);
             }
+
+            if (delay == null) return DefaultHoldOff;
+            if (delay.Value < MinimumHoldOff) return MinimumHoldOff;
+            return delay.Value > MaximumHoldOff ? MaximumHoldOff : delay.Value;
         }
 
         private static string ReadErrorCode(string body)
@@ -1071,6 +1190,7 @@ namespace Fort.ind_UWP
         private static SocialApiStatus ClassifyFailure(int statusCode, string errorCode)
         {
             if (statusCode == 401) return SocialApiStatus.TokenRejected;
+            if (statusCode == 429) return SocialApiStatus.RateLimited;
             if (statusCode == 400 || statusCode == 404 || statusCode == 422) return SocialApiStatus.Refused;
             if (statusCode != 403) return SocialApiStatus.Failed;
 

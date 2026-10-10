@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -55,7 +54,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserPage: could not show the profile - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialUserPage: could not show the profile", ex);
             }
         }
 
@@ -117,7 +116,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserPage: could not open the follow list - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialUserPage: could not open the follow list", ex);
             }
         }
     }

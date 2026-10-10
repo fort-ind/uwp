@@ -110,7 +110,7 @@ namespace Fort.ind_UWP
             {
                 var status = WebSocketError.GetStatus(ex.HResult);
                 Unauthorized = status == WebErrorStatus.Unauthorized || status == WebErrorStatus.Forbidden;
-                Debug.WriteLine($"SocialStream: connect failed - {status} {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error($"SocialStream: connect failed - {status}", ex);
                 Dispose();
                 return false;
             }
@@ -133,7 +133,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: send failed - {WebSocketError.GetStatus(ex.HResult)} {ex.Message}");
+                AppLog.Error($"SocialStream: send failed - {WebSocketError.GetStatus(ex.HResult)}", ex);
                 Dispose();
                 return false;
             }
@@ -175,7 +175,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: read failed - {WebSocketError.GetStatus(ex.HResult)} {ex.Message}");
+                AppLog.Error($"SocialStream: read failed - {WebSocketError.GetStatus(ex.HResult)}", ex);
                 Dispose();
                 return;
             }
@@ -210,7 +210,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: message handling failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialStream: message handling failed", ex);
             }
         }
 
@@ -222,7 +222,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: could not read why the socket closed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialStream: could not read why the socket closed", ex);
             }
 
             Dispose();
@@ -247,7 +247,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: a close handler failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialStream: a close handler failed", ex);
             }
         }
 
@@ -260,7 +260,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: could not detach from the socket - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialStream: could not detach from the socket", ex);
             }
 
             try
@@ -269,7 +269,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: close failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialStream: close failed", ex);
             }
 
             try
@@ -278,7 +278,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialStream: dispose failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialStream: dispose failed", ex);
             }
         }
     }

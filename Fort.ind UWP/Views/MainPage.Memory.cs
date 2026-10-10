@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -84,7 +83,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not unload {page.GetType().Name} - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error($"MainPage: could not unload {page.GetType().Name}", ex);
             }
         }
 
@@ -117,13 +116,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"MainPage: memory trim failed - {ex.Message}");
+                        AppLog.Error("MainPage: memory trim failed", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: memory trim handler failed - {ex.Message}");
+                AppLog.Error("MainPage: memory trim handler failed", ex);
             }
         }
     }

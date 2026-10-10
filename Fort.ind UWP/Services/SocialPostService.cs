@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -252,7 +251,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPostService: posting failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialPostService: posting failed", ex);
                 result = SocialApiResult<SocialNote>.Failed(SocialApiStatus.Failed);
             }
 
@@ -272,17 +271,22 @@ namespace Fort.ind_UWP
                                                      LocalizedStrings.Get(draft.EditId != null ? "SocialPostEditFailedTitle"
                                                                           : draft.ReplyId != null ? "SocialPostReplyFailedTitle"
                                                                           : "SocialPostFailedTitle"),
-                                                     MessageFor(result.ErrorCode),
+                                                     MessageFor(result.Status, result.ErrorCode),
                                                      LocalizedStrings.Get("DialogOk"));
             }
 
             return new SocialPostResult(null, result.Status, result.ErrorCode);
         }
 
-        public static string MessageFor(string errorCode)
+        public static string MessageFor(SocialApiStatus status, string errorCode)
         {
             string key;
-            if (errorCode == null || !s_errorMessages.TryGetValue(errorCode, out key)) key = "SocialPostErrorGeneric";
+            if (errorCode == null || !s_errorMessages.TryGetValue(errorCode, out key))
+            {
+                key = status == SocialApiStatus.Unreachable ? "SocialPostErrorUnreachable"
+                      : status == SocialApiStatus.RateLimited ? "SocialPostErrorRateLimited"
+                      : "SocialPostErrorGeneric";
+            }
 
             return LocalizedStrings.Get(key);
         }
@@ -324,7 +328,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialPostService: could not resolve a mention - {ex.Message}");
+                    AppLog.Error("SocialPostService: could not resolve a mention", ex);
                 }
             }
 

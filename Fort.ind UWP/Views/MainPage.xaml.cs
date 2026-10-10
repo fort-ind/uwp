@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -134,7 +133,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to load sitemap items - {ex.Message}");
+                AppLog.Error("MainPage: Failed to load sitemap items", ex);
             }
             finally
             {
@@ -179,7 +178,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MainPage: Failed to remove title bar handlers - {ex.Message}");
+                    AppLog.Error("MainPage: Failed to remove title bar handlers", ex);
                 }
                 _titleBarHandlersAttached = false;
             }
@@ -198,7 +197,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MainPage: Failed to remove system back handler - {ex.Message}");
+                    AppLog.Error("MainPage: Failed to remove system back handler", ex);
                 }
                 _systemBackHandlerAttached = false;
             }
@@ -211,7 +210,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MainPage: Failed to remove mouse back handler - {ex.Message}");
+                    AppLog.Error("MainPage: Failed to remove mouse back handler", ex);
                 }
                 _mouseBackHandlerAttached = false;
             }

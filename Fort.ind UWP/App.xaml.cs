@@ -14,11 +14,23 @@ namespace Fort.ind_UWP
     {
         public App()
         {
+            this.UnhandledException += OnUnhandledException;
+            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
             this.InitializeComponent();
             this.Suspending += OnSuspending;
             this.Resuming += OnResuming;
             this.EnteredBackground += OnEnteredBackground;
             MemoryService.Initialize();
+        }
+
+        private void OnUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            AppLog.Crash("App: unhandled exception - " + e.Message, e.Exception);
+        }
+
+        private static void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            AppLog.Error("App: a task's exception was never observed", e.Exception);
         }
 
         private void OnEnteredBackground(object sender, EnteredBackgroundEventArgs e)
@@ -29,7 +41,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: background memory trim failed - {ex.Message}");
+                AppLog.Error("App: background memory trim failed", ex);
             }
         }
 
@@ -108,7 +120,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Critical: OnLaunched failed - {ex}");
+                AppLog.Error("Critical: OnLaunched failed", ex);
                 showStartupErrorDialog = true;
             }
 
@@ -126,7 +138,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Critical: startup error dialog failed - {ex.Message}");
+                    AppLog.Error("Critical: startup error dialog failed", ex);
                 }
             }
         }
@@ -147,7 +159,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: Failed to apply saved theme - {ex.Message}");
+                AppLog.Error("App: Failed to apply saved theme", ex);
             }
         }
 
@@ -170,7 +182,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: background session restore failed - {ex.Message}");
+                AppLog.Error("App: background session restore failed", ex);
             }
         }
 
@@ -185,7 +197,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: could not open the composer from the jump list - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("App: could not open the composer from the jump list", ex);
             }
         }
 
@@ -216,7 +228,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: background activation failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("App: background activation failed", ex);
             }
         }
 
@@ -238,7 +250,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: share activation failed - {ex}");
+                AppLog.Error("App: share activation failed", ex);
             }
         }
 
@@ -294,7 +306,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: could not read the toast arguments - {ex.Message}");
+                AppLog.Error("App: could not read the toast arguments", ex);
                 return null;
             }
         }
@@ -328,7 +340,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: could not open the toast's note - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("App: could not open the toast's note", ex);
             }
         }
 
@@ -348,7 +360,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: could not launch the pinned game - {ex.Message}");
+                AppLog.Error("App: could not launch the pinned game", ex);
             }
         }
 
@@ -443,7 +455,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"OnActivated failed: {ex.Message}");
+                AppLog.Error("OnActivated failed", ex);
             }
         }
 
@@ -462,7 +474,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: could not report the sign-in failure - {ex.Message}");
+                AppLog.Error("App: could not report the sign-in failure", ex);
             }
         }
 
@@ -472,7 +484,7 @@ namespace Fort.ind_UWP
 
             try
             {
-                Debug.WriteLine($"Navigation failed: {e.SourcePageType.FullName} - {(e.Exception != null ? e.Exception.Message : "Unknown error")}");
+                AppLog.Error($"App: navigation to {e.SourcePageType.FullName} failed", e.Exception);
 
                 await DialogService.ShowMessageAsync(Window.Current.Content,
                                                      LocalizedStrings.Get("NavigationErrorDialogTitle"),
@@ -481,7 +493,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error dialog failed: {ex.Message}");
+                AppLog.Error("Error dialog failed", ex);
             }
         }
 
@@ -501,7 +513,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: suspend badge update failed - {ex.Message}");
+                AppLog.Error("App: suspend badge update failed", ex);
             }
             finally
             {
@@ -523,7 +535,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"App: resume badge clear failed - {ex.Message}");
+                AppLog.Error("App: resume badge clear failed", ex);
             }
         }
     }

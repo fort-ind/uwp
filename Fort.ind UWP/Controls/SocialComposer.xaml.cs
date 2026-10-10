@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -140,7 +139,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not show the avatar - {ex.Message}");
+                AppLog.Error("SocialComposer: could not show the avatar", ex);
             }
         }
 
@@ -229,7 +228,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not show the avatar - {ex.Message}");
+                AppLog.Error("SocialComposer: could not show the avatar", ex);
             }
         }
 
@@ -304,7 +303,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not load the recipients - {ex.Message}");
+                AppLog.Error("SocialComposer: could not load the recipients", ex);
             }
             finally
             {
@@ -389,7 +388,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not collapse the reply box - {ex.Message}");
+                AppLog.Error("SocialComposer: could not collapse the reply box", ex);
             }
         }
 
@@ -435,7 +434,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: change notification failed - {ex.Message}");
+                AppLog.Error("SocialComposer: change notification failed", ex);
             }
         }
 
@@ -462,7 +461,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not add the mentioned people - {ex.Message}");
+                AppLog.Error("SocialComposer: could not add the mentioned people", ex);
             }
         }
 
@@ -517,7 +516,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: posting failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposer: posting failed", ex);
                 SetPosting(false);
             }
         }
@@ -726,7 +725,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not show the quoted note - {ex.Message}");
+                AppLog.Error("SocialComposer: could not show the quoted note", ex);
             }
         }
 
@@ -748,7 +747,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not open the emoji picker - {ex.Message}");
+                AppLog.Error("SocialComposer: could not open the emoji picker", ex);
             }
         }
 
@@ -795,7 +794,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: discard failed - {ex.Message}");
+                AppLog.Error("SocialComposer: discard failed", ex);
             }
         }
 
@@ -816,7 +815,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not collapse the reply box - {ex.Message}");
+                AppLog.Error("SocialComposer: could not collapse the reply box", ex);
             }
         }
 

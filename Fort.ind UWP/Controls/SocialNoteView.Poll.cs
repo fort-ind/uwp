@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
@@ -251,7 +250,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not reveal the poll results - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not reveal the poll results", ex);
             }
         }
 
@@ -270,7 +269,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: could not select a poll choice - {ex.Message}");
+                AppLog.Error("SocialNoteView: could not select a poll choice", ex);
             }
         }
 
@@ -298,7 +297,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialNoteView: vote failed - {ex.Message}");
+                AppLog.Error("SocialNoteView: vote failed", ex);
             }
         }
     }

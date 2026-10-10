@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -152,7 +151,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMenus: could not check the renote - {ex.Message}");
+                AppLog.Error("SocialMenus: could not check the renote", ex);
             }
         }
 
@@ -201,7 +200,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMenus: could not read the note's state - {ex.Message}");
+                AppLog.Error("SocialMenus: could not read the note's state", ex);
             }
         }
 
@@ -261,7 +260,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMenus: could not read the pinned notes - {ex.Message}");
+                AppLog.Error("SocialMenus: could not read the pinned notes", ex);
             }
         }
 
@@ -344,7 +343,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMenus: could not read the relation - {ex.Message}");
+                AppLog.Error("SocialMenus: could not read the relation", ex);
             }
         }
 
@@ -459,7 +458,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMenus: could not open the profile - {ex.Message}");
+                AppLog.Error("SocialMenus: could not open the profile", ex);
             }
         }
 
@@ -490,7 +489,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMenus: a menu command failed - {ex.Message}");
+                AppLog.Error("SocialMenus: a menu command failed", ex);
             }
         }
 
@@ -523,7 +522,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialMenus: filling the share request failed - {ex.Message}");
+                    AppLog.Error("SocialMenus: filling the share request failed", ex);
                 }
             };
 
@@ -535,7 +534,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 manager.DataRequested -= handler;
-                Debug.WriteLine($"SocialMenus: could not show the share UI - {ex.Message}");
+                AppLog.Error("SocialMenus: could not show the share UI", ex);
             }
         }
     }

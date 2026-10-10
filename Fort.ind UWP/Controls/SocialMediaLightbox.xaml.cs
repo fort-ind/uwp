@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Graphics.Display;
@@ -160,7 +159,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMediaLightbox: could not detach from the window - {ex.Message}");
+                AppLog.Error("SocialMediaLightbox: could not detach from the window", ex);
             }
 
             CancelPendingOpen();
@@ -181,7 +180,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMediaLightbox: close animation failed - {ex.Message}");
+                AppLog.Error("SocialMediaLightbox: close animation failed", ex);
                 Finish();
             }
         }
@@ -229,7 +228,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMediaLightbox: could not close - {ex.Message}");
+                AppLog.Error("SocialMediaLightbox: could not close", ex);
             }
 
             _owner = null;
@@ -248,7 +247,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMediaLightbox: could not cancel the open animation - {ex.Message}");
+                AppLog.Error("SocialMediaLightbox: could not cancel the open animation", ex);
             }
         }
 
@@ -280,7 +279,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMediaLightbox: could not finish opening - {ex.Message}");
+                AppLog.Error("SocialMediaLightbox: could not finish opening", ex);
             }
         }
 
@@ -326,7 +325,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMediaLightbox: could not follow the window size - {ex.Message}");
+                AppLog.Error("SocialMediaLightbox: could not follow the window size", ex);
             }
         }
 
@@ -356,7 +355,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialMediaLightbox: could not switch images - {ex.Message}");
+                AppLog.Error("SocialMediaLightbox: could not switch images", ex);
             }
         }
 
@@ -629,7 +628,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialMediaLightbox: could not read the screen size - {ex.Message}");
+                    AppLog.Error("SocialMediaLightbox: could not read the screen size", ex);
                     return 0;
                 }
             }
@@ -645,7 +644,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialMediaLightbox: could not follow the zoom - {ex.Message}");
+                    AppLog.Error("SocialMediaLightbox: could not follow the zoom", ex);
                 }
             }
 
@@ -677,7 +676,7 @@ namespace Fort.ind_UWP
 
             private void Detail_ImageFailed(object sender, ExceptionRoutedEventArgs e)
             {
-                Debug.WriteLine($"SocialMediaLightbox: full-size image failed - {e.ErrorMessage}");
+                AppLog.Warning($"SocialMediaLightbox: full-size image failed - {e.ErrorMessage}");
                 DropDetail();
             }
 
@@ -691,7 +690,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialMediaLightbox: image layout failed - {ex.Message}");
+                    AppLog.Error("SocialMediaLightbox: image layout failed", ex);
                 }
             }
 
@@ -747,7 +746,7 @@ namespace Fort.ind_UWP
 
             private void Bitmap_ImageFailed(object sender, ExceptionRoutedEventArgs e)
             {
-                Debug.WriteLine($"SocialMediaLightbox: image failed - {e.ErrorMessage}");
+                AppLog.Warning($"SocialMediaLightbox: image failed - {e.ErrorMessage}");
 
                 var fallback = _usedFallback ? null : WebLauncher.TryCreateFetchUri(File.ThumbnailUrl);
                 if (fallback != null)
@@ -812,7 +811,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialMediaLightbox: could not open the image - {ex.Message}");
+                    AppLog.Error("SocialMediaLightbox: could not open the image", ex);
                 }
             }
 
@@ -834,7 +833,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialMediaLightbox: style {key} unavailable - {ex.Message}");
+                    AppLog.Error($"SocialMediaLightbox: style {key} unavailable", ex);
                     return null;
                 }
             }

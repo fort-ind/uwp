@@ -26,7 +26,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Focus search accelerator failed - {ex.Message}");
+                AppLog.Error("MainPage: Focus search accelerator failed", ex);
             }
         }
 
@@ -43,7 +43,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Clear search accelerator failed - {ex.Message}");
+                AppLog.Error("MainPage: Clear search accelerator failed", ex);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not search what was written - {ex.Message}");
+                AppLog.Error("MainPage: could not search what was written", ex);
             }
         }
 
@@ -108,7 +108,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Debounced search failed – {ex.Message}");
+                AppLog.Error("MainPage: Debounced search failed", ex);
             }
         }
 
@@ -156,7 +156,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Search query failed – {ex.Message}");
+                AppLog.Error("MainPage: Search query failed", ex);
             }
         }
 

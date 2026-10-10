@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using Microsoft.Xaml.Interactivity;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -37,7 +36,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFeedListBehavior: Failed to attach - {ex.Message}");
+                AppLog.Error("SocialFeedListBehavior: Failed to attach", ex);
             }
         }
 
@@ -57,7 +56,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFeedListBehavior: Failed to detach - {ex.Message}");
+                AppLog.Error("SocialFeedListBehavior: Failed to detach", ex);
             }
 
             base.OnDetaching();
@@ -77,7 +76,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFeedListBehavior: Failed to follow the list's items - {ex.Message}");
+                AppLog.Error("SocialFeedListBehavior: Failed to follow the list's items", ex);
             }
         }
 
@@ -90,7 +89,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFeedListBehavior: Failed to sync on load - {ex.Message}");
+                AppLog.Error("SocialFeedListBehavior: Failed to sync on load", ex);
             }
         }
 
@@ -114,7 +113,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFeedListBehavior: Failed to show Back to newest - {ex.Message}");
+                AppLog.Error("SocialFeedListBehavior: Failed to show Back to newest", ex);
             }
         }
 

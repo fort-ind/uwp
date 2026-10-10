@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.ApplicationModel.Resources;
 using Windows.UI.Core;
 
@@ -25,7 +24,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"LocalizedStrings: could not open the resource loader - {ex.Message}");
+                    AppLog.Error("LocalizedStrings: could not open the resource loader", ex);
                 }
 
                 return s_loader;
@@ -44,7 +43,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"LocalizedStrings: could not open the view-independent resource loader - {ex.Message}");
+                    AppLog.Error("LocalizedStrings: could not open the view-independent resource loader", ex);
                 }
 
                 return s_viewIndependentLoader;
@@ -68,7 +67,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LocalizedStrings: no resource for '{key}' - {ex.Message}");
+                AppLog.Error($"LocalizedStrings: no resource for '{key}'", ex);
                 return key;
             }
         }
@@ -86,7 +85,7 @@ namespace Fort.ind_UWP
             }
             catch (FormatException ex)
             {
-                Debug.WriteLine($"LocalizedStrings: '{key}' has malformed placeholders - {ex.Message}");
+                AppLog.Error($"LocalizedStrings: '{key}' has malformed placeholders", ex);
                 return pattern;
             }
         }

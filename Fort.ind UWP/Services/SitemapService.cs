@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,7 +77,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SitemapService: failed to load sitemap – {ex.Message}");
+                AppLog.Error("SitemapService: failed to load sitemap", ex);
             }
 
             return items;
@@ -120,7 +119,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SitemapService: XML parsing failed – {ex.Message}");
+                AppLog.Error("SitemapService: XML parsing failed", ex);
                 return null;
             }
 
@@ -198,7 +197,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SitemapService: could not remove the legacy URL cache – {ex.Message}");
+                AppLog.Error("SitemapService: could not remove the legacy URL cache", ex);
             }
         }
 

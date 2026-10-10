@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -16,7 +15,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not apply the saved appearance - {ex.Message}");
+                AppLog.Error("MainPage: could not apply the saved appearance", ex);
             }
         }
 
@@ -28,7 +27,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: OnActualThemeChanged failed - {ex.Message}");
+                AppLog.Error("MainPage: OnActualThemeChanged failed", ex);
             }
         }
 
@@ -40,7 +39,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: title bar repaint failed - {ex.Message}");
+                AppLog.Error("MainPage: title bar repaint failed", ex);
             }
         }
     }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Windows.Devices.Input;
 using Windows.UI.Core;
@@ -102,7 +101,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialHandwritingPad: could not refresh the input types - {ex.Message}");
+                AppLog.Error("SocialHandwritingPad: could not refresh the input types", ex);
             }
         }
 
@@ -168,7 +167,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialHandwritingPad: could not recognise the ink - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialHandwritingPad: could not recognise the ink", ex);
             }
             finally
             {
@@ -182,7 +181,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialHandwritingPad: could not finish the commit - {ex.Message}");
+                AppLog.Error("SocialHandwritingPad: could not finish the commit", ex);
             }
         }
 

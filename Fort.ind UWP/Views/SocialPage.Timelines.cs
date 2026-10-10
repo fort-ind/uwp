@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -125,7 +124,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialPage: {feed.Timeline} timeline load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error($"SocialPage: {feed.Timeline} timeline load failed", ex);
                 if (version != feed.Version) return true;
                 if (keepList) return false;
 

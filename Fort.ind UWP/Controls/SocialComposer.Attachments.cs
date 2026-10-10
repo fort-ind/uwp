@@ -71,7 +71,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not pick files - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposer: could not pick files", ex);
             }
         }
 
@@ -96,7 +96,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialComposer: could not read a file's size - {ex.Message}");
+                    AppLog.Error("SocialComposer: could not read a file's size", ex);
                 }
 
                 var item = SocialAttachmentItem.ForUpload(file.Name, file.ContentType, size, async () => await file.OpenReadAsync());
@@ -126,7 +126,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: no thumbnail for {file.Name} - {ex.Message}");
+                AppLog.Error($"SocialComposer: no thumbnail for {file.Name}", ex);
             }
         }
 
@@ -190,7 +190,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: upload failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposer: upload failed", ex);
                 Fail(item, "SocialAttachmentFailed");
             }
             finally
@@ -218,7 +218,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialComposer: could not cancel an upload - {ex.Message}");
+                    AppLog.Error("SocialComposer: could not cancel an upload", ex);
                 }
             }
         }
@@ -239,7 +239,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not cancel the upload - {ex.Message}");
+                AppLog.Error("SocialComposer: could not cancel the upload", ex);
             }
 
             _attachments.Remove(item);
@@ -325,7 +325,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not save the description - {ex.Message}");
+                AppLog.Error("SocialComposer: could not save the description", ex);
             }
             finally
             {
@@ -380,7 +380,8 @@ namespace Fort.ind_UWP
 
             await DialogService.ShowMessageAsync(this,
                                                  LocalizedStrings.Get("SocialAttachmentDescriptionFailedTitle"),
-                                                 LocalizedStrings.Get("SocialActionErrorGeneric"),
+                                                 LocalizedStrings.Get(SocialApiService.ConnectionMessageKey(result.Status)
+                                                                      ?? "SocialActionErrorGeneric"),
                                                  LocalizedStrings.Get("DialogOk"));
             return false;
         }
@@ -410,7 +411,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not read the clipboard - {ex.Message}");
+                AppLog.Error("SocialComposer: could not read the clipboard", ex);
             }
         }
 
@@ -423,7 +424,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not paste the files - {ex.Message}");
+                AppLog.Error("SocialComposer: could not paste the files", ex);
             }
         }
 
@@ -435,7 +436,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not paste the image - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposer: could not paste the image", ex);
             }
         }
 
@@ -506,7 +507,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: could not carry the description over - {ex.Message}");
+                AppLog.Error("SocialComposer: could not carry the description over", ex);
             }
         }
 
@@ -532,7 +533,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: drag over failed - {ex.Message}");
+                AppLog.Error("SocialComposer: drag over failed", ex);
             }
         }
 
@@ -559,7 +560,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposer: drop failed - {ex.Message}");
+                AppLog.Error("SocialComposer: drop failed", ex);
             }
         }
     }

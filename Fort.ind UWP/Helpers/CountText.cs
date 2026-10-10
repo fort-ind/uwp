@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.Globalization.NumberFormatting;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Documents;
@@ -27,7 +26,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"CountText: count formatting failed - {ex.Message}");
+                AppLog.Error("CountText: count formatting failed", ex);
                 return count.ToString(System.Globalization.CultureInfo.CurrentCulture);
             }
         }

@@ -51,7 +51,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error saving profile: {ex.Message}");
+                AppLog.Error("Error saving profile", ex);
                 return false;
             }
         }
@@ -75,7 +75,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading profile: {ex.Message}");
+                AppLog.Error("Error loading profile", ex);
                 return null;
             }
         }
@@ -91,7 +91,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error clearing profile: {ex.Message}");
+                AppLog.Error("Error clearing profile", ex);
             }
         }
 
@@ -120,13 +120,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error deleting {item.Name} during app reset: {ex.Message}");
+                        AppLog.Error($"Error deleting {item.Name} during app reset", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error enumerating local folder during app reset: {ex.Message}");
+                AppLog.Error("Error enumerating local folder during app reset", ex);
             }
 
             try
@@ -135,7 +135,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error clearing local settings during app reset: {ex.Message}");
+                AppLog.Error("Error clearing local settings during app reset", ex);
             }
         }
 
@@ -170,7 +170,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error resolving app folders for the footprint: {ex.Message}");
+                AppLog.Error("Error resolving app folders for the footprint", ex);
                 return Task.FromResult<long?>(null);
             }
 
@@ -209,7 +209,7 @@ namespace Fort.ind_UWP
                 {
                     if (ReferenceEquals(folder, rootFolder)) return null;
 
-                    Debug.WriteLine($"Footprint: skipped {folder.FullName} - {ex.Message}");
+                    AppLog.Error($"Footprint: skipped {folder.FullName}", ex);
                     continue;
                 }
 

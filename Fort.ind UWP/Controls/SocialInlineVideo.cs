@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.System;
@@ -161,7 +160,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: could not release the player - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: could not release the player", ex);
             }
 
             SetDisplayRequest(false);
@@ -187,7 +186,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialInlineVideo: could not move focus into the player - {ex.Message}");
+                    AppLog.Error("SocialInlineVideo: could not move focus into the player", ex);
                 }
             });
         }
@@ -205,7 +204,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: player layout failed - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: player layout failed", ex);
             }
         }
 
@@ -252,13 +251,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialInlineVideo: could not fit the video - {ex.Message}");
+                        AppLog.Error("SocialInlineVideo: could not fit the video", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: video size handler failed - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: video size handler failed", ex);
             }
         }
 
@@ -285,7 +284,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialInlineVideo: could not move focus into the full-window player - {ex.Message}");
+                    AppLog.Error("SocialInlineVideo: could not move focus into the full-window player", ex);
                 }
             });
         }
@@ -301,7 +300,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: could not leave full window - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: could not leave full window", ex);
                 return false;
             }
         }
@@ -331,7 +330,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: playback state handler failed - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: playback state handler failed", ex);
             }
         }
 
@@ -339,7 +338,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                Debug.WriteLine($"SocialInlineVideo: playback failed - {args.Error}: {args.ErrorMessage}");
+                AppLog.Warning($"SocialInlineVideo: playback failed - {args.Error}: {args.ErrorMessage}");
                 var ignored = _host.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     try
@@ -348,13 +347,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialInlineVideo: could not show the playback failure - {ex.Message}");
+                        AppLog.Error("SocialInlineVideo: could not show the playback failure", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: media failure handler failed - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: media failure handler failed", ex);
             }
         }
 
@@ -425,7 +424,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: could not open the video - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: could not open the video", ex);
             }
         }
 
@@ -449,7 +448,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: display request failed - {ex.Message}");
+                AppLog.Error("SocialInlineVideo: display request failed", ex);
             }
         }
 
@@ -481,7 +480,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialInlineVideo: style {key} unavailable - {ex.Message}");
+                AppLog.Error($"SocialInlineVideo: style {key} unavailable", ex);
                 return null;
             }
         }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -244,7 +243,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTileService: could not release the tile avatars - {ex.Message}");
+                AppLog.Error("SocialTileService: could not release the tile avatars", ex);
             }
         }
 
@@ -262,7 +261,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTileService: could not read the shown previews - {ex.Message}");
+                AppLog.Error("SocialTileService: could not read the shown previews", ex);
                 return null;
             }
         }
@@ -275,7 +274,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTileService: could not record the shown previews - {ex.Message}");
+                AppLog.Error("SocialTileService: could not record the shown previews", ex);
             }
         }
 
@@ -287,7 +286,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTileService: could not forget the shown previews - {ex.Message}");
+                AppLog.Error("SocialTileService: could not forget the shown previews", ex);
             }
         }
 
@@ -300,7 +299,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTileService: could not read {key} - {ex.Message}");
+                AppLog.Error($"SocialTileService: could not read {key}", ex);
                 return fallback;
             }
         }
@@ -313,7 +312,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialTileService: could not write {key} - {ex.Message}");
+                AppLog.Error($"SocialTileService: could not write {key}", ex);
             }
         }
     }

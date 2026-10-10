@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -83,13 +82,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialProfileEditor: could not show the profile - {ex.Message}");
+                        AppLog.Error("SocialProfileEditor: could not show the profile", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: auth state change handler failed - {ex.Message}");
+                AppLog.Error("SocialProfileEditor: auth state change handler failed", ex);
             }
         }
 
@@ -249,7 +248,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: save failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileEditor: save failed", ex);
             }
             finally
             {
@@ -303,7 +302,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: could not open sign-in - {ex.Message}");
+                AppLog.Error("SocialProfileEditor: could not open sign-in", ex);
             }
         }
 
@@ -348,7 +347,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileEditor: could not change a flag - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileEditor: could not change a flag", ex);
             }
             finally
             {

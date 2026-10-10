@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -129,7 +128,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: could not let go of the window's picker - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: could not let go of the window's picker", ex);
             }
         }
 
@@ -242,7 +241,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: could not show the emoji - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: could not show the emoji", ex);
                 _loading = null;
                 ShowMessage(LocalizedStrings.Get("SocialEmojiPickerFailed"));
             }
@@ -446,7 +445,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: could not jump to a category - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: could not jump to a category", ex);
             }
         }
 
@@ -495,7 +494,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: search failed - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: search failed", ex);
             }
         }
 
@@ -521,7 +520,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: search key failed - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: search key failed", ex);
             }
         }
 
@@ -543,7 +542,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: could not use the emoji - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: could not use the emoji", ex);
             }
         }
 
@@ -557,7 +556,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: like failed - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: like failed", ex);
             }
         }
 
@@ -571,7 +570,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: remove failed - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: remove failed", ex);
             }
         }
 
@@ -637,7 +636,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiPicker: could not change the skin tone - {ex.Message}");
+                AppLog.Error("SocialEmojiPicker: could not change the skin tone", ex);
             }
         }
     }

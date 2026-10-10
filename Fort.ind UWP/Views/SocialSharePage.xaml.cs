@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.ApplicationModel.DataTransfer.ShareTarget;
@@ -65,7 +64,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSharePage: could not set up the share window - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialSharePage: could not set up the share window", ex);
             }
         }
 
@@ -127,7 +126,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSharePage: could not open the share - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialSharePage: could not open the share", ex);
                 ShowMessage("SocialShareFailedTitle", "SocialShareFailedBody");
             }
         }
@@ -208,7 +207,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSharePage: could not report the data retrieved - {ex.Message}");
+                AppLog.Error("SocialSharePage: could not report the data retrieved", ex);
             }
         }
 
@@ -236,7 +235,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSharePage: could not complete the share - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialSharePage: could not complete the share", ex);
             }
         }
 
@@ -259,7 +258,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSharePage: could not close the share - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialSharePage: could not close the share", ex);
             }
         }
 
@@ -271,7 +270,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSharePage: could not repaint the share window - {ex.Message}");
+                AppLog.Error("SocialSharePage: could not repaint the share window", ex);
             }
         }
 
@@ -299,7 +298,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSharePage: could not let go of the share window - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialSharePage: could not let go of the share window", ex);
             }
         }
     }

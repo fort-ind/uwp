@@ -69,7 +69,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: could not show the list - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialUserListPage: could not show the list", ex);
             }
         }
 
@@ -111,7 +111,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: could not cancel pending loads - {ex.Message}");
+                AppLog.Error("SocialUserListPage: could not cancel pending loads", ex);
             }
 
             foreach (var feed in _feeds)
@@ -133,7 +133,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: could not watch follow changes - {ex.Message}");
+                AppLog.Error("SocialUserListPage: could not watch follow changes", ex);
             }
         }
 
@@ -189,13 +189,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialUserListPage: could not show a follow change - {ex.Message}");
+                        AppLog.Error("SocialUserListPage: could not show a follow change", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: follow change handler failed - {ex.Message}");
+                AppLog.Error("SocialUserListPage: follow change handler failed", ex);
             }
         }
 
@@ -272,7 +272,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: could not open the remote list - {ex.Message}");
+                AppLog.Error("SocialUserListPage: could not open the remote list", ex);
             }
         }
 
@@ -350,7 +350,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: list load failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialUserListPage: list load failed", ex);
                 if (version == feed.Version && !_released) SetFeedState(feed, ListState.Failed);
             }
         }
@@ -422,7 +422,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: retry failed - {ex.Message}");
+                AppLog.Error("SocialUserListPage: retry failed", ex);
             }
         }
 
@@ -435,7 +435,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserListPage: could not open the profile - {ex.Message}");
+                AppLog.Error("SocialUserListPage: could not open the profile", ex);
             }
         }
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.UI;
@@ -107,7 +106,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: UpdateAccentSelection failed - {ex.Message}");
+                AppLog.Error("SettingsPage: UpdateAccentSelection failed", ex);
             }
         }
 
@@ -176,7 +175,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: AccentColorButton_Click failed - {ex.Message}");
+                AppLog.Error("SettingsPage: AccentColorButton_Click failed", ex);
             }
         }
 
@@ -232,7 +231,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: Custom accent dialog failed - {ex.Message}");
+                AppLog.Error("SettingsPage: Custom accent dialog failed", ex);
             }
         }
 
@@ -272,7 +271,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsPage: AccentRestartButton_Click failed - {ex.Message}");
+                AppLog.Error("SettingsPage: AccentRestartButton_Click failed", ex);
             }
         }
     }

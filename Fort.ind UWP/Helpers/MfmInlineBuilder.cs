@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
@@ -122,7 +121,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MfmInlineBuilder: following a link failed - {ex.Message}");
+                AppLog.Error("MfmInlineBuilder: following a link failed", ex);
             }
         }
 

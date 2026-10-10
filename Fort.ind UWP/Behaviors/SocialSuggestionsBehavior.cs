@@ -63,7 +63,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSuggestionsBehavior: Failed to attach - {ex.Message}");
+                AppLog.Error("SocialSuggestionsBehavior: Failed to attach", ex);
             }
         }
 
@@ -82,7 +82,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSuggestionsBehavior: Failed to detach - {ex.Message}");
+                AppLog.Error("SocialSuggestionsBehavior: Failed to detach", ex);
             }
 
             base.OnDetaching();
@@ -105,7 +105,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSuggestionsBehavior: could not watch the scroller - {ex.Message}");
+                AppLog.Error("SocialSuggestionsBehavior: could not watch the scroller", ex);
             }
         }
 
@@ -230,7 +230,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSuggestionsBehavior: suggestions failed - {ex.Message}");
+                AppLog.Error("SocialSuggestionsBehavior: suggestions failed", ex);
             }
         }
 
@@ -325,7 +325,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSuggestionsBehavior: could not find the caret - {ex.Message}");
+                AppLog.Error("SocialSuggestionsBehavior: could not find the caret", ex);
                 rect = new Rect(0, 0, 0, box.ActualHeight);
             }
 
@@ -376,7 +376,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialSuggestionsBehavior: suggestion key failed - {ex.Message}");
+                AppLog.Error("SocialSuggestionsBehavior: suggestion key failed", ex);
             }
         }
 

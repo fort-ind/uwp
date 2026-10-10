@@ -35,7 +35,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: could not register the toast actions - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialToastActions: could not register the toast actions", ex);
             }
         }
 
@@ -53,7 +53,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: could not unregister the toast actions - {ex.Message}");
+                AppLog.Error("SocialToastActions: could not unregister the toast actions", ex);
             }
         }
 
@@ -93,7 +93,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: no quick reply for this toast - {ex.Message}");
+                AppLog.Error("SocialToastActions: no quick reply for this toast", ex);
                 return null;
             }
         }
@@ -130,7 +130,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialToastActions: the toast action failed - {ex.GetType().Name}: {ex.Message}");
+                    AppLog.Error("SocialToastActions: the toast action failed", ex);
                 }
                 finally
                 {
@@ -149,7 +149,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: could not read the toast arguments - {ex.Message}");
+                AppLog.Error("SocialToastActions: could not read the toast arguments", ex);
                 return;
             }
 
@@ -202,7 +202,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: the reply failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialToastActions: the reply failed", ex);
                 failure = LocalizedStrings.Get("SocialPostErrorGeneric");
             }
 
@@ -243,7 +243,7 @@ namespace Fort.ind_UWP
                 case SocialApiStatus.TokenRejected:
                     return LocalizedStrings.Get("SocialToastFailedSignedOut");
                 default:
-                    return SocialPostService.MessageFor(errorCode);
+                    return SocialPostService.MessageFor(status, errorCode);
             }
         }
 
@@ -260,7 +260,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: the like failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialToastActions: the like failed", ex);
                 failure = LocalizedStrings.Get("SocialActionErrorGeneric");
             }
 
@@ -301,7 +301,7 @@ namespace Fort.ind_UWP
                 default:
                     return LocalizedStrings.Get(string.Equals(errorCode, "NO_SUCH_NOTE", StringComparison.Ordinal)
                                                 ? "SocialActionErrorNoSuchNote"
-                                                : "SocialActionErrorGeneric");
+                                                : SocialApiService.ConnectionMessageKey(status) ?? "SocialActionErrorGeneric");
             }
         }
 
@@ -367,7 +367,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: could not keep the failed reply - {ex.Message}");
+                AppLog.Error("SocialToastActions: could not keep the failed reply", ex);
             }
         }
 
@@ -390,7 +390,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialToastActions: could not read the failed reply - {ex.Message}");
+                AppLog.Error("SocialToastActions: could not read the failed reply", ex);
                 return null;
             }
         }

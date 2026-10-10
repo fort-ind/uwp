@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -27,11 +26,13 @@ namespace Fort.ind_UWP
 
     public sealed class SocialFollowResult
     {
-        public SocialFollowResult(SocialFollowOutcome outcome, SocialFollowState action, SocialUserDetail updated, string errorCode)
+        public SocialFollowResult(SocialFollowOutcome outcome, SocialFollowState action, SocialUserDetail updated,
+                                  SocialApiStatus status, string errorCode)
         {
             Outcome = outcome;
             Action = action;
             Updated = updated;
+            Status = status;
             ErrorCode = errorCode;
         }
 
@@ -40,6 +41,8 @@ namespace Fort.ind_UWP
         public SocialFollowState Action { get; private set; }
 
         public SocialUserDetail Updated { get; private set; }
+
+        public SocialApiStatus Status { get; private set; }
 
         public string ErrorCode { get; private set; }
     }
@@ -93,7 +96,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFollowService: a follow change handler failed - {ex.Message}");
+                AppLog.Error("SocialFollowService: a follow change handler failed", ex);
             }
         }
 
@@ -113,7 +116,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialFollowService: could not read the remote list notice setting - {ex.Message}");
+                    AppLog.Error("SocialFollowService: could not read the remote list notice setting", ex);
                     return true;
                 }
             }
@@ -125,7 +128,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialFollowService: could not save the remote list notice setting - {ex.Message}");
+                    AppLog.Error("SocialFollowService: could not save the remote list notice setting", ex);
                 }
             }
         }
@@ -178,13 +181,13 @@ namespace Fort.ind_UWP
             var state = StateOf(detail);
             if (state == SocialFollowState.None)
             {
-                return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, null);
+                return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, SocialApiStatus.Ok, null);
             }
 
             if (!CanFollow)
             {
                 await SocialPermissions.OfferSignInAsync(owner, SocialSignInPrompt.Follow);
-                return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, null);
+                return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, SocialApiStatus.Ok, null);
             }
 
             var name = SocialNoteItem.DisplayNameOf(detail.User);
@@ -196,7 +199,7 @@ namespace Fort.ind_UWP
                                                                      LocalizedStrings.Get("SocialUnfollowDialogConfirm"),
                                                                      LocalizedStrings.Get("DialogCancel"),
                                                                      ContentDialogButton.Close);
-                if (!confirmed) return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, null);
+                if (!confirmed) return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, SocialApiStatus.Ok, null);
             }
             else if (state == SocialFollowState.Requested)
             {
@@ -206,7 +209,7 @@ namespace Fort.ind_UWP
                                                                      LocalizedStrings.Get("SocialWithdrawRequestDialogConfirm"),
                                                                      LocalizedStrings.Get("DialogCancel"),
                                                                      ContentDialogButton.Close);
-                if (!confirmed) return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, null);
+                if (!confirmed) return new SocialFollowResult(SocialFollowOutcome.Cancelled, state, null, SocialApiStatus.Ok, null);
             }
 
             var token = await MisskeyAuthService.TryGetTokenAsync();
@@ -231,7 +234,7 @@ namespace Fort.ind_UWP
                 SocialPermissions.Forget(Permission);
                 Raise(null);
                 await SocialPermissions.OfferSignInAsync(owner, SocialSignInPrompt.Follow);
-                return new SocialFollowResult(SocialFollowOutcome.NeedsSignIn, state, null, result.ErrorCode);
+                return new SocialFollowResult(SocialFollowOutcome.NeedsSignIn, state, null, result.Status, result.ErrorCode);
             }
 
             var fresh = await SocialApiService.GetUserAsync(token, userId, CancellationToken.None);
@@ -247,7 +250,7 @@ namespace Fort.ind_UWP
                           || (result.Status == SocialApiStatus.Refused && updated != null && StateOf(updated) != state);
 
             return new SocialFollowResult(changed ? SocialFollowOutcome.Changed : SocialFollowOutcome.Failed,
-                                          state, updated, result.ErrorCode);
+                                          state, updated, result.Status, result.ErrorCode);
         }
 
         public static async Task RereadAsync(string userId)
@@ -262,7 +265,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialFollowService: could not re-read the person - {ex.Message}");
+                AppLog.Error("SocialFollowService: could not re-read the person", ex);
             }
         }
 
@@ -302,7 +305,8 @@ namespace Fort.ind_UWP
                 }
             }
 
-            return LocalizedStrings.Get("SocialFollowFailedBody");
+            var connectionKey = result == null ? null : SocialApiService.ConnectionMessageKey(result.Status);
+            return LocalizedStrings.Get(connectionKey ?? "SocialFollowFailedBody");
         }
 
         public static string FailureTitle(SocialFollowResult result, string name)

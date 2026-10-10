@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,7 +58,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InkRecognition: analysis failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("InkRecognition: analysis failed", ex);
             }
             finally
             {

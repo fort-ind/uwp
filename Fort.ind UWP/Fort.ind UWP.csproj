@@ -213,6 +213,7 @@
       <DependentUpon>SocialUserRow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\TagWrapPanel.cs" />
+    <Compile Include="Helpers\AppLog.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
     <Compile Include="Helpers\Blurhash.cs" />
     <Compile Include="Helpers\BlurhashImage.cs" />
@@ -346,6 +347,9 @@
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsPage.Appearance.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsPage.Diagnostics.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsPage.Ink.cs">

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Metadata;
@@ -214,7 +213,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InlineInkLayer: could not close - {ex.Message}");
+                AppLog.Error("InlineInkLayer: could not close", ex);
             }
         }
 
@@ -261,7 +260,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InlineInkLayer: could not turn the ink into text - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("InlineInkLayer: could not turn the ink into text", ex);
                 RemoveStrokes(container, strokes);
             }
             finally
@@ -276,7 +275,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"InlineInkLayer: could not finish the commit - {ex.Message}");
+                AppLog.Error("InlineInkLayer: could not finish the commit", ex);
             }
         }
 

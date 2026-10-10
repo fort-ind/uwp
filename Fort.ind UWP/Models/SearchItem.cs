@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -122,13 +121,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SearchItem: a {args.PropertyName} subscriber on view {subscriber.ViewId} threw - {ex.Message}");
+                        AppLog.Error($"SearchItem: a {args.PropertyName} subscriber on view {subscriber.ViewId} threw", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SearchItem: could not reach view {subscriber.ViewId} - {ex.Message}");
+                AppLog.Error($"SearchItem: could not reach view {subscriber.ViewId}", ex);
             }
         }
 
@@ -177,7 +176,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SearchItem: could not identify the subscribing view - {ex.Message}");
+                    AppLog.Error("SearchItem: could not identify the subscribing view", ex);
                 }
 
                 return new Subscriber(handler, window.Dispatcher, viewId);

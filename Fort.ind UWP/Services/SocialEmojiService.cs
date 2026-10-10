@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -105,7 +104,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialEmojiService: could not read the skin tone - {ex.Message}");
+                    AppLog.Error("SocialEmojiService: could not read the skin tone", ex);
                     return 0;
                 }
             }
@@ -117,7 +116,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialEmojiService: could not save the skin tone - {ex.Message}");
+                    AppLog.Error("SocialEmojiService: could not save the skin tone", ex);
                 }
             }
         }
@@ -135,7 +134,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialEmojiService: could not read the recent emoji - {ex.Message}");
+                    AppLog.Error("SocialEmojiService: could not read the recent emoji", ex);
                     return new string[0];
                 }
             }
@@ -158,7 +157,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiService: could not save a recent emoji - {ex.Message}");
+                AppLog.Error("SocialEmojiService: could not save a recent emoji", ex);
             }
         }
 
@@ -183,7 +182,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiService: could not load the emoji list - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialEmojiService: could not load the emoji list", ex);
                 lock (s_lock)
                 {
                     s_unicodeTask = null;
@@ -266,7 +265,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialEmojiService: could not read the Windows build - {ex.Message}");
+                AppLog.Error("SocialEmojiService: could not read the Windows build", ex);
             }
 
             if (build >= 26100) return new Version(15, 1);

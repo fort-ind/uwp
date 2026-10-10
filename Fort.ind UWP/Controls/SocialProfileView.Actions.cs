@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 
@@ -45,13 +44,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialProfileView: could not apply a note change - {ex.Message}");
+                        AppLog.Error("SocialProfileView: could not apply a note change", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: note change handler failed - {ex.Message}");
+                AppLog.Error("SocialProfileView: note change handler failed", ex);
             }
         }
 
@@ -85,13 +84,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"SocialProfileView: could not show a follow change - {ex.Message}");
+                        AppLog.Error("SocialProfileView: could not show a follow change", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: follow change handler failed - {ex.Message}");
+                AppLog.Error("SocialProfileView: follow change handler failed", ex);
             }
         }
 
@@ -153,7 +152,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: follow action failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialProfileView: follow action failed", ex);
             }
             finally
             {
@@ -164,7 +163,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SocialProfileView: could not restore the follow button - {ex.Message}");
+                    AppLog.Error("SocialProfileView: could not restore the follow button", ex);
                 }
             }
         }
@@ -178,7 +177,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialProfileView: could not show the profile menu - {ex.Message}");
+                AppLog.Error("SocialProfileView: could not show the profile menu", ex);
             }
         }
     }

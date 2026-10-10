@@ -24,7 +24,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: could not attach the new-window menus - {ex.Message}");
+                AppLog.Error("MainPage: could not attach the new-window menus", ex);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: opening a new window failed - {ex.Message}");
+                AppLog.Error("MainPage: opening a new window failed", ex);
             }
         }
     }

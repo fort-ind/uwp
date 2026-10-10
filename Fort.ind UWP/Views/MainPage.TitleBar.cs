@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -45,7 +44,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to apply title bar layout metrics - {ex.Message}");
+                AppLog.Error("MainPage: Failed to apply title bar layout metrics", ex);
             }
         }
 
@@ -59,7 +58,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: Failed to follow title bar visibility - {ex.Message}");
+                AppLog.Error("MainPage: Failed to follow title bar visibility", ex);
             }
         }
 
@@ -75,7 +74,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"MainPage: title bar repaint after high contrast change failed - {ex.Message}");
+                    AppLog.Error("MainPage: title bar repaint after high contrast change failed", ex);
                 }
             });
         }
@@ -114,7 +113,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"MainPage: UpdateLiveTile failed – {ex.Message}");
+                AppLog.Error("MainPage: UpdateLiveTile failed", ex);
             }
         }
     }

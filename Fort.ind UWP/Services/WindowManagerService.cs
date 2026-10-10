@@ -32,7 +32,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"WindowManagerService: could not tell which view this is - {ex.Message}");
+                    AppLog.Error("WindowManagerService: could not tell which view this is", ex);
                     return false;
                 }
             }
@@ -120,7 +120,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"WindowManagerService: could not open sign-in in the main window - {ex.GetType().Name}: {ex.Message}");
+                    AppLog.Error("WindowManagerService: could not open sign-in in the main window", ex);
                 }
             });
 
@@ -145,7 +145,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"WindowManagerService: could not close view {view.Id} - {ex.Message}");
+                    AppLog.Error($"WindowManagerService: could not close view {view.Id}", ex);
                 }
             }
         }
@@ -168,7 +168,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowManagerService: could not retitle the window - {ex.Message}");
+                AppLog.Error("WindowManagerService: could not retitle the window", ex);
             }
         }
 
@@ -181,7 +181,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowManagerService: consolidating a window failed - {ex.Message}");
+                AppLog.Error("WindowManagerService: consolidating a window failed", ex);
                 ForceRelease(view);
             }
         }
@@ -196,7 +196,7 @@ namespace Fort.ind_UWP
             }
             catch (InvalidOperationException ex)
             {
-                Debug.WriteLine($"WindowManagerService: view {view.Id} was already released - {ex.Message}");
+                AppLog.Error($"WindowManagerService: view {view.Id} was already released", ex);
             }
         }
 
@@ -293,7 +293,7 @@ namespace Fort.ind_UWP
             }
             catch (InvalidOperationException ex)
             {
-                Debug.WriteLine($"WindowManagerService: view {view.Id} is closing - {ex.Message}");
+                AppLog.Error($"WindowManagerService: view {view.Id} is closing", ex);
                 Forget(view);
                 return false;
             }
@@ -306,7 +306,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowManagerService: could not show view {view.Id} - {ex.Message}");
+                AppLog.Error($"WindowManagerService: could not show view {view.Id}", ex);
                 return false;
             }
             finally
@@ -317,7 +317,7 @@ namespace Fort.ind_UWP
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Debug.WriteLine($"WindowManagerService: view {view.Id} closed while being shown - {ex.Message}");
+                    AppLog.Error($"WindowManagerService: view {view.Id} closed while being shown", ex);
                 }
             }
         }
@@ -340,13 +340,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"WindowManagerService: could not resize view {view.Id} - {ex.Message}");
+                        AppLog.Error($"WindowManagerService: could not resize view {view.Id}", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowManagerService: resize dispatch failed - {ex.Message}");
+                AppLog.Error("WindowManagerService: resize dispatch failed", ex);
             }
         }
 
@@ -364,13 +364,13 @@ namespace Fort.ind_UWP
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"WindowManagerService: could not reopen view {view.Id} - {ex.Message}");
+                        AppLog.Error($"WindowManagerService: could not reopen view {view.Id}", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowManagerService: reopen dispatch failed - {ex.Message}");
+                AppLog.Error("WindowManagerService: reopen dispatch failed", ex);
             }
         }
 
@@ -408,8 +408,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"WindowManagerService: could not build the window for {request.Key} - {ex.GetType().Name}: {ex.Message}"
-                                    + (ex.InnerException != null ? $" | inner: {ex.InnerException.Message}" : ""));
+                    AppLog.Error($"WindowManagerService: could not build the window for {request.Key}", ex);
                     CloseCurrentWindowNow();
                 }
             });
@@ -445,7 +444,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowManagerService: releasing a window failed - {ex.Message}");
+                AppLog.Error("WindowManagerService: releasing a window failed", ex);
             }
         }
 
@@ -457,7 +456,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"WindowManagerService: could not close the window - {ex.Message}");
+                AppLog.Error("WindowManagerService: could not close the window", ex);
             }
         }
 

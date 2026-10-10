@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Graphics.Display;
@@ -77,7 +76,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not detach the window surface - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not detach the window surface", ex);
             }
         }
 
@@ -90,7 +89,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not release the content page - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not release the content page", ex);
             }
         }
 
@@ -102,7 +101,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not apply the appearance - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not apply the appearance", ex);
             }
         }
 
@@ -146,7 +145,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not retitle the view - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not retitle the view", ex);
             }
         }
 
@@ -213,7 +212,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: content navigation bookkeeping failed - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: content navigation bookkeeping failed", ex);
             }
         }
 
@@ -244,7 +243,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not follow the page's title bar - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not follow the page's title bar", ex);
             }
         }
 
@@ -286,7 +285,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not set up the title bar - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not set up the title bar", ex);
             }
         }
 
@@ -322,7 +321,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not set up keep on top - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not set up keep on top", ex);
             }
         }
 
@@ -377,7 +376,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: switching keep on top failed - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: switching keep on top failed", ex);
             }
         }
 
@@ -392,7 +391,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: Failed to follow a window size change - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: Failed to follow a window size change", ex);
             }
         }
 
@@ -435,7 +434,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not attach window handlers - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not attach window handlers", ex);
             }
         }
 
@@ -458,7 +457,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not follow the window's visibility - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not follow the window's visibility", ex);
             }
         }
 
@@ -481,7 +480,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: memory trim handler failed - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: memory trim handler failed", ex);
             }
         }
 
@@ -496,7 +495,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not trim the content page - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not trim the content page", ex);
             }
         }
 
@@ -530,7 +529,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: could not detach window handlers - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: could not detach window handlers", ex);
             }
         }
 
@@ -542,7 +541,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: Failed to follow a DPI change - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: Failed to follow a DPI change", ex);
             }
         }
 
@@ -567,7 +566,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: Failed to apply title bar layout metrics - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: Failed to apply title bar layout metrics", ex);
             }
         }
 
@@ -582,7 +581,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: Failed to follow title bar visibility - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: Failed to follow title bar visibility", ex);
             }
         }
 
@@ -596,7 +595,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SecondaryWindowPage: title bar repaint after high contrast change failed - {ex.Message}");
+                    AppLog.Error("SecondaryWindowPage: title bar repaint after high contrast change failed", ex);
                 }
             });
         }
@@ -610,7 +609,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: repaint after theme change failed - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: repaint after theme change failed", ex);
             }
         }
 
@@ -668,7 +667,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SecondaryWindowPage: Back navigation failed - {ex.Message}");
+                AppLog.Error("SecondaryWindowPage: Back navigation failed", ex);
                 return false;
             }
         }

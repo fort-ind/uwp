@@ -104,7 +104,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ViewLifetimeControl: view {Id} consolidated after release - {ex.Message}");
+                AppLog.Error($"ViewLifetimeControl: view {Id} consolidated after release", ex);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ViewLifetimeControl: could not detach from view {Id} - {ex.Message}");
+                AppLog.Error($"ViewLifetimeControl: could not detach from view {Id}", ex);
             }
 
             if (handlers == null)
@@ -140,7 +140,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ViewLifetimeControl: a Released handler for view {Id} threw - {ex.Message}");
+                AppLog.Error($"ViewLifetimeControl: a Released handler for view {Id} threw", ex);
             }
         }
     }

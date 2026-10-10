@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Controls;
@@ -42,7 +41,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserRow: could not show a person - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialUserRow: could not show a person", ex);
             }
         }
 
@@ -81,7 +80,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserRow: could not update the follow button - {ex.Message}");
+                AppLog.Error("SocialUserRow: could not update the follow button", ex);
             }
         }
 
@@ -138,7 +137,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialUserRow: follow action failed - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialUserRow: follow action failed", ex);
             }
             finally
             {

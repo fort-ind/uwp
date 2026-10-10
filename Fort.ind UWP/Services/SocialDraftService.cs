@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -182,7 +181,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDraftService: scheduled save failed - {ex.Message}");
+                AppLog.Error("SocialDraftService: scheduled save failed", ex);
             }
         }
 
@@ -215,7 +214,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDraftService: could not read the drafts - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialDraftService: could not read the drafts", ex);
                 if (file != null) s_saveBlocked = !await TryMoveAsideAsync(file);
                 s_loaded = true;
             }
@@ -275,12 +274,12 @@ namespace Fort.ind_UWP
             try
             {
                 await file.RenameAsync(AppConstants.SocialDraftsFileName + ".bak", NameCollisionOption.ReplaceExisting);
-                Debug.WriteLine("SocialDraftService: moved the unreadable drafts file aside");
+                AppLog.Warning("SocialDraftService: moved the unreadable drafts file aside");
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDraftService: could not move the unreadable drafts file aside - {ex.Message}");
+                AppLog.Error("SocialDraftService: could not move the unreadable drafts file aside", ex);
                 return false;
             }
         }
@@ -302,7 +301,7 @@ namespace Fort.ind_UWP
 
                 if (s_saveBlocked)
                 {
-                    Debug.WriteLine("SocialDraftService: not saving - the existing drafts file could not be read or moved aside");
+                    AppLog.Warning("SocialDraftService: not saving - the existing drafts file could not be read or moved aside");
                     return;
                 }
 
@@ -312,7 +311,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialDraftService: could not save the drafts - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialDraftService: could not save the drafts", ex);
                 lock (s_lock)
                 {
                     s_dirty = true;

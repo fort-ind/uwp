@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,7 +64,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not save the draft on close - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not save the draft on close", ex);
             }
         }
 
@@ -77,7 +76,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not write the drafts - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not write the drafts", ex);
             }
         }
 
@@ -131,7 +130,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not open the composer - {ex.GetType().Name}: {ex.Message}");
+                AppLog.Error("SocialComposePage: could not open the composer", ex);
             }
         }
 
@@ -191,7 +190,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not read the last visibility - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not read the last visibility", ex);
                 return SocialNoteActionService.PublicVisibility;
             }
         }
@@ -205,7 +204,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not read the last federation choice - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not read the last federation choice", ex);
                 return false;
             }
         }
@@ -219,7 +218,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not remember the visibility - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not remember the visibility", ex);
             }
         }
 
@@ -245,7 +244,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not save the draft - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not save the draft", ex);
             }
         }
 
@@ -260,7 +259,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not finish after posting - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not finish after posting", ex);
             }
         }
 
@@ -297,7 +296,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not remember the window size - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not remember the window size", ex);
             }
         }
 
@@ -321,7 +320,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SocialComposePage: could not read the window size - {ex.Message}");
+                AppLog.Error("SocialComposePage: could not read the window size", ex);
             }
 
             return new Size(AppConstants.SocialComposeWindowWidth, AppConstants.SocialComposeWindowHeight);

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -26,7 +25,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"LoginPage: skip-hint tip failed - {ex.Message}");
+                AppLog.Error("LoginPage: skip-hint tip failed", ex);
             }
         }
 
@@ -52,7 +51,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SignInButton_Click error: {ex}");
+                AppLog.Error("SignInButton_Click error", ex);
                 ShowError(LocalizedStrings.Get("LoginErrorGeneric"));
             }
             finally
