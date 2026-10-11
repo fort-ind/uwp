@@ -459,11 +459,22 @@ namespace Fort.ind_UWP
 
         #region Token Storage
 
+        private static readonly object s_tokenLock = new object();
+
+        private static string s_token;
+
+        private static int s_tokenVersion;
+
         private static void SaveToken(string token)
         {
             ClearToken();
             PasswordVault vault = new PasswordVault();
             vault.Add(new PasswordCredential(VaultResource, VaultUsernameKey, token));
+            lock (s_tokenLock)
+            {
+                s_tokenVersion++;
+                s_token = token;
+            }
             WriteGrantedPermissions(RequestedPermissions);
         }
 
@@ -527,12 +538,25 @@ namespace Fort.ind_UWP
 
         public static string TryGetToken()
         {
+            int version;
+            lock (s_tokenLock)
+            {
+                if (s_token != null) return s_token;
+                version = s_tokenVersion;
+            }
+
             try
             {
                 PasswordVault vault = new PasswordVault();
                 var credential = vault.Retrieve(VaultResource, VaultUsernameKey);
                 credential.RetrievePassword();
-                return credential.Password;
+                var token = credential.Password;
+
+                lock (s_tokenLock)
+                {
+                    if (version == s_tokenVersion && !string.IsNullOrEmpty(token)) s_token = token;
+                }
+                return token;
             }
             catch
             {
@@ -542,11 +566,22 @@ namespace Fort.ind_UWP
 
         public static Task<string> TryGetTokenAsync()
         {
+            lock (s_tokenLock)
+            {
+                if (s_token != null) return Task.FromResult(s_token);
+            }
+
             return Task.Run(() => TryGetToken());
         }
 
         public static void ClearToken()
         {
+            lock (s_tokenLock)
+            {
+                s_tokenVersion++;
+                s_token = null;
+            }
+
             try
             {
                 Windows.Storage.ApplicationData.Current.LocalSettings.Values.Remove(GrantedPermissionsSettingKey);

@@ -111,6 +111,8 @@ namespace Fort.ind_UWP
         public const string SocialToastGroup = "social";
         public const int SocialToastIndividualLimit = 4;
         public const int SocialFeedPageSize = 20;
+        public const int SocialFeedRetrySeconds = 5;
+        public const int SocialFeedRetryLimit = 5;
         public const int SocialTilePreviewLimit = 5;
         public const int SocialTileListLimit = 3;
         public const int SocialLinkPreviewCacheLimit = 200;

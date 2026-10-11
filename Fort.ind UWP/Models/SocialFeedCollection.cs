@@ -46,6 +46,8 @@ namespace Fort.ind_UWP
 
         private int _firstPageCount;
 
+        private int _failures;
+
         public SocialFeedCollection(Func<string, CancellationToken, Task<IReadOnlyList<T>>> loadPageAfter, SocialFeedPaging paging)
             : this(loadPageAfter, paging, false)
         {
@@ -83,6 +85,7 @@ namespace Fort.ind_UWP
         {
             _generation++;
             _loading = false;
+            _failures = 0;
 
             ClearItems();
             foreach (var item in items)
@@ -152,10 +155,17 @@ namespace Fort.ind_UWP
             _loading = true;
             try
             {
-                var page = await _loadPageAfter(this[Count - 1].PagingId, cancellationToken);
+                var page = await TryLoadPageAsync(cancellationToken);
                 if (generation != _generation) return new LoadMoreItemsResult { Count = 0 };
 
-                if (page == null || page.Count == 0)
+                if (page == null)
+                {
+                    await WaitBeforeRetryAsync(cancellationToken);
+                    return new LoadMoreItemsResult { Count = 0 };
+                }
+
+                _failures = 0;
+                if (page.Count == 0)
                 {
                     HasMoreItems = false;
                     return new LoadMoreItemsResult { Count = 0 };
@@ -177,7 +187,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SocialFeedCollection: could not load more", ex);
+                AppLog.Error("SocialFeedCollection: could not add a page", ex);
                 if (generation == _generation) HasMoreItems = false;
                 return new LoadMoreItemsResult { Count = 0 };
             }
@@ -185,6 +195,34 @@ namespace Fort.ind_UWP
             {
                 if (generation == _generation) _loading = false;
             }
+        }
+
+        private async Task<IReadOnlyList<T>> TryLoadPageAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                return await _loadPageAfter(this[Count - 1].PagingId, cancellationToken);
+            }
+            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+            {
+                AppLog.Error("SocialFeedCollection: could not load more", ex);
+                return null;
+            }
+        }
+
+        private async Task WaitBeforeRetryAsync(CancellationToken cancellationToken)
+        {
+            _failures++;
+            if (_failures > AppConstants.SocialFeedRetryLimit)
+            {
+                AppLog.Warning($"SocialFeedCollection: stopped paging after {AppConstants.SocialFeedRetryLimit} retries");
+                HasMoreItems = false;
+                return;
+            }
+
+            var delay = TimeSpan.FromSeconds(AppConstants.SocialFeedRetrySeconds << (_failures - 1));
+            Debug.WriteLine($"SocialFeedCollection: a page failed; retrying in {delay.TotalSeconds} s");
+            await Task.Delay(delay, cancellationToken);
         }
     }
 }
