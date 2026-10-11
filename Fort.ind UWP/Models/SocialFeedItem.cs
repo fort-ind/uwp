@@ -1,6 +1,4 @@
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
@@ -8,7 +6,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Fort.ind_UWP
 {
-    public sealed class SocialFeedItem : INotifyPropertyChanged, ISocialFeedEntry
+    public sealed class SocialFeedItem : BindableBase, ISocialFeedEntry
     {
         private const int ExcerptTextElements = 280;
 
@@ -21,6 +19,10 @@ namespace Fort.ind_UWP
         private bool _avatarCreated;
 
         private string _timeText;
+
+        private SocialFollowRequestState _requestState;
+
+        private bool _requestBusy;
 
         private SocialFeedItem()
         {
@@ -72,6 +74,59 @@ namespace Fort.ind_UWP
 
         public bool OpensActor { get; private set; }
 
+        public bool IsFollowRequest { get; private set; }
+
+        public SocialFollowRequestState RequestState
+        {
+            get { return _requestState; }
+            set
+            {
+                if (!SetProperty(ref _requestState, value)) return;
+                OnPropertyChanged("RequestActionsVisibility");
+                OnPropertyChanged("RequestOutcome");
+                OnPropertyChanged("RequestOutcomeVisibility");
+            }
+        }
+
+        public bool RequestBusy
+        {
+            get { return _requestBusy; }
+            set
+            {
+                if (SetProperty(ref _requestBusy, value)) OnPropertyChanged("RequestIdle");
+            }
+        }
+
+        public bool RequestIdle
+        {
+            get { return !_requestBusy; }
+        }
+
+        public Visibility RequestActionsVisibility
+        {
+            get { return IsFollowRequest && _requestState == SocialFollowRequestState.Pending ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        public string RequestOutcome
+        {
+            get { return SocialFollowRequestService.OutcomeText(_requestState); }
+        }
+
+        public Visibility RequestOutcomeVisibility
+        {
+            get { return IsFollowRequest && !string.IsNullOrEmpty(RequestOutcome) ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        public string AcceptRequestLabel
+        {
+            get { return LocalizedStrings.Format("SocialFollowRequestAcceptNameFormat", ActorName ?? ""); }
+        }
+
+        public string RejectRequestLabel
+        {
+            get { return LocalizedStrings.Format("SocialFollowRequestRejectNameFormat", ActorName ?? ""); }
+        }
+
         public Visibility BodyVisibility
         {
             get { return string.IsNullOrEmpty(Body) ? Visibility.Collapsed : Visibility.Visible; }
@@ -111,9 +166,7 @@ namespace Fort.ind_UWP
             get { return _isUnread; }
             set
             {
-                if (_isUnread == value) return;
-                _isUnread = value;
-                OnPropertyChanged();
+                if (!SetProperty(ref _isUnread, value)) return;
                 OnPropertyChanged("UnreadVisibility");
                 OnPropertyChanged("AutomationName");
             }
@@ -146,13 +199,6 @@ namespace Fort.ind_UWP
             OnPropertyChanged("TimeText");
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         public static SocialFeedItem FromNotification(SocialNotification notification, bool isUnread)
         {
             if (notification == null) return null;
@@ -174,10 +220,13 @@ namespace Fort.ind_UWP
                 AvatarUri = user == null ? null : WebLauncher.TryCreateFetchUri(user.AvatarUrl),
                 TargetUrl = TargetUrlFor(notification),
                 ThreadNote = ThreadNoteFor(notification),
-                OpensActor = notification.Type == "follow" || notification.Type == "followRequestAccepted",
+                OpensActor = notification.Type == "follow" || notification.Type == "followRequestAccepted"
+                             || notification.Type == "receiveFollowRequest",
+                IsFollowRequest = notification.Type == "receiveFollowRequest" && user != null && !string.IsNullOrEmpty(user.Id),
                 _isUnread = isUnread
             };
             item._timeText = RelativeTime.Short(item.CreatedAt, DateTimeOffset.Now);
+            if (item.IsFollowRequest) item._requestState = SocialFollowRequestService.StateOf(user.Id);
 
             return item;
         }

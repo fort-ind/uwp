@@ -20,30 +20,8 @@ namespace Fort.ind_UWP
 
         public static int LimitMegabytes
         {
-            get
-            {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingMediaCacheLimitMegabytes];
-                    return stored == null ? AppConstants.DefaultMediaCacheLimitMegabytes : Math.Max(0, Convert.ToInt32(stored));
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("MediaCacheService: could not read the cache limit", ex);
-                    return AppConstants.DefaultMediaCacheLimitMegabytes;
-                }
-            }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingMediaCacheLimitMegabytes] = Math.Max(0, value);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("MediaCacheService: could not save the cache limit", ex);
-                }
-            }
+            get { return Math.Max(0, AppSettings.ReadInt(AppConstants.SettingMediaCacheLimitMegabytes, AppConstants.DefaultMediaCacheLimitMegabytes)); }
+            set { AppSettings.Write(AppConstants.SettingMediaCacheLimitMegabytes, Math.Max(0, value)); }
         }
 
         public static Task<long?> MeasureAsync()

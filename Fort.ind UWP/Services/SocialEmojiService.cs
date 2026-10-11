@@ -96,47 +96,20 @@ namespace Fort.ind_UWP
         {
             get
             {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialEmojiSkinTone];
-                    var tone = stored == null ? 0 : Convert.ToInt32(stored, CultureInfo.InvariantCulture);
-                    return tone >= 0 && tone <= 5 ? tone : 0;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialEmojiService: could not read the skin tone", ex);
-                    return 0;
-                }
+                var tone = AppSettings.ReadInt(AppConstants.SettingSocialEmojiSkinTone, 0);
+                return tone >= 0 && tone <= 5 ? tone : 0;
             }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialEmojiSkinTone] = Math.Max(0, Math.Min(5, value));
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialEmojiService: could not save the skin tone", ex);
-                }
-            }
+            set { AppSettings.Write(AppConstants.SettingSocialEmojiSkinTone, Math.Max(0, Math.Min(5, value))); }
         }
 
         public static IReadOnlyList<string> Recents
         {
             get
             {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialRecentReactions] as string;
-                    if (string.IsNullOrEmpty(stored)) return new string[0];
+                var stored = AppSettings.ReadString(AppConstants.SettingSocialRecentReactions, null);
+                if (string.IsNullOrEmpty(stored)) return new string[0];
 
-                    return stored.Split(RecentSeparator).Where(key => key.Length > 0).Take(RecentLimit).ToList();
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialEmojiService: could not read the recent emoji", ex);
-                    return new string[0];
-                }
+                return stored.Split(RecentSeparator).Where(key => key.Length > 0).Take(RecentLimit).ToList();
             }
         }
 
@@ -144,21 +117,14 @@ namespace Fort.ind_UWP
         {
             if (string.IsNullOrEmpty(key) || key.IndexOf(RecentSeparator) >= 0) return;
 
-            try
+            var keys = new List<string> { key };
+            foreach (var existing in Recents)
             {
-                var keys = new List<string> { key };
-                foreach (var existing in Recents)
-                {
-                    if (keys.Count >= RecentLimit) break;
-                    if (!SocialReactions.AreSame(existing, key)) keys.Add(existing);
-                }
+                if (keys.Count >= RecentLimit) break;
+                if (!SocialReactions.AreSame(existing, key)) keys.Add(existing);
+            }
 
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialRecentReactions] = string.Join(RecentSeparator.ToString(), keys);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialEmojiService: could not save a recent emoji", ex);
-            }
+            AppSettings.Write(AppConstants.SettingSocialRecentReactions, string.Join(RecentSeparator.ToString(), keys));
         }
 
         public static Task<IReadOnlyList<SocialEmojiEntry>> GetUnicodeAsync()

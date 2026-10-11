@@ -98,6 +98,28 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static ToastFollowRequest FollowRequestFor(SocialUser user, string account)
+        {
+            try
+            {
+                if (user == null || string.IsNullOrEmpty(user.Id) || string.IsNullOrEmpty(account)) return null;
+                if (FindRegistration() == null || !SocialPermissions.Has(SocialPermissions.WriteFollowing)) return null;
+
+                return new ToastFollowRequest
+                {
+                    UserId = user.Id,
+                    Account = account,
+                    AcceptText = LocalizedStrings.Get("SocialToastAcceptButton"),
+                    RejectText = LocalizedStrings.Get("SocialToastRejectButton")
+                };
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialToastActions: no follow request buttons for this toast", ex);
+                return null;
+            }
+        }
+
         public static bool IsToastAction(IBackgroundTaskInstance instance)
         {
             return instance != null && instance.Task != null
@@ -156,7 +178,23 @@ namespace Fort.ind_UWP
             string action;
             string noteId;
             string account;
-            if (!arguments.TryGetValue(AppConstants.ToastArgumentAction, out action)
+            string userId;
+            arguments.TryGetValue(AppConstants.ToastArgumentAction, out action);
+            var followAccept = string.Equals(action, AppConstants.ToastActionFollowAccept, StringComparison.Ordinal);
+            var followReject = string.Equals(action, AppConstants.ToastActionFollowReject, StringComparison.Ordinal);
+            if (followAccept || followReject)
+            {
+                if (arguments.TryGetValue(AppConstants.ToastArgumentUser, out userId)
+                    && arguments.TryGetValue(AppConstants.ToastArgumentAccount, out account)
+                    && !string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(account))
+                {
+                    await RespondToFollowRequestAsync(userId, account, followAccept, cancellationToken);
+                }
+
+                return;
+            }
+
+            if (string.IsNullOrEmpty(action)
                 || !arguments.TryGetValue(AppConstants.ToastArgumentNote, out noteId)
                 || !arguments.TryGetValue(AppConstants.ToastArgumentAccount, out account)
                 || string.IsNullOrEmpty(noteId) || string.IsNullOrEmpty(account))
@@ -174,6 +212,38 @@ namespace Fort.ind_UWP
             {
                 await LikeAsync(noteId, account, cancellationToken);
             }
+        }
+
+        private static async Task RespondToFollowRequestAsync(string userId, string account, bool accept, CancellationToken cancellationToken)
+        {
+            string failure;
+            try
+            {
+                failure = await SocialFollowRequestService.RespondInBackgroundAsync(userId, account, accept, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                failure = LocalizedStrings.Get("SocialToastFailedTimeout");
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialToastActions: answering the follow request failed", ex);
+                failure = LocalizedStrings.Get("SocialActionErrorGeneric");
+            }
+
+            if (failure == null) return;
+
+            var toast = new GroupedToast
+            {
+                Title = LocalizedStrings.Get(accept ? "SocialToastAcceptFailedTitle" : "SocialToastRejectFailedTitle"),
+                Body = failure,
+                Attribution = LocalizedStrings.Get("SocialToastAttribution"),
+                Group = AppConstants.SocialToastFailureGroup,
+                Tag = TagFor("request:", userId)
+            };
+            toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenNotifications);
+
+            LiveTileService.ShowGroupedToast(toast);
         }
 
         private sealed class ReplyAttempt

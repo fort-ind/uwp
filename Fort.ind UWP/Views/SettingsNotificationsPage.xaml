@@ -1,0 +1,117 @@
+﻿<Page
+    x:Class="Fort.ind_UWP.SettingsNotificationsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid x:Name="RootGrid">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="24"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer x:Name="PageScrollViewer" IsTabStop="True">
+            <StackPanel x:Name="ContentPanel" Padding="24">
+                <StackPanel MaxWidth="700" HorizontalAlignment="Stretch">
+                    <StackPanel.ChildrenTransitions>
+                        <TransitionCollection>
+                            <EntranceThemeTransition FromVerticalOffset="40"/>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </StackPanel.ChildrenTransitions>
+
+                    <StackPanel x:Name="NotificationsSection" Margin="0,0,0,40">
+                        <TextBlock x:Uid="MainNotifications2" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <ToggleSwitch x:Uid="SocialNotificationsToggle" x:Name="SocialNotificationsToggle"
+                                      Toggled="SocialNotificationsToggle_Toggled"/>
+                        <TextBlock x:Uid="SocialNotificationsDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="SocialBackgroundCheckToggle" x:Name="SocialBackgroundCheckToggle"
+                                      Margin="0,14,0,0"
+                                      Toggled="SocialBackgroundCheckToggle_Toggled"/>
+                        <TextBlock x:Uid="SocialBackgroundCheckDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <TextBlock x:Uid="SocialNotificationsBackgroundDenied" x:Name="SocialNotificationsBackgroundDenied"
+                                   Visibility="Collapsed" Margin="0,8,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   AutomationProperties.LiveSetting="Polite"/>
+                        <ToggleSwitch x:Uid="TileBadgeToggle" x:Name="TileBadgeToggle"
+                                      Margin="0,14,0,0"
+                                      Toggled="TileBadgeToggle_Toggled"/>
+                        <TextBlock x:Uid="MainTheSmallCounterThat"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <TextBlock x:Uid="SocialNotificationsLockScreenHint"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <HyperlinkButton x:Uid="SocialNotificationsLockScreenLink"
+                                         Padding="0" Margin="0,-6,0,0"
+                                         MinHeight="40"
+                                         VerticalContentAlignment="Center"
+                                         Click="SocialNotificationsLockScreenLink_Click"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="TileSection">
+                        <TextBlock x:Uid="MainLiveTile2" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <StackPanel x:Name="TileNotificationsPanel" Visibility="Collapsed">
+                            <ToggleSwitch x:Uid="TileNotificationsToggle" x:Name="TileNotificationsToggle"
+                                          Toggled="TileNotificationsToggle_Toggled"/>
+                            <TextBlock x:Uid="TileNotificationsDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ToggleSwitch x:Uid="LockScreenSendersToggle" x:Name="LockScreenSendersToggle"
+                                          Toggled="LockScreenSendersToggle_Toggled"/>
+                            <TextBlock x:Uid="LockScreenSendersDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Button x:Name="RefreshTileButton"
+                                    Click="RefreshTileButton_Click"
+                                    Style="{StaticResource ButtonRevealStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE72C;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                                    <TextBlock x:Uid="MainRefreshLiveTile"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="ClearTileButton"
+                                    Click="ClearTileButton_Click"
+                                    Style="{StaticResource ButtonRevealStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE74D;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                                    <TextBlock x:Uid="MainClearLiveTile"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

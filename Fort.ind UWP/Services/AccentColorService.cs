@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
 
@@ -39,22 +38,10 @@ namespace Fort.ind_UWP
         {
             get
             {
-                try
-                {
-                    var tag = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppAccentColor]?.ToString();
-                    return IsUsableTag(tag) ? tag : AppConstants.ThemeDefault;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("AccentColorService: could not read the saved accent", ex);
-                    return AppConstants.ThemeDefault;
-                }
+                var tag = AppSettings.ReadString(AppConstants.SettingAppAccentColor, null);
+                return IsUsableTag(tag) ? tag : AppConstants.ThemeDefault;
             }
-            set
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppAccentColor] =
-                    IsUsableTag(value) ? value : AppConstants.ThemeDefault;
-            }
+            set { AppSettings.Write(AppConstants.SettingAppAccentColor, IsUsableTag(value) ? value : AppConstants.ThemeDefault); }
         }
 
         public static bool IsRestartPending
@@ -167,17 +154,7 @@ namespace Fort.ind_UWP
 
             if (tag == AppConstants.AccentMatchTint)
             {
-                string tint = null;
-                try
-                {
-                    tint = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor]?.ToString();
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("AccentColorService: could not read the tint to match", ex);
-                }
-
-                return ColorHelper.AccentForTint(tint);
+                return ColorHelper.AccentForTint(AppSettings.ReadString(AppConstants.SettingAppTintColor, null));
             }
 
             Color custom;

@@ -352,30 +352,10 @@ namespace Fort.ind_UWP
 
         public static bool BadgeEnabled
         {
-            get
-            {
-                try
-                {
-                    var stored = Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingShowTileBadge];
-                    if (stored == null) return true;
-                    return Convert.ToBoolean(stored);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("LiveTileService: BadgeEnabled read failed", ex);
-                    return true;
-                }
-            }
+            get { return AppSettings.ReadBool(AppConstants.SettingShowTileBadge, true); }
             set
             {
-                try
-                {
-                    Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingShowTileBadge] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("LiveTileService: BadgeEnabled write failed", ex);
-                }
+                AppSettings.Write(AppConstants.SettingShowTileBadge, value);
 
                 if (!value) ClearBadge();
             }
@@ -383,29 +363,8 @@ namespace Fort.ind_UWP
 
         public static bool TileCleared
         {
-            get
-            {
-                try
-                {
-                    return Convert.ToBoolean(Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLiveTileCleared]);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("LiveTileService: TileCleared read failed", ex);
-                    return false;
-                }
-            }
-            set
-            {
-                try
-                {
-                    Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLiveTileCleared] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("LiveTileService: TileCleared write failed", ex);
-                }
-            }
+            get { return AppSettings.ReadBool(AppConstants.SettingLiveTileCleared, false); }
+            set { AppSettings.Write(AppConstants.SettingLiveTileCleared, value); }
         }
 
         public static void UpdateBadge(int count)
@@ -532,6 +491,7 @@ namespace Fort.ind_UWP
                 }
 
                 AddQuickReply(builder, toast.QuickReply);
+                AddFollowRequestButtons(builder, toast.FollowRequest);
 
                 ToastNotification notification = new ToastNotification(builder.GetToastContent().GetXml());
                 notification.Group = toast.Group;
@@ -572,6 +532,24 @@ namespace Fort.ind_UWP
                                   .AddArgument(AppConstants.ToastArgumentAccount, reply.Account)
                                   .SetBackgroundActivation());
             }
+        }
+
+        private static void AddFollowRequestButtons(ToastContentBuilder builder, ToastFollowRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.UserId) || string.IsNullOrEmpty(request.Account)) return;
+
+            builder.AddButton(new ToastButton()
+                              .SetContent(SanitizeText(request.AcceptText))
+                              .AddArgument(AppConstants.ToastArgumentAction, AppConstants.ToastActionFollowAccept)
+                              .AddArgument(AppConstants.ToastArgumentUser, request.UserId)
+                              .AddArgument(AppConstants.ToastArgumentAccount, request.Account)
+                              .SetBackgroundActivation());
+            builder.AddButton(new ToastButton()
+                              .SetContent(SanitizeText(request.RejectText))
+                              .AddArgument(AppConstants.ToastArgumentAction, AppConstants.ToastActionFollowReject)
+                              .AddArgument(AppConstants.ToastArgumentUser, request.UserId)
+                              .AddArgument(AppConstants.ToastArgumentAccount, request.Account)
+                              .SetBackgroundActivation());
         }
 
         public static void RemoveToastGroup(string group)
@@ -657,6 +635,7 @@ namespace Fort.ind_UWP
         public string Tag { get; set; }
         public IList<KeyValuePair<string, string>> Arguments { get; } = new List<KeyValuePair<string, string>>();
         public ToastQuickReply QuickReply { get; set; }
+        public ToastFollowRequest FollowRequest { get; set; }
 
         public void AddArgument(string key, string value)
         {
@@ -671,6 +650,14 @@ namespace Fort.ind_UWP
         public string Placeholder { get; set; }
         public string ReplyText { get; set; }
         public string LikeText { get; set; }
+    }
+
+    public sealed class ToastFollowRequest
+    {
+        public string UserId { get; set; }
+        public string Account { get; set; }
+        public string AcceptText { get; set; }
+        public string RejectText { get; set; }
     }
 
     public sealed class TilePreview

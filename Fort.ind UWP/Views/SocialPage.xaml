@@ -73,6 +73,26 @@
                                    MaxLines="3"
                                    TextTrimming="CharacterEllipsis"
                                    AutomationProperties.AccessibilityView="Raw"/>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8"
+                                    Margin="0,6,0,0"
+                                    Visibility="{x:Bind RequestActionsVisibility, Mode=OneWay}">
+                            <Button x:Uid="SocialFollowRequestAcceptButton"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="{x:Bind RequestIdle, Mode=OneWay}"
+                                    AutomationProperties.Name="{x:Bind AcceptRequestLabel}"
+                                    Click="FollowRequestAccept_Click"/>
+                            <Button x:Uid="SocialFollowRequestRejectButton"
+                                    IsEnabled="{x:Bind RequestIdle, Mode=OneWay}"
+                                    AutomationProperties.Name="{x:Bind RejectRequestLabel}"
+                                    Click="FollowRequestReject_Click"/>
+                        </StackPanel>
+                        <TextBlock Text="{x:Bind RequestOutcome, Mode=OneWay}"
+                                   Visibility="{x:Bind RequestOutcomeVisibility, Mode=OneWay}"
+                                   Margin="0,4,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                   AutomationProperties.LiveSetting="Polite"/>
                     </StackPanel>
 
                     <TextBlock Grid.Column="2"

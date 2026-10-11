@@ -5,7 +5,7 @@ using Windows.UI.Xaml.Input;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class SettingsPage
+    public sealed partial class SettingsAboutPage
     {
         private const int DiagnosticsTapCount = 7;
 
@@ -39,7 +39,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: could not show the diagnostics", ex);
+                AppLog.Error("SettingsAboutPage: could not show the diagnostics", ex);
             }
         }
 
@@ -69,7 +69,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: could not copy the diagnostics", ex);
+                AppLog.Error("SettingsAboutPage: could not copy the diagnostics", ex);
                 ShowDiagnosticsStatus(LocalizedStrings.Get("DiagnosticsCopyFailed"));
             }
             finally

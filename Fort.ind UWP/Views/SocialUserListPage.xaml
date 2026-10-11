@@ -49,6 +49,13 @@
                                    Checked="Tab_Checked">
                 <TextBlock x:Uid="SocialFollowListFollowersTab" Style="{StaticResource BaseTextBlockStyle}"/>
             </local:SocialTabButton>
+            <local:SocialTabButton x:Name="RequestsTab"
+                                   GroupName="SocialFollowListTabs"
+                                   Style="{StaticResource SocialTabButtonStyle}"
+                                   Visibility="Collapsed"
+                                   Checked="Tab_Checked">
+                <TextBlock x:Uid="SocialFollowListRequestsTab" Style="{StaticResource BaseTextBlockStyle}"/>
+            </local:SocialTabButton>
         </local:SocialTabStrip>
 
         <Grid x:Name="RemoteNotice"

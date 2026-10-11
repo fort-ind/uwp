@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Windows.Storage;
 using Windows.UI.StartScreen;
 
 namespace Fort.ind_UWP
@@ -64,22 +63,7 @@ namespace Fort.ind_UWP
             {
                 if (!JumpList.IsSupported()) return;
 
-                var settings = ApplicationData.Current.LocalSettings;
-
-                string savedRevision = null;
-                object raw;
-                if (settings.Values.TryGetValue(AppConstants.SettingJumpListRevision, out raw) && raw != null)
-                {
-                    try
-                    {
-                        savedRevision = Convert.ToString(raw);
-                    }
-                    catch
-                    {
-                        savedRevision = null;
-                    }
-                }
-
+                var savedRevision = AppSettings.ReadString(AppConstants.SettingJumpListRevision, null);
                 var currentRevision = CurrentRevisionStamp();
                 if (string.Equals(savedRevision, currentRevision, StringComparison.Ordinal)) return;
 
@@ -101,7 +85,7 @@ namespace Fort.ind_UWP
 
                 await jumpList.SaveAsync();
 
-                settings.Values[AppConstants.SettingJumpListRevision] = currentRevision;
+                AppSettings.Write(AppConstants.SettingJumpListRevision, currentRevision);
             }
             catch (Exception ex)
             {

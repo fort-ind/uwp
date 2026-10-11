@@ -1,5 +1,4 @@
 using System;
-using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -16,10 +15,9 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var settings = ApplicationData.Current.LocalSettings;
-                if (!settings.Values.ContainsKey(AppConstants.SettingHasSeenSkipSignInTip))
+                if (!AppSettings.Contains(AppConstants.SettingHasSeenSkipSignInTip))
                 {
-                    settings.Values[AppConstants.SettingHasSeenSkipSignInTip] = true;
+                    AppSettings.Write(AppConstants.SettingHasSeenSkipSignInTip, true);
                     SkipHintTip.IsOpen = true;
                 }
             }

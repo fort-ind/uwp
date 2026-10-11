@@ -73,7 +73,8 @@ namespace Fort.ind_UWP
             {
                 if (!ReferenceEquals(sender, Item)) return;
 
-                if (e.PropertyName == "FollowState" || e.PropertyName == "IsBusy")
+                if (e.PropertyName == "FollowState" || e.PropertyName == "IsBusy" || e.PropertyName == "RequestState"
+                    || e.PropertyName == "ModerationActive")
                 {
                     UpdateFollowButton(Item);
                 }
@@ -99,6 +100,25 @@ namespace Fort.ind_UWP
 
         private void UpdateFollowButton(SocialUserItem item)
         {
+            if (item != null && item.Moderation.HasValue)
+            {
+                UpdateModerationPanel(item);
+                return;
+            }
+
+            ModerationButton.Visibility = Visibility.Collapsed;
+            ModerationOutcomePanel.Visibility = Visibility.Collapsed;
+            DetailText.Visibility = Visibility.Collapsed;
+
+            if (item != null && item.IsRequest)
+            {
+                UpdateRequestPanel(item);
+                return;
+            }
+
+            RequestPanel.Visibility = Visibility.Collapsed;
+            RequestOutcomeText.Visibility = Visibility.Collapsed;
+
             var state = item == null ? SocialFollowState.None : item.FollowState;
             if (state == SocialFollowState.None)
             {
@@ -122,6 +142,128 @@ namespace Fort.ind_UWP
 
             FollowButton.IsEnabled = !item.IsBusy;
             FollowButton.Visibility = Visibility.Visible;
+        }
+
+        private void UpdateModerationPanel(SocialUserItem item)
+        {
+            FollowButton.Visibility = Visibility.Collapsed;
+            RequestPanel.Visibility = Visibility.Collapsed;
+            RequestOutcomeText.Visibility = Visibility.Collapsed;
+
+            var list = item.Moderation.Value;
+            var detail = SocialModerationText.Detail(item);
+            DetailText.Text = detail;
+            DetailText.Visibility = string.IsNullOrEmpty(detail) ? Visibility.Collapsed : Visibility.Visible;
+
+            var label = SocialModerationText.ActionLabel(list);
+            ModerationButton.Content = label;
+            AutomationProperties.SetName(ModerationButton, LocalizedStrings.Format("SocialUserRowFollowButtonFormat", label, item.DisplayName));
+            ModerationButton.IsEnabled = !item.IsBusy;
+            ModerationButton.Visibility = item.ModerationActive ? Visibility.Visible : Visibility.Collapsed;
+
+            ModerationOutcomeText.Text = SocialModerationText.Outcome(list);
+            ModerationUndoLink.IsEnabled = !item.IsBusy;
+            AutomationProperties.SetName(ModerationUndoLink, LocalizedStrings.Format("SocialModerationUndoNameFormat", item.DisplayName));
+            ModerationOutcomePanel.Visibility = item.ModerationActive ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ModerationButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetModeration(false);
+        }
+
+        private void ModerationUndoLink_Click(object sender, RoutedEventArgs e)
+        {
+            SetModeration(true);
+        }
+
+        private async void SetModeration(bool active)
+        {
+            var item = Item;
+            if (item == null || !item.Moderation.HasValue || item.IsBusy || item.ModerationActive == active) return;
+
+            item.IsBusy = true;
+            try
+            {
+                bool changed;
+                switch (item.Moderation.Value)
+                {
+                    case SocialModerationList.Muted:
+                        changed = active
+                                  ? await SocialModerationService.MuteAsync(this, item.User, SocialModerationText.RemainingMute(item))
+                                  : await SocialModerationService.UnmuteAsync(this, item.User);
+                        break;
+                    case SocialModerationList.RenoteMuted:
+                        changed = await SocialModerationService.SetRenotesHiddenAsync(this, item.User, active);
+                        break;
+                    default:
+                        changed = active
+                                  ? await SocialModerationService.BlockAsync(this, item.User, false)
+                                  : await SocialModerationService.UnblockAsync(this, item.User, true);
+                        break;
+                }
+
+                if (changed) item.ModerationActive = active;
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialUserRow: could not change the mute or block", ex);
+            }
+            finally
+            {
+                item.IsBusy = false;
+            }
+        }
+
+        private void UpdateRequestPanel(SocialUserItem item)
+        {
+            FollowButton.Visibility = Visibility.Collapsed;
+
+            var pending = item.RequestState == SocialFollowRequestState.Pending;
+            RequestPanel.Visibility = pending ? Visibility.Visible : Visibility.Collapsed;
+            AcceptButton.IsEnabled = !item.IsBusy;
+            RejectButton.IsEnabled = !item.IsBusy;
+            AutomationProperties.SetName(AcceptButton, LocalizedStrings.Format("SocialFollowRequestAcceptNameFormat", item.DisplayName));
+            AutomationProperties.SetName(RejectButton, LocalizedStrings.Format("SocialFollowRequestRejectNameFormat", item.DisplayName));
+
+            var outcome = SocialFollowRequestService.OutcomeText(item.RequestState);
+            RequestOutcomeText.Text = outcome;
+            RequestOutcomeText.Visibility = string.IsNullOrEmpty(outcome) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void AcceptButton_Click(object sender, RoutedEventArgs e)
+        {
+            Respond(true);
+        }
+
+        private void RejectButton_Click(object sender, RoutedEventArgs e)
+        {
+            Respond(false);
+        }
+
+        private async void Respond(bool accept)
+        {
+            var item = Item;
+            if (item == null || !item.IsRequest || item.IsBusy) return;
+
+            item.IsBusy = true;
+            try
+            {
+                var state = await SocialFollowRequestService.RespondAsync(this, item.User, accept);
+                if (state.HasValue)
+                {
+                    item.RequestState = state.Value;
+                    AutomationHelper.AnnounceStatus(this, SocialFollowRequestService.OutcomeText(state.Value), "SocialFollowRequest");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialUserRow: could not answer the follow request", ex);
+            }
+            finally
+            {
+                item.IsBusy = false;
+            }
         }
 
         private async void FollowButton_Click(object sender, RoutedEventArgs e)

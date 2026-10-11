@@ -42,9 +42,21 @@ namespace Fort.ind_UWP
 
         public SocialProfileImage Banner { get; set; }
 
+        public bool LocationChanged { get; set; }
+
+        public string Location { get; set; }
+
+        public bool BirthdayChanged { get; set; }
+
+        public string Birthday { get; set; }
+
+        public bool FieldsChanged { get; set; }
+
+        public IReadOnlyList<SocialUserField> Fields { get; set; }
+
         public bool IsEmpty
         {
-            get { return !NameChanged && !BioChanged && Avatar == null && Banner == null; }
+            get { return !NameChanged && !BioChanged && !LocationChanged && !BirthdayChanged && !FieldsChanged && Avatar == null && Banner == null; }
         }
     }
 
@@ -53,6 +65,10 @@ namespace Fort.ind_UWP
         public const int NameMaxLength = 50;
 
         public const int BioMaxLength = 1500;
+
+        public const int LocationMaxLength = 50;
+
+        public const int FieldsMaxCount = 16;
 
         public const string BotField = "isBot";
 
@@ -100,6 +116,14 @@ namespace Fort.ind_UWP
                 var body = new JsonObject();
                 if (edit.NameChanged) body.Add("name", OptionalText(edit.Name));
                 if (edit.BioChanged) body.Add("description", OptionalText(edit.Bio));
+                if (edit.LocationChanged) body.Add("location", OptionalText(edit.Location));
+                if (edit.BirthdayChanged)
+                {
+                    body.Add("birthday", string.IsNullOrEmpty(edit.Birthday)
+                                             ? JsonValue.CreateNullValue()
+                                             : (IJsonValue)JsonValue.CreateStringValue(edit.Birthday));
+                }
+                if (edit.FieldsChanged) body.Add("fields", FieldsJson(edit.Fields));
 
                 var total = (double)((edit.Avatar != null ? edit.Avatar.Size : 0) + (edit.Banner != null ? edit.Banner.Size : 0));
                 var done = 0.0;
@@ -134,7 +158,17 @@ namespace Fort.ind_UWP
             }
         }
 
-        public static async Task<bool> SetFlagAsync(UIElement owner, string field, bool value)
+        public static Task<bool> SetFlagAsync(UIElement owner, string field, bool value)
+        {
+            return SetSettingAsync(owner, field, JsonValue.CreateBooleanValue(value));
+        }
+
+        public static Task<bool> SetChoiceAsync(UIElement owner, string field, string value)
+        {
+            return SetSettingAsync(owner, field, JsonValue.CreateStringValue(value));
+        }
+
+        private static async Task<bool> SetSettingAsync(UIElement owner, string field, IJsonValue value)
         {
             if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteAccount, SocialSignInPrompt.Profile)) return false;
 
@@ -144,7 +178,7 @@ namespace Fort.ind_UWP
             {
                 token = await MisskeyAuthService.TryGetTokenAsync();
                 var body = new JsonObject();
-                body.Add(field, JsonValue.CreateBooleanValue(value));
+                body.Add(field, value);
                 result = await SocialApiService.UpdateProfileAsync(token, body, CancellationToken.None);
             }
             catch (Exception ex)
@@ -172,6 +206,60 @@ namespace Fort.ind_UWP
             }
 
             return false;
+        }
+
+        public static string FormatBirthday(DateTimeOffset? date)
+        {
+            if (!date.HasValue) return null;
+
+            var value = date.Value;
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:D4}-{1:D2}-{2:D2}", value.Year, value.Month, value.Day);
+        }
+
+        public static DateTimeOffset? ParseBirthday(string text)
+        {
+            DateTime parsed;
+            if (string.IsNullOrWhiteSpace(text)
+                || !DateTime.TryParseExact(text.Trim(), "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
+                                           System.Globalization.DateTimeStyles.None, out parsed))
+            {
+                return null;
+            }
+
+            return new DateTimeOffset(parsed.Year, parsed.Month, parsed.Day, 12, 0, 0, DateTimeOffset.Now.Offset);
+        }
+
+        public static IReadOnlyList<SocialUserField> CleanFields(IEnumerable<SocialUserField> fields)
+        {
+            var cleaned = new List<SocialUserField>();
+            if (fields == null) return cleaned;
+
+            foreach (var field in fields)
+            {
+                var name = SocialPostService.NormalizeText(field.Name).Trim();
+                var value = SocialPostService.NormalizeText(field.Value).Trim();
+                if (name.Length == 0 && value.Length == 0) continue;
+
+                cleaned.Add(new SocialUserField(name, value));
+            }
+
+            return cleaned;
+        }
+
+        private static JsonArray FieldsJson(IReadOnlyList<SocialUserField> fields)
+        {
+            var array = new JsonArray();
+            foreach (var field in CleanFields(fields))
+            {
+                if (field.Name.Length == 0 || field.Value.Length == 0) continue;
+
+                var entry = new JsonObject();
+                entry.Add("name", JsonValue.CreateStringValue(field.Name));
+                entry.Add("value", JsonValue.CreateStringValue(field.Value));
+                array.Add(entry);
+            }
+
+            return array;
         }
 
         private static IJsonValue OptionalText(string text)

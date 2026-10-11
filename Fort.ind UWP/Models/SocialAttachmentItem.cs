@@ -1,6 +1,4 @@
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
@@ -18,7 +16,7 @@ namespace Fort.ind_UWP
         TooLarge
     }
 
-    public sealed class SocialAttachmentItem : INotifyPropertyChanged
+    public sealed class SocialAttachmentItem : BindableBase
     {
         private const int ThumbnailDecodeSize = 80;
 
@@ -53,9 +51,7 @@ namespace Fort.ind_UWP
             get { return _state; }
             set
             {
-                if (_state == value) return;
-                _state = value;
-                OnPropertyChanged();
+                if (!SetProperty(ref _state, value)) return;
                 OnPropertyChanged("IsUploading");
                 OnPropertyChanged("HasError");
                 OnPropertyChanged("AutomationName");
@@ -68,10 +64,7 @@ namespace Fort.ind_UWP
             get { return _markUpEnabled; }
             set
             {
-                if (_markUpEnabled == value) return;
-                _markUpEnabled = value;
-                OnPropertyChanged();
-                OnPropertyChanged("CanMarkUp");
+                if (SetProperty(ref _markUpEnabled, value)) OnPropertyChanged("CanMarkUp");
             }
         }
 
@@ -122,8 +115,7 @@ namespace Fort.ind_UWP
             get { return _file; }
             set
             {
-                _file = value;
-                OnPropertyChanged();
+                if (!SetProperty(ref _file, value)) return;
                 OnPropertyChanged("HasDescription");
                 OnPropertyChanged("AutomationName");
                 OnPropertyChanged("CanMarkUp");
@@ -150,11 +142,7 @@ namespace Fort.ind_UWP
         public ImageSource Thumbnail
         {
             get { return _thumbnail; }
-            set
-            {
-                _thumbnail = value;
-                OnPropertyChanged();
-            }
+            set { SetProperty(ref _thumbnail, value); }
         }
 
         public string ErrorText
@@ -162,9 +150,7 @@ namespace Fort.ind_UWP
             get { return _errorText; }
             set
             {
-                _errorText = value;
-                OnPropertyChanged();
-                OnPropertyChanged("AutomationName");
+                if (SetProperty(ref _errorText, value)) OnPropertyChanged("AutomationName");
             }
         }
 
@@ -186,13 +172,6 @@ namespace Fort.ind_UWP
                                : LocalizedStrings.Format("SocialAttachmentAutomationFormat", name);
                 }
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public static SocialAttachmentItem ForUpload(string name, string contentType, ulong size, Func<Task<IRandomAccessStream>> open)

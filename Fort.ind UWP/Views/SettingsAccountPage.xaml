@@ -1,0 +1,228 @@
+﻿<Page
+    x:Class="Fort.ind_UWP.SettingsAccountPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Page.Resources>
+        <DataTemplate x:Key="ModerationItemTemplate" x:DataType="local:SocialUserItem">
+            <local:SocialUserRow Item="{x:Bind}"
+                                 AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"/>
+        </DataTemplate>
+
+        <Style x:Key="ModerationContainerStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid x:Name="RootGrid">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="24"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer x:Name="PageScrollViewer" IsTabStop="True">
+            <StackPanel x:Name="ContentPanel" Padding="24">
+                <StackPanel MaxWidth="700" HorizontalAlignment="Stretch">
+                    <StackPanel.ChildrenTransitions>
+                        <TransitionCollection>
+                            <EntranceThemeTransition FromVerticalOffset="40"/>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </StackPanel.ChildrenTransitions>
+
+                    <StackPanel x:Name="ProfileSection" Margin="0,0,0,40">
+                        <TextBlock x:Uid="MainProfileSettings2" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <local:SocialProfileEditor x:Name="ProfileEditor"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PrivacySection" Margin="0,0,0,40">
+                        <TextBlock x:Uid="SocialPrivacyHeading" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,0">
+                            <FontIcon Glyph="&#xE716;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="SocialPrivacyFollowersHeading" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                        </StackPanel>
+                        <ToggleSwitch x:Uid="PrivacyLockedToggle" x:Name="PrivacyLockedToggle" Margin="0,8,0,0" Toggled="PrivacyToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyLockedToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyAutoAcceptToggle" x:Name="PrivacyAutoAcceptToggle" Margin="0,14,0,0" Toggled="PrivacyToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyAutoAcceptToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,32,0,0">
+                            <FontIcon Glyph="&#xE890;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="SocialPrivacyVisibilityHeading" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                        </StackPanel>
+                        <ComboBox x:Uid="PrivacyFollowingVisibilityCombo" x:Name="PrivacyFollowingVisibilityCombo" Margin="0,8,0,0" MinWidth="200"
+                                  SelectionChanged="PrivacyCombo_SelectionChanged">
+                            <ComboBoxItem x:Uid="SocialPrivacyVisibilityPublic" Tag="public"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyVisibilityFollowers" Tag="followers"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyVisibilityPrivate" Tag="private"/>
+                        </ComboBox>
+                        <ComboBox x:Uid="PrivacyFollowersVisibilityCombo" x:Name="PrivacyFollowersVisibilityCombo" Margin="0,14,0,0" MinWidth="200"
+                                  SelectionChanged="PrivacyCombo_SelectionChanged">
+                            <ComboBoxItem x:Uid="SocialPrivacyVisibilityPublic" Tag="public"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyVisibilityFollowers" Tag="followers"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyVisibilityPrivate" Tag="private"/>
+                        </ComboBox>
+                        <ToggleSwitch x:Uid="PrivacyPublicReactionsToggle" x:Name="PrivacyPublicReactionsToggle" Margin="0,14,0,0" Toggled="PrivacyToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyPublicReactionsToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyHideOnlineToggle" x:Name="PrivacyHideOnlineToggle" Margin="0,14,0,0" Toggled="PrivacyToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyHideOnlineToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,32,0,0">
+                            <FontIcon Glyph="&#xE721;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="SocialPrivacyDiscoveryHeading" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                        </StackPanel>
+                        <ToggleSwitch x:Uid="PrivacyExplorableToggle" x:Name="PrivacyExplorableToggle" Margin="0,8,0,0" Toggled="PrivacyToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyExplorableToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyNoCrawleToggle" x:Name="PrivacyNoCrawleToggle" Margin="0,14,0,0" Toggled="PrivacyToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyNoCrawleToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyPreventAiToggle" x:Name="PrivacyPreventAiToggle" Margin="0,14,0,0" Toggled="PrivacyToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyPreventAiToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,32,0,0">
+                            <FontIcon Glyph="&#xE8BD;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="SocialPrivacyChatHeading" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                        </StackPanel>
+                        <ComboBox x:Uid="PrivacyChatScopeCombo" x:Name="PrivacyChatScopeCombo" Margin="0,8,0,0" MinWidth="200"
+                                  SelectionChanged="PrivacyCombo_SelectionChanged">
+                            <ComboBoxItem x:Uid="SocialPrivacyChatEveryone" Tag="everyone"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyChatFollowers" Tag="followers"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyChatFollowing" Tag="following"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyChatMutual" Tag="mutual"/>
+                            <ComboBoxItem x:Uid="SocialPrivacyChatNone" Tag="none"/>
+                        </ComboBox>
+                        <TextBlock x:Uid="PrivacyChatScopeComboDescription" Margin="0,4,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="MutedBlockedSection" Margin="0,0,0,40" Visibility="Collapsed">
+                        <TextBlock x:Uid="SocialModerationHeading" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <local:SocialTabStrip x:Uid="SocialModerationTabs"
+                                              x:Name="ModerationTabs"
+                                              BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                                              BorderThickness="0,0,0,1">
+                            <local:SocialTabButton x:Name="MutedTab"
+                                                   GroupName="SocialModerationTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="ModerationTab_Checked">
+                                <TextBlock x:Uid="SocialModerationMutedTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                            </local:SocialTabButton>
+                            <local:SocialTabButton x:Name="RenoteMutedTab"
+                                                   GroupName="SocialModerationTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="ModerationTab_Checked">
+                                <TextBlock x:Uid="SocialModerationRenoteMutedTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                            </local:SocialTabButton>
+                            <local:SocialTabButton x:Name="BlockedTab"
+                                                   GroupName="SocialModerationTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="ModerationTab_Checked">
+                                <TextBlock x:Uid="SocialModerationBlockedTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                            </local:SocialTabButton>
+                        </local:SocialTabStrip>
+
+                        <ListView x:Name="ModerationList"
+                                  ItemTemplate="{StaticResource ModerationItemTemplate}"
+                                  ItemContainerStyle="{StaticResource ModerationContainerStyle}"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  ItemClick="ModerationList_ItemClick"
+                                  ScrollViewer.VerticalScrollMode="Disabled"
+                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+
+                        <Grid Margin="0,12,0,0">
+                            <ProgressRing x:Uid="SocialModerationLoading"
+                                          x:Name="ModerationLoadingRing"
+                                          Width="24" Height="24"
+                                          HorizontalAlignment="Left"/>
+                            <StackPanel x:Name="ModerationStatePanel" Visibility="Collapsed">
+                                <TextBlock x:Name="ModerationStateText"
+                                           Style="{StaticResource BodyTextBlockStyle}"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           TextWrapping="Wrap"
+                                           AutomationProperties.LiveSetting="Polite"/>
+                                <Button x:Name="ModerationStateButton"
+                                        Margin="0,8,0,0"
+                                        Visibility="Collapsed"
+                                        Click="ModerationStateButton_Click"/>
+                            </StackPanel>
+                            <Button x:Uid="SocialModerationShowMoreButton"
+                                    x:Name="ModerationMoreButton"
+                                    Visibility="Collapsed"
+                                    Click="ModerationMoreButton_Click"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel x:Name="RefreshingSection">
+                        <TextBlock x:Uid="ProfileRefreshingHeading" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <StackPanel Spacing="12">
+                            <ToggleSwitch x:Uid="ProfileAutoRefreshToggle" x:Name="ProfileAutoRefreshToggle"
+                                          Toggled="ProfileAutoRefreshToggle_Toggled"/>
+                            <ComboBox x:Uid="ProfileRefreshIntervalCombo" x:Name="ProfileRefreshIntervalCombo"
+                                      MinWidth="200"
+                                      SelectionChanged="ProfileRefreshIntervalCombo_SelectionChanged">
+                                <ComboBoxItem x:Uid="ProfileRefreshEveryVisit" Tag="0"/>
+                                <ComboBoxItem x:Uid="ProfileRefreshFiveMinutes" Tag="5"/>
+                                <ComboBoxItem x:Uid="ProfileRefreshFifteenMinutes" Tag="15"/>
+                                <ComboBoxItem x:Uid="ProfileRefreshHourly" Tag="60"/>
+                            </ComboBox>
+                            <TextBlock x:Uid="ProfileAutoRefreshDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ToggleSwitch x:Uid="RemoteListNoticeToggle" x:Name="RemoteListNoticeToggle"
+                                          Margin="0,8,0,0"
+                                          Toggled="RemoteListNoticeToggle_Toggled"/>
+                            <TextBlock x:Uid="RemoteListNoticeDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

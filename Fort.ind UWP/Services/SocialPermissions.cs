@@ -19,7 +19,9 @@ namespace Fort.ind_UWP
         Post,
         Profile,
         MuteUser,
-        Block
+        Block,
+        FollowRequests,
+        MutedBlocked
     }
 
     public static class SocialPermissions
@@ -50,14 +52,26 @@ namespace Fort.ind_UWP
 
         public const string WriteBlocks = "write:blocks";
 
+        public const string ReadFollowing = "read:following";
+
+        public const string ReadMutes = "read:mutes";
+
+        public const string ReadBlocks = "read:blocks";
+
         public const string Requested = ReadAccount + "," + ReadNotifications + "," + WriteFollowing + ","
                                         + WriteNotes + "," + WriteReactions + "," + WriteVotes + ","
                                         + ReadFavorites + "," + WriteFavorites + "," + WriteDrive + ","
-                                        + WriteAccount + "," + WriteReportAbuse + "," + WriteMutes + "," + WriteBlocks;
+                                        + WriteAccount + "," + WriteReportAbuse + "," + WriteMutes + "," + WriteBlocks + ","
+                                        + ReadFollowing + "," + ReadMutes + "," + ReadBlocks;
 
         private static readonly string[] s_postingPermissions =
         {
             WriteNotes, WriteReactions, WriteVotes, ReadFavorites, WriteFavorites, WriteDrive, WriteAccount, WriteReportAbuse
+        };
+
+        private static readonly string[] s_accountListPermissions =
+        {
+            ReadFollowing, ReadMutes, ReadBlocks
         };
 
         public static event EventHandler Changed;
@@ -78,6 +92,11 @@ namespace Fort.ind_UWP
 
                 return true;
             }
+        }
+
+        public static bool HasAccountLists
+        {
+            get { return Array.TrueForAll(s_accountListPermissions, Has); }
         }
 
         public static void Forget(string permission)

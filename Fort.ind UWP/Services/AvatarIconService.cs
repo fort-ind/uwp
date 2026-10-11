@@ -558,12 +558,11 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var values = ApplicationData.Current.LocalSettings.Values;
-                if (values.ContainsKey(AppConstants.SettingAvatarLegacySweepDone)) return;
+                if (AppSettings.Contains(AppConstants.SettingAvatarLegacySweepDone)) return;
 
                 if (await PruneOtherAvatarsAsync(folder, keepFileName))
                 {
-                    values[AppConstants.SettingAvatarLegacySweepDone] = true;
+                    AppSettings.Write(AppConstants.SettingAvatarLegacySweepDone, true);
                 }
             }
             catch (Exception ex)

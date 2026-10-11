@@ -183,8 +183,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var values = ApplicationData.Current.LocalSettings.Values;
-                if (!values.ContainsKey(AppConstants.LegacySitemapCacheTimestampKey)) return;
+                if (!AppSettings.Contains(AppConstants.LegacySitemapCacheTimestampKey)) return;
 
                 var cacheFile = await ApplicationData.Current.LocalFolder.TryGetItemAsync(AppConstants.LegacySitemapCacheFileName);
                 if (cacheFile != null)
@@ -192,8 +191,8 @@ namespace Fort.ind_UWP
                     await cacheFile.DeleteAsync(StorageDeleteOption.PermanentDelete);
                 }
 
-                values.Remove(AppConstants.LegacySitemapCacheTimestampKey);
-                values.Remove(AppConstants.LegacySitemapCacheAppVersionKey);
+                AppSettings.Remove(AppConstants.LegacySitemapCacheTimestampKey);
+                AppSettings.Remove(AppConstants.LegacySitemapCacheAppVersionKey);
             }
             catch (Exception ex)
             {

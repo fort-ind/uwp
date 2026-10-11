@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -14,57 +13,11 @@ using Windows.UI.Xaml.Media;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class SettingsPage : Page
+    public sealed partial class SettingsPersonalizationPage : Page
     {
         private string _warningKey;
         private bool _warningIsDark;
         private bool _warningShown;
-
-        private void LoadSettingsControls()
-        {
-            _loadingSettings = true;
-            try
-            {
-                switch (AppearanceService.Theme)
-                {
-                    case AppConstants.ThemeLight: ThemeLightRadio.IsChecked = true; break;
-                    case AppConstants.ThemeDark: ThemeDarkRadio.IsChecked = true; break;
-                    default: ThemeSystemRadio.IsChecked = true; break;
-                }
-
-                TintCustomButton.ClearValue(Control.BackgroundProperty);
-                TintCustomIcon.Visibility = Visibility.Visible;
-
-                LoadAcrylicControls();
-
-                UpdateTintSelection(AppearanceService.TintTag);
-
-                var rememberedCustom = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppCustomTintColor] as string;
-                if (TintCustomIcon.IsShown() && !string.IsNullOrEmpty(rememberedCustom))
-                {
-                    ShowCustomSwatchColor(rememberedCustom);
-                }
-
-                LoadSocialNotificationControls();
-                TileBadgeToggle.IsOn = LiveTileService.BadgeEnabled;
-                LoadTileNotificationControls();
-                AutoUpdateCheckToggle.IsOn = UpdateService.AutomaticChecksEnabled;
-                LoadProfileRefreshControls();
-                LoadMediaCacheControls();
-                LoadLowMemoryControls();
-                LoadInkControls();
-
-                RestoreSettingsPanelStates();
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SettingsPage: LoadSettingsControls failed", ex);
-            }
-            finally
-            {
-                _loadingSettings = false;
-            }
-        }
 
         private Dictionary<Button, string> _swatchBaseNames;
 
@@ -192,7 +145,7 @@ namespace Fort.ind_UWP
             }
             else if (!TintCustomIcon.IsShown())
             {
-                var remembered = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppCustomTintColor] as string;
+                var remembered = AppSettings.ReadString(AppConstants.SettingAppCustomTintColor, null);
                 if (!string.IsNullOrEmpty(remembered))
                 {
                     ShowCustomSwatchColor(remembered);
@@ -227,7 +180,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: SwatchGroup_GettingFocus failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: SwatchGroup_GettingFocus failed", ex);
             }
         }
 
@@ -250,7 +203,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: SwatchGroup_KeyDown failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: SwatchGroup_KeyDown failed", ex);
             }
         }
 
@@ -261,7 +214,7 @@ namespace Fort.ind_UWP
                 Color parsed;
                 if (!ColorHelper.TryHexToColor(hex, out parsed))
                 {
-                    Debug.WriteLine($"SettingsPage: custom swatch colour '{hex}' is not a colour");
+                    Debug.WriteLine($"SettingsPersonalizationPage: custom swatch colour '{hex}' is not a colour");
                     return;
                 }
 
@@ -270,18 +223,8 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: ShowCustomSwatchColor failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: ShowCustomSwatchColor failed", ex);
             }
-        }
-
-        private void AppearanceHeader_Tapped(object sender, RoutedEventArgs e)
-        {
-            ToggleSettingsRow(AppearanceHeader, AppearanceContent, AppearanceChevronRotation, AppConstants.SettingSettingsAppearanceExpanded);
-        }
-
-        private void TransparencyHeader_Tapped(object sender, RoutedEventArgs e)
-        {
-            ToggleSettingsRow(TransparencyHeader, TransparencyContent, TransparencyChevronRotation, AppConstants.SettingSettingsTransparencyExpanded);
         }
 
         private void ThemeRadio_Checked(object sender, RoutedEventArgs e)
@@ -313,13 +256,12 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: Custom tint flow failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: Custom tint flow failed", ex);
             }
         }
 
         private async Task ShowCustomTintDialogAsync()
         {
-            var localSettings = ApplicationData.Current.LocalSettings;
             string previousTag = AppearanceService.TintTag;
 
             await DialogService.RunExclusiveAsync(async () =>
@@ -329,7 +271,7 @@ namespace Fort.ind_UWP
                     string seed = previousTag;
                     if (seed == AppConstants.ThemeDefault || ColorHelper.TryGetLightPreset(seed) != null)
                     {
-                        seed = localSettings.Values[AppConstants.SettingAppCustomTintColor]?.ToString() ?? "#1E3A5F";
+                        seed = AppSettings.ReadString(AppConstants.SettingAppCustomTintColor, "#1E3A5F");
                     }
 
                     Color seedColor;
@@ -366,7 +308,7 @@ namespace Fort.ind_UWP
                     if (result == ContentDialogResult.Primary)
                     {
                         var hex = ColorHelper.ColorToHex(picker.Color);
-                        localSettings.Values[AppConstants.SettingAppCustomTintColor] = hex;
+                        AppSettings.Write(AppConstants.SettingAppCustomTintColor, hex);
                         AppearanceService.SetTint(hex, true);
                         UpdateTintSelection(hex);
                     }
@@ -378,7 +320,7 @@ namespace Fort.ind_UWP
                 }
                 catch (Exception ex)
                 {
-                    AppLog.Error("SettingsPage: Custom tint dialog failed", ex);
+                    AppLog.Error("SettingsPersonalizationPage: Custom tint dialog failed", ex);
                     AppearanceService.SetTint(previousTag, true);
                     UpdateTintSelection(previousTag);
                 }
@@ -422,7 +364,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: percent formatting failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: percent formatting failed", ex);
                 return string.Empty;
             }
         }
@@ -473,7 +415,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: UpdateAcrylicLegibilityWarnings failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: UpdateAcrylicLegibilityWarnings failed", ex);
             }
         }
 
@@ -488,7 +430,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: BodyAcrylicSlider_ValueChanged failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: BodyAcrylicSlider_ValueChanged failed", ex);
             }
         }
 
@@ -503,7 +445,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: PaneAcrylicSlider_ValueChanged failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: PaneAcrylicSlider_ValueChanged failed", ex);
             }
         }
 
@@ -532,7 +474,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: TintScopeRadio_Checked failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: TintScopeRadio_Checked failed", ex);
             }
         }
     }

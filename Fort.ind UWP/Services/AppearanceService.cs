@@ -114,11 +114,9 @@ namespace Fort.ind_UWP
 
         private static void ReadSettings()
         {
-            var localSettings = ApplicationData.Current.LocalSettings;
+            Theme = AppSettings.ReadString(AppConstants.SettingAppTheme, AppConstants.ThemeDefault);
 
-            Theme = ReadTag(localSettings, AppConstants.SettingAppTheme, AppConstants.ThemeDefault);
-
-            var tintTag = ReadTag(localSettings, AppConstants.SettingAppTintColor, AppConstants.ThemeDefault);
+            var tintTag = AppSettings.ReadString(AppConstants.SettingAppTintColor, AppConstants.ThemeDefault);
             if (!IsUsableTintTag(tintTag))
             {
                 Debug.WriteLine($"AppearanceService: tint tag '{tintTag}' is not a colour; using the default surface");
@@ -126,17 +124,11 @@ namespace Fort.ind_UWP
             }
             TintTag = tintTag;
 
-            BodyAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppBodyAcrylicOpacity,
-                                             AppConstants.DefaultBodyAcrylicOpacity);
-            PaneAcrylicOpacity = ReadOpacity(localSettings, AppConstants.SettingAppPaneAcrylicOpacity,
-                                             AppConstants.DefaultPaneAcrylicOpacity);
+            BodyAcrylicOpacity = ReadOpacity(AppConstants.SettingAppBodyAcrylicOpacity, AppConstants.DefaultBodyAcrylicOpacity);
+            PaneAcrylicOpacity = ReadOpacity(AppConstants.SettingAppPaneAcrylicOpacity, AppConstants.DefaultPaneAcrylicOpacity);
 
-            TintScope = AppConstants.TintScopeDefault;
-            if (localSettings.Values.ContainsKey(AppConstants.SettingAppTintScope))
-            {
-                var saved = localSettings.Values[AppConstants.SettingAppTintScope]?.ToString();
-                if (IsUsableTintScope(saved)) TintScope = saved;
-            }
+            var savedScope = AppSettings.ReadString(AppConstants.SettingAppTintScope, null);
+            TintScope = IsUsableTintScope(savedScope) ? savedScope : AppConstants.TintScopeDefault;
         }
 
         public static void Reload()
@@ -154,15 +146,7 @@ namespace Fort.ind_UWP
 
             Theme = theme;
             ApplyThemeToRootFrame(theme);
-
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTheme] = theme;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("AppearanceService: could not save the theme", ex);
-            }
+            AppSettings.Write(AppConstants.SettingAppTheme, theme);
 
             RepaintThemeDependentChrome();
         }
@@ -179,16 +163,7 @@ namespace Fort.ind_UWP
             TintTag = colorTag;
             RepaintSurfaces();
 
-            if (!persist) return;
-
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintColor] = colorTag;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("AppearanceService: could not save the tint", ex);
-            }
+            if (persist) AppSettings.Write(AppConstants.SettingAppTintColor, colorTag);
         }
 
         public static void SetTintScope(string scope)
@@ -196,15 +171,7 @@ namespace Fort.ind_UWP
             if (!IsUsableTintScope(scope)) return;
 
             TintScope = scope;
-
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTintScope] = scope;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("AppearanceService: could not save the tint scope", ex);
-            }
+            AppSettings.Write(AppConstants.SettingAppTintScope, scope);
 
             RepaintSurfaces();
         }
@@ -597,31 +564,10 @@ namespace Fort.ind_UWP
                    || scope == AppConstants.TintScopeBoth;
         }
 
-        private static string ReadTag(ApplicationDataContainer localSettings, string key, string fallback)
+        private static double ReadOpacity(string key, double fallback)
         {
-            if (!localSettings.Values.ContainsKey(key)) return fallback;
-            return localSettings.Values[key]?.ToString() ?? fallback;
-        }
-
-        private static double ReadOpacity(ApplicationDataContainer localSettings, string key, double fallback)
-        {
-            try
-            {
-                if (!localSettings.Values.ContainsKey(key)) return fallback;
-
-                var raw = localSettings.Values[key];
-                if (raw == null) return fallback;
-
-                var value = Convert.ToDouble(raw);
-                if (double.IsNaN(value)) return fallback;
-
-                return Math.Max(AppConstants.MinimumAcrylicOpacity, Math.Min(1.0, value));
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"AppearanceService: could not read {key}", ex);
-                return fallback;
-            }
+            var value = AppSettings.ReadDouble(key, fallback);
+            return Math.Max(AppConstants.MinimumAcrylicOpacity, Math.Min(1.0, value));
         }
 
         private sealed class SurfacePaint

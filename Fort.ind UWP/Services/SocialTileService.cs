@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
-using Windows.Storage;
 
 namespace Fort.ind_UWP
 {
@@ -32,14 +31,14 @@ namespace Fort.ind_UWP
 
         public static bool PreviewsEnabled
         {
-            get { return ReadFlag(AppConstants.SettingTileShowsNotifications, true); }
-            set { WriteFlag(AppConstants.SettingTileShowsNotifications, value); }
+            get { return AppSettings.ReadBool(AppConstants.SettingTileShowsNotifications, true); }
+            set { AppSettings.Write(AppConstants.SettingTileShowsNotifications, value); }
         }
 
         public static bool LockScreenShowsSenders
         {
-            get { return ReadFlag(AppConstants.SettingLockScreenShowsSenders, false); }
-            set { WriteFlag(AppConstants.SettingLockScreenShowsSenders, value); }
+            get { return AppSettings.ReadBool(AppConstants.SettingLockScreenShowsSenders, false); }
+            set { AppSettings.Write(AppConstants.SettingLockScreenShowsSenders, value); }
         }
 
         public static bool StartShowsLiveTiles
@@ -255,65 +254,17 @@ namespace Fort.ind_UWP
 
         private static string ReadShown()
         {
-            try
-            {
-                return ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialTileShown] as string;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialTileService: could not read the shown previews", ex);
-                return null;
-            }
+            return AppSettings.ReadString(AppConstants.SettingSocialTileShown, null);
         }
 
         private static void WriteShown(string signature)
         {
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialTileShown] = signature;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialTileService: could not record the shown previews", ex);
-            }
+            AppSettings.Write(AppConstants.SettingSocialTileShown, signature);
         }
 
         private static void RemoveShown()
         {
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values.Remove(AppConstants.SettingSocialTileShown);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialTileService: could not forget the shown previews", ex);
-            }
-        }
-
-        private static bool ReadFlag(string key, bool fallback)
-        {
-            try
-            {
-                var stored = ApplicationData.Current.LocalSettings.Values[key];
-                return stored == null ? fallback : Convert.ToBoolean(stored);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"SocialTileService: could not read {key}", ex);
-                return fallback;
-            }
-        }
-
-        private static void WriteFlag(string key, bool value)
-        {
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[key] = value;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"SocialTileService: could not write {key}", ex);
-            }
+            AppSettings.Remove(AppConstants.SettingSocialTileShown);
         }
     }
 }

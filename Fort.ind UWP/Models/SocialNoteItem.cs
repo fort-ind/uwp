@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -9,7 +8,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Fort.ind_UWP
 {
-    public sealed class SocialNoteItem : INotifyPropertyChanged, ISocialFeedEntry
+    public sealed class SocialNoteItem : BindableBase, ISocialFeedEntry
     {
         private const string HomeVisibility = "home";
 
@@ -146,12 +145,7 @@ namespace Fort.ind_UWP
         public bool IsPollRevealed
         {
             get { return _isPollRevealed; }
-            set
-            {
-                if (_isPollRevealed == value) return;
-                _isPollRevealed = value;
-                OnPropertyChanged();
-            }
+            set { SetProperty(ref _isPollRevealed, value); }
         }
 
         public IReadOnlyList<SocialReactionCount> Reactions
@@ -263,33 +257,20 @@ namespace Fort.ind_UWP
             get { return _isContentRevealed; }
             set
             {
-                if (_isContentRevealed == value) return;
-                _isContentRevealed = value;
-                OnPropertyChanged();
-                OnPropertyChanged("AutomationName");
+                if (SetProperty(ref _isContentRevealed, value)) OnPropertyChanged("AutomationName");
             }
         }
 
         public bool IsMediaRevealed
         {
             get { return _isMediaRevealed; }
-            set
-            {
-                if (_isMediaRevealed == value) return;
-                _isMediaRevealed = value;
-                OnPropertyChanged();
-            }
+            set { SetProperty(ref _isMediaRevealed, value); }
         }
 
         public SocialLinkPreview LinkPreview
         {
             get { return _linkPreview; }
-            private set
-            {
-                if (ReferenceEquals(_linkPreview, value)) return;
-                _linkPreview = value;
-                OnPropertyChanged();
-            }
+            private set { SetProperty(ref _linkPreview, value); }
         }
 
         public ImageSource Avatar
@@ -375,12 +356,10 @@ namespace Fort.ind_UWP
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             Version++;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            base.OnPropertyChanged(propertyName);
         }
 
         public void RefreshTime(DateTimeOffset now)

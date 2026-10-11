@@ -73,21 +73,23 @@ namespace Fort.ind_UWP
                                                   && !needed
                                                   && !SocialPermissions.HasAllPosting
                                                   && !IsWriteSignInDismissed();
+
+            SocialAccountPermissionInfoBar.IsOpen = signedIn
+                                                    && !needed
+                                                    && !SocialWritePermissionInfoBar.IsOpen
+                                                    && !SocialPermissions.HasAccountLists
+                                                    && !IsSignInBannerDismissed(AppConstants.SettingSocialAccountSignInDismissed);
         }
 
         private static bool IsWriteSignInDismissed()
         {
-            try
-            {
-                var account = SocialContentService.CurrentAccountId();
-                var stored = Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialWriteSignInDismissed] as string;
-                return account != null && string.Equals(stored, account, StringComparison.Ordinal);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("MainPage: could not read the permission banner dismissal", ex);
-                return false;
-            }
+            return IsSignInBannerDismissed(AppConstants.SettingSocialWriteSignInDismissed);
+        }
+
+        private static bool IsSignInBannerDismissed(string key)
+        {
+            var account = SocialContentService.CurrentAccountId();
+            return account != null && string.Equals(AppSettings.ReadString(key, null), account, StringComparison.Ordinal);
         }
 
         private void SocialPermissionInfoBar_CloseButtonClick(Microsoft.UI.Xaml.Controls.InfoBar sender, object args)
@@ -97,18 +99,18 @@ namespace Fort.ind_UWP
 
         private void SocialWritePermissionInfoBar_CloseButtonClick(Microsoft.UI.Xaml.Controls.InfoBar sender, object args)
         {
-            try
-            {
-                var account = SocialContentService.CurrentAccountId();
-                if (account != null)
-                {
-                    Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialWriteSignInDismissed] = account;
-                }
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("MainPage: could not remember the permission banner dismissal", ex);
-            }
+            RememberSignInBannerDismissed(AppConstants.SettingSocialWriteSignInDismissed);
+        }
+
+        private void SocialAccountPermissionInfoBar_CloseButtonClick(Microsoft.UI.Xaml.Controls.InfoBar sender, object args)
+        {
+            RememberSignInBannerDismissed(AppConstants.SettingSocialAccountSignInDismissed);
+        }
+
+        private static void RememberSignInBannerDismissed(string key)
+        {
+            var account = SocialContentService.CurrentAccountId();
+            if (account != null) AppSettings.Write(key, account);
         }
 
         private void SocialPermissionSignInButton_Click(object sender, RoutedEventArgs e)

@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -14,6 +13,8 @@ namespace Fort.ind_UWP
     public sealed partial class MainPage : Page
     {
         private string _launchNavTag;
+
+        private bool _confirmingLeave;
 
         private async void OnAuthStateChanged(object sender, bool isLoggedIn)
         {
@@ -130,13 +131,7 @@ namespace Fort.ind_UWP
                     LiveTileService.ClearBadge();
                 }
 
-                var localSettings = ApplicationData.Current.LocalSettings;
-                bool hideWelcome = false;
-                if (localSettings.Values.ContainsKey(AppConstants.SettingHideWelcomeDialog))
-                {
-                    hideWelcome = Convert.ToBoolean(localSettings.Values[AppConstants.SettingHideWelcomeDialog]);
-                }
-                if (!hideWelcome)
+                if (!AppSettings.ReadBool(AppConstants.SettingHideWelcomeDialog, false))
                 {
                     await ShowWelcomeDialogAsync();
                 }
@@ -235,9 +230,19 @@ namespace Fort.ind_UWP
 
         private void ShowContent(string tag, bool moveFocus = false)
         {
-            var header = TitleSection(tag);
-
             var pageType = PageTypeFor(tag);
+
+            if (ContentFrame.CurrentSourcePageType != pageType
+                && HoldForUnsavedChanges(() =>
+                {
+                    SelectNavItemForTag(tag);
+                    ShowContent(tag, moveFocus);
+                }))
+            {
+                return;
+            }
+
+            var header = TitleSection(tag);
 
             try
             {
@@ -345,23 +350,34 @@ namespace Fort.ind_UWP
             {
                 if (string.IsNullOrEmpty(tag)) return;
 
-                var revealSection = !string.IsNullOrEmpty(settingsSection);
+                var settingsCategory = tag == AppConstants.NavigationSettings
+                    ? SettingsCategory.ForSection(settingsSection)
+                    : null;
+
+                var targetType = settingsCategory != null ? settingsCategory.PageType : PageTypeFor(tag);
+                if (ContentFrame.CurrentSourcePageType != targetType
+                    && HoldForUnsavedChanges(() => NavigateToTag(tag, settingsSection)))
+                {
+                    return;
+                }
 
                 SelectNavItemForTag(tag);
-                ShowContent(tag, !revealSection);
                 ClosePaneUnlessExpanded();
 
-                if (revealSection)
+                if (settingsCategory == null)
                 {
-                    var settings = ContentFrame.Content as SettingsPage;
-                    if (settings != null)
-                    {
-                        settings.RevealSection(settingsSection);
-                    }
-                    else
-                    {
-                        FocusContentRegion();
-                    }
+                    ShowContent(tag, true);
+                    return;
+                }
+
+                var subpage = ContentFrame.Content as ISettingsSubpage;
+                if (subpage != null && ContentFrame.CurrentSourcePageType == settingsCategory.PageType)
+                {
+                    subpage.RevealSection(settingsSection);
+                }
+                else if (!ContentFrame.Navigate(settingsCategory.PageType, settingsSection))
+                {
+                    AppLog.Warning($"MainPage: navigation to {settingsCategory.PageType.Name} returned false");
                 }
             }
             catch (Exception ex)
@@ -372,6 +388,8 @@ namespace Fort.ind_UWP
 
         internal void ShowSocialNotifications()
         {
+            if (HoldForUnsavedChanges(ShowSocialNotifications)) return;
+
             NavigateToTag(AppConstants.NavigationSocial);
 
             var social = ContentFrame.Content as SocialPage;
@@ -385,6 +403,8 @@ namespace Fort.ind_UWP
         {
             try
             {
+                if (HoldForUnsavedChanges(() => ShowSocialThread(noteId, restoredReply))) return;
+
                 var thread = ContentFrame.Content as SocialNotePage;
                 if (thread != null && thread.Shows(noteId))
                 {
@@ -422,15 +442,7 @@ namespace Fort.ind_UWP
 
         private static void RememberLastNavTag(string tag)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(tag)) return;
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLastNavTag] = tag;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("MainPage: Failed to record last nav tag", ex);
-            }
+            if (!string.IsNullOrEmpty(tag)) AppSettings.Write(AppConstants.SettingLastNavTag, tag);
         }
 
         private string ResolveStartupNavTag()
@@ -441,7 +453,7 @@ namespace Fort.ind_UWP
 
                 if (!App.ResumingFromTermination) return AppConstants.NavigationLatestNews;
 
-                var saved = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLastNavTag] as string;
+                var saved = AppSettings.ReadString(AppConstants.SettingLastNavTag, null);
                 if (string.IsNullOrEmpty(saved)) return AppConstants.NavigationLatestNews;
 
                 switch (saved)
@@ -501,7 +513,12 @@ namespace Fort.ind_UWP
                 TrackContentPage(e.Content as Page);
 
                 var tagArgs = e.Content is SocialTagPage ? e.Parameter as SocialTagArgs : null;
-                if (e.Content is SocialNotePage)
+                var settingsCategory = SettingsCategory.ForPage(e.SourcePageType);
+                if (settingsCategory != null)
+                {
+                    TitleSettingsSubpage(settingsCategory, e.NavigationMode == NavigationMode.New ? e.Parameter as string : null);
+                }
+                else if (e.Content is SocialNotePage)
                 {
                     TitleSubPage(LocalizedStrings.Get("HeaderNote"));
                 }
@@ -525,6 +542,41 @@ namespace Fort.ind_UWP
             NavView.Header = header;
             Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentHost, header);
             NameContentRegion(header);
+        }
+
+        private void TitleSettingsSubpage(SettingsCategory category, string revealedSection)
+        {
+            var header = category.Title;
+
+            SelectNavItemForTag(AppConstants.NavigationSettings);
+            RememberLastNavTag(AppConstants.NavigationSettings);
+
+            NavView.Header = category;
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(ContentHost, header);
+            NameContentRegion(header);
+
+            if (string.IsNullOrEmpty(revealedSection)) FocusContentRegion();
+        }
+
+        private void SettingsBreadcrumb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (HoldForUnsavedChanges(() => SettingsBreadcrumb_Click(sender, e))) return;
+
+                var stack = ContentFrame.BackStack;
+                if (stack.Count > 0 && stack[stack.Count - 1].SourcePageType == typeof(SettingsPage))
+                {
+                    ContentFrame.GoBack();
+                    return;
+                }
+
+                ShowContent(AppConstants.NavigationSettings, true);
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MainPage: could not go to the Settings home", ex);
+            }
         }
 
         private void PruneContentBackStack(Type currentPageType)
@@ -608,6 +660,58 @@ namespace Fort.ind_UWP
             TryGoBack();
         }
 
+        private bool HoldForUnsavedChanges(Action proceed)
+        {
+            var page = ContentFrame.Content as IUnsavedChangesPage;
+            if (page == null || !page.HasUnsavedChanges) return false;
+
+            SelectNavItemForContentPage();
+            ConfirmLeaveThen(page, proceed);
+            return true;
+        }
+
+        private async void ConfirmLeaveThen(IUnsavedChangesPage page, Action proceed)
+        {
+            try
+            {
+                if (_confirmingLeave) return;
+
+                bool leave;
+                _confirmingLeave = true;
+                try
+                {
+                    leave = await page.ConfirmLeaveAsync();
+                }
+                finally
+                {
+                    _confirmingLeave = false;
+                }
+
+                if (!ReferenceEquals(ContentFrame.Content, page)) return;
+
+                if (leave)
+                {
+                    proceed();
+                }
+                else
+                {
+                    SelectNavItemForContentPage();
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MainPage: could not confirm leaving a page with unsaved changes", ex);
+            }
+        }
+
+        private void SelectNavItemForContentPage()
+        {
+            if (SettingsCategory.ForPage(ContentFrame.CurrentSourcePageType) != null)
+            {
+                SelectNavItemForTag(AppConstants.NavigationSettings);
+            }
+        }
+
         private bool TryGoBack()
         {
             try
@@ -619,6 +723,8 @@ namespace Fort.ind_UWP
                 if (ClosePaneUnlessExpanded()) return true;
 
                 if (!ContentFrame.CanGoBack) return false;
+
+                if (HoldForUnsavedChanges(() => TryGoBack())) return true;
 
                 ContentFrame.GoBack();
 

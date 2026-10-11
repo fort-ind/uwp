@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -28,7 +27,7 @@ namespace Fort.ind_UWP
             welcomeDialog.DefaultButton = ContentDialogButton.Close;
             DialogService.AttachToOwner(welcomeDialog, this);
 
-            ApplicationData.Current.LocalSettings.Values[AppConstants.SettingHideWelcomeDialog] = true;
+            AppSettings.Write(AppConstants.SettingHideWelcomeDialog, true);
 
             await welcomeDialog.ShowAsync();
         }

@@ -60,58 +60,14 @@ namespace Fort.ind_UWP
 
         public static bool Enabled
         {
-            get
-            {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialNotificationsEnabled];
-                    return stored == null || Convert.ToBoolean(stored);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialNotificationService: could not read the notifications setting", ex);
-                    return true;
-                }
-            }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialNotificationsEnabled] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialNotificationService: could not save the notifications setting", ex);
-                }
-            }
+            get { return AppSettings.ReadBool(AppConstants.SettingSocialNotificationsEnabled, true); }
+            set { AppSettings.Write(AppConstants.SettingSocialNotificationsEnabled, value); }
         }
 
         public static bool BackgroundCheckEnabled
         {
-            get
-            {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialBackgroundCheck];
-                    return stored == null || Convert.ToBoolean(stored);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialNotificationService: could not read the background check setting", ex);
-                    return true;
-                }
-            }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialBackgroundCheck] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialNotificationService: could not save the background check setting", ex);
-                }
-            }
+            get { return AppSettings.ReadBool(AppConstants.SettingSocialBackgroundCheck, true); }
+            set { AppSettings.Write(AppConstants.SettingSocialBackgroundCheck, value); }
         }
 
         public static bool OwnsBadge
@@ -125,7 +81,7 @@ namespace Fort.ind_UWP
             {
                 var user = ProfileService.CurrentUser;
                 return user != null &&
-                       string.Equals(ReadStoredString(AppConstants.SettingSocialSignInAgainDismissed), AccountOf(user),
+                       string.Equals(AppSettings.ReadString(AppConstants.SettingSocialSignInAgainDismissed, null), AccountOf(user),
                                      StringComparison.Ordinal);
             }
         }
@@ -135,7 +91,7 @@ namespace Fort.ind_UWP
             var user = ProfileService.CurrentUser;
             if (user == null) return;
 
-            WriteStoredString(AppConstants.SettingSocialSignInAgainDismissed, AccountOf(user));
+            AppSettings.Write(AppConstants.SettingSocialSignInAgainDismissed, AccountOf(user));
         }
 
         public static void Initialize()
@@ -180,7 +136,7 @@ namespace Fort.ind_UWP
                 if (wanted)
                 {
                     var account = AccountOf(user);
-                    WriteStoredString(AppConstants.SettingSocialNotificationsAccount, account);
+                    AppSettings.Write(AppConstants.SettingSocialNotificationsAccount, account);
 
                     if (previousAccount != null && !string.Equals(previousAccount, account, StringComparison.Ordinal))
                     {
@@ -200,7 +156,7 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                WriteStoredString(AppConstants.SettingSocialNotificationsAccount, null);
+                AppSettings.Write(AppConstants.SettingSocialNotificationsAccount, null);
                 UnregisterBackgroundCheck();
                 SocialToastActions.Unregister();
                 LeaveAccount(wasActive || previousAccount != null || ReadWatermark().HasValue);
@@ -392,7 +348,7 @@ namespace Fort.ind_UWP
             if (notificationsStatus == SocialApiStatus.Ok)
             {
                 SetNeedsSignInAgain(false);
-                WriteStoredString(AppConstants.SettingSocialSignInAgainDismissed, null);
+                AppSettings.Write(AppConstants.SettingSocialSignInAgainDismissed, null);
             }
             else if (notificationsStatus == SocialApiStatus.PermissionDenied)
             {
@@ -486,7 +442,7 @@ namespace Fort.ind_UWP
                 builder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
                 builder.Register();
 
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialCheckRegisteredMinutes] = minutes;
+                AppSettings.Write(AppConstants.SettingSocialCheckRegisteredMinutes, minutes);
             }
             catch (Exception ex)
             {
@@ -514,14 +470,13 @@ namespace Fort.ind_UWP
             var version = Package.Current.Id.Version;
             var stamp = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
 
-            var values = ApplicationData.Current.LocalSettings.Values;
-            if (string.Equals(values[AppConstants.SettingBackgroundAccessVersion] as string, stamp, StringComparison.Ordinal))
+            if (string.Equals(AppSettings.ReadString(AppConstants.SettingBackgroundAccessVersion, null), stamp, StringComparison.Ordinal))
             {
                 return;
             }
 
             BackgroundExecutionManager.RemoveAccess();
-            values[AppConstants.SettingBackgroundAccessVersion] = stamp;
+            AppSettings.Write(AppConstants.SettingBackgroundAccessVersion, stamp);
         }
 
         private static uint BackgroundCheckMinutes
@@ -899,45 +854,12 @@ namespace Fort.ind_UWP
 
         internal static string ReadActiveAccount()
         {
-            return ReadStoredString(AppConstants.SettingSocialNotificationsAccount);
+            return AppSettings.ReadString(AppConstants.SettingSocialNotificationsAccount, null);
         }
 
         internal static bool IsActiveAccount(string account)
         {
             return account != null && string.Equals(ReadActiveAccount(), account, StringComparison.Ordinal);
-        }
-
-        private static string ReadStoredString(string key)
-        {
-            try
-            {
-                return ApplicationData.Current.LocalSettings.Values[key] as string;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"SocialNotificationService: could not read {key}", ex);
-                return null;
-            }
-        }
-
-        private static void WriteStoredString(string key, string value)
-        {
-            try
-            {
-                var values = ApplicationData.Current.LocalSettings.Values;
-                if (value == null)
-                {
-                    values.Remove(key);
-                }
-                else
-                {
-                    values[key] = value;
-                }
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"SocialNotificationService: could not write {key}", ex);
-            }
         }
 
         private static async Task ShowToastAsync(SocialNotification notification, CancellationToken cancellationToken)
@@ -974,6 +896,7 @@ namespace Fort.ind_UWP
             else
             {
                 toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenNotifications);
+                if (item.IsFollowRequest) toast.FollowRequest = SocialToastActions.FollowRequestFor(notification.User, account);
             }
 
             LiveTileService.ShowGroupedToast(toast);

@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Input.Inking;
 
@@ -21,63 +20,38 @@ namespace Fort.ind_UWP
 
         public static bool InkWithMouse
         {
-            get { return Read(AppConstants.SettingInkWithMouse, true); }
-            set { Write(AppConstants.SettingInkWithMouse, value); }
+            get { return AppSettings.ReadBool(AppConstants.SettingInkWithMouse, true); }
+            set { WriteAndBump(AppConstants.SettingInkWithMouse, value); }
         }
 
         public static PenTextMode PenTextMode
         {
-            get
-            {
-                try
-                {
-                    PenTextMode mode;
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingInkPenTextMode] as string;
-                    return stored != null && Enum.TryParse(stored, out mode) ? mode : PenTextMode.WriteOnBox;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("InkSettingsService: could not read the pen text mode", ex);
-                    return PenTextMode.WriteOnBox;
-                }
-            }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingInkPenTextMode] = value.ToString();
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("InkSettingsService: could not save the pen text mode", ex);
-                }
-
-                Interlocked.Increment(ref s_version);
-            }
+            get { return AppSettings.ReadEnum(AppConstants.SettingInkPenTextMode, PenTextMode.WriteOnBox); }
+            set { WriteAndBump(AppConstants.SettingInkPenTextMode, value.ToString()); }
         }
 
         public static bool HandwritingFont
         {
-            get { return Read(AppConstants.SettingInkHandwritingFont, false); }
-            set { Write(AppConstants.SettingInkHandwritingFont, value); }
+            get { return AppSettings.ReadBool(AppConstants.SettingInkHandwritingFont, false); }
+            set { WriteAndBump(AppConstants.SettingInkHandwritingFont, value); }
         }
 
         public static bool TouchPansAfterPen
         {
-            get { return Read(AppConstants.SettingInkTouchPansAfterPen, true); }
-            set { Write(AppConstants.SettingInkTouchPansAfterPen, value); }
+            get { return AppSettings.ReadBool(AppConstants.SettingInkTouchPansAfterPen, true); }
+            set { WriteAndBump(AppConstants.SettingInkTouchPansAfterPen, value); }
         }
 
         public static DrawingAspect DrawingAspect
         {
-            get { return ReadEnum(AppConstants.SettingInkDrawingAspect, DrawingAspect.Landscape); }
-            set { WriteEnum(AppConstants.SettingInkDrawingAspect, value); }
+            get { return AppSettings.ReadEnum(AppConstants.SettingInkDrawingAspect, DrawingAspect.Landscape); }
+            set { AppSettings.Write(AppConstants.SettingInkDrawingAspect, value.ToString()); }
         }
 
         public static DrawingBackground DrawingBackground
         {
-            get { return ReadEnum(AppConstants.SettingInkDrawingBackground, DrawingBackground.White); }
-            set { WriteEnum(AppConstants.SettingInkDrawingBackground, value); }
+            get { return AppSettings.ReadEnum(AppConstants.SettingInkDrawingBackground, DrawingBackground.White); }
+            set { AppSettings.Write(AppConstants.SettingInkDrawingBackground, value.ToString()); }
         }
 
         public static int Version
@@ -126,58 +100,9 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static T ReadEnum<T>(string key, T fallback) where T : struct
+        private static void WriteAndBump(string key, object value)
         {
-            try
-            {
-                T value;
-                var stored = ApplicationData.Current.LocalSettings.Values[key] as string;
-                return stored != null && Enum.TryParse(stored, out value) ? value : fallback;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"InkSettingsService: could not read {key}", ex);
-                return fallback;
-            }
-        }
-
-        private static void WriteEnum<T>(string key, T value) where T : struct
-        {
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[key] = value.ToString();
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"InkSettingsService: could not save {key}", ex);
-            }
-        }
-
-        private static bool Read(string key, bool fallback)
-        {
-            try
-            {
-                var stored = ApplicationData.Current.LocalSettings.Values[key];
-                return stored == null ? fallback : Convert.ToBoolean(stored);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"InkSettingsService: could not read {key}", ex);
-                return fallback;
-            }
-        }
-
-        private static void Write(string key, bool value)
-        {
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[key] = value;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"InkSettingsService: could not save {key}", ex);
-            }
-
+            AppSettings.Write(key, value);
             Interlocked.Increment(ref s_version);
         }
     }

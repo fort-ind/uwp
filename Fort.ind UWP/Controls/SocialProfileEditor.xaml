@@ -93,6 +93,120 @@
                 <local:SocialCharacterRing x:Name="BioRing" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
             </Grid>
 
+            <Grid Margin="0,24,0,0" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Uid="SocialProfileLocationBox"
+                         x:Name="LocationBox"
+                         IsSpellCheckEnabled="False"
+                         TextChanged="Field_TextChanged">
+                    <i:Interaction.Behaviors>
+                        <local:PenHandwritingBehavior/>
+                    </i:Interaction.Behaviors>
+                </TextBox>
+                <local:SocialCharacterRing x:Name="LocationRing" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Margin="0,24,0,0">
+                <CalendarDatePicker x:Uid="SocialProfileBirthdayPicker"
+                                    x:Name="BirthdayPicker"
+                                    MinWidth="200"
+                                    DateChanged="BirthdayPicker_DateChanged"/>
+                <Button x:Uid="SocialProfileClearBirthdayButton"
+                        x:Name="ClearBirthdayButton"
+                        Margin="8,0,0,0"
+                        Width="32" Height="32" Padding="0"
+                        VerticalAlignment="Bottom"
+                        Visibility="Collapsed"
+                        Click="ClearBirthdayButton_Click">
+                    <FontIcon Glyph="&#xE711;" FontSize="12" AutomationProperties.AccessibilityView="Raw"/>
+                </Button>
+            </StackPanel>
+
+            <TextBlock x:Uid="SocialProfileFieldsHeading"
+                       x:Name="FieldsHeading"
+                       Margin="0,24,0,0"
+                       Style="{StaticResource BodyTextBlockStyle}"/>
+
+            <ItemsControl x:Name="FieldRows"
+                          IsTabStop="False"
+                          SizeChanged="FieldRows_SizeChanged">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="local:SocialProfileFieldRow">
+                        <Grid Margin="0,8,0,0"
+                              Loaded="FieldRow_Loaded"
+                              ContextRequested="FieldRow_ContextRequested">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBox x:Uid="SocialProfileFieldLabelBox"
+                                     Text="{x:Bind Name}"
+                                     Grid.ColumnSpan="{x:Bind LabelColumnSpan, Mode=OneWay}"
+                                     AutomationProperties.Name="{x:Bind LabelBoxName, Mode=OneWay}"
+                                     IsSpellCheckEnabled="False"
+                                     TextChanged="FieldLabel_TextChanged">
+                                <i:Interaction.Behaviors>
+                                    <local:PenHandwritingBehavior/>
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                            <TextBox x:Uid="SocialProfileFieldValueBox"
+                                     Text="{x:Bind Value}"
+                                     Grid.Row="{x:Bind ValueRow, Mode=OneWay}"
+                                     Grid.Column="{x:Bind ValueColumn, Mode=OneWay}"
+                                     Grid.ColumnSpan="{x:Bind ValueColumnSpan, Mode=OneWay}"
+                                     Margin="{x:Bind ValueMargin, Mode=OneWay}"
+                                     AutomationProperties.Name="{x:Bind ValueBoxName, Mode=OneWay}"
+                                     IsSpellCheckEnabled="False"
+                                     TextChanged="FieldValue_TextChanged">
+                                <i:Interaction.Behaviors>
+                                    <local:PenHandwritingBehavior/>
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                            <Button Grid.Column="2"
+                                    Margin="8,0,0,0"
+                                    Width="32" Height="32" Padding="0"
+                                    VerticalAlignment="Top"
+                                    AutomationProperties.Name="{x:Bind RemoveButtonName, Mode=OneWay}"
+                                    ToolTipService.ToolTip="{x:Bind RemoveButtonName, Mode=OneWay}"
+                                    Click="RemoveFieldButton_Click">
+                                <FontIcon Glyph="&#xE711;" FontSize="12" AutomationProperties.AccessibilityView="Raw"/>
+                            </Button>
+                            <TextBlock Grid.Row="2" Grid.ColumnSpan="2"
+                                       Margin="0,4,0,0"
+                                       Text="{x:Bind Error, Mode=OneWay}"
+                                       Visibility="{x:Bind HasError, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Grid Margin="0,8,0,0">
+                <Button x:Name="AddFieldButton" Click="AddFieldButton_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE710;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Uid="SocialProfileAddFieldText"/>
+                    </StackPanel>
+                </Button>
+                <TextBlock x:Name="FieldCountText"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           AutomationProperties.AccessibilityView="Raw"/>
+            </Grid>
+
             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,24,0,0">
                 <Button x:Uid="SocialProfileSaveButton" x:Name="SaveButton"
                         Style="{StaticResource AccentButtonStyle}"

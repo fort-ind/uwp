@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -175,51 +174,27 @@ namespace Fort.ind_UWP
 
         internal static string LastVisibility()
         {
-            try
+            var stored = AppSettings.ReadString(AppConstants.SettingSocialLastVisibility, null);
+            switch (stored)
             {
-                var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialLastVisibility] as string;
-                switch (stored)
-                {
-                    case SocialNoteActionService.HomeVisibility:
-                    case SocialNoteActionService.FollowersVisibility:
-                    case SocialPostService.DirectVisibility:
-                        return stored;
-                    default:
-                        return SocialNoteActionService.PublicVisibility;
-                }
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialComposePage: could not read the last visibility", ex);
-                return SocialNoteActionService.PublicVisibility;
+                case SocialNoteActionService.HomeVisibility:
+                case SocialNoteActionService.FollowersVisibility:
+                case SocialPostService.DirectVisibility:
+                    return stored;
+                default:
+                    return SocialNoteActionService.PublicVisibility;
             }
         }
 
         internal static bool LastLocalOnly()
         {
-            try
-            {
-                var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialLastLocalOnly];
-                return stored != null && Convert.ToBoolean(stored);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialComposePage: could not read the last federation choice", ex);
-                return false;
-            }
+            return AppSettings.ReadBool(AppConstants.SettingSocialLastLocalOnly, false);
         }
 
         internal static void RememberVisibility(SocialComposeDraft draft)
         {
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialLastVisibility] = draft.Visibility;
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialLastLocalOnly] = draft.LocalOnly;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialComposePage: could not remember the visibility", ex);
-            }
+            AppSettings.Write(AppConstants.SettingSocialLastVisibility, draft.Visibility);
+            AppSettings.Write(AppConstants.SettingSocialLastLocalOnly, draft.LocalOnly);
         }
 
         private void SaveDraft()
@@ -291,8 +266,8 @@ namespace Fort.ind_UWP
                 var bounds = Window.Current.Bounds;
                 if (bounds.Width < AppConstants.SocialComposeMinWidth || bounds.Height < AppConstants.SocialComposeMinHeight) return;
 
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialComposeWindowSize] =
-                    string.Format(CultureInfo.InvariantCulture, "{0:0},{1:0}", bounds.Width, bounds.Height);
+                AppSettings.Write(AppConstants.SettingSocialComposeWindowSize,
+                                  string.Format(CultureInfo.InvariantCulture, "{0:0},{1:0}", bounds.Width, bounds.Height));
             }
             catch (Exception ex)
             {
@@ -302,25 +277,18 @@ namespace Fort.ind_UWP
 
         public static Size RememberedSize()
         {
-            try
+            var stored = AppSettings.ReadString(AppConstants.SettingSocialComposeWindowSize, null);
+            if (!string.IsNullOrEmpty(stored))
             {
-                var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialComposeWindowSize] as string;
-                if (!string.IsNullOrEmpty(stored))
+                var parts = stored.Split(',');
+                double width, height;
+                if (parts.Length == 2
+                    && double.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out width)
+                    && double.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out height)
+                    && width >= AppConstants.SocialComposeMinWidth && height >= AppConstants.SocialComposeMinHeight)
                 {
-                    var parts = stored.Split(',');
-                    double width, height;
-                    if (parts.Length == 2
-                        && double.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out width)
-                        && double.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out height)
-                        && width >= AppConstants.SocialComposeMinWidth && height >= AppConstants.SocialComposeMinHeight)
-                    {
-                        return new Size(width, height);
-                    }
+                    return new Size(width, height);
                 }
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("SocialComposePage: could not read the window size", ex);
             }
 
             return new Size(AppConstants.SocialComposeWindowWidth, AppConstants.SocialComposeWindowHeight);

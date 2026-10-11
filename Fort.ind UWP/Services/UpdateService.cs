@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
-using Windows.Storage;
 using Windows.Web.Http;
 
 namespace Fort.ind_UWP
@@ -51,31 +50,8 @@ namespace Fort.ind_UWP
 
         public static bool AutomaticChecksEnabled
         {
-            get
-            {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingCheckForUpdates];
-                    if (stored == null) return true;
-                    return Convert.ToBoolean(stored);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("UpdateService: AutomaticChecksEnabled read failed", ex);
-                    return true;
-                }
-            }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingCheckForUpdates] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("UpdateService: AutomaticChecksEnabled write failed", ex);
-                }
-            }
+            get { return AppSettings.ReadBool(AppConstants.SettingCheckForUpdates, true); }
+            set { AppSettings.Write(AppConstants.SettingCheckForUpdates, value); }
         }
 
         public static async Task<UpdateCheckResult> CheckNowAsync()
@@ -133,14 +109,7 @@ namespace Fort.ind_UWP
         {
             if (version == null) return;
 
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingUpdateDismissedVersion] = version.ToString();
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("UpdateService: could not record the dismissed version", ex);
-            }
+            AppSettings.Write(AppConstants.SettingUpdateDismissedVersion, version.ToString());
         }
 
         public static string FormatForDisplay(Version version)
@@ -253,15 +222,7 @@ namespace Fort.ind_UWP
 
         private static bool IsAutomaticCheckDue()
         {
-            string raw = null;
-            try
-            {
-                raw = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingUpdateLastCheckedUtc] as string;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("UpdateService: could not read the last check time", ex);
-            }
+            var raw = AppSettings.ReadString(AppConstants.SettingUpdateLastCheckedUtc, null);
 
             DateTimeOffset lastChecked;
             if (string.IsNullOrEmpty(raw) ||
@@ -276,32 +237,16 @@ namespace Fort.ind_UWP
 
         private static void RememberLatest(Version latest)
         {
-            try
-            {
-                var values = ApplicationData.Current.LocalSettings.Values;
-                values[AppConstants.SettingUpdateLatestVersion] = latest.ToString();
-                values[AppConstants.SettingUpdateLastCheckedUtc] = DateTimeOffset.UtcNow.ToString("o", CultureInfo.InvariantCulture);
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("UpdateService: could not record the check", ex);
-            }
+            AppSettings.Write(AppConstants.SettingUpdateLatestVersion, latest.ToString());
+            AppSettings.Write(AppConstants.SettingUpdateLastCheckedUtc, DateTimeOffset.UtcNow.ToString("o", CultureInfo.InvariantCulture));
         }
 
         private static Version ReadVersionSetting(string key)
         {
-            try
-            {
-                var raw = ApplicationData.Current.LocalSettings.Values[key] as string;
+            var raw = AppSettings.ReadString(key, null);
 
-                Version parsed;
-                return !string.IsNullOrEmpty(raw) && Version.TryParse(raw, out parsed) ? parsed : null;
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error($"UpdateService: could not read {key}", ex);
-                return null;
-            }
+            Version parsed;
+            return !string.IsNullOrEmpty(raw) && Version.TryParse(raw, out parsed) ? parsed : null;
         }
 
         private static string JsonString(JsonObject obj, string key)

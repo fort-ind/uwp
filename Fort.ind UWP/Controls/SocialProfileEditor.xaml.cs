@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -40,6 +41,9 @@ namespace Fort.ind_UWP
         public SocialProfileEditor()
         {
             this.InitializeComponent();
+
+            FieldRows.ItemsSource = _fieldRows;
+            BirthdayPicker.MaxDate = DateTimeOffset.Now;
 
             Loaded += SocialProfileEditor_Loaded;
             Unloaded += SocialProfileEditor_Unloaded;
@@ -110,6 +114,7 @@ namespace Fort.ind_UWP
             {
                 _accountId = null;
                 ResetEdits("", "");
+                ResetDetails("", null, null);
                 return;
             }
 
@@ -121,11 +126,13 @@ namespace Fort.ind_UWP
             if (!sameAccount)
             {
                 ResetEdits(name, bio);
+                ResetDetails(detail.Location, detail.Birthday, detail.Fields);
             }
             else
             {
                 RebaseField(NameBox, ref _savedName, name);
                 RebaseField(BioBox, ref _savedBio, bio);
+                RebaseDetails(detail.Location, detail.Birthday, detail.Fields);
             }
 
             AvatarPicture.DisplayName = SocialNoteItem.DisplayNameOf(detail.User);
@@ -185,7 +192,7 @@ namespace Fort.ind_UWP
 
         private bool HasChanges
         {
-            get { return NameChanged || BioChanged || _pendingAvatar != null || _pendingBanner != null; }
+            get { return NameChanged || BioChanged || DetailsChanged || _pendingAvatar != null || _pendingBanner != null; }
         }
 
         private void Field_TextChanged(object sender, TextChangedEventArgs e)
@@ -203,7 +210,10 @@ namespace Fort.ind_UWP
             NameRing.Update(nameLength, SocialProfileEditService.NameMaxLength);
             BioRing.Update(bioLength, SocialProfileEditService.BioMaxLength);
 
-            var withinLimits = nameLength <= SocialProfileEditService.NameMaxLength && bioLength <= SocialProfileEditService.BioMaxLength;
+            UpdateDetailsState();
+
+            var withinLimits = nameLength <= SocialProfileEditService.NameMaxLength && bioLength <= SocialProfileEditService.BioMaxLength
+                               && DetailsValid;
             var changed = HasChanges;
 
             SaveButton.IsEnabled = !_saving && changed && withinLimits;
@@ -214,12 +224,71 @@ namespace Fort.ind_UWP
             BioBox.IsReadOnly = _saving;
         }
 
+        public bool HasUnsavedChanges
+        {
+            get { return _accountId != null && HasChanges; }
+        }
+
+        private bool CanSave
+        {
+            get { return SaveButton.IsEnabled; }
+        }
+
+        public async Task<bool> ConfirmLeaveAsync()
+        {
+            try
+            {
+                if (!HasUnsavedChanges) return true;
+
+                var dialog = new ContentDialog
+                {
+                    Title = LocalizedStrings.Get("SocialProfileLeaveDialogTitle"),
+                    Content = LocalizedStrings.Get("SocialProfileLeaveDialogBody"),
+                    PrimaryButtonText = LocalizedStrings.Get("SocialProfileLeaveDialogSave"),
+                    SecondaryButtonText = LocalizedStrings.Get("SocialProfileLeaveDialogDontSave"),
+                    CloseButtonText = LocalizedStrings.Get("DialogCancel"),
+                    DefaultButton = ContentDialogButton.Primary,
+                    IsPrimaryButtonEnabled = CanSave
+                };
+
+                var result = await DialogService.ShowAsync(this, dialog);
+                switch (result)
+                {
+                    case ContentDialogResult.Primary:
+                        return await SaveCoreAsync();
+                    case ContentDialogResult.Secondary:
+                        DiscardEdits();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialProfileEditor: the leave confirmation failed", ex);
+                return false;
+            }
+        }
+
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (_saving || !HasChanges) return;
+                await SaveCoreAsync();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialProfileEditor: save failed", ex);
+            }
+        }
 
+        private async Task<bool> SaveCoreAsync()
+        {
+            if (_saving || !HasChanges) return !HasChanges;
+            if (!CanSave) return false;
+
+            try
+            {
                 var edit = new SocialProfileEdit
                 {
                     NameChanged = NameChanged,
@@ -229,6 +298,7 @@ namespace Fort.ind_UWP
                     Avatar = _pendingAvatar,
                     Banner = _pendingBanner
                 };
+                AddDetailsTo(edit);
                 var savedName = NameBox.Text;
                 var savedBio = BioBox.Text;
                 var account = _accountId;
@@ -241,14 +311,18 @@ namespace Fort.ind_UWP
                 {
                     _savedName = savedName;
                     _savedBio = savedBio;
+                    AcceptSavedDetails(edit);
                     ClearPendingImages();
                     ShowStatus(LocalizedStrings.Get("SocialProfileSaved"));
                     ShowProfile(ProfileService.CurrentUser);
                 }
+
+                return saved;
             }
             catch (Exception ex)
             {
                 AppLog.Error("SocialProfileEditor: save failed", ex);
+                return false;
             }
             finally
             {
@@ -275,10 +349,16 @@ namespace Fort.ind_UWP
 
         private void DiscardButton_Click(object sender, RoutedEventArgs e)
         {
+            DiscardEdits();
+        }
+
+        private void DiscardEdits()
+        {
             if (_saving) return;
 
             SetText(NameBox, _savedName);
             SetText(BioBox, _savedBio);
+            RestoreSavedDetails();
             ClearPendingImages();
             StatusText.Visibility = Visibility.Collapsed;
 

@@ -1,0 +1,256 @@
+name: Build MSIX Package
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version override (e.g. 2.1.4.0). Leave empty to derive it from Package.appxmanifest.'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: windows
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86, x64, ARM64]
+        configuration: [Release]
+
+    env:
+      Solution_Name: Fort.ind UWP.sln
+      Project_Path: Fort.ind UWP\Fort.ind UWP.csproj
+      Manifest_Path: Fort.ind UWP\Package.appxmanifest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+    - name: Checkout repository
+      uses: https://code.forgejo.org/actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Resolve Visual Studio MSBuild path
+      id: msbuild
+      run: |
+        $msbuildPath = $null
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        if (Test-Path $vswhere) {
+          $msbuildPath = & $vswhere -latest -prerelease -products * -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+        }
+        if ([string]::IsNullOrWhiteSpace($msbuildPath)) {
+          $msbuildPath = Get-ChildItem "$env:ProgramFiles\Microsoft Visual Studio\*\*\MSBuild\Current\Bin\MSBuild.exe" -ErrorAction SilentlyContinue |
+                         Sort-Object FullName -Descending |
+                         Select-Object -First 1 -ExpandProperty FullName
+        }
+        if ([string]::IsNullOrWhiteSpace($msbuildPath)) {
+          throw "Could not locate Visual Studio MSBuild.exe on this runner"
+        }
+
+        Write-Host "Using MSBuild: $msbuildPath"
+        "msbuild_path=$msbuildPath" >> $env:GITHUB_OUTPUT
+
+    - name: Restore solution
+      run: |
+        & "${{ steps.msbuild.outputs.msbuild_path }}" "${{ env.Solution_Name }}" `
+          /t:Restore `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:Platform=${{ matrix.platform }} `
+          /nologo
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    - name: Update manifest version
+      id: version
+      env:
+        GH_REF: ${{ github.ref }}
+        GH_REF_NAME: ${{ github.ref_name }}
+        VERSION_INPUT: ${{ github.event.inputs.version }}
+      run: |
+
+        $manifestPath = "${{ env.Manifest_Path }}"
+        $manifestGitPath = $manifestPath -replace '\\', '/'
+
+        [xml]$manifest = Get-Content $manifestPath
+        $manifestVersion = [Version]$manifest.Package.Identity.Version
+        $series = "$($manifestVersion.Major).$($manifestVersion.Minor)"
+
+        function Format-FourPart([string]$raw) {
+          $parts = (($raw -split '-')[0]).Split('.')
+          while ($parts.Count -lt 4) { $parts += '0' }
+          return ($parts[0..3] -join '.')
+        }
+
+        if ($env:GH_REF -match '^refs/tags/v(.+)$') {
+          $version = Format-FourPart $matches[1]
+          $source = "tag $env:GH_REF_NAME"
+        }
+        elseif (-not [string]::IsNullOrWhiteSpace($env:VERSION_INPUT)) {
+          $version = Format-FourPart $env:VERSION_INPUT
+          $source = "workflow_dispatch input"
+        }
+        else {
+          $bumpCommit = $null
+          foreach ($sha in @(git log --format=%H -- $manifestGitPath)) {
+            $blob = git show "${sha}:$manifestGitPath" 2>$null
+            if ($LASTEXITCODE -ne 0 -or -not $blob) { break }
+            try { [xml]$old = ($blob -join "`n").TrimStart([char]0xFEFF, ' ', "`t", "`r", "`n") } catch { break }
+            $v = [Version]$old.Package.Identity.Version
+            if ("$($v.Major).$($v.Minor)" -ne $series) { break }
+            $bumpCommit = $sha
+          }
+
+          if ($bumpCommit) {
+            $build = [int](git rev-list --count "$bumpCommit..HEAD")
+            Write-Host "$series was introduced by $bumpCommit"
+          } else {
+            Write-Warning "Could not locate the commit that introduced $series; using build 0"
+            $build = 0
+          }
+
+          $version = "$series.$build.0"
+          $source = "Package.appxmanifest + commit count"
+        }
+
+        Write-Host "Setting version to: $version (source: $source)"
+        $manifest.Package.Identity.Version = $version
+        $manifest.Save($manifestPath)
+        "APP_VERSION=$version" >> $env:GITHUB_ENV
+        "app_version=$version" >> $env:GITHUB_OUTPUT
+        exit 0
+
+    - name: Decode signing certificate
+      id: cert
+      env:
+        SIGNING_CERT: ${{ secrets.SIGNING_CERTIFICATE }}
+        CERT_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+      run: |
+        if ([string]::IsNullOrEmpty($env:SIGNING_CERT)) {
+          Write-Host "No signing certificate found, will build unsigned"
+          "has_certificate=false" >> $env:GITHUB_OUTPUT
+          exit 0
+        }
+
+        $pfxPath = "Fort.ind UWP\Fort.ind UWP_TemporaryKey.pfx"
+        $certBytes = [Convert]::FromBase64String($env:SIGNING_CERT)
+        [IO.File]::WriteAllBytes($pfxPath, $certBytes)
+
+        $cerPath = "Fort.ind UWP\Fort.ind_UWP.cer"
+        try {
+          if (-not [string]::IsNullOrWhiteSpace($env:CERT_PASSWORD)) {
+            $x509 = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2(
+              (Resolve-Path $pfxPath).Path,
+              $env:CERT_PASSWORD,
+              [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet
+            )
+            [IO.File]::WriteAllBytes($cerPath, $x509.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
+            Write-Host "Exported public certificate to: $cerPath"
+          } else {
+            Write-Host "CERT_PASSWORD is empty; skipping CER export"
+          }
+
+          "has_certificate=true" >> $env:GITHUB_OUTPUT
+        } catch {
+          Write-Warning "Certificate processing failed, building unsigned instead. Error: $($_.Exception.Message)"
+          Remove-Item $pfxPath -Force -ErrorAction SilentlyContinue
+          "has_certificate=false" >> $env:GITHUB_OUTPUT
+        }
+
+    - name: Build MSIX Package (Signed)
+      if: steps.cert.outputs.has_certificate == 'true'
+      env:
+        CERT_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+      run: |
+        & "${{ steps.msbuild.outputs.msbuild_path }}" "${{ env.Project_Path }}" `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:Platform=${{ matrix.platform }} `
+          /p:UapAppxPackageBuildMode=SideloadOnly `
+          /p:AppxBundle=Never `
+          /p:AppxPackageSigningEnabled=true `
+          /p:PackageCertificateThumbprint="" `
+          /p:PackageCertificateKeyFile="Fort.ind UWP_TemporaryKey.pfx" `
+          /p:PackageCertificatePassword="$env:CERT_PASSWORD" `
+          /p:GenerateAppxPackageOnBuild=true `
+          /restore `
+          /nologo
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    - name: Build MSIX Package (Unsigned)
+      if: steps.cert.outputs.has_certificate != 'true'
+      run: |
+        & "${{ steps.msbuild.outputs.msbuild_path }}" "${{ env.Project_Path }}" `
+          /p:Configuration=${{ matrix.configuration }} `
+          /p:Platform=${{ matrix.platform }} `
+          /p:UapAppxPackageBuildMode=SideloadOnly `
+          /p:AppxBundle=Never `
+          /p:AppxPackageSigningEnabled=false `
+          /p:GenerateAppxPackageOnBuild=true `
+          /restore `
+          /nologo
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    - name: Stage release files
+      env:
+        PLATFORM: ${{ matrix.platform }}
+      run: |
+        $package = Get-ChildItem -Path "Fort.ind UWP\AppPackages" -Directory |
+                   ForEach-Object { Get-ChildItem -Path $_.FullName -File } |
+                   Where-Object { $_.Extension -in '.msix', '.appx' } |
+                   Select-Object -First 1
+        if (-not $package) {
+          throw "No .msix or .appx package found under Fort.ind UWP\AppPackages"
+        }
+        $packageDir = $package.Directory.FullName
+
+        $stage = Join-Path $env:GITHUB_WORKSPACE "release-files"
+        if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
+        New-Item -ItemType Directory -Path $stage -Force | Out-Null
+
+        Copy-Item $package.FullName -Destination $stage
+        Copy-Item "scripts\Install.ps1" -Destination $stage
+
+        $cer = Get-ChildItem -Path $packageDir -Filter "*.cer" -File | Select-Object -First 1
+        if (-not $cer -and (Test-Path "Fort.ind UWP\Fort.ind_UWP.cer")) {
+          $cer = Get-Item "Fort.ind UWP\Fort.ind_UWP.cer"
+        }
+        if ($cer) {
+          Copy-Item $cer.FullName -Destination $stage
+        } else {
+          Write-Warning "No signing certificate to include; the package is unsigned"
+        }
+
+        $dependencyRoot = Join-Path $packageDir "Dependencies"
+        $arch = $env:PLATFORM.ToLowerInvariant()
+        $archSource = Join-Path $dependencyRoot $arch
+        if (-not (Get-ChildItem -Path $archSource -File -ErrorAction SilentlyContinue)) {
+          throw "No framework packages found in $archSource"
+        }
+
+        $archTarget = Join-Path $stage "Dependencies\$arch"
+        New-Item -ItemType Directory -Path $archTarget -Force | Out-Null
+        Copy-Item -Path (Join-Path $archSource "*") -Destination $archTarget
+        Get-ChildItem -Path $dependencyRoot -File | Copy-Item -Destination (Join-Path $stage "Dependencies")
+
+        Write-Host "Release files:"
+        Get-ChildItem -Path $stage -Recurse -File | ForEach-Object {
+          Write-Host ("  {0}  ({1:N1} MB)" -f $_.FullName.Substring($stage.Length + 1), ($_.Length / 1MB))
+        }
+
+    - name: Upload MSIX Package
+      uses: https://code.forgejo.org/forgejo/upload-artifact@v4
+      with:
+        name: ${{ matrix.platform }}-${{ matrix.configuration }}-v${{ steps.version.outputs.app_version }}
+        path: release-files
+        if-no-files-found: error
+
+    - name: Remove signing key
+      if: always()
+      run: |
+        Remove-Item "Fort.ind UWP\Fort.ind UWP_TemporaryKey.pfx" -Force -ErrorAction SilentlyContinue
+        exit 0

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Windows.Foundation;
-using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
@@ -10,7 +9,7 @@ using Windows.UI.Xaml.Media;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class SettingsPage : Page
+    public sealed partial class SettingsPersonalizationPage : Page
     {
         private const string DefaultCustomAccentSeed = "#0078D7";
 
@@ -69,7 +68,7 @@ namespace Fort.ind_UWP
                 var restBrush = isDark ? s_restBrushDark : s_restBrushLight;
 
                 PaintMatchTintSwatch();
-                PaintCustomAccentSwatch(ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppCustomAccentColor] as string);
+                PaintCustomAccentSwatch(AppSettings.ReadString(AppConstants.SettingAppCustomAccentColor, null));
 
                 foreach (var check in AccentSwatchChecks.Values)
                 {
@@ -106,7 +105,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: UpdateAccentSelection failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: UpdateAccentSelection failed", ex);
             }
         }
 
@@ -175,7 +174,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: AccentColorButton_Click failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: AccentColorButton_Click failed", ex);
             }
         }
 
@@ -194,9 +193,8 @@ namespace Fort.ind_UWP
                     var warningText = content.FindName("AccentContrastWarningText") as TextBlock;
                     if (picker == null || warning == null || warningText == null) return;
 
-                    var localSettings = ApplicationData.Current.LocalSettings;
                     Color seed;
-                    if (!ColorHelper.TryHexToColor(localSettings.Values[AppConstants.SettingAppCustomAccentColor] as string, out seed)
+                    if (!ColorHelper.TryHexToColor(AppSettings.ReadString(AppConstants.SettingAppCustomAccentColor, null), out seed)
                         && !ColorHelper.TryHexToColor(AccentColorService.ResolveSavedAccentHex(), out seed))
                     {
                         seed = ColorHelper.HexToColor(DefaultCustomAccentSeed);
@@ -224,14 +222,14 @@ namespace Fort.ind_UWP
                     if (result != ContentDialogResult.Primary) return;
 
                     var hex = ColorHelper.ColorToHex(picker.Color);
-                    localSettings.Values[AppConstants.SettingAppCustomAccentColor] = hex;
+                    AppSettings.Write(AppConstants.SettingAppCustomAccentColor, hex);
                     AccentColorService.SavedAccentTag = hex;
                     UpdateAccentSelection();
                 });
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: Custom accent dialog failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: Custom accent dialog failed", ex);
             }
         }
 
@@ -262,7 +260,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                await RequestAppRestartAsync();
+                await AppRestart.RequestAsync();
 
                 await DialogService.ShowMessageAsync(this,
                                                      LocalizedStrings.Get("AccentRestartFailedDialogTitle"),
@@ -271,7 +269,7 @@ namespace Fort.ind_UWP
             }
             catch (Exception ex)
             {
-                AppLog.Error("SettingsPage: AccentRestartButton_Click failed", ex);
+                AppLog.Error("SettingsPersonalizationPage: AccentRestartButton_Click failed", ex);
             }
         }
     }

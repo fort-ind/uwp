@@ -107,30 +107,8 @@ namespace Fort.ind_UWP
 
         public static bool ShowRemoteListNotice
         {
-            get
-            {
-                try
-                {
-                    var stored = Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialRemoteListNotice];
-                    return stored == null || Convert.ToBoolean(stored);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialFollowService: could not read the remote list notice setting", ex);
-                    return true;
-                }
-            }
-            set
-            {
-                try
-                {
-                    Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialRemoteListNotice] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("SocialFollowService: could not save the remote list notice setting", ex);
-                }
-            }
+            get { return AppSettings.ReadBool(AppConstants.SettingSocialRemoteListNotice, true); }
+            set { AppSettings.Write(AppConstants.SettingSocialRemoteListNotice, value); }
         }
 
         public static SocialFollowState StateOf(SocialUserDetail detail)

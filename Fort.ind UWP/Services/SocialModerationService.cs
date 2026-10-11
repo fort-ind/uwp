@@ -76,72 +76,89 @@ namespace Fort.ind_UWP
             return result.Value;
         }
 
-        public static async Task MuteAsync(UIElement owner, SocialUser user, TimeSpan? duration)
+        public static async Task<bool> MuteAsync(UIElement owner, SocialUser user, TimeSpan? duration)
         {
-            if (!CanModerate(user)) return;
-            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser)) return;
+            if (!CanModerate(user)) return false;
+            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser)) return false;
 
             DateTimeOffset? ends = duration.HasValue ? DateTimeOffset.UtcNow + duration.Value : (DateTimeOffset?)null;
-            await RunAsync(owner, user, SocialRelationKind.Mute, true,
+            return await RunAsync(owner, user, SocialRelationKind.Mute, true,
                            token => SocialApiService.MuteUserAsync(token, user.Id, ends, CancellationToken.None),
                            AlreadyMutingCode, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser,
                            "SocialMutedUserAnnouncementFormat", "SocialMuteUserFailedTitleFormat", ends);
         }
 
-        public static async Task UnmuteAsync(UIElement owner, SocialUser user)
+        public static async Task<bool> UnmuteAsync(UIElement owner, SocialUser user)
         {
-            if (!CanModerate(user)) return;
-            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser)) return;
+            if (!CanModerate(user)) return false;
+            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser)) return false;
 
-            await RunAsync(owner, user, SocialRelationKind.Mute, false,
+            return await RunAsync(owner, user, SocialRelationKind.Mute, false,
                            token => SocialApiService.UnmuteUserAsync(token, user.Id, CancellationToken.None),
                            NotMutingCode, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser,
                            "SocialUnmutedUserAnnouncementFormat", "SocialUnmuteUserFailedTitleFormat", null);
         }
 
-        public static async Task SetRenotesHiddenAsync(UIElement owner, SocialUser user, bool hide)
+        public static async Task<bool> SetRenotesHiddenAsync(UIElement owner, SocialUser user, bool hide)
         {
-            if (!CanModerate(user)) return;
-            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser)) return;
+            if (!CanModerate(user)) return false;
+            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser)) return false;
 
-            await RunAsync(owner, user, SocialRelationKind.RenoteMute, hide,
+            return await RunAsync(owner, user, SocialRelationKind.RenoteMute, hide,
                            token => SocialApiService.MuteRenotesAsync(token, user.Id, hide, CancellationToken.None),
                            hide ? AlreadyMutingCode : NotMutingCode, SocialPermissions.WriteMutes, SocialSignInPrompt.MuteUser,
                            hide ? "SocialRenotesHiddenAnnouncementFormat" : "SocialRenotesShownAnnouncementFormat",
                            hide ? "SocialHideRenotesFailedTitleFormat" : "SocialShowRenotesFailedTitleFormat", null);
         }
 
-        public static async Task BlockAsync(UIElement owner, SocialUser user)
+        public static async Task<bool> BlockAsync(UIElement owner, SocialUser user, bool confirm = true)
         {
-            if (!CanModerate(user)) return;
-            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteBlocks, SocialSignInPrompt.Block)) return;
+            if (!CanModerate(user)) return false;
+            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteBlocks, SocialSignInPrompt.Block)) return false;
 
-            var name = SocialNoteItem.DisplayNameOf(user);
-            var confirmed = await DialogService.ShowConfirmAsync(owner,
-                                                                 LocalizedStrings.Format("SocialBlockDialogTitleFormat", name),
-                                                                 LocalizedStrings.Get("SocialBlockDialogBody"),
-                                                                 LocalizedStrings.Get("SocialBlockDialogConfirm"),
-                                                                 LocalizedStrings.Get("DialogCancel"),
-                                                                 ContentDialogButton.Close);
-            if (!confirmed) return;
+            if (confirm)
+            {
+                var name = SocialNoteItem.DisplayNameOf(user);
+                var confirmed = await DialogService.ShowConfirmAsync(owner,
+                                                                     LocalizedStrings.Format("SocialBlockDialogTitleFormat", name),
+                                                                     LocalizedStrings.Get("SocialBlockDialogBody"),
+                                                                     LocalizedStrings.Get("SocialBlockDialogConfirm"),
+                                                                     LocalizedStrings.Get("DialogCancel"),
+                                                                     ContentDialogButton.Close);
+                if (!confirmed) return false;
+            }
 
             var changed = await RunAsync(owner, user, SocialRelationKind.Block, true,
                                          token => SocialApiService.BlockAsync(token, user.Id, true, CancellationToken.None),
                                          AlreadyBlockingCode, SocialPermissions.WriteBlocks, SocialSignInPrompt.Block,
                                          "SocialBlockedAnnouncementFormat", "SocialBlockFailedTitleFormat", null);
             if (changed) await SocialFollowService.RereadAsync(user.Id);
+            return changed;
         }
 
-        public static async Task UnblockAsync(UIElement owner, SocialUser user)
+        public static async Task<bool> UnblockAsync(UIElement owner, SocialUser user, bool confirm = false)
         {
-            if (!CanModerate(user)) return;
-            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteBlocks, SocialSignInPrompt.Block)) return;
+            if (!CanModerate(user)) return false;
+            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteBlocks, SocialSignInPrompt.Block)) return false;
+
+            if (confirm)
+            {
+                var name = SocialNoteItem.DisplayNameOf(user);
+                var confirmed = await DialogService.ShowConfirmAsync(owner,
+                                                                     LocalizedStrings.Format("SocialUnblockDialogTitleFormat", name),
+                                                                     LocalizedStrings.Get("SocialUnblockDialogBody"),
+                                                                     LocalizedStrings.Get("SocialUnblockDialogConfirm"),
+                                                                     LocalizedStrings.Get("DialogCancel"),
+                                                                     ContentDialogButton.Close);
+                if (!confirmed) return false;
+            }
 
             var changed = await RunAsync(owner, user, SocialRelationKind.Block, false,
                                          token => SocialApiService.BlockAsync(token, user.Id, false, CancellationToken.None),
                                          NotBlockingCode, SocialPermissions.WriteBlocks, SocialSignInPrompt.Block,
                                          "SocialUnblockedAnnouncementFormat", "SocialUnblockFailedTitleFormat", null);
             if (changed) await SocialFollowService.RereadAsync(user.Id);
+            return changed;
         }
 
         private static async Task<bool> RunAsync(UIElement owner, SocialUser user, SocialRelationKind kind, bool on,

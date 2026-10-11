@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace Fort.ind_UWP
 {
-    public sealed class SocialUserItem : INotifyPropertyChanged, ISocialFeedEntry
+    public sealed class SocialUserItem : BindableBase, ISocialFeedEntry
     {
         private const int AvatarDecodeSize = 40;
 
@@ -20,14 +18,18 @@ namespace Fort.ind_UWP
 
         private bool _avatarCreated;
 
-        private SocialUserItem(string pagingId, SocialUserDetail detail)
+        private SocialFollowRequestState _requestState;
+
+        private bool _moderationActive = true;
+
+        private SocialUserItem(string pagingId, SocialUserDetail detail, bool isRequest)
         {
             PagingId = pagingId;
+            IsRequest = isRequest;
+            _requestState = isRequest ? SocialFollowRequestState.Pending : SocialFollowRequestState.None;
             _detail = detail;
             NameSegments = MfmText.ParseName(detail.User.DisplayName, detail.User.Emojis);
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public string PagingId { get; private set; }
 
@@ -62,21 +64,56 @@ namespace Fort.ind_UWP
             get { return SocialFollowService.StateOf(_detail); }
         }
 
+        public bool IsRequest { get; private set; }
+
+        public SocialModerationList? Moderation { get; private set; }
+
+        public DateTimeOffset? ModerationExpiresAt { get; private set; }
+
+        public bool ModerationActive
+        {
+            get { return _moderationActive; }
+            set
+            {
+                if (SetProperty(ref _moderationActive, value)) OnPropertyChanged("AutomationName");
+            }
+        }
+
+        public SocialFollowRequestState RequestState
+        {
+            get { return _requestState; }
+            set
+            {
+                if (SetProperty(ref _requestState, value)) OnPropertyChanged("AutomationName");
+            }
+        }
+
         public bool IsBusy
         {
             get { return _isBusy; }
-            set
-            {
-                if (_isBusy == value) return;
-                _isBusy = value;
-                OnPropertyChanged();
-            }
+            set { SetProperty(ref _isBusy, value); }
         }
 
         public string AutomationName
         {
             get
             {
+                if (Moderation.HasValue)
+                {
+                    var status = SocialModerationText.StatusOf(this);
+                    return string.IsNullOrEmpty(status)
+                           ? LocalizedStrings.Format("SocialUserRowAutomationFormat", DisplayName, Handle)
+                           : LocalizedStrings.Format("SocialUserRowRelationAutomationFormat", DisplayName, Handle, status);
+                }
+
+                if (IsRequest)
+                {
+                    var outcome = SocialFollowRequestService.OutcomeText(_requestState);
+                    return string.IsNullOrEmpty(outcome)
+                           ? LocalizedStrings.Format("SocialFollowRequestRowAutomationFormat", DisplayName, Handle)
+                           : LocalizedStrings.Format("SocialUserRowRelationAutomationFormat", DisplayName, Handle, outcome);
+                }
+
                 var state = FollowState;
                 return state == SocialFollowState.None || state == SocialFollowState.Follow || state == SocialFollowState.RequestToFollow
                        ? LocalizedStrings.Format("SocialUserRowAutomationFormat", DisplayName, Handle)
@@ -121,18 +158,26 @@ namespace Fort.ind_UWP
             OnPropertyChanged("AutomationName");
         }
 
-        public static IReadOnlyList<SocialUserItem> CreateAll(IReadOnlyList<SocialFollowEntry> entries)
+        public static IReadOnlyList<SocialUserItem> CreateAll(IReadOnlyList<SocialFollowEntry> entries, bool requests = false)
         {
             if (entries == null) return new List<SocialUserItem>();
 
             return entries.Where(entry => entry != null && entry.User != null && entry.User.User != null)
-                          .Select(entry => new SocialUserItem(entry.Id, entry.User))
+                          .Select(entry => new SocialUserItem(entry.Id, entry.User, requests))
                           .ToList();
         }
 
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public static IReadOnlyList<SocialUserItem> CreateAll(IReadOnlyList<SocialModerationEntry> entries, SocialModerationList list)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (entries == null) return new List<SocialUserItem>();
+
+            return entries.Where(entry => entry != null && entry.User != null && entry.User.User != null)
+                          .Select(entry => new SocialUserItem(entry.Id, entry.User, false)
+                          {
+                              Moderation = list,
+                              ModerationExpiresAt = entry.ExpiresAt
+                          })
+                          .ToList();
         }
     }
 }

@@ -668,12 +668,6 @@ Open your profile and try again.</value>
   <data name="LoginYouLlBeTaken.Text" xml:space="preserve">
     <value>You'll be taken to fort.social to login to your account. you will be taken back here after signing in!</value>
   </data>
-  <data name="MainAbout.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Version info, credits, and more</value>
-  </data>
-  <data name="MainAbout.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>About</value>
-  </data>
   <data name="MainAbout2.Text" xml:space="preserve">
     <value>About</value>
   </data>
@@ -682,12 +676,6 @@ Open your profile and try again.</value>
   </data>
   <data name="MainAppTheme.Text" xml:space="preserve">
     <value>App Theme</value>
-  </data>
-  <data name="MainAppearance.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Change app theme and background color</value>
-  </data>
-  <data name="MainAppearance.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Appearance</value>
   </data>
   <data name="MainAppearance2.Text" xml:space="preserve">
     <value>Appearance</value>
@@ -716,20 +704,11 @@ Open your profile and try again.</value>
   <data name="MainBetaPrograms.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>labs+betas</value>
   </data>
-  <data name="MainChangeAppThemeAnd.Text" xml:space="preserve">
-    <value>Change app theme, background and accent color</value>
-  </data>
   <data name="MainCheckBackHereFor.Text" xml:space="preserve">
     <value>check back here for what's new and view your favorite games!</value>
   </data>
   <data name="MainClearLiveTile.Text" xml:space="preserve">
     <value>Clear Live Tile</value>
-  </data>
-  <data name="MainDataStorage.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Manage local storage and view account data</value>
-  </data>
-  <data name="MainDataStorage.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Storage</value>
   </data>
   <data name="MainDataStorage2.Text" xml:space="preserve">
     <value>Storage</value>
@@ -767,17 +746,11 @@ Open your profile and try again.</value>
   <data name="MainJustNow.Text" xml:space="preserve">
     <value>Just now</value>
   </data>
-  <data name="MainLiveTile.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>refresh the tile or clear it</value>
-  </data>
-  <data name="MainLiveTile.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Live Tile</value>
-  </data>
   <data name="MainLiveTile2.Text" xml:space="preserve">
     <value>Live Tile</value>
   </data>
   <data name="MainLocalCache.Text" xml:space="preserve">
-    <value>local cache</value>
+    <value>Local cache</value>
   </data>
   <data name="MainMadeWithLoveBy.Text" xml:space="preserve">
     <value>made with love by fort.ind</value>
@@ -785,20 +758,11 @@ Open your profile and try again.</value>
   <data name="MainMakeFortDesktopWork.Text" xml:space="preserve">
     <value>make fort.desktop work for you :3 change it to how you like</value>
   </data>
-  <data name="MainManageLocalStorageAnd.Text" xml:space="preserve">
-    <value>view how much space is used and manage your account</value>
-  </data>
   <data name="MainRefreshLiveTile.Text" xml:space="preserve">
     <value>Refresh Live Tile</value>
   </data>
-  <data name="MainRefreshOrClearYour.Text" xml:space="preserve">
-    <value>Refresh or clear your Start menu tile</value>
-  </data>
   <data name="MainReportABug.Text" xml:space="preserve">
     <value>Report a Bug</value>
-  </data>
-  <data name="MainResetTheFirstRun.Text" xml:space="preserve">
-    <value>Reset the first-run welcome experience</value>
   </data>
   <data name="MainShowWelcomeDialogAgain.Text" xml:space="preserve">
     <value>Show Welcome Dialog again</value>
@@ -836,20 +800,11 @@ Open your profile and try again.</value>
   <data name="MainThisUpdateFixesMany.Text" xml:space="preserve">
     <value>Welcome to 3.0! we have added banner support and more appearance changes :) and finally.. AUTOMATIC UPDATES!! </value>
   </data>
-  <data name="MainVersionInfoCreditsAnd.Text" xml:space="preserve">
-    <value>Version info, credits, and more</value>
-  </data>
   <data name="MainWebsite.Text" xml:space="preserve">
     <value>Website</value>
   </data>
   <data name="MainWelcome.Text" xml:space="preserve">
     <value>hello!!</value>
-  </data>
-  <data name="MainWelcomeDialog.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Reset the first-run welcome experience</value>
-  </data>
-  <data name="MainWelcomeDialog.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Welcome Dialog</value>
   </data>
   <data name="MainWelcomeDialog2.Text" xml:space="preserve">
     <value>Welcome Dialog</value>
@@ -936,17 +891,8 @@ Open your profile and try again.</value>
   <data name="TintScopeBothRadio.Content" xml:space="preserve">
     <value>Both</value>
   </data>
-  <data name="MainTransparency.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Choose how much of your desktop shows through</value>
-  </data>
-  <data name="MainTransparency.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Transparency</value>
-  </data>
   <data name="MainTransparency2.Text" xml:space="preserve">
     <value>Transparency</value>
-  </data>
-  <data name="MainTransparencyDescription.Text" xml:space="preserve">
-    <value>Choose how much of your desktop shows through</value>
   </data>
   <data name="MainTransparencyHint.Text" xml:space="preserve">
     <value>Higher is more solid.</value>
@@ -1250,17 +1196,8 @@ Open your profile and try again.</value>
     <value>{0} follower</value>
     <comment>{0} is always 1. It is drawn in bold.</comment>
   </data>
-  <data name="MainProfileSettings.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Profile</value>
-  </data>
-  <data name="MainProfileSettings.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>choose how often your profile and notifications are updated</value>
-  </data>
   <data name="MainProfileSettings2.Text" xml:space="preserve">
     <value>Profile</value>
-  </data>
-  <data name="MainProfileSettingsCaption.Text" xml:space="preserve">
-    <value>Edit your fort.social profile, and choose how often it updates</value>
   </data>
   <data name="ProfileAutoRefreshToggle.Header" xml:space="preserve">
     <value>Refresh follower counts automatically</value>
@@ -1287,7 +1224,7 @@ Open your profile and try again.</value>
     <value>At most once an hour</value>
   </data>
   <data name="ProfileAutoRefreshDescription.Text" xml:space="preserve">
-    <value>Your profile is refreshed from fort.social when you open it, and whenever fort.desktop checks for new notifications. While it's closed, it checks for new notifications at this interval, but never more than every 15 minutes. When this is off, your profile only refreshes when the app starts, and new notifications are checked for every 15 minutes.</value>
+    <value>Your profile is refreshed from fort.social when you open it, and whenever fort.desktop checks for new notifications. While it's closed, it checks for new notifications at this interval. When this is off your profile only refreshes when the app starts</value>
   </data>
   <data name="SearchItemProfileSettings" xml:space="preserve">
     <value>Profile settings</value>
@@ -1307,17 +1244,8 @@ Open your profile and try again.</value>
   <data name="SearchItemBackgroundCheck" xml:space="preserve">
     <value>Check for notifications in the background</value>
   </data>
-  <data name="MainNotifications.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Notifications</value>
-  </data>
-  <data name="MainNotifications.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>turn fort.social notifications and the badge on or off</value>
-  </data>
   <data name="MainNotifications2.Text" xml:space="preserve">
     <value>Notifications</value>
-  </data>
-  <data name="MainNotificationsCaption.Text" xml:space="preserve">
-    <value>fort.social notifications and the badge</value>
   </data>
   <data name="LabsHeading.Text" xml:space="preserve">
     <value>labs</value>
@@ -3498,17 +3426,8 @@ Open your profile and try again.</value>
   <data name="SocialTagLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Loading notes</value>
   </data>
-  <data name="MainInk.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Pen and ink</value>
-  </data>
-  <data name="MainInk.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>choose how pen, touch and mouse draw and write</value>
-  </data>
   <data name="MainInk2.Text" xml:space="preserve">
     <value>Pen &amp; ink</value>
-  </data>
-  <data name="MainInkCaption.Text" xml:space="preserve">
-    <value>Drawing, handwriting and writing into text boxes</value>
   </data>
   <data name="InkMouseToggle.Header" xml:space="preserve">
     <value>Draw and write with the mouse</value>
@@ -3738,9 +3657,6 @@ Open your profile and try again.</value>
   <data name="DiagnosticsTitle.Text" xml:space="preserve">
     <value>Diagnostics</value>
   </data>
-  <data name="DiagnosticsCaption.Text" xml:space="preserve">
-    <value>For bug reports</value>
-  </data>
   <data name="DiagnosticsDescription.Text" xml:space="preserve">
     <value>AAAAAAAAA a easter egg :) this is only for diagnostic and debugging purposes. use this if your filing a bug report </value>
   </data>
@@ -3754,6 +3670,408 @@ Open your profile and try again.</value>
     <value>Couldn't copy the diagnostics. Try again in a moment.</value>
   </data>
   <data name="DiagnosticsUnlockedAnnouncement" xml:space="preserve">
-    <value>Diagnostics are now shown at the end of Settings.</value>
+    <value>Diagnostics are now shown at the end of About.</value>
+  </data>
+  <data name="SettingsCategoryPersonalization" xml:space="preserve">
+    <value>Personalization</value>
+  </data>
+  <data name="SettingsCategoryPersonalizationCaption" xml:space="preserve">
+    <value>Theme, colors, transparency, and pen &amp; ink</value>
+  </data>
+  <data name="SettingsCategoryAccount" xml:space="preserve">
+    <value>fort.social account</value>
+  </data>
+  <data name="SettingsCategoryAccountCaption" xml:space="preserve">
+    <value>Your profile, privacy, muted and blocked accounts</value>
+  </data>
+  <data name="SettingsCategoryNotifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="SettingsCategoryNotificationsCaption" xml:space="preserve">
+    <value>fort.social notifications, the badge, and the live tile</value>
+  </data>
+  <data name="SettingsCategoryStorage" xml:space="preserve">
+    <value>Storage</value>
+  </data>
+  <data name="SettingsCategoryStorageCaption" xml:space="preserve">
+    <value>Space used, the media cache, memory, and reset</value>
+  </data>
+  <data name="SettingsCategoryAbout" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="SettingsCategoryAboutCaption" xml:space="preserve">
+    <value>Version, updates, the welcome dialog, and links</value>
+  </data>
+  <data name="SettingsCategoryList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Settings categories</value>
+  </data>
+  <data name="SettingsBreadcrumbHome.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsBreadcrumbHome.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>Back to all settings</value>
+  </data>
+  <data name="SettingsBreadcrumbHomeText.Text" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsUpdatesHeading.Text" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="SocialProfileLocationBox.Header" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="SocialProfileBirthdayPicker.Header" xml:space="preserve">
+    <value>Birthday</value>
+  </data>
+  <data name="SocialProfileBirthdayPicker.PlaceholderText" xml:space="preserve">
+    <value>Pick a date</value>
+  </data>
+  <data name="SocialProfileClearBirthdayButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Clear birthday</value>
+  </data>
+  <data name="SocialProfileClearBirthdayButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Clear birthday</value>
+  </data>
+  <data name="SocialProfileFieldsHeading.Text" xml:space="preserve">
+    <value>Profile fields</value>
+  </data>
+  <data name="SocialProfileFieldLabelBox.PlaceholderText" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="SocialProfileFieldValueBox.PlaceholderText" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="SocialProfileFieldLabelNameFormat" xml:space="preserve">
+    <value>Label, field {0}</value>
+  </data>
+  <data name="SocialProfileFieldValueNameFormat" xml:space="preserve">
+    <value>Value, field {0}</value>
+  </data>
+  <data name="SocialProfileFieldRemoveNameFormat" xml:space="preserve">
+    <value>Remove field {0}</value>
+  </data>
+  <data name="SocialProfileAddFieldText.Text" xml:space="preserve">
+    <value>Add field</value>
+  </data>
+  <data name="SocialProfileFieldCountFormat" xml:space="preserve">
+    <value>{0} of {1}</value>
+  </data>
+  <data name="SocialProfileFieldNeedsValue" xml:space="preserve">
+    <value>Add a value, or clear the label.</value>
+  </data>
+  <data name="SocialProfileFieldNeedsLabel" xml:space="preserve">
+    <value>Add a label, or clear the value.</value>
+  </data>
+  <data name="SocialProfileFieldMoveUp" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="SocialProfileFieldMoveUpKeys" xml:space="preserve">
+    <value>Alt+Up</value>
+  </data>
+  <data name="SocialProfileFieldMoveDown" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="SocialProfileFieldMoveDownKeys" xml:space="preserve">
+    <value>Alt+Down</value>
+  </data>
+  <data name="SocialProfileFieldRemove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SocialProfileLeaveDialogTitle" xml:space="preserve">
+    <value>Save your profile changes?</value>
+  </data>
+  <data name="SocialProfileLeaveDialogBody" xml:space="preserve">
+    <value>You've changed your profile but haven't saved it yet.</value>
+  </data>
+  <data name="SocialProfileLeaveDialogSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SocialProfileLeaveDialogDontSave" xml:space="preserve">
+    <value>Don't save</value>
+  </data>
+  <data name="SocialPrivacyHeading.Text" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="SocialPrivacyFollowersHeading.Text" xml:space="preserve">
+    <value>Followers</value>
+  </data>
+  <data name="PrivacyLockedToggle.Header" xml:space="preserve">
+    <value>Approve new followers</value>
+  </data>
+  <data name="PrivacyLockedToggleDescription.Text" xml:space="preserve">
+    <value>People have to request to follow you</value>
+  </data>
+  <data name="PrivacyAutoAcceptToggle.Header" xml:space="preserve">
+    <value>Approve people you follow automatically</value>
+  </data>
+  <data name="PrivacyAutoAcceptToggleDescription.Text" xml:space="preserve">
+    <value>A request from someone you already follow is approved without asking you.</value>
+  </data>
+  <data name="SocialPrivacyVisibilityHeading.Text" xml:space="preserve">
+    <value>Who can see</value>
+  </data>
+  <data name="PrivacyFollowingVisibilityCombo.Header" xml:space="preserve">
+    <value>Who can see the accounts you follow</value>
+  </data>
+  <data name="PrivacyFollowersVisibilityCombo.Header" xml:space="preserve">
+    <value>Who can see your followers</value>
+  </data>
+  <data name="SocialPrivacyVisibilityPublic.Content" xml:space="preserve">
+    <value>Everyone</value>
+  </data>
+  <data name="SocialPrivacyVisibilityFollowers.Content" xml:space="preserve">
+    <value>Your followers</value>
+  </data>
+  <data name="SocialPrivacyVisibilityPrivate.Content" xml:space="preserve">
+    <value>Only you</value>
+  </data>
+  <data name="PrivacyPublicReactionsToggle.Header" xml:space="preserve">
+    <value>Make your reactions public</value>
+  </data>
+  <data name="PrivacyPublicReactionsToggleDescription.Text" xml:space="preserve">
+    <value>Anyone can see the reactions you've left on notes</value>
+  </data>
+  <data name="PrivacyHideOnlineToggle.Header" xml:space="preserve">
+    <value>Hide when you're online</value>
+  </data>
+  <data name="PrivacyHideOnlineToggleDescription.Text" xml:space="preserve">
+    <value>use this toggle if you dont feel like showing users that your online (only people on misskey/sharkey servers see this!)</value>
+  </data>
+  <data name="SocialPrivacyDiscoveryHeading.Text" xml:space="preserve">
+    <value>Discovery</value>
+  </data>
+  <data name="PrivacyExplorableToggle.Header" xml:space="preserve">
+    <value>Show my account in Explore</value>
+  </data>
+  <data name="PrivacyExplorableToggleDescription.Text" xml:space="preserve">
+    <value>When this is off, fort.social will not suggest your account in Explore.</value>
+  </data>
+  <data name="PrivacyNoCrawleToggle.Header" xml:space="preserve">
+    <value>Ask search engines not to index me</value>
+  </data>
+  <data name="PrivacyNoCrawleToggleDescription.Text" xml:space="preserve">
+    <value>Asks search engines to leave your profile and notes out of their results.</value>
+  </data>
+  <data name="PrivacyPreventAiToggle.Header" xml:space="preserve">
+    <value>Ask AI crawlers not to train on my posts</value>
+  </data>
+  <data name="PrivacyPreventAiToggleDescription.Text" xml:space="preserve">
+    <value>Adds a "noai" flag to your posts and pictures. AI scrapers can ignore it- so this toggle might not work all the time</value>
+  </data>
+  <data name="SocialPrivacyChatHeading.Text" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="PrivacyChatScopeCombo.Header" xml:space="preserve">
+    <value>Who can start a chat with you</value>
+  </data>
+  <data name="SocialPrivacyChatEveryone.Content" xml:space="preserve">
+    <value>Everyone</value>
+  </data>
+  <data name="SocialPrivacyChatFollowers.Content" xml:space="preserve">
+    <value>People who follow you</value>
+  </data>
+  <data name="SocialPrivacyChatFollowing.Content" xml:space="preserve">
+    <value>People you follow</value>
+  </data>
+  <data name="SocialPrivacyChatMutual.Content" xml:space="preserve">
+    <value>Mutual followers</value>
+  </data>
+  <data name="SocialPrivacyChatNone.Content" xml:space="preserve">
+    <value>Nobody</value>
+  </data>
+  <data name="PrivacyChatScopeComboDescription.Text" xml:space="preserve">
+    <value>chat is not on fort.desktop yet if you want to use chat head to social.fort1nd.com/chat</value>
+  </data>
+  <data name="SearchItemProfileFields" xml:space="preserve">
+    <value>Profile fields</value>
+  </data>
+  <data name="SearchItemBirthday" xml:space="preserve">
+    <value>Birthday and location</value>
+  </data>
+  <data name="SearchItemPrivacy" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="SearchItemApproveFollowers" xml:space="preserve">
+    <value>Approve new followers</value>
+  </data>
+  <data name="SearchItemChatPrivacy" xml:space="preserve">
+    <value>Who can chat with you</value>
+  </data>
+  <data name="SearchItemSearchEngines" xml:space="preserve">
+    <value>Search engines and AI crawlers</value>
+  </data>
+  <data name="SocialSignInPromptFollowRequestsTitle" xml:space="preserve">
+    <value>Sign in again to see follow requests</value>
+  </data>
+  <data name="SocialAccountPermissionInfoBar.Title" xml:space="preserve">
+    <value>Sign in again for follow requests</value>
+  </data>
+  <data name="SocialAccountPermissionInfoBar.Message" xml:space="preserve">
+    <value>fort.desktop can now accept and reject follow requests, and show who you've muted or blocked. Sign in again once so fort.social can allow it.</value>
+  </data>
+  <data name="SocialAccountPermissionSignInButton.Content" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="SocialFollowRequestAcceptButton.Content" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="SocialFollowRequestRejectButton.Content" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="SocialFollowRequestAcceptNameFormat" xml:space="preserve">
+    <value>Accept {0}'s follow request</value>
+  </data>
+  <data name="SocialFollowRequestRejectNameFormat" xml:space="preserve">
+    <value>Reject {0}'s follow request</value>
+  </data>
+  <data name="SocialFollowRequestAccepted" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="SocialFollowRequestDeclined" xml:space="preserve">
+    <value>Declined</value>
+  </data>
+  <data name="SocialFollowRequestGone" xml:space="preserve">
+    <value>No longer pending</value>
+  </data>
+  <data name="SocialFollowRequestAcceptFailedFormat" xml:space="preserve">
+    <value>Couldn't accept {0}'s request</value>
+  </data>
+  <data name="SocialFollowRequestRejectFailedFormat" xml:space="preserve">
+    <value>Couldn't reject {0}'s request</value>
+  </data>
+  <data name="SocialFollowRequestRowAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}, wants to follow you</value>
+  </data>
+  <data name="SocialFollowListRequestsTab.Text" xml:space="preserve">
+    <value>Requests</value>
+  </data>
+  <data name="SocialFollowRequestsListNameFormat" xml:space="preserve">
+    <value>People asking to follow {0}</value>
+  </data>
+  <data name="SocialFollowRequestsEmpty" xml:space="preserve">
+    <value>No one is waiting for your approval.</value>
+  </data>
+  <data name="SocialFollowRequestsNeedPermission" xml:space="preserve">
+    <value>fort.desktop needs one more permission to show your follow requests. Sign in again once so fort.social can allow it.</value>
+  </data>
+  <data name="SocialFollowRequestsSignInButton" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="FollowRequestsViewButton.Content" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="FollowRequestsBannerOne" xml:space="preserve">
+    <value>You have 1 follow request</value>
+  </data>
+  <data name="FollowRequestsBannerFormat" xml:space="preserve">
+    <value>You have {0} follow requests</value>
+  </data>
+  <data name="FollowRequestsBannerManyFormat" xml:space="preserve">
+    <value>You have {0} or more follow requests</value>
+  </data>
+  <data name="SocialToastAcceptButton" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="SocialToastRejectButton" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="SocialToastAcceptFailedTitle" xml:space="preserve">
+    <value>Couldn't accept the follow request</value>
+  </data>
+  <data name="SocialToastRejectFailedTitle" xml:space="preserve">
+    <value>Couldn't reject the follow request</value>
+  </data>
+  <data name="SocialModerationHeading.Text" xml:space="preserve">
+    <value>Muted &amp; blocked</value>
+  </data>
+  <data name="SocialModerationTabs.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Muted and blocked lists</value>
+  </data>
+  <data name="SocialModerationMutedTab.Text" xml:space="preserve">
+    <value>Muted</value>
+  </data>
+  <data name="SocialModerationRenoteMutedTab.Text" xml:space="preserve">
+    <value>Hidden renotes</value>
+  </data>
+  <data name="SocialModerationBlockedTab.Text" xml:space="preserve">
+    <value>Blocked</value>
+  </data>
+  <data name="SocialModerationLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading list</value>
+  </data>
+  <data name="SocialModerationShowMoreButton.Content" xml:space="preserve">
+    <value>Show more</value>
+  </data>
+  <data name="SocialModerationMutedListName" xml:space="preserve">
+    <value>Muted accounts</value>
+  </data>
+  <data name="SocialModerationRenoteMutedListName" xml:space="preserve">
+    <value>Accounts whose renotes you hide</value>
+  </data>
+  <data name="SocialModerationBlockedListName" xml:space="preserve">
+    <value>Blocked accounts</value>
+  </data>
+  <data name="SocialModerationMutedEmpty" xml:space="preserve">
+    <value>You haven't muted anyone.</value>
+  </data>
+  <data name="SocialModerationRenoteMutedEmpty" xml:space="preserve">
+    <value>You haven't hidden anyone's renotes.</value>
+  </data>
+  <data name="SocialModerationBlockedEmpty" xml:space="preserve">
+    <value>You haven't blocked anyone.</value>
+  </data>
+  <data name="SocialModerationFailed" xml:space="preserve">
+    <value>Couldn't load this list.</value>
+  </data>
+  <data name="SocialModerationNeedsPermission" xml:space="preserve">
+    <value>fort.desktop needs one more permission to show who you've muted or blocked. Sign in again once so fort.social can allow it.</value>
+  </data>
+  <data name="SocialSignInPromptMutedBlockedTitle" xml:space="preserve">
+    <value>Sign in again to see who you've muted or blocked</value>
+  </data>
+  <data name="SocialModerationUnmute" xml:space="preserve">
+    <value>Unmute</value>
+  </data>
+  <data name="SocialModerationShowRenotes" xml:space="preserve">
+    <value>Show renotes</value>
+  </data>
+  <data name="SocialModerationUnblock" xml:space="preserve">
+    <value>Unblock</value>
+  </data>
+  <data name="SocialModerationUnmuted" xml:space="preserve">
+    <value>Unmuted</value>
+  </data>
+  <data name="SocialModerationRenotesShown" xml:space="preserve">
+    <value>Renotes shown</value>
+  </data>
+  <data name="SocialModerationUnblocked" xml:space="preserve">
+    <value>Unblocked</value>
+  </data>
+  <data name="SocialModerationMutedUntilFormat" xml:space="preserve">
+    <value>Muted until {0}</value>
+  </data>
+  <data name="SocialModerationMutedForever" xml:space="preserve">
+    <value>Muted until you unmute them</value>
+  </data>
+  <data name="SocialModerationUndoLink.Content" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="SocialModerationUndoNameFormat" xml:space="preserve">
+    <value>Undo for {0}</value>
+  </data>
+  <data name="SocialUnblockDialogTitleFormat" xml:space="preserve">
+    <value>Unblock {0}?</value>
+  </data>
+  <data name="SocialUnblockDialogBody" xml:space="preserve">
+    <value>They'll be able to follow you, see your notes and reply to you again.</value>
+  </data>
+  <data name="SocialUnblockDialogConfirm" xml:space="preserve">
+    <value>Unblock</value>
+  </data>
+  <data name="SearchItemMutedAccounts" xml:space="preserve">
+    <value>Muted accounts</value>
+  </data>
+  <data name="SearchItemBlockedAccounts" xml:space="preserve">
+    <value>Blocked accounts</value>
   </data>
 </root>

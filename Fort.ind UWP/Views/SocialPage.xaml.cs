@@ -167,6 +167,8 @@ namespace Fort.ind_UWP
                 _noteHandlerAttached = true;
             }
 
+            AttachFollowRequests();
+
             RefreshGate();
             RemoveTimelineRows(item => item.IsGone || SocialNoteItem.IsHiddenPerson(item, null));
             foreach (var note in SocialNoteService.PostsSince(_seenPostsVersion))
@@ -222,6 +224,8 @@ namespace Fort.ind_UWP
 
         public void Release()
         {
+            DetachFollowRequests();
+
             if (_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged -= OnAuthStateChanged;
@@ -485,6 +489,7 @@ namespace Fort.ind_UWP
             _notificationsStale = false;
             _unseenLiveNotifications = false;
             if (!keepList) SetNotificationsState(FeedState.Loading);
+            RefreshPendingRequests();
 
             try
             {

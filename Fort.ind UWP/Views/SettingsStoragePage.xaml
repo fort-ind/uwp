@@ -1,0 +1,132 @@
+﻿<Page
+    x:Class="Fort.ind_UWP.SettingsStoragePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid x:Name="RootGrid">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowWidthStates">
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="24"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer x:Name="PageScrollViewer" IsTabStop="True">
+            <StackPanel x:Name="ContentPanel" Padding="24">
+                <StackPanel MaxWidth="700" HorizontalAlignment="Stretch">
+                    <StackPanel.ChildrenTransitions>
+                        <TransitionCollection>
+                            <EntranceThemeTransition FromVerticalOffset="40"/>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </StackPanel.ChildrenTransitions>
+
+                    <StackPanel x:Name="LocalCacheSection" Margin="0,0,0,40">
+                        <TextBlock x:Uid="MainLocalCache" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <StackPanel Spacing="8">
+                            <TextBlock x:Name="StorageFootprintText"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock x:Uid="CacheDescriptionText" x:Name="CacheDescriptionText"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock x:Name="StoragePathText"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <TextBlock x:Name="UserCountText"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,4,0,0">
+                                <Button x:Uid="ClearLoginInfoButton" x:Name="ClearLoginInfoButton"
+                                        Click="ClearLoginInfoButton_Click"/>
+                                <Button x:Uid="ResetAppButton" x:Name="ResetAppButton"
+                                        Click="ResetAppButton_Click">
+                                    <TextBlock x:Uid="ResetAppButtonText"
+                                               Foreground="{ThemeResource SystemControlErrorTextForegroundBrush}"/>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel x:Name="MediaCacheSection" Margin="0,0,0,40">
+                        <TextBlock x:Uid="MediaCacheHeading" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <StackPanel Spacing="8">
+                            <TextBlock x:Name="MediaCacheSizeText"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock x:Uid="MediaCacheDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <Button x:Uid="ClearMediaCacheButton" x:Name="ClearMediaCacheButton"
+                                    Margin="0,4,0,0"
+                                    Click="ClearMediaCacheButton_Click"/>
+                            <TextBlock x:Name="MediaCacheStatusText"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       Visibility="Collapsed"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <ComboBox x:Uid="MediaCacheLimitCombo" x:Name="MediaCacheLimitCombo"
+                                      Margin="0,8,0,0"
+                                      MinWidth="200"
+                                      SelectionChanged="MediaCacheLimitCombo_SelectionChanged">
+                                <ComboBoxItem x:Uid="MediaCacheLimitOff" Tag="0"/>
+                                <ComboBoxItem x:Uid="MediaCacheLimit250" Tag="250"/>
+                                <ComboBoxItem x:Uid="MediaCacheLimit500" Tag="500"/>
+                                <ComboBoxItem x:Uid="MediaCacheLimit1024" Tag="1024"/>
+                            </ComboBox>
+                            <TextBlock x:Uid="MediaCacheLimitDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel x:Name="MemorySection">
+                        <TextBlock x:Uid="LowMemoryHeading" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <StackPanel Spacing="8">
+                            <ComboBox x:Uid="LowMemoryModeCombo" x:Name="LowMemoryModeCombo"
+                                      MinWidth="200"
+                                      SelectionChanged="LowMemoryModeCombo_SelectionChanged">
+                                <ComboBoxItem x:Uid="LowMemoryModeAutomatic" Tag="Automatic"/>
+                                <ComboBoxItem x:Uid="LowMemoryModeOn" Tag="On"/>
+                                <ComboBoxItem x:Uid="LowMemoryModeOff" Tag="Off"/>
+                            </ComboBox>
+                            <TextBlock x:Name="LowMemoryStatusText"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <TextBlock x:Uid="LowMemoryModeDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

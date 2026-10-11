@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Background="Transparent">
 
@@ -103,9 +104,22 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
+                    <muxc:InfoBar x:Uid="FollowRequestsInfoBar"
+                                  x:Name="FollowRequestsInfoBar"
+                                  Severity="Informational"
+                                  IsOpen="False"
+                                  IsClosable="False">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="FollowRequestsViewButton"
+                                    Click="FollowRequestsViewButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
                     <Grid x:Name="BannerHost"
+                          Grid.Row="1"
                           FlowDirection="LeftToRight"
                           SizeChanged="BannerHost_SizeChanged"
                           AutomationProperties.AccessibilityView="Raw">
@@ -119,7 +133,7 @@
                     </Grid>
 
                     <StackPanel x:Name="ActionsPanel"
-                                Grid.Row="1"
+                                Grid.Row="2"
                                 Margin="16,12,16,0"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
@@ -139,14 +153,14 @@
                     </StackPanel>
 
                     <PersonPicture x:Name="AvatarPicture"
-                                   Grid.Row="1"
+                                   Grid.Row="2"
                                    Width="80" Height="80"
                                    Margin="16,-40,0,0"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Top"
                                    AutomationProperties.AccessibilityView="Raw"/>
 
-                    <StackPanel Grid.Row="2" Padding="16,10,16,0" Spacing="2">
+                    <StackPanel Grid.Row="3" Padding="16,10,16,0" Spacing="2">
                         <RichTextBlock x:Name="NameText"
                                        Style="{StaticResource SubtitleRichTextBlockStyle}"
                                        IsTextSelectionEnabled="False"
@@ -158,7 +172,7 @@
                     </StackPanel>
 
                     <local:SocialProfileDetails x:Name="Details"
-                                                Grid.Row="3"
+                                                Grid.Row="4"
                                                 Margin="16,16,16,16"
                                                 ShowAccountAge="True"/>
                 </Grid>

@@ -160,6 +160,9 @@
     <Compile Include="Controls\SocialProfileEditor.Images.cs">
       <DependentUpon>SocialProfileEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialProfileEditor.Details.cs">
+      <DependentUpon>SocialProfileEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialSuggestionList.xaml.cs">
       <DependentUpon>SocialSuggestionList.xaml</DependentUpon>
     </Compile>
@@ -214,7 +217,10 @@
     </Compile>
     <Compile Include="Controls\TagWrapPanel.cs" />
     <Compile Include="Helpers\AppLog.cs" />
+    <Compile Include="Helpers\AppRestart.cs" />
+    <Compile Include="Helpers\AppSettings.cs" />
     <Compile Include="Helpers\AutomationHelper.cs" />
+    <Compile Include="Helpers\BindableBase.cs" />
     <Compile Include="Helpers\Blurhash.cs" />
     <Compile Include="Helpers\BlurhashImage.cs" />
     <Compile Include="Helpers\CaptionButtonColors.cs" />
@@ -228,6 +234,10 @@
     <Compile Include="Helpers\SocialLinks.cs" />
     <Compile Include="Helpers\SocialMenus.cs" />
     <Compile Include="Helpers\SocialMenuSink.cs" />
+    <Compile Include="Helpers\SettingsComboTags.cs" />
+    <Compile Include="Helpers\SettingsSectionReveal.cs" />
+    <Compile Include="Helpers\ShellHeaderTemplateSelector.cs" />
+    <Compile Include="Helpers\SocialModerationText.cs" />
     <Compile Include="Helpers\SocialReactions.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Helpers\VisibilityHelper.cs" />
@@ -238,6 +248,9 @@
     <Compile Include="Helpers\WebLauncher.cs" />
     <Compile Include="Models\GameGroup.cs" />
     <Compile Include="Models\SearchItem.cs" />
+    <Compile Include="Models\SettingsCategory.cs" />
+    <Compile Include="Models\SocialPrivacySettings.cs" />
+    <Compile Include="Models\SocialProfileFieldRow.cs" />
     <Compile Include="Models\SocialAttachmentItem.cs" />
     <Compile Include="Models\SocialComposeDraft.cs" />
     <Compile Include="Models\SocialDriveFile.cs" />
@@ -275,6 +288,7 @@
     <Compile Include="Services\SocialContentService.cs" />
     <Compile Include="Services\SocialDraftService.cs" />
     <Compile Include="Services\SocialEmojiService.cs" />
+    <Compile Include="Services\SocialFollowRequestService.cs" />
     <Compile Include="Services\SocialFollowService.cs" />
     <Compile Include="Services\InkSettingsService.cs" />
     <Compile Include="Services\SocialModerationService.cs" />
@@ -332,6 +346,8 @@
     <Compile Include="Views\IImmersiveWindowPage.cs" />
     <Compile Include="Views\IReleasablePage.cs" />
     <Compile Include="Views\IReopenablePage.cs" />
+    <Compile Include="Views\ISettingsSubpage.cs" />
+    <Compile Include="Views\IUnsavedChangesPage.cs" />
     <Compile Include="Views\IShellContentPage.cs" />
     <Compile Include="Views\ITrimmablePage.cs" />
     <Compile Include="Views\BetasPage.xaml.cs">
@@ -343,17 +359,38 @@
     <Compile Include="Views\SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SettingsPage.Accent.cs">
-      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    <Compile Include="Views\SettingsAboutPage.xaml.cs">
+      <DependentUpon>SettingsAboutPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SettingsPage.Appearance.cs">
-      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    <Compile Include="Views\SettingsAboutPage.Diagnostics.cs">
+      <DependentUpon>SettingsAboutPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SettingsPage.Diagnostics.cs">
-      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    <Compile Include="Views\SettingsAccountPage.xaml.cs">
+      <DependentUpon>SettingsAccountPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SettingsPage.Ink.cs">
-      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    <Compile Include="Views\SettingsAccountPage.Privacy.cs">
+      <DependentUpon>SettingsAccountPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsAccountPage.Moderation.cs">
+      <DependentUpon>SettingsAccountPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsNotificationsPage.xaml.cs">
+      <DependentUpon>SettingsNotificationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsPersonalizationPage.xaml.cs">
+      <DependentUpon>SettingsPersonalizationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsPersonalizationPage.Accent.cs">
+      <DependentUpon>SettingsPersonalizationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsPersonalizationPage.Appearance.cs">
+      <DependentUpon>SettingsPersonalizationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsPersonalizationPage.Ink.cs">
+      <DependentUpon>SettingsPersonalizationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsStoragePage.xaml.cs">
+      <DependentUpon>SettingsStoragePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SecondaryWindowPage.xaml.cs">
       <DependentUpon>SecondaryWindowPage.xaml</DependentUpon>
@@ -384,10 +421,16 @@
     <Compile Include="Views\SocialPage.Refresh.cs">
       <DependentUpon>SocialPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SocialPage.FollowRequests.cs">
+      <DependentUpon>SocialPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SocialPage.Timelines.cs">
       <DependentUpon>SocialPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProfilePage.xaml.cs">
+      <DependentUpon>ProfilePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProfilePage.FollowRequests.cs">
       <DependentUpon>ProfilePage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -568,6 +611,26 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsAboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsAccountPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsNotificationsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsPersonalizationPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsStoragePage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

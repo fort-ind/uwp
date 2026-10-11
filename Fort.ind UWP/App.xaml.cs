@@ -149,8 +149,7 @@ namespace Fort.ind_UWP
 
             try
             {
-                var savedTheme = Windows.Storage.ApplicationData.Current.LocalSettings.Values[AppConstants.SettingAppTheme]?.ToString();
-                switch (savedTheme)
+                switch (AppSettings.ReadString(AppConstants.SettingAppTheme, null))
                 {
                     case AppConstants.ThemeLight: rootFrame.RequestedTheme = ElementTheme.Light; break;
                     case AppConstants.ThemeDark: rootFrame.RequestedTheme = ElementTheme.Dark; break;

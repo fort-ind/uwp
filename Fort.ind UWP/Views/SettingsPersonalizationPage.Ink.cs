@@ -5,7 +5,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace Fort.ind_UWP
 {
-    public sealed partial class SettingsPage
+    public sealed partial class SettingsPersonalizationPage
     {
         private void LoadInkControls()
         {
@@ -29,11 +29,6 @@ namespace Fort.ind_UWP
         private void UpdateHandwritingFontEnabled()
         {
             InkHandwritingFontToggle.IsEnabled = SelectedPenTextMode() != PenTextMode.Off;
-        }
-
-        private void InkHeader_Tapped(object sender, RoutedEventArgs e)
-        {
-            ToggleSettingsRow(InkHeader, InkContent, InkChevronRotation, AppConstants.SettingSettingsInkExpanded);
         }
 
         private void InkMouseToggle_Toggled(object sender, RoutedEventArgs e)

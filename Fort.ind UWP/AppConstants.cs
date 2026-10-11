@@ -71,26 +71,19 @@ namespace Fort.ind_UWP
 
         
         public const int AcrylicPersistDebounceMilliseconds = 400;
-        public const string SettingSettingsAppearanceExpanded = "SettingsAppearanceExpanded";
-        public const string SettingSettingsTransparencyExpanded = "SettingsTransparencyExpanded";
-        public const string SettingSettingsStorageExpanded = "SettingsStorageExpanded";
-        public const string SettingSettingsTileExpanded = "SettingsTileExpanded";
         public const string SettingShowTileBadge = "ShowTileBadge";
         public const string SettingLiveTileCleared = "LiveTileCleared";
         public const string SettingTileShowsNotifications = "TileShowsNotifications";
         public const string SettingLockScreenShowsSenders = "LockScreenShowsSenders";
         public const string SettingSocialTileShown = "SocialTileShown";
-        public const string SettingSettingsWelcomeExpanded = "SettingsWelcomeExpanded";
-        public const string SettingSettingsAboutExpanded = "SettingsAboutExpanded";
-        public const string SettingSettingsProfileExpanded = "SettingsProfileExpanded";
-        public const string SettingSettingsNotificationsExpanded = "SettingsNotificationsExpanded";
-        public const string SettingSettingsInkExpanded = "SettingsInkExpanded";
         public const string SettingLastNavTag = "LastNavTag";
 
         public const string SettingsSectionAppearance = "Appearance";
         public const string SettingsSectionTransparency = "Transparency";
         public const string SettingsSectionInk = "Ink";
         public const string SettingsSectionProfile = "Profile";
+        public const string SettingsSectionPrivacy = "Privacy";
+        public const string SettingsSectionMutedBlocked = "MutedBlocked";
         public const string SettingsSectionNotifications = "Notifications";
         public const string SettingsSectionStorage = "Storage";
         public const string SettingsSectionTile = "Tile";
@@ -173,6 +166,7 @@ namespace Fort.ind_UWP
         public const string SettingSocialRecentReactions = "SocialRecentReactions";
         public const string SettingSocialEmojiSkinTone = "SocialEmojiSkinTone";
         public const string SettingSocialWriteSignInDismissed = "SocialWriteSignInDismissed";
+        public const string SettingSocialAccountSignInDismissed = "SocialAccountSignInDismissed";
 
         public const string SettingSocialRemoteListNotice = "SocialRemoteListNotice";
 
@@ -199,6 +193,9 @@ namespace Fort.ind_UWP
         public const string ToastArgumentAction = "action";
         public const string ToastActionReply = "reply";
         public const string ToastActionLike = "like";
+        public const string ToastActionFollowAccept = "followAccept";
+        public const string ToastActionFollowReject = "followReject";
+        public const string ToastArgumentUser = "user";
         public const string ToastReplyInputId = "reply";
         public const string SocialToastActionTaskName = "SocialToastAction";
         public const string SocialToastFailureGroup = "socialFailed";

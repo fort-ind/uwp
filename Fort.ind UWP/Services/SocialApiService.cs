@@ -42,7 +42,8 @@ namespace Fort.ind_UWP
     public enum SocialFollowList
     {
         Following,
-        Followers
+        Followers,
+        Requests
     }
 
     public sealed class SocialFollowEntry
@@ -56,6 +57,29 @@ namespace Fort.ind_UWP
         public string Id { get; private set; }
 
         public SocialUserDetail User { get; private set; }
+    }
+
+    public enum SocialModerationList
+    {
+        Muted,
+        RenoteMuted,
+        Blocked
+    }
+
+    public sealed class SocialModerationEntry
+    {
+        public SocialModerationEntry(string id, SocialUserDetail user, DateTimeOffset? expiresAt)
+        {
+            Id = id;
+            User = user;
+            ExpiresAt = expiresAt;
+        }
+
+        public string Id { get; private set; }
+
+        public SocialUserDetail User { get; private set; }
+
+        public DateTimeOffset? ExpiresAt { get; private set; }
     }
 
     public sealed class SocialFavoriteEntry
@@ -490,6 +514,102 @@ namespace Fort.ind_UWP
         public static Task<SocialApiResult<bool>> CancelFollowRequestAsync(string token, string userId, CancellationToken cancellationToken)
         {
             return UserActionAsync("following/requests/cancel", token, userId, cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialModerationEntry>>> GetModerationListAsync(
+            string token, SocialModerationList list, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            if (!string.IsNullOrEmpty(untilId))
+            {
+                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+            }
+
+            var endpoint = list == SocialModerationList.Muted ? "mute/list"
+                           : list == SocialModerationList.RenoteMuted ? "renote-mute/list"
+                           : "blocking/list";
+            var personKey = list == SocialModerationList.Blocked ? "blockee" : "mutee";
+
+            var response = await PostAsync(endpoint, token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialModerationEntry>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            if (response.Value.ValueType != JsonValueType.Array)
+            {
+                return SocialApiResult<IReadOnlyList<SocialModerationEntry>>.Failed(SocialApiStatus.Failed);
+            }
+
+            var entries = new List<SocialModerationEntry>();
+            foreach (var value in response.Value.GetArray())
+            {
+                if (value.ValueType != JsonValueType.Object) continue;
+
+                var record = value.GetObject();
+                var id = SocialJson.String(record, "id");
+                var person = SocialJson.Object(record, personKey);
+                var detail = person == null ? null : SocialUserDetail.FromJson(person);
+                if (string.IsNullOrEmpty(id) || detail == null) continue;
+
+                var expires = SocialJson.String(record, "expiresAt");
+                DateTimeOffset expiresAt = default(DateTimeOffset);
+                var hasExpiry = !string.IsNullOrEmpty(expires)
+                                && DateTimeOffset.TryParse(expires, System.Globalization.CultureInfo.InvariantCulture,
+                                                           System.Globalization.DateTimeStyles.AssumeUniversal, out expiresAt);
+                entries.Add(new SocialModerationEntry(id, detail, hasExpiry ? expiresAt : (DateTimeOffset?)null));
+            }
+
+            return SocialApiResult<IReadOnlyList<SocialModerationEntry>>.Succeeded(entries);
+        }
+
+        public static Task<SocialApiResult<bool>> AcceptFollowRequestAsync(string token, string userId, CancellationToken cancellationToken)
+        {
+            return UserActionAsync("following/requests/accept", token, userId, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> RejectFollowRequestAsync(string token, string userId, CancellationToken cancellationToken)
+        {
+            return UserActionAsync("following/requests/reject", token, userId, cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialFollowEntry>>> GetFollowRequestsAsync(
+            string token, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            if (!string.IsNullOrEmpty(untilId))
+            {
+                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+            }
+
+            var response = await PostAsync("following/requests/list", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            if (response.Value.ValueType != JsonValueType.Array)
+            {
+                return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(SocialApiStatus.Failed);
+            }
+
+            var entries = new List<SocialFollowEntry>();
+            foreach (var value in response.Value.GetArray())
+            {
+                if (value.ValueType != JsonValueType.Object) continue;
+
+                var request = value.GetObject();
+                var id = SocialJson.String(request, "id");
+                var person = SocialJson.Object(request, "follower");
+                var detail = person == null ? null : SocialUserDetail.FromJson(person);
+                if (string.IsNullOrEmpty(id) || detail == null) continue;
+
+                entries.Add(new SocialFollowEntry(id, detail));
+            }
+
+            return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Succeeded(entries);
         }
 
         public static async Task<SocialApiResult<SocialRelation>> GetRelationAsync(string token, string userId, CancellationToken cancellationToken)

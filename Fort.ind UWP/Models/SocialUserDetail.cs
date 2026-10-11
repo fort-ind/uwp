@@ -48,7 +48,8 @@ namespace Fort.ind_UWP
             "id", "username", "host", "name", "avatarUrl", "avatarBlurhash", "isBot", "emojis",
             "description", "location", "birthday", "createdAt", "bannerUrl", "bannerBlurhash", "fields",
             "notesCount", "followingCount", "followersCount", "followingVisibility", "followersVisibility",
-            "isLocked", "roles", "isCat", "speakAsCat"
+            "isLocked", "roles", "isCat", "speakAsCat", "autoAcceptFollowed", "publicReactions",
+            "hideOnlineStatus", "isExplorable", "noCrawle", "preventAiLearning", "chatScope"
         };
 
         private SocialUserDetail()

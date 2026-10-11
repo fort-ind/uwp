@@ -1,5 +1,4 @@
 using System;
-using Windows.Storage;
 using Windows.System;
 using Windows.System.Diagnostics;
 
@@ -84,35 +83,12 @@ namespace Fort.ind_UWP
 
         public static void SetLowMemoryChoice(LowMemoryModeChoice choice)
         {
-            try
-            {
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingLowMemoryMode] = choice.ToString();
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("MemoryService: could not save the low-memory choice", ex);
-            }
+            AppSettings.Write(AppConstants.SettingLowMemoryMode, choice.ToString());
         }
 
         private static LowMemoryModeChoice ReadChoice()
         {
-            try
-            {
-                object value;
-                LowMemoryModeChoice choice;
-                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(AppConstants.SettingLowMemoryMode, out value)
-                    && Enum.TryParse(Convert.ToString(value), out choice)
-                    && Enum.IsDefined(typeof(LowMemoryModeChoice), choice))
-                {
-                    return choice;
-                }
-            }
-            catch (Exception ex)
-            {
-                AppLog.Error("MemoryService: could not read the low-memory choice", ex);
-            }
-
-            return LowMemoryModeChoice.Automatic;
+            return AppSettings.ReadEnum(AppConstants.SettingLowMemoryMode, LowMemoryModeChoice.Automatic);
         }
 
         private static bool ReadSmallDevice()

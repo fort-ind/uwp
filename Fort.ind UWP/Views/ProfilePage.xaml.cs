@@ -146,6 +146,8 @@ namespace Fort.ind_UWP
                 SocialNoteService.Changed -= OnNoteChanged;
                 _noteHandlerAttached = false;
             }
+
+            DetachFollowRequests();
         }
 
         private async void OnNoteChanged(object sender, SocialNoteChange change)
@@ -261,6 +263,7 @@ namespace Fort.ind_UWP
 
             RefreshUI();
             CatchUpNoteChanges();
+            AttachFollowRequests();
 
             ProfileService.RefreshOnProfileVisit();
         }
@@ -268,6 +271,8 @@ namespace Fort.ind_UWP
         public void RefreshUI()
         {
             if (_released) return;
+
+            UpdateFollowRequestsBanner();
 
             var user = ProfileService.CurrentUser;
             var detail = user == null ? null : SocialUserDetail.FromProfile(user);

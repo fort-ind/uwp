@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Windows.Storage;
 
 namespace Fort.ind_UWP
 {
@@ -22,64 +21,20 @@ namespace Fort.ind_UWP
 
         public static bool AutoRefreshEnabled
         {
-            get
-            {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileAutoRefresh];
-                    if (stored == null) return true;
-                    return Convert.ToBoolean(stored);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("ProfileService: AutoRefreshEnabled read failed", ex);
-                    return true;
-                }
-            }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileAutoRefresh] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("ProfileService: AutoRefreshEnabled write failed", ex);
-                }
-            }
+            get { return AppSettings.ReadBool(AppConstants.SettingProfileAutoRefresh, true); }
+            set { AppSettings.Write(AppConstants.SettingProfileAutoRefresh, value); }
         }
 
         public static int AutoRefreshMinutes
         {
             get
             {
-                try
-                {
-                    var stored = ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileRefreshMinutes];
-                    if (stored == null) return AppConstants.DefaultProfileRefreshMinutes;
-
-                    var minutes = Convert.ToInt32(stored);
-                    return minutes >= 0 && minutes <= MaximumAutoRefreshMinutes
-                           ? minutes
-                           : AppConstants.DefaultProfileRefreshMinutes;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("ProfileService: AutoRefreshMinutes read failed", ex);
-                    return AppConstants.DefaultProfileRefreshMinutes;
-                }
+                var minutes = AppSettings.ReadInt(AppConstants.SettingProfileRefreshMinutes, AppConstants.DefaultProfileRefreshMinutes);
+                return minutes >= 0 && minutes <= MaximumAutoRefreshMinutes
+                       ? minutes
+                       : AppConstants.DefaultProfileRefreshMinutes;
             }
-            set
-            {
-                try
-                {
-                    ApplicationData.Current.LocalSettings.Values[AppConstants.SettingProfileRefreshMinutes] = value;
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error("ProfileService: AutoRefreshMinutes write failed", ex);
-                }
-            }
+            set { AppSettings.Write(AppConstants.SettingProfileRefreshMinutes, value); }
         }
 
         public static async Task<LoginResult> LoginWithMisskeyAsync()

@@ -41,6 +41,13 @@
                        TextWrapping="NoWrap"
                        TextTrimming="CharacterEllipsis"
                        MaxLines="1"/>
+            <TextBlock x:Name="DetailText"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                       TextWrapping="NoWrap"
+                       TextTrimming="CharacterEllipsis"
+                       MaxLines="1"
+                       Visibility="Collapsed"/>
         </StackPanel>
 
         <Button x:Name="FollowButton"
@@ -51,5 +58,50 @@
                 Click="FollowButton_Click">
             <TextBlock x:Name="FollowText"/>
         </Button>
+
+        <StackPanel x:Name="RequestPanel"
+                    Grid.Column="2"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+            <Button x:Uid="SocialFollowRequestAcceptButton"
+                    x:Name="AcceptButton"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Click="AcceptButton_Click"/>
+            <Button x:Uid="SocialFollowRequestRejectButton"
+                    x:Name="RejectButton"
+                    Click="RejectButton_Click"/>
+        </StackPanel>
+
+        <Button x:Name="ModerationButton"
+                Grid.Column="2"
+                MinWidth="96"
+                VerticalAlignment="Center"
+                Visibility="Collapsed"
+                Click="ModerationButton_Click"/>
+
+        <StackPanel x:Name="ModerationOutcomePanel"
+                    Grid.Column="2"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+            <TextBlock x:Name="ModerationOutcomeText"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+            <HyperlinkButton x:Uid="SocialModerationUndoLink"
+                             x:Name="ModerationUndoLink"
+                             VerticalAlignment="Center"
+                             Click="ModerationUndoLink_Click"/>
+        </StackPanel>
+
+        <TextBlock x:Name="RequestOutcomeText"
+                   Grid.Column="2"
+                   VerticalAlignment="Center"
+                   Style="{StaticResource CaptionTextBlockStyle}"
+                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                   Visibility="Collapsed"/>
     </Grid>
 </UserControl>

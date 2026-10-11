@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
-using Windows.Storage;
 using Windows.UI.StartScreen;
 
 namespace Fort.ind_UWP
@@ -144,11 +143,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                var settings = ApplicationData.Current.LocalSettings;
-
-                object raw;
-                if (settings.Values.TryGetValue(AppConstants.SettingGameTileArtRevision, out raw)
-                    && string.Equals(raw as string, TileArtRevision, StringComparison.Ordinal))
+                if (string.Equals(AppSettings.ReadString(AppConstants.SettingGameTileArtRevision, null), TileArtRevision, StringComparison.Ordinal))
                 {
                     return;
                 }
@@ -172,7 +167,7 @@ namespace Fort.ind_UWP
                     }
                 }
 
-                settings.Values[AppConstants.SettingGameTileArtRevision] = TileArtRevision;
+                AppSettings.Write(AppConstants.SettingGameTileArtRevision, TileArtRevision);
             }
             catch (Exception ex)
             {

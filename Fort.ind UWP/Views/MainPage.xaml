@@ -34,6 +34,97 @@
                            Opacity="0.9"/>
             </StackPanel>
         </DataTemplate>
+
+        <Style x:Key="SettingsBreadcrumbButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0,4,0,4"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="UseSystemFocusVisuals" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter x:Name="ContentPresenter"
+                                          Background="{TemplateBinding Background}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          Padding="{TemplateBinding Padding}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          ContentTransitions="{TemplateBinding ContentTransitions}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          AutomationProperties.AccessibilityView="Raw">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Foreground" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="ShellTitleHeaderTemplate">
+            <TextBlock Text="{Binding}"
+                       Style="{StaticResource TitleTextBlockStyle}"
+                       AutomationProperties.HeadingLevel="Level1"
+                       VerticalAlignment="Top"
+                       TextTrimming="CharacterEllipsis"
+                       Margin="12,0,12,0"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SettingsBreadcrumbHeaderTemplate" x:DataType="local:SettingsCategory">
+            <Grid Margin="12,0,12,0" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Uid="SettingsBreadcrumbHome"
+                        Style="{StaticResource SettingsBreadcrumbButtonStyle}"
+                        Margin="0,-4,0,-4"
+                        VerticalAlignment="Top"
+                        Click="SettingsBreadcrumb_Click">
+                    <TextBlock x:Uid="SettingsBreadcrumbHomeText"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               TextWrapping="NoWrap"/>
+                </Button>
+                <FontIcon Grid.Column="1" Glyph="&#xE76C;" FontSize="16"
+                          Margin="12,0,12,0" VerticalAlignment="Center"
+                          Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                          AutomationProperties.AccessibilityView="Raw"/>
+                <TextBlock Grid.Column="2" Text="{x:Bind Title}"
+                           Style="{StaticResource TitleTextBlockStyle}"
+                           AutomationProperties.HeadingLevel="Level1"
+                           VerticalAlignment="Top"
+                           TextWrapping="NoWrap"
+                           TextTrimming="CharacterEllipsis"/>
+            </Grid>
+        </DataTemplate>
+
+        <local:ShellHeaderTemplateSelector x:Key="ShellHeaderTemplateSelector"
+                                           TitleTemplate="{StaticResource ShellTitleHeaderTemplate}"
+                                           SettingsBreadcrumbTemplate="{StaticResource SettingsBreadcrumbHeaderTemplate}"/>
     </Page.Resources>
 
     <i:Interaction.Behaviors>
@@ -52,6 +143,7 @@
                         <Setter Target="UpdateInfoBar.Margin" Value="12,8,12,0"/>
                         <Setter Target="SocialPermissionInfoBar.Margin" Value="12,8,12,0"/>
                         <Setter Target="SocialWritePermissionInfoBar.Margin" Value="12,8,12,0"/>
+                        <Setter Target="SocialAccountPermissionInfoBar.Margin" Value="12,8,12,0"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="WideState">
@@ -62,6 +154,7 @@
                         <Setter Target="UpdateInfoBar.Margin" Value="24,8,24,0"/>
                         <Setter Target="SocialPermissionInfoBar.Margin" Value="24,8,24,0"/>
                         <Setter Target="SocialWritePermissionInfoBar.Margin" Value="24,8,24,0"/>
+                        <Setter Target="SocialAccountPermissionInfoBar.Margin" Value="24,8,24,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -141,12 +234,11 @@
 
             <NavigationView.HeaderTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding}"
-                               Style="{StaticResource TitleTextBlockStyle}"
-                               AutomationProperties.HeadingLevel="Level1"
-                               VerticalAlignment="Top"
-                               TextTrimming="CharacterEllipsis"
-                               Margin="12,0,12,0"/>
+                    <ContentControl Content="{Binding}"
+                                    ContentTemplateSelector="{StaticResource ShellHeaderTemplateSelector}"
+                                    HorizontalContentAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    IsTabStop="False"/>
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
 
@@ -242,6 +334,18 @@
                                   CloseButtonClick="SocialWritePermissionInfoBar_CloseButtonClick">
                         <muxc:InfoBar.ActionButton>
                             <Button x:Uid="SocialWritePermissionSignInButton"
+                                    Click="SocialPermissionSignInButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
+                    <muxc:InfoBar x:Uid="SocialAccountPermissionInfoBar" x:Name="SocialAccountPermissionInfoBar"
+                                  Margin="24,8,24,0"
+                                  Severity="Informational"
+                                  IsOpen="False"
+                                  IsClosable="True"
+                                  CloseButtonClick="SocialAccountPermissionInfoBar_CloseButtonClick">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialAccountPermissionSignInButton"
                                     Click="SocialPermissionSignInButton_Click"/>
                         </muxc:InfoBar.ActionButton>
                     </muxc:InfoBar>
