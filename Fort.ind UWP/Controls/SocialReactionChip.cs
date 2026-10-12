@@ -15,7 +15,13 @@ namespace Fort.ind_UWP
 
         private const double EmojiFontSize = 16;
 
-        private static readonly FontFamily s_emojiFont = new FontFamily("Segoe UI Emoji");
+        [ThreadStatic]
+        private static FontFamily t_emojiFont;
+
+        private static FontFamily EmojiFont
+        {
+            get { return t_emojiFont ?? (t_emojiFont = new FontFamily("Segoe UI Emoji")); }
+        }
 
         private readonly TextBlock _emojiText;
 
@@ -31,7 +37,7 @@ namespace Fort.ind_UWP
         {
             _emojiText = new TextBlock
             {
-                FontFamily = s_emojiFont,
+                FontFamily = EmojiFont,
                 FontSize = EmojiFontSize,
                 VerticalAlignment = VerticalAlignment.Center,
                 IsTextScaleFactorEnabled = false
@@ -49,10 +55,11 @@ namespace Fort.ind_UWP
             _countText = new TextBlock
             {
                 Style = SocialNoteView.StyleOf("CaptionTextBlockStyle"),
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(6, 0, 0, 0)
             };
 
-            var content = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+            var content = new StackPanel { Orientation = Orientation.Horizontal };
             content.Children.Add(_emojiText);
             content.Children.Add(_emojiImage);
             content.Children.Add(_countText);
@@ -97,7 +104,7 @@ namespace Fort.ind_UWP
                 _emojiImage.Source = null;
                 _emojiImage.Visibility = Visibility.Collapsed;
                 if (custom) _emojiText.ClearValue(TextBlock.FontFamilyProperty);
-                else _emojiText.FontFamily = s_emojiFont;
+                else _emojiText.FontFamily = EmojiFont;
                 _emojiText.FontSize = custom ? _countText.FontSize : EmojiFontSize;
                 _emojiText.Text = SocialReactions.SpokenName(reaction.Key);
                 _emojiText.Visibility = Visibility.Visible;

@@ -42,6 +42,8 @@ namespace Fort.ind_UWP
     {
         public const string MainChannel = "main";
 
+        private const int IllegalMethodCall = unchecked((int)0x8000000E);
+
         private readonly string _channelId = Guid.NewGuid().ToString("N");
 
         private readonly string _channel;
@@ -257,6 +259,10 @@ namespace Fort.ind_UWP
             {
                 socket.MessageReceived -= OnMessageReceived;
                 socket.Closed -= OnClosed;
+            }
+            catch (Exception ex) when (ex.HResult == IllegalMethodCall)
+            {
+                Debug.WriteLine("SocialStream: the socket was already closing, so its handlers could not be removed");
             }
             catch (Exception ex)
             {

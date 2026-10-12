@@ -313,9 +313,10 @@
                     <Button x:Name="ReplyButton"
                             Style="{StaticResource SocialActionButtonStyle}"
                             Click="ReplyButton_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
+                        <StackPanel Orientation="Horizontal">
                             <FontIcon Glyph="&#xE97A;" FontSize="14" IsTextScaleFactorEnabled="False"/>
                             <TextBlock x:Name="RepliesCountText"
+                                       Margin="8,0,0,0"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
@@ -325,9 +326,10 @@
                             Grid.Column="1"
                             Style="{StaticResource SocialActionButtonStyle}"
                             Click="RenoteButton_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
+                        <StackPanel Orientation="Horizontal">
                             <FontIcon x:Name="RenoteIcon" Glyph="&#xE8EE;" FontSize="14" IsTextScaleFactorEnabled="False"/>
                             <TextBlock x:Name="RenotesCountText"
+                                       Margin="8,0,0,0"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
@@ -337,7 +339,7 @@
                                        Grid.Column="2"
                                        Style="{StaticResource SocialReactionSplitButtonStyle}"
                                        Click="ReactButton_Click">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
+                        <StackPanel Orientation="Horizontal">
                             <Grid Width="16" Height="16" VerticalAlignment="Center">
                                 <FontIcon x:Name="LikeIcon" Glyph="&#xEB51;" FontSize="14" IsTextScaleFactorEnabled="False"/>
                                 <FontIcon x:Name="LikedIcon"
@@ -359,6 +361,7 @@
                                        Visibility="Collapsed"/>
                             </Grid>
                             <TextBlock x:Name="ReactionsCountText"
+                                       Margin="8,0,0,0"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
