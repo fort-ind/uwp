@@ -741,10 +741,10 @@ Open your profile and try again.</value>
     <value>Home</value>
   </data>
   <data name="MainInTheFutureMaybe.Text" xml:space="preserve">
-    <value>in the future (maybe subject to change)</value>
+    <value>check back for more tips :3</value>
   </data>
   <data name="MainJustNow.Text" xml:space="preserve">
-    <value>Just now</value>
+    <value></value>
   </data>
   <data name="MainLiveTile2.Text" xml:space="preserve">
     <value>Live Tile</value>
@@ -780,13 +780,13 @@ Open your profile and try again.</value>
     <value>Social</value>
   </data>
   <data name="MainSoon3.Text" xml:space="preserve">
-    <value>soon! :3</value>
+    <value>tip</value>
   </data>
   <data name="MainSoonSoonSoon.Text" xml:space="preserve">
-    <value>soon soon soon-</value>
+    <value>did you know..?</value>
   </data>
   <data name="MainSoonYouWillBe.Text" xml:space="preserve">
-    <value>soon you will be able to manage your fort.ind account, view posts from social and play your games from fort1nd.com on windows! if you want to use the full experience for now go to fort1nd.com</value>
+    <value>you can pin all your favorite games to the start menu! its easy :) right click any game hit pin to start and your done!</value>
   </data>
   <data name="MainSourceCode.Text" xml:space="preserve">
     <value>Source Code</value>
@@ -798,13 +798,13 @@ Open your profile and try again.</value>
     <value>The welcome dialog appears the first time you open the app.</value>
   </data>
   <data name="MainThisUpdateFixesMany.Text" xml:space="preserve">
-    <value>Welcome to 3.0! we have added banner support and more appearance changes :) and finally.. AUTOMATIC UPDATES!! </value>
+    <value>our biggest update is out! :D you can now fully use fort.social on desktop, view profiles edit yours too! and so much more, OH you can use windows ink now :3 </value>
   </data>
   <data name="MainWebsite.Text" xml:space="preserve">
     <value>Website</value>
   </data>
   <data name="MainWelcome.Text" xml:space="preserve">
-    <value>hello!!</value>
+    <value>whats new</value>
   </data>
   <data name="MainWelcomeDialog2.Text" xml:space="preserve">
     <value>Welcome Dialog</value>
@@ -813,7 +813,7 @@ Open your profile and try again.</value>
     <value>Welcome to fort.desktop! the one stop shop for all of- well everything you do on fort.ind on windows :P cutely packaged in this tiny app have fun and enjoy!</value>
   </data>
   <data name="MainWelcomeToVersion2.Text" xml:space="preserve">
-    <value>3.0 is out :p</value>
+    <value>welcome to 4.0!</value>
   </data>
   <data name="NavSearchBox.PlaceholderText" xml:space="preserve">
     <value>Search for games, pages, and more...</value>
