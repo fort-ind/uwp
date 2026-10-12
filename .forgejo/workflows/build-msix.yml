@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
@@ -63,6 +63,7 @@ jobs:
           /t:Restore `
           /p:Configuration=${{ matrix.configuration }} `
           /p:Platform=${{ matrix.platform }} `
+          /m `
           /nologo
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
@@ -73,7 +74,6 @@ jobs:
         GH_REF_NAME: ${{ github.ref_name }}
         VERSION_INPUT: ${{ github.event.inputs.version }}
       run: |
-
         $manifestPath = "${{ env.Manifest_Path }}"
         $manifestGitPath = $manifestPath -replace '\\', '/'
 
@@ -178,6 +178,7 @@ jobs:
           /p:PackageCertificatePassword="$env:CERT_PASSWORD" `
           /p:GenerateAppxPackageOnBuild=true `
           /restore `
+          /m `
           /nologo
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
@@ -192,6 +193,7 @@ jobs:
           /p:AppxPackageSigningEnabled=false `
           /p:GenerateAppxPackageOnBuild=true `
           /restore `
+          /m `
           /nologo
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

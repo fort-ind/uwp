@@ -69,6 +69,7 @@ jobs:
           /p:Configuration=${{ matrix.configuration }} `
           /p:Platform=${{ matrix.platform }} `
           /p:VisualStudioVersion=17.0 `
+          /m `
           /nologo
 
     - name: Update manifest version
@@ -79,7 +80,6 @@ jobs:
         GH_REF_NAME: ${{ github.ref_name }}
         VERSION_INPUT: ${{ github.event.inputs.version }}
       run: |
-
         $manifestPath = "${{ env.Manifest_Path }}"
         $manifestGitPath = $manifestPath -replace '\\', '/'
 
@@ -196,7 +196,8 @@ jobs:
           /p:PackageCertificateKeyFile="Fort.ind UWP_TemporaryKey.pfx" `
           /p:PackageCertificatePassword="$env:CERT_PASSWORD" `
           /p:GenerateAppxPackageOnBuild=true `
-          /restore
+          /restore `
+          /m
 
     - name: Build MSIX Package (Unsigned)
       if: steps.cert.outputs.has_certificate != 'true'
@@ -210,7 +211,8 @@ jobs:
           /p:AppxBundle=Never `
           /p:AppxPackageSigningEnabled=false `
           /p:GenerateAppxPackageOnBuild=true `
-          /restore
+          /restore `
+          /m
 
     - name: Stage release files
       shell: pwsh
