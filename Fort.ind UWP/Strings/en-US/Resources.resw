@@ -412,7 +412,7 @@
     <value>Welcome Dialog</value>
   </data>
   <data name="SearchItemShowWelcomeDialogAgain" xml:space="preserve">
-    <value>Show Welcome Dialog Again</value>
+    <value>welcome to hell!!</value>
   </data>
   <data name="SearchItemAppearance" xml:space="preserve">
     <value>Appearance</value>
@@ -675,13 +675,13 @@ Open your profile and try again.</value>
     <value>Access beta versions and early features (coming soon)</value>
   </data>
   <data name="MainAppTheme.Text" xml:space="preserve">
-    <value>App Theme</value>
+    <value>app Theme</value>
   </data>
   <data name="MainAppearance2.Text" xml:space="preserve">
-    <value>Appearance</value>
+    <value>appearance</value>
   </data>
   <data name="MainBackgroundTint.Text" xml:space="preserve">
-    <value>Background Tint</value>
+    <value>background Tint</value>
   </data>
   <data name="MainAccentColor.Text" xml:space="preserve">
     <value>Accent Color</value>
@@ -713,8 +713,8 @@ Open your profile and try again.</value>
   <data name="MainDataStorage2.Text" xml:space="preserve">
     <value>Storage</value>
   </data>
-  <data name="MainFortInd.Text" xml:space="preserve">
-    <value>Fort.ind</value>
+  <data name="AboutAppName.Text" xml:space="preserve">
+    <value>fort.desktop</value>
   </data>
   <data name="MainGames.Content" xml:space="preserve">
     <value>Games</value>
@@ -1118,7 +1118,7 @@ Open your profile and try again.</value>
     <value>see all your games</value>
   </data>
   <data name="HomeFavoritesSeeAll.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
-    <value>Go to the Games page to see every game you have favorited</value>
+    <value>Go to the Games page to see every game you have favorited </value>
   </data>
   <data name="FavoriteToggleNameFormat" xml:space="preserve">
     <value>Favorite {0}</value>
@@ -1153,7 +1153,7 @@ Open your profile and try again.</value>
     <value>Download</value>
   </data>
   <data name="UpdateStatusChecking" xml:space="preserve">
-    <value>Checking for updates…</value>
+    <value>checking for updates…</value>
   </data>
   <data name="UpdateStatusUpToDate" xml:space="preserve">
     <value>your up to date! :) </value>
@@ -1163,7 +1163,27 @@ Open your profile and try again.</value>
     <comment>{0} is the new version number, for example 2.3.4.</comment>
   </data>
   <data name="UpdateStatusFailed" xml:space="preserve">
-    <value>Couldn't check for updates. Check your connection and try again.</value>
+    <value>wah :( either github is being a piece of shit or your offline so we cant check for updates</value>
+  </data>
+  <data name="UpdateLastCheckedFormat" xml:space="preserve">
+    <value>Last checked {0}</value>
+    <comment>{0} is the date and time of the last check</comment>
+  </data>
+  <data name="UpdateSummaryDefault" xml:space="preserve">
+    <value>update fort.desktop or turn off updates (i dont really mind) </value>
+  </data>
+  <data name="UpdateSummaryUpToDate" xml:space="preserve">
+    <value>Up to date</value>
+  </data>
+  <data name="UpdateSummaryUpToDateFormat" xml:space="preserve">
+    <value>Up to date · Last checked {0}</value>
+    <comment>{0} is the date and time of the last update check, for example 10/18/2026 3:42 PM.</comment>
+  </data>
+  <data name="UpdateSummaryFailed" xml:space="preserve">
+    <value>Couldn't check for updates</value>
+  </data>
+  <data name="UpdateCheckingRing.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Checking for updates</value>
   </data>
   <data name="AutoUpdateCheckToggle.Header" xml:space="preserve">
     <value>Check for updates automatically</value>
@@ -3667,16 +3687,16 @@ Open your profile and try again.</value>
     <value>Copied!</value>
   </data>
   <data name="DiagnosticsCopyFailed" xml:space="preserve">
-    <value>Couldn't copy the diagnostics. Try again in a moment.</value>
+    <value>Couldn't copy the diagnostics. Try again in a moment. :(</value>
   </data>
   <data name="DiagnosticsUnlockedAnnouncement" xml:space="preserve">
-    <value>Diagnostics are now shown at the end of About.</value>
+    <value>*gasp* you found the silly easter egg :)</value>
   </data>
   <data name="SettingsCategoryPersonalization" xml:space="preserve">
     <value>Personalization</value>
   </data>
   <data name="SettingsCategoryPersonalizationCaption" xml:space="preserve">
-    <value>Theme, colors, transparency, and pen &amp; ink</value>
+    <value>mix and match :3 change the colors to whatever and customize pen settings </value>
   </data>
   <data name="SettingsCategoryAccount" xml:space="preserve">
     <value>fort.social account</value>
@@ -3694,13 +3714,13 @@ Open your profile and try again.</value>
     <value>Storage</value>
   </data>
   <data name="SettingsCategoryStorageCaption" xml:space="preserve">
-    <value>Space used, the media cache, memory, and reset</value>
+    <value>how much space is used and clear cache + reset the app</value>
   </data>
   <data name="SettingsCategoryAbout" xml:space="preserve">
     <value>About</value>
   </data>
   <data name="SettingsCategoryAboutCaption" xml:space="preserve">
-    <value>Version, updates, the welcome dialog, and links</value>
+    <value>see what version ur on and update (or just replay the welcome thingy)</value>
   </data>
   <data name="SettingsCategoryList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Settings categories</value>

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Web.Http;
+using Windows.Web.Http.Filters;
 
 namespace Fort.ind_UWP
 {
@@ -29,7 +30,11 @@ namespace Fort.ind_UWP
 
         private static HttpClient CreateClient()
         {
-            var client = new HttpClient();
+            var filter = new HttpBaseProtocolFilter();
+            filter.CacheControl.ReadBehavior = HttpCacheReadBehavior.NoCache;
+            filter.CacheControl.WriteBehavior = HttpCacheWriteBehavior.NoCache;
+
+            var client = new HttpClient(filter);
 
             var version = AppConstants.AppVersionDisplay;
             int space = version.IndexOf(' ');
@@ -220,18 +225,26 @@ namespace Fort.ind_UWP
             return new Version(parsed.Major, parsed.Minor, Math.Max(parsed.Build, 0), Math.Max(parsed.Revision, 0));
         }
 
+        public static DateTimeOffset? LastChecked
+        {
+            get
+            {
+                var raw = AppSettings.ReadString(AppConstants.SettingUpdateLastCheckedUtc, null);
+
+                DateTimeOffset parsed;
+                return !string.IsNullOrEmpty(raw) &&
+                       DateTimeOffset.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out parsed)
+                       ? parsed
+                       : (DateTimeOffset?)null;
+            }
+        }
+
         private static bool IsAutomaticCheckDue()
         {
-            var raw = AppSettings.ReadString(AppConstants.SettingUpdateLastCheckedUtc, null);
+            var lastChecked = LastChecked;
+            if (!lastChecked.HasValue) return true;
 
-            DateTimeOffset lastChecked;
-            if (string.IsNullOrEmpty(raw) ||
-                !DateTimeOffset.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out lastChecked))
-            {
-                return true;
-            }
-
-            var age = DateTimeOffset.UtcNow - lastChecked;
+            var age = DateTimeOffset.UtcNow - lastChecked.Value;
             return age < TimeSpan.Zero || age >= AutomaticCheckInterval;
         }
 

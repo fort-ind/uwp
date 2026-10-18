@@ -18,6 +18,16 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="ContentPanel.Padding" Value="12"/>
+                        <Setter Target="LinksPanel.Orientation" Value="Vertical"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="MediumState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="440"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="ContentPanel.Padding" Value="12"/>
+                        <Setter Target="LinksPanel.Orientation" Value="Horizontal"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="WideState">
@@ -26,6 +36,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="ContentPanel.Padding" Value="24"/>
+                        <Setter Target="LinksPanel.Orientation" Value="Horizontal"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -41,77 +52,25 @@
                         </TransitionCollection>
                     </StackPanel.ChildrenTransitions>
 
-                    <StackPanel x:Name="AboutSection" Margin="0,0,0,40">
-                        <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
-                            <Border Width="44" Height="44"
-                                    Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
-                                <FontIcon Glyph="&#xE774;" FontSize="22"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          AutomationProperties.AccessibilityView="Raw"/>
-                            </Border>
-                            <StackPanel VerticalAlignment="Center" Spacing="4">
-                                <TextBlock x:Uid="MainFortInd" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                                <TextBlock x:Uid="AboutVersionText" x:Name="AboutVersionText"
-                                           Tapped="AboutVersionText_Tapped"
-                                           Style="{StaticResource CaptionTextBlockStyle}"
-                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </StackPanel>
+                    <StackPanel x:Name="AboutSection" HorizontalAlignment="Center" Margin="0,16,0,0">
+                        <Image Source="ms-appx:///Assets/Square150x150Logo.png"
+                               Width="128" Height="128" Stretch="Uniform"
+                               HorizontalAlignment="Center"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Uid="AboutAppName" Style="{StaticResource TitleTextBlockStyle}"
+                                   TextAlignment="Center" Margin="0,8,0,0"/>
+                        <TextBlock x:Uid="AboutVersionText" x:Name="AboutVersionText"
+                                   Tapped="AboutVersionText_Tapped"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   HorizontalAlignment="Center" TextAlignment="Center" Margin="0,4,0,0"/>
 
-                    <StackPanel x:Name="UpdatesSection" Margin="0,0,0,40">
-                        <TextBlock x:Uid="SettingsUpdatesHeading" Style="{StaticResource SubtitleTextBlockStyle}"
-                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
-                        <StackPanel Spacing="8">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Button x:Name="CheckForUpdatesButton"
-                                        Click="CheckForUpdatesButton_Click"
-                                        Style="{StaticResource ButtonRevealStyle}">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE895;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
-                                        <TextBlock x:Uid="CheckForUpdatesButtonText"/>
-                                    </StackPanel>
-                                </Button>
-                                <HyperlinkButton x:Uid="UpdateDownloadLink" x:Name="UpdateDownloadLink"
-                                                 VerticalAlignment="Center"
-                                                 Visibility="Collapsed"
-                                                 Click="UpdateDownloadLink_Click"/>
-                            </StackPanel>
-                            <TextBlock x:Name="UpdateStatusText"
-                                       Style="{StaticResource CaptionTextBlockStyle}"
-                                       TextWrapping="Wrap"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                       Visibility="Collapsed"
-                                       AutomationProperties.LiveSetting="Polite"/>
-                            <ToggleSwitch x:Uid="AutoUpdateCheckToggle" x:Name="AutoUpdateCheckToggle"
-                                          Toggled="AutoUpdateCheckToggle_Toggled"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel x:Name="WelcomeSection" Margin="0,0,0,40">
-                        <TextBlock x:Uid="MainWelcomeDialog2" Style="{StaticResource SubtitleTextBlockStyle}"
-                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
-                        <StackPanel Spacing="10">
-                            <TextBlock x:Uid="MainTheWelcomeDialogAppears"
-                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                            <Button x:Name="ResetWelcomeButton"
-                                    Click="ResetWelcomeButton_Click"
-                                    Style="{StaticResource ButtonRevealStyle}">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE72C;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
-                                    <TextBlock x:Uid="MainShowWelcomeDialogAgain"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel x:Name="LinksSection" Spacing="12">
-                        <StackPanel Orientation="Horizontal" Spacing="24">
+                        <StackPanel x:Name="LinksPanel" Orientation="Horizontal" Spacing="24"
+                                    HorizontalAlignment="Center" Margin="0,16,0,0">
                             <HyperlinkButton x:Uid="WebsiteLink"
                                              NavigateUri="https://fort1nd.com"
                                              Padding="0" MinHeight="40"
+                                             HorizontalAlignment="Center"
                                              VerticalContentAlignment="Center">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon Glyph="&#xE774;" FontSize="16" AutomationProperties.AccessibilityView="Raw"/>
@@ -122,6 +81,7 @@
                             <HyperlinkButton x:Uid="GitHubLink" x:Name="GitHubLink"
                                              NavigateUri="https://github.com/fort-ind/uwp"
                                              Padding="0" MinHeight="40"
+                                             HorizontalAlignment="Center"
                                              VerticalContentAlignment="Center">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon Glyph="&#xE943;" FontSize="16" AutomationProperties.AccessibilityView="Raw"/>
@@ -132,6 +92,7 @@
                             <HyperlinkButton x:Uid="IssuesLink" x:Name="IssuesLink"
                                              NavigateUri="https://github.com/fort-ind/uwp/issues"
                                              Padding="0" MinHeight="40"
+                                             HorizontalAlignment="Center"
                                              VerticalContentAlignment="Center">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon Glyph="&#xE946;" FontSize="16" AutomationProperties.AccessibilityView="Raw"/>
@@ -140,29 +101,199 @@
                                 </StackPanel>
                             </HyperlinkButton>
                         </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"
-                                      Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                      AutomationProperties.AccessibilityView="Raw"/>
-                            <TextBlock x:Uid="MainMadeWithLoveBy"
-                                       Style="{StaticResource CaptionTextBlockStyle}"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                       VerticalAlignment="Center"/>
-                            <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"
-                                      Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                      AutomationProperties.AccessibilityView="Raw"/>
-                        </StackPanel>
                     </StackPanel>
 
-                    <StackPanel x:Name="DiagnosticsSection" x:Load="False" Margin="0,40,0,0" Spacing="10">
+                    <Border Height="1" Margin="0,24,0,32"
+                            Background="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                            AutomationProperties.AccessibilityView="Raw"/>
+
+                    <Border x:Name="UpdatesSection" MaxWidth="480" Margin="0,0,0,16"
+                            BorderThickness="1"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+                        <StackPanel>
+                            <local:ExpanderHeaderButton x:Name="UpdatesHeader"
+                                    Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    MinWidth="0"
+                                    CornerRadius="0"
+                                    Padding="16,12"
+                                    AutomationProperties.HeadingLevel="Level2"
+                                    Click="UpdatesHeader_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Width="36" Height="36"
+                                          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                        <FontIcon Glyph="&#xE895;" FontSize="16"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  AutomationProperties.AccessibilityView="Raw"/>
+                                    </Grid>
+                                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock x:Uid="SettingsUpdatesHeading" Style="{StaticResource BaseTextBlockStyle}"/>
+                                        <TextBlock x:Name="UpdateSummaryText"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </StackPanel>
+                                    <FontIcon Grid.Column="2" Glyph="&#xE76C;"
+                                              FontSize="12" VerticalAlignment="Center"
+                                              AutomationProperties.AccessibilityView="Raw"
+                                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                              RenderTransformOrigin="0.5,0.5">
+                                        <FontIcon.RenderTransform>
+                                            <RotateTransform x:Name="UpdatesChevronRotation" Angle="0"/>
+                                        </FontIcon.RenderTransform>
+                                    </FontIcon>
+                                </Grid>
+                            </local:ExpanderHeaderButton>
+
+                            <StackPanel x:Name="UpdatesContent" Visibility="Collapsed" Padding="20,16,20,16">
+                                <StackPanel.ChildrenTransitions>
+                                    <TransitionCollection>
+                                        <EntranceThemeTransition FromVerticalOffset="20"/>
+                                    </TransitionCollection>
+                                </StackPanel.ChildrenTransitions>
+
+                                <Grid HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ProgressRing x:Uid="UpdateCheckingRing" x:Name="UpdateProgressRing"
+                                                  Width="20" Height="20" Margin="0,0,10,0"
+                                                  VerticalAlignment="Center"
+                                                  Visibility="Collapsed"/>
+                                    <TextBlock x:Name="UpdateStatusText" Grid.Column="1"
+                                               Style="{StaticResource BodyTextBlockStyle}"
+                                               TextWrapping="Wrap" TextAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Visibility="Collapsed"
+                                               AutomationProperties.LiveSetting="Polite"/>
+                                </Grid>
+                                <TextBlock x:Name="UpdateLastCheckedText"
+                                           Style="{StaticResource CaptionTextBlockStyle}"
+                                           TextWrapping="Wrap" TextAlignment="Center"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           Margin="0,4,0,0"
+                                           Visibility="Collapsed"/>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                                    <Button x:Name="CheckForUpdatesButton"
+                                            Click="CheckForUpdatesButton_Click"
+                                            Style="{StaticResource ButtonRevealStyle}">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE895;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                                            <TextBlock x:Uid="CheckForUpdatesButtonText"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <HyperlinkButton x:Uid="UpdateDownloadLink" x:Name="UpdateDownloadLink"
+                                                     VerticalAlignment="Center"
+                                                     Margin="12,0,0,0"
+                                                     Visibility="Collapsed"
+                                                     Click="UpdateDownloadLink_Click"/>
+                                </StackPanel>
+
+                                <ToggleSwitch x:Uid="AutoUpdateCheckToggle" x:Name="AutoUpdateCheckToggle"
+                                              HorizontalAlignment="Center" Margin="0,16,0,0"
+                                              Toggled="AutoUpdateCheckToggle_Toggled"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border x:Name="WelcomeSection" MaxWidth="480" Margin="0,0,0,40"
+                            BorderThickness="1"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+                        <StackPanel>
+                            <local:ExpanderHeaderButton x:Name="WelcomeHeader"
+                                    Style="{StaticResource ButtonRevealStyle}"
+                                    Background="{ThemeResource SettingsSectionHeaderBackgroundBrush}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    MinWidth="0"
+                                    CornerRadius="0"
+                                    Padding="16,12"
+                                    AutomationProperties.HeadingLevel="Level2"
+                                    Click="WelcomeHeader_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Width="36" Height="36"
+                                          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                                        <FontIcon Glyph="&#xE946;" FontSize="16"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  AutomationProperties.AccessibilityView="Raw"/>
+                                    </Grid>
+                                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock x:Uid="MainWelcomeDialog2" Style="{StaticResource BaseTextBlockStyle}"/>
+                                        <TextBlock x:Uid="MainTheWelcomeDialogAppears"
+                                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </StackPanel>
+                                    <FontIcon Grid.Column="2" Glyph="&#xE76C;"
+                                              FontSize="12" VerticalAlignment="Center"
+                                              AutomationProperties.AccessibilityView="Raw"
+                                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                              RenderTransformOrigin="0.5,0.5">
+                                        <FontIcon.RenderTransform>
+                                            <RotateTransform x:Name="WelcomeChevronRotation" Angle="0"/>
+                                        </FontIcon.RenderTransform>
+                                    </FontIcon>
+                                </Grid>
+                            </local:ExpanderHeaderButton>
+
+                            <StackPanel x:Name="WelcomeContent" Visibility="Collapsed" Padding="20,16,20,16">
+                                <StackPanel.ChildrenTransitions>
+                                    <TransitionCollection>
+                                        <EntranceThemeTransition FromVerticalOffset="20"/>
+                                    </TransitionCollection>
+                                </StackPanel.ChildrenTransitions>
+                                <Button x:Name="ResetWelcomeButton"
+                                        Click="ResetWelcomeButton_Click"
+                                        HorizontalAlignment="Center"
+                                        Style="{StaticResource ButtonRevealStyle}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE72C;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
+                                        <TextBlock x:Uid="MainShowWelcomeDialogAgain"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                        <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBlock x:Uid="MainMadeWithLoveBy"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                   VerticalAlignment="Center"/>
+                        <FontIcon Glyph="&#xE734;" FontSize="10" VerticalAlignment="Center"
+                                  Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="DiagnosticsSection" x:Load="False" HorizontalAlignment="Center" MaxWidth="480"
+                                Margin="0,40,0,0" Spacing="10">
                         <TextBlock x:Uid="DiagnosticsTitle" Style="{StaticResource SubtitleTextBlockStyle}"
-                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,6"/>
+                                   AutomationProperties.HeadingLevel="Level2"
+                                   TextAlignment="Center" Margin="0,0,0,6"/>
                         <TextBlock x:Uid="DiagnosticsDescription"
-                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   TextWrapping="Wrap" TextAlignment="Center"
                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         <Button x:Name="CopyDiagnosticsButton"
                                 Click="CopyDiagnosticsButton_Click"
+                                HorizontalAlignment="Center"
                                 Style="{StaticResource ButtonRevealStyle}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE8C8;" FontSize="14" AutomationProperties.AccessibilityView="Raw"/>
@@ -171,7 +302,7 @@
                         </Button>
                         <TextBlock x:Name="DiagnosticsStatusText"
                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                   TextWrapping="Wrap"
+                                   TextWrapping="Wrap" TextAlignment="Center"
                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                    Visibility="Collapsed"
                                    AutomationProperties.LiveSetting="Polite"/>

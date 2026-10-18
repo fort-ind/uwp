@@ -95,6 +95,8 @@ namespace Fort.ind_UWP
         public const string SettingUpdateLatestVersion = "UpdateLatestVersion";
         public const string SettingUpdateDismissedVersion = "UpdateDismissedVersion";
         public const int UpdateCheckIntervalHours = 24;
+        public const string SettingAboutUpdatesExpanded = "AboutUpdatesExpanded";
+        public const string SettingAboutWelcomeExpanded = "AboutWelcomeExpanded";
 
         public const string SettingSocialNotificationsEnabled = "SocialNotificationsEnabled";
         public const string SettingSocialNotificationsAccount = "SocialNotificationsAccount";
