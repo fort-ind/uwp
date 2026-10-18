@@ -952,6 +952,48 @@ Open your profile and try again.</value>
   <data name="TileNotificationsDescription.Text" xml:space="preserve">
     <value>Your newest unread fort.social notifications take turns on the tile. Once you've read them, it goes back to normal.</value>
   </data>
+  <data name="TileFeedToggle.Header" xml:space="preserve">
+    <value>Local posts on the tile</value>
+  </data>
+  <data name="TileFeedToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="TileFeedToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="TileFeedDescription.Text" xml:space="preserve">
+    <value>Recent public posts from fort.social's local timeline take turns on the tile while you have no unread notifications. Replies, renotes with nothing added, posts with a content warning and posts with sensitive media are skipped. This works signed out too.</value>
+  </data>
+  <data name="TileFeedAvatarsToggle.Header" xml:space="preserve">
+    <value>Show authors' pictures</value>
+  </data>
+  <data name="TileFeedAvatarsToggle.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="TileFeedAvatarsToggle.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="TileFeedAvatarsDescription.Text" xml:space="preserve">
+    <value>Shows each author's profile picture on the tile. Turn it off for text only.</value>
+  </data>
+  <data name="TileFeedIntervalCombo.Header" xml:space="preserve">
+    <value>Refresh local posts</value>
+  </data>
+  <data name="TileFeedInterval15.Content" xml:space="preserve">
+    <value>Every 15 minutes</value>
+  </data>
+  <data name="TileFeedInterval30.Content" xml:space="preserve">
+    <value>Every 30 minutes</value>
+  </data>
+  <data name="TileFeedInterval60.Content" xml:space="preserve">
+    <value>Every hour</value>
+  </data>
+  <data name="TileFeedInterval120.Content" xml:space="preserve">
+    <value>Every 2 hours</value>
+  </data>
+  <data name="TileFeedIntervalDescription.Text" xml:space="preserve">
+    <value>Windows checks this often, even while fort.desktop is closed, and never more than every 15 minutes. If a check can't run, posts leave the tile after about three times this long.</value>
+  </data>
   <data name="LockScreenSendersToggle.Header" xml:space="preserve">
     <value>Show who they're from on the lock screen</value>
   </data>

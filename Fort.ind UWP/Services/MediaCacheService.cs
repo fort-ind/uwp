@@ -65,6 +65,7 @@ namespace Fort.ind_UWP
                 await AvatarIconService.ClearToastAvatarsAsync();
                 await SocialTileService.ClearAvatarsAsync();
                 SocialNotificationService.RefreshTileInBackground();
+                SocialFeedTileService.RefreshInBackground();
 
                 var after = await MeasureAsync();
                 if (!before.HasValue || !after.HasValue) return null;

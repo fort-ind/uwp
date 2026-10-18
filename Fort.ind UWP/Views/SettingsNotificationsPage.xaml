@@ -91,6 +91,29 @@
                                        Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         </StackPanel>
+                        <StackPanel x:Name="TileFeedPanel" Visibility="Collapsed">
+                            <ToggleSwitch x:Uid="TileFeedToggle" x:Name="TileFeedToggle"
+                                          Toggled="TileFeedToggle_Toggled"/>
+                            <TextBlock x:Uid="TileFeedDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ToggleSwitch x:Uid="TileFeedAvatarsToggle" x:Name="TileFeedAvatarsToggle"
+                                          Toggled="TileFeedAvatarsToggle_Toggled"/>
+                            <TextBlock x:Uid="TileFeedAvatarsDescription"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,14"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ComboBox x:Uid="TileFeedIntervalCombo" x:Name="TileFeedIntervalCombo"
+                                      MinWidth="200"
+                                      SelectionChanged="TileFeedIntervalCombo_SelectionChanged">
+                                <ComboBoxItem x:Uid="TileFeedInterval15" Tag="15"/>
+                                <ComboBoxItem x:Uid="TileFeedInterval30" Tag="30"/>
+                                <ComboBoxItem x:Uid="TileFeedInterval60" Tag="60"/>
+                                <ComboBoxItem x:Uid="TileFeedInterval120" Tag="120"/>
+                            </ComboBox>
+                            <TextBlock x:Uid="TileFeedIntervalDescription" Margin="0,4,0,14"
+                                       Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="12">
                             <Button x:Name="RefreshTileButton"
                                     Click="RefreshTileButton_Click"

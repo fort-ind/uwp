@@ -76,6 +76,16 @@ namespace Fort.ind_UWP
         public const string SettingTileShowsNotifications = "TileShowsNotifications";
         public const string SettingLockScreenShowsSenders = "LockScreenShowsSenders";
         public const string SettingSocialTileShown = "SocialTileShown";
+        public const string SettingSocialFeedTile = "SocialFeedTile";
+        public const string SettingSocialFeedTileAvatars = "SocialFeedTileAvatars";
+        public const string SettingSocialFeedTileMinutes = "SocialFeedTileMinutes";
+        public const string SettingSocialFeedTileRegisteredMinutes = "SocialFeedTileRegisteredMinutes";
+        public const string SettingSocialFeedTilePushedAt = "SocialFeedTilePushedAt";
+        public const string SocialFeedTileTaskName = "SocialFeedTileCheck";
+        public const int SocialFeedTileDefaultMinutes = 30;
+        public const int SocialFeedTileExpiryMultiple = 3;
+        public const int SocialFeedTileMinimumExpiryHours = 3;
+        public const int SocialFeedTileBackgroundSeconds = 25;
         public const string SettingLastNavTag = "LastNavTag";
 
         public const string SettingsSectionAppearance = "Appearance";

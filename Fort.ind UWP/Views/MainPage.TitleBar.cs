@@ -105,6 +105,7 @@ namespace Fort.ind_UWP
                 }
 
                 SocialTileService.ShowNewsTile(userRequested);
+                SocialFeedTileService.RefreshInBackground();
 
                 if (userRequested)
                 {

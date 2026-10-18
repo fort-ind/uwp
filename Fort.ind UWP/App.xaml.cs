@@ -208,6 +208,7 @@ namespace Fort.ind_UWP
             SocialNoteCapture.Initialize();
             SocialNotificationService.Initialize();
             SocialNotificationService.ReconcileInBackground();
+            SocialFeedTileService.ReconcileInBackground();
         }
 
         protected override async void OnBackgroundActivated(BackgroundActivatedEventArgs args)
@@ -219,6 +220,10 @@ namespace Fort.ind_UWP
                 if (SocialNotificationService.IsBackgroundCheck(args.TaskInstance))
                 {
                     await SocialNotificationService.RunBackgroundCheckAsync(args.TaskInstance);
+                }
+                else if (SocialFeedTileService.IsBackgroundCheck(args.TaskInstance))
+                {
+                    await SocialFeedTileService.RunBackgroundCheckAsync(args.TaskInstance);
                 }
                 else if (SocialToastActions.IsToastAction(args.TaskInstance))
                 {
@@ -531,6 +536,7 @@ namespace Fort.ind_UWP
 
                 SocialNotificationService.OnResuming();
                 SocialNoteCapture.OnResuming();
+                SocialFeedTileService.OnResuming();
             }
             catch (Exception ex)
             {

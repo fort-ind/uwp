@@ -61,6 +61,12 @@ namespace Fort.ind_UWP
                 TileNotificationsToggle.IsOn = SocialTileService.PreviewsEnabled;
                 LockScreenSendersToggle.IsOn = SocialTileService.LockScreenShowsSenders;
                 LockScreenSendersToggle.IsEnabled = TileNotificationsToggle.IsOn;
+
+                TileFeedPanel.Visibility = SocialTileService.StartShowsLiveTiles ? Visibility.Visible : Visibility.Collapsed;
+                TileFeedToggle.IsOn = SocialFeedTileService.Enabled;
+                TileFeedAvatarsToggle.IsOn = SocialFeedTileService.ShowAvatars;
+                SelectFeedInterval(SocialFeedTileService.IntervalMinutes);
+                UpdateTileFeedEnabled();
             }
             catch (Exception ex)
             {
@@ -174,6 +180,82 @@ namespace Fort.ind_UWP
             if (_loadingSettings) return;
             SocialTileService.LockScreenShowsSenders = LockScreenSendersToggle.IsOn;
             SocialNotificationService.RefreshTileInBackground();
+        }
+
+        private void SelectFeedInterval(int minutes)
+        {
+            ComboBoxItem fallback = null;
+            ComboBoxItem match = null;
+            foreach (var entry in TileFeedIntervalCombo.Items)
+            {
+                var item = entry as ComboBoxItem;
+                var itemMinutes = SettingsComboTags.IntTagOf(item);
+                if (!itemMinutes.HasValue) continue;
+
+                if (itemMinutes.Value == minutes) match = item;
+                if (itemMinutes.Value == AppConstants.SocialFeedTileDefaultMinutes) fallback = item;
+            }
+
+            TileFeedIntervalCombo.SelectedItem = match ?? fallback;
+        }
+
+        private void UpdateTileFeedEnabled()
+        {
+            TileFeedAvatarsToggle.IsEnabled = TileFeedToggle.IsOn;
+            TileFeedIntervalCombo.IsEnabled = TileFeedToggle.IsOn;
+        }
+
+        private async void TileFeedToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            UpdateTileFeedEnabled();
+
+            if (_loadingSettings) return;
+
+            try
+            {
+                SocialFeedTileService.Enabled = TileFeedToggle.IsOn;
+
+                if (TileFeedToggle.IsOn)
+                {
+                    await SocialFeedTileService.ReconcileAsync();
+                    SocialFeedTileService.RefreshInBackground();
+                }
+                else
+                {
+                    SocialTileService.WithdrawFeed();
+                    await SocialFeedTileService.ReconcileAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SettingsNotificationsPage: could not apply the local posts tile setting", ex);
+            }
+        }
+
+        private void TileFeedAvatarsToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            SocialFeedTileService.ShowAvatars = TileFeedAvatarsToggle.IsOn;
+            SocialFeedTileService.RefreshInBackground();
+        }
+
+        private async void TileFeedIntervalCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_loadingSettings) return;
+
+            try
+            {
+                var minutes = SettingsComboTags.IntTagOf(TileFeedIntervalCombo.SelectedItem as ComboBoxItem);
+                if (!minutes.HasValue) return;
+
+                SocialFeedTileService.IntervalMinutes = minutes.Value;
+                await SocialFeedTileService.ReconcileAsync();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SettingsNotificationsPage: could not apply the local posts interval", ex);
+            }
         }
 
         private void RefreshTileButton_Click(object sender, RoutedEventArgs e)

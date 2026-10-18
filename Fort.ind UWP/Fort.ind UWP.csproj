@@ -301,6 +301,7 @@
     <Compile Include="Services\SocialPostService.cs" />
     <Compile Include="Services\SocialProfileEditService.cs" />
     <Compile Include="Services\SocialStream.cs" />
+    <Compile Include="Services\SocialFeedTileService.cs" />
     <Compile Include="Services\SocialTileService.cs" />
     <Compile Include="Services\SocialToastActions.cs" />
     <Compile Include="Services\UpdateService.cs" />

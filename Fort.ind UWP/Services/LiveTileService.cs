@@ -70,7 +70,7 @@ namespace Fort.ind_UWP
             });
         }
 
-        public static bool ShowPreviewTiles(IReadOnlyList<TilePreview> previews, IReadOnlyList<string> lockLines)
+        public static bool ShowPreviewTiles(IReadOnlyList<TilePreview> previews, IReadOnlyList<string> lockLines, DateTimeOffset? expiration = null)
         {
             if (previews == null || previews.Count == 0) return false;
 
@@ -87,6 +87,11 @@ namespace Fort.ind_UWP
                 {
                     TileNotification tileNotification = new TileNotification(CreatePreviewTileXml(previews[i], previews, lockLines));
                     tileNotification.Tag = PreviewTagPrefix + i.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    if (expiration.HasValue)
+                    {
+                        tileNotification.ExpirationTime = expiration.Value;
+                    }
+
                     tileUpdater.Update(tileNotification);
                 }
 

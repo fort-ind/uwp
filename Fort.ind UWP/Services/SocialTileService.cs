@@ -16,6 +16,12 @@ namespace Fort.ind_UWP
 
         private const int MaximumLockLines = 3;
 
+        private const string FeedSignaturePrefix = "f|";
+
+        private const string FeedAvatars = "a";
+
+        private const string FeedNoAvatars = "n";
+
         private const string UniversalApiContract = "Windows.Foundation.UniversalApiContract";
 
         private const ushort WindowsElevenContractVersion = 14;
@@ -78,12 +84,46 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static bool ShowsNotificationPreviews
+        {
+            get
+            {
+                var shown = ReadShown();
+                return shown != null && !IsFeedSignature(shown);
+            }
+        }
+
         public static void Withdraw()
+        {
+            var restoreFeed = false;
+            lock (s_lock)
+            {
+                s_generation++;
+                var shown = ReadShown();
+                if (shown == null || IsFeedSignature(shown)) return;
+
+                RemoveShown();
+                if (!LiveTileService.TileCleared)
+                {
+                    LiveTileService.ShowNewsTile();
+                    restoreFeed = SocialFeedTileService.WantsFeed;
+                }
+            }
+
+            ReleaseAvatarsInBackground();
+
+            if (restoreFeed)
+            {
+                SocialFeedTileService.RefreshInBackground();
+            }
+        }
+
+        public static void WithdrawFeed()
         {
             lock (s_lock)
             {
                 s_generation++;
-                if (ReadShown() == null) return;
+                if (!IsFeedSignature(ReadShown())) return;
 
                 RemoveShown();
                 if (!LiveTileService.TileCleared)
@@ -161,6 +201,59 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static async Task ShowFeedAsync(IReadOnlyList<SocialNote> notes, bool showAvatars, TimeSpan interval, CancellationToken cancellationToken)
+        {
+            if (notes == null || notes.Count == 0 || !SocialFeedTileService.WantsFeed) return;
+
+            var signature = FeedSignaturePrefix + (showAvatars ? FeedAvatars : FeedNoAvatars) + "|" +
+                            string.Join(",", notes.Select(n => n.Id));
+
+            int generation;
+            lock (s_lock)
+            {
+                var shown = ReadShown();
+                if (shown != null && !IsFeedSignature(shown)) return;
+                if (string.Equals(shown, signature, StringComparison.Ordinal) && FeedPushIsFresh(interval)) return;
+
+                generation = s_generation;
+            }
+
+            await s_gate.WaitAsync(cancellationToken);
+            try
+            {
+                var previews = new List<TilePreview>();
+                foreach (var note in notes)
+                {
+                    var preview = await BuildFeedPreviewAsync(note, showAvatars, cancellationToken);
+                    if (preview != null)
+                    {
+                        previews.Add(preview);
+                    }
+                }
+
+                if (previews.Count == 0) return;
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var expiration = DateTimeOffset.Now + FeedExpiry(interval);
+
+                lock (s_lock)
+                {
+                    if (generation != s_generation || !SocialFeedTileService.WantsFeed) return;
+                    if (ShowsNotificationPreviews) return;
+                    if (!LiveTileService.ShowPreviewTiles(previews, null, expiration)) return;
+
+                    WriteShown(signature);
+                    AppSettings.Write(AppConstants.SettingSocialFeedTilePushedAt, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+                }
+
+                await AvatarIconService.RetainTileAvatarsAsync(previews.Select(p => p.Avatar).ToList());
+            }
+            finally
+            {
+                s_gate.Release();
+            }
+        }
+
         public static async Task ClearAvatarsAsync()
         {
             await s_gate.WaitAsync();
@@ -197,6 +290,47 @@ namespace Fort.ind_UWP
                 ActorName = item.ActorName,
                 Avatar = avatar
             };
+        }
+
+        private static async Task<TilePreview> BuildFeedPreviewAsync(SocialNote note, bool showAvatars, CancellationToken cancellationToken)
+        {
+            var item = SocialFeedItem.FromNote(note);
+            if (item == null || string.IsNullOrWhiteSpace(item.Body)) return null;
+
+            Uri avatar = null;
+            if (showAvatars && note.User != null)
+            {
+                avatar = await AvatarIconService.GetTileAvatarUriAsync(note.User.AvatarUrl, cancellationToken);
+            }
+
+            return new TilePreview
+            {
+                Title = item.Title,
+                Body = item.Body,
+                ActorName = item.ActorName,
+                Avatar = avatar
+            };
+        }
+
+        private static bool IsFeedSignature(string signature)
+        {
+            return signature != null && signature.StartsWith(FeedSignaturePrefix, StringComparison.Ordinal);
+        }
+
+        private static TimeSpan FeedExpiry(TimeSpan interval)
+        {
+            var expiry = TimeSpan.FromTicks(interval.Ticks * AppConstants.SocialFeedTileExpiryMultiple);
+            var floor = TimeSpan.FromHours(AppConstants.SocialFeedTileMinimumExpiryHours);
+            return expiry < floor ? floor : expiry;
+        }
+
+        private static bool FeedPushIsFresh(TimeSpan interval)
+        {
+            var pushedAt = AppSettings.ReadDouble(AppConstants.SettingSocialFeedTilePushedAt, 0);
+            if (pushedAt <= 0) return false;
+
+            var age = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - pushedAt;
+            return age >= 0 && age < interval.TotalSeconds / 2;
         }
 
         private static IReadOnlyList<string> LockLinesFor(IReadOnlyList<TilePreview> previews, int count, bool showSenders)
