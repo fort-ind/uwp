@@ -258,6 +258,19 @@ namespace Fort.ind_UWP
             return item;
         }
 
+        public static string PlainBody(SocialNote note)
+        {
+            return note == null ? "" : Truncate(MfmText.Preview(note.Text, note.MentionHandles));
+        }
+
+        public static string PlainActorName(SocialNote note)
+        {
+            if (note == null || note.User == null) return LocalizedStrings.Get("SocialUnknownUser");
+
+            var plain = MfmText.PlainName(note.User.Name);
+            return string.IsNullOrWhiteSpace(plain) ? note.User.Username : plain;
+        }
+
         private static string GlyphFor(string type)
         {
             switch (type)

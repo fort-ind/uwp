@@ -81,6 +81,7 @@ namespace Fort.ind_UWP
         public const string SettingSocialFeedTileMinutes = "SocialFeedTileMinutes";
         public const string SettingSocialFeedTileRegisteredMinutes = "SocialFeedTileRegisteredMinutes";
         public const string SettingSocialFeedTilePushedAt = "SocialFeedTilePushedAt";
+        public const string SettingSocialFeedTileExpiresAt = "SocialFeedTileExpiresAt";
         public const string SocialFeedTileTaskName = "SocialFeedTileCheck";
         public const int SocialFeedTileDefaultMinutes = 30;
         public const int SocialFeedTileExpiryMultiple = 3;

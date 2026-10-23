@@ -113,6 +113,28 @@ namespace Fort.ind_UWP
             return CollapseSpaces(builder.ToString());
         }
 
+        public static string Preview(string text, IReadOnlyDictionary<string, string> mentionHandles)
+        {
+            var segments = Parse(text, null, null, mentionHandles);
+            if (segments.Count == 0) return "";
+
+            var builder = new StringBuilder();
+            foreach (var segment in segments)
+            {
+                builder.Append(segment.Kind == MfmSegmentKind.Link ? LinkPreviewText(segment) : segment.Text);
+            }
+
+            return PlainName(builder.ToString());
+        }
+
+        private static string LinkPreviewText(MfmSegment segment)
+        {
+            if (!string.Equals(segment.Text, segment.Url, StringComparison.Ordinal)) return segment.Text;
+
+            var uri = WebLauncher.TryCreateWebUri(segment.Url);
+            return uri == null ? segment.Text : uri.Host;
+        }
+
         public static MfmSegment FirstPreviewLink(IReadOnlyList<MfmSegment> segments)
         {
             if (segments == null) return null;

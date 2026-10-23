@@ -314,6 +314,15 @@ namespace Fort.ind_UWP
 
             CurrentUser = fetched;
             await LocalStorageService.SaveProfileAsync(fetched);
+
+            if (CurrentUser == null)
+            {
+                await LocalStorageService.ClearProfileAsync();
+                return;
+            }
+
+            if (!ReferenceEquals(CurrentUser, fetched)) return;
+
             AuthStateChanged?.Invoke(null, true);
         }
 

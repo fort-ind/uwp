@@ -17,6 +17,8 @@ namespace Fort.ind_UWP
         private static readonly StorageFolder LocalFolder = ApplicationData.Current.LocalFolder;
         private const string PROFILE_FILE = "misskey_profile.json";
 
+        private static readonly SemaphoreSlim s_profileGate = new SemaphoreSlim(1, 1);
+
         public static Task InitializeAsync()
         {
             return Task.CompletedTask;
@@ -31,11 +33,15 @@ namespace Fort.ind_UWP
                 return false;
             }
 
+            var gateHeld = false;
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var json = SerializeToJson(profile);
+
+                await s_profileGate.WaitAsync(cancellationToken);
+                gateHeld = true;
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -53,6 +59,10 @@ namespace Fort.ind_UWP
             {
                 AppLog.Error("Error saving profile", ex);
                 return false;
+            }
+            finally
+            {
+                if (gateHeld) s_profileGate.Release();
             }
         }
 
@@ -82,6 +92,7 @@ namespace Fort.ind_UWP
 
         public static async Task ClearProfileAsync()
         {
+            await s_profileGate.WaitAsync();
             try
             {
                 var file = await LocalFolder.TryGetItemAsync(PROFILE_FILE) as StorageFile;
@@ -92,6 +103,10 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 AppLog.Error("Error clearing profile", ex);
+            }
+            finally
+            {
+                s_profileGate.Release();
             }
         }
 

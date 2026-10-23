@@ -90,9 +90,10 @@ namespace Fort.ind_UWP
         private static bool IsEligible(SocialNote note)
         {
             if (note == null || note.IsHidden || note.IsDirect) return false;
+            if (!string.Equals(note.Visibility, SocialNoteActionService.PublicVisibility, StringComparison.Ordinal)) return false;
             if (!string.IsNullOrEmpty(note.ReplyId)) return false;
             if (!string.IsNullOrWhiteSpace(note.ContentWarning)) return false;
-            if (string.IsNullOrWhiteSpace(note.Text)) return false;
+            if (string.IsNullOrWhiteSpace(SocialFeedItem.PlainBody(note))) return false;
             if (HasSensitiveFile(note)) return false;
 
             var quoted = note.Renote;

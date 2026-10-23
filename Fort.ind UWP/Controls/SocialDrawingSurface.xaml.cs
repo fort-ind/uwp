@@ -630,11 +630,23 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 AppLog.Error("SocialDrawingSurface: could not attach the drawing", ex);
+                await ReportAttachFailedAsync();
+            }
+        }
+
+        private async Task ReportAttachFailedAsync()
+        {
+            try
+            {
                 SetExporting(false);
                 await DialogService.ShowMessageAsync(this,
                                                      LocalizedStrings.Get("InkDrawFailedTitle"),
                                                      LocalizedStrings.Get("SocialActionErrorGeneric"),
                                                      LocalizedStrings.Get("DialogOk"));
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialDrawingSurface: could not report the failed attach", ex);
             }
         }
 

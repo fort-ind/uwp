@@ -22,6 +22,8 @@ namespace Fort.ind_UWP
 
         private const string FeedNoAvatars = "n";
 
+        private const string StaleMark = "!";
+
         private const string UniversalApiContract = "Windows.Foundation.UniversalApiContract";
 
         private const ushort WindowsElevenContractVersion = 14;
@@ -69,9 +71,10 @@ namespace Fort.ind_UWP
                 {
                     s_generation++;
                 }
-                else if (ReadShown() != null)
+                else
                 {
-                    return;
+                    var shown = ReadShown();
+                    if (shown != null && !FeedTilesExpired(shown)) return;
                 }
 
                 RemoveShown();
@@ -208,14 +211,11 @@ namespace Fort.ind_UWP
             var signature = FeedSignaturePrefix + (showAvatars ? FeedAvatars : FeedNoAvatars) + "|" +
                             string.Join(",", notes.Select(n => n.Id));
 
-            int generation;
             lock (s_lock)
             {
                 var shown = ReadShown();
                 if (shown != null && !IsFeedSignature(shown)) return;
                 if (string.Equals(shown, signature, StringComparison.Ordinal) && FeedPushIsFresh(interval)) return;
-
-                generation = s_generation;
             }
 
             await s_gate.WaitAsync(cancellationToken);
@@ -238,12 +238,13 @@ namespace Fort.ind_UWP
 
                 lock (s_lock)
                 {
-                    if (generation != s_generation || !SocialFeedTileService.WantsFeed) return;
+                    if (!SocialFeedTileService.WantsFeed) return;
                     if (ShowsNotificationPreviews) return;
                     if (!LiveTileService.ShowPreviewTiles(previews, null, expiration)) return;
 
                     WriteShown(signature);
                     AppSettings.Write(AppConstants.SettingSocialFeedTilePushedAt, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+                    AppSettings.Write(AppConstants.SettingSocialFeedTileExpiresAt, expiration.ToUnixTimeSeconds());
                 }
 
                 await AvatarIconService.RetainTileAvatarsAsync(previews.Select(p => p.Avatar).ToList());
@@ -261,7 +262,8 @@ namespace Fort.ind_UWP
             {
                 lock (s_lock)
                 {
-                    RemoveShown();
+                    var shown = ReadShown();
+                    if (shown != null && !shown.EndsWith(StaleMark, StringComparison.Ordinal)) WriteShown(shown + StaleMark);
                 }
 
                 await AvatarIconService.RetainTileAvatarsAsync(new Uri[0]);
@@ -294,8 +296,10 @@ namespace Fort.ind_UWP
 
         private static async Task<TilePreview> BuildFeedPreviewAsync(SocialNote note, bool showAvatars, CancellationToken cancellationToken)
         {
-            var item = SocialFeedItem.FromNote(note);
-            if (item == null || string.IsNullOrWhiteSpace(item.Body)) return null;
+            var body = SocialFeedItem.PlainBody(note);
+            if (string.IsNullOrWhiteSpace(body)) return null;
+
+            var actor = SocialFeedItem.PlainActorName(note);
 
             Uri avatar = null;
             if (showAvatars && note.User != null)
@@ -305,9 +309,9 @@ namespace Fort.ind_UWP
 
             return new TilePreview
             {
-                Title = item.Title,
-                Body = item.Body,
-                ActorName = item.ActorName,
+                Title = actor,
+                Body = body,
+                ActorName = actor,
                 Avatar = avatar
             };
         }
@@ -322,6 +326,14 @@ namespace Fort.ind_UWP
             var expiry = TimeSpan.FromTicks(interval.Ticks * AppConstants.SocialFeedTileExpiryMultiple);
             var floor = TimeSpan.FromHours(AppConstants.SocialFeedTileMinimumExpiryHours);
             return expiry < floor ? floor : expiry;
+        }
+
+        private static bool FeedTilesExpired(string shown)
+        {
+            if (!IsFeedSignature(shown)) return false;
+
+            var expiresAt = AppSettings.ReadDouble(AppConstants.SettingSocialFeedTileExpiresAt, 0);
+            return expiresAt > 0 && DateTimeOffset.UtcNow.ToUnixTimeSeconds() >= expiresAt;
         }
 
         private static bool FeedPushIsFresh(TimeSpan interval)
