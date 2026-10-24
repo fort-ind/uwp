@@ -123,6 +123,13 @@ namespace Fort.ind_UWP
         public const string SettingSocialCheckRegisteredMinutes = "SocialCheckRegisteredMinutes";
         public const string SocialToastGroup = "social";
         public const int SocialToastIndividualLimit = 4;
+        public const string SettingSocialDismissedAnnouncements = "SocialDismissedAnnouncements";
+        public const int SocialDismissedAnnouncementLimit = 50;
+        public const int SocialAnnouncementLimit = 10;
+        public const int SocialAnnouncementCacheMinutes = 10;
+        public const int SocialAnnouncementRefreshSeconds = 60;
+        public const int SocialHashtagLimit = 20;
+        public const int SocialHashtagCacheMinutes = 30;
         public const int SocialFeedPageSize = 20;
         public const int SocialFeedRetrySeconds = 5;
         public const int SocialFeedRetryLimit = 5;

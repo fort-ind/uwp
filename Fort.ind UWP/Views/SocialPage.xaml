@@ -113,6 +113,27 @@
             <Setter Property="Margin" Value="0"/>
         </Style>
 
+        <DataTemplate x:Key="SocialHashtagTemplate" x:DataType="local:SocialHashtag">
+            <Grid ColumnSpacing="12"
+                  AutomationProperties.Name="{x:Bind AutomationName}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{x:Bind Label}"
+                           Style="{StaticResource BodyTextBlockStyle}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           AutomationProperties.AccessibilityView="Raw"/>
+                <TextBlock Grid.Column="1"
+                           Text="{x:Bind CountText}"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                           VerticalAlignment="Center"
+                           AutomationProperties.AccessibilityView="Raw"/>
+            </Grid>
+        </DataTemplate>
+
         <Style x:Key="SocialStatePanelStyle" TargetType="StackPanel">
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -122,6 +143,11 @@
     </Page.Resources>
 
     <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowWidthStates">
                 <VisualState x:Name="NarrowState">
@@ -130,6 +156,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="SocialPivot.Margin" Value="0,0,0,0"/>
+                        <Setter Target="AnnouncementsPanel.Margin" Value="0,0,0,0"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="WideState">
@@ -138,12 +165,18 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="SocialPivot.Margin" Value="12,12,12,0"/>
+                        <Setter Target="AnnouncementsPanel.Margin" Value="12,12,12,0"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
+        <StackPanel x:Name="AnnouncementsPanel"
+                    Spacing="4"
+                    Visibility="Collapsed"/>
+
         <Pivot x:Uid="SocialPivot" x:Name="SocialPivot"
+               Grid.Row="1"
                Visibility="Collapsed"
                SelectionChanged="SocialPivot_SelectionChanged">
             <Pivot.HeaderTemplate>
@@ -165,6 +198,43 @@
                         <FontIcon Glyph="&#xE70F;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                         <TextBlock x:Uid="SocialNewNoteLabel"/>
                     </StackPanel>
+                </Button>
+                <Button x:Uid="SocialTagsButton" x:Name="SocialTagsButton"
+                        Style="{StaticResource ButtonRevealStyle}"
+                        Background="Transparent"
+                        Width="40" Height="40"
+                        MinWidth="40" MinHeight="40"
+                        Padding="0"
+                        CornerRadius="0"
+                        VerticalAlignment="Center">
+                    <FontIcon Glyph="&#xE1CB;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    <Button.Flyout>
+                        <Flyout x:Name="TagsFlyout" Placement="Bottom" Opening="TagsFlyout_Opening">
+                            <StackPanel Width="280" Spacing="8">
+                                <TextBlock x:Uid="SocialTagsHeader" Style="{StaticResource BaseTextBlockStyle}"/>
+                                <ProgressRing x:Uid="SocialTagsLoading" x:Name="TagsLoadingRing"
+                                              Width="32" Height="32"
+                                              HorizontalAlignment="Center"
+                                              IsActive="False"
+                                              Visibility="Collapsed"/>
+                                <StackPanel x:Name="TagsStatePanel" Spacing="8" Visibility="Collapsed">
+                                    <TextBlock x:Name="TagsStateText"
+                                               Style="{StaticResource BodyTextBlockStyle}"
+                                               TextWrapping="Wrap"
+                                               AutomationProperties.LiveSetting="Polite"/>
+                                    <Button x:Uid="SocialTagsRetryButton" x:Name="TagsRetryButton"
+                                            Click="TagsRetryButton_Click"/>
+                                </StackPanel>
+                                <ListView x:Name="TagsList"
+                                          MaxHeight="360"
+                                          SelectionMode="None"
+                                          IsItemClickEnabled="True"
+                                          ItemTemplate="{StaticResource SocialHashtagTemplate}"
+                                          ItemClick="TagsList_ItemClick"
+                                          Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
                 </Button>
                 <Button x:Uid="SocialRefreshButton" x:Name="SocialRefreshButton"
                         Style="{StaticResource ButtonRevealStyle}"

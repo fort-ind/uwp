@@ -170,6 +170,7 @@ namespace Fort.ind_UWP
             AttachFollowRequests();
 
             RefreshGate();
+            LoadAnnouncements(false);
             RemoveTimelineRows(item => item.IsGone || SocialNoteItem.IsHiddenPerson(item, null));
             foreach (var note in SocialNoteService.PostsSince(_seenPostsVersion))
             {
@@ -683,6 +684,8 @@ namespace Fort.ind_UWP
 
         private void SocialRefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            LoadAnnouncements(true);
+
             if (TryRequestRefresh(SelectedRefresh())) return;
 
             var selected = SocialPivot.SelectedItem;
@@ -805,6 +808,7 @@ namespace Fort.ind_UWP
                     try
                     {
                         RefreshGate();
+                        LoadAnnouncements(false);
                     }
                     catch (Exception ex)
                     {

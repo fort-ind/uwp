@@ -425,6 +425,54 @@ namespace Fort.ind_UWP
             return NotesFrom(await PostOptionalTokenAsync("notes/search-by-tag", token, body, cancellationToken));
         }
 
+        public static async Task<SocialApiResult<IReadOnlyList<SocialHashtag>>> GetPopularHashtagsAsync(
+            int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            body.Add("sort", JsonValue.CreateStringValue("+mentionedUsers"));
+
+            var response = await PostOptionalTokenAsync("hashtags/list", null, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialHashtag>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            return response.Value.ValueType == JsonValueType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialHashtag>>.Succeeded(SocialHashtag.ListFromJson(response.Value.GetArray()))
+                   : SocialApiResult<IReadOnlyList<SocialHashtag>>.Failed(SocialApiStatus.Failed);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialAnnouncement>>> GetAnnouncementsAsync(
+            string token, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            body.Add("isActive", JsonValue.CreateBooleanValue(true));
+
+            var response = await PostOptionalTokenAsync("announcements", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialAnnouncement>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            return response.Value.ValueType == JsonValueType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialAnnouncement>>.Succeeded(SocialAnnouncement.ListFromJson(response.Value.GetArray()))
+                   : SocialApiResult<IReadOnlyList<SocialAnnouncement>>.Failed(SocialApiStatus.Failed);
+        }
+
+        public static async Task<SocialApiResult<bool>> ReadAnnouncementAsync(
+            string token, string announcementId, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("announcementId", JsonValue.CreateStringValue(announcementId ?? ""));
+
+            var response = await PostAsync("i/read-announcement", token, body, cancellationToken);
+            return response.Status == SocialApiStatus.Ok
+                   ? SocialApiResult<bool>.Succeeded(true)
+                   : SocialApiResult<bool>.Failed(response.Status, response.ErrorCode);
+        }
+
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetUserNotesAsync(
             string token, string userId, SocialUserNotesTab tab, string untilId, int limit, CancellationToken cancellationToken)
         {

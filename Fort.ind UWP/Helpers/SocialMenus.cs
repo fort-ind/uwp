@@ -52,6 +52,7 @@ namespace Fort.ind_UWP
         {
             string url = null;
             string shareTitle = null;
+            string copyText = null;
             SocialUser author = null;
             SocialUser renoter = null;
 
@@ -59,6 +60,7 @@ namespace Fort.ind_UWP
             if (note != null)
             {
                 url = note.NoteUrl;
+                copyText = note.IsHidden ? null : note.Note.Text;
                 shareTitle = LocalizedStrings.Format("SocialShareNoteTitleFormat", note.AuthorName);
                 author = note.Author;
                 renoter = note.Renoter;
@@ -80,7 +82,7 @@ namespace Fort.ind_UWP
                 shareTitle = userItem.DisplayName;
             }
 
-            AddLinkItems(flyout, url, shareTitle, announcer);
+            AddLinkItems(flyout, url, shareTitle, announcer, copyText);
 
             if (userItem != null) author = userItem.User;
 
@@ -402,17 +404,29 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static void AddLinkItems(SocialMenuSink flyout, string url, string shareTitle, UIElement announcer)
+        private static void AddLinkItems(SocialMenuSink flyout, string url, string shareTitle, UIElement announcer, string copyText = null)
         {
             var link = WebLauncher.TryCreateWebUri(url);
-            if (link == null) return;
-
-            Add(flyout, "SocialMenuOpenOnFortSocial", OpenGlyph, async () => await WebLauncher.LaunchAsync(link.AbsoluteUri), false);
-            Add(flyout, "SocialMenuCopyLink", CopyGlyph, () =>
+            if (link != null)
             {
-                CopyLink(link, announcer);
-                return Task.CompletedTask;
-            }, true);
+                Add(flyout, "SocialMenuOpenOnFortSocial", OpenGlyph, async () => await WebLauncher.LaunchAsync(link.AbsoluteUri), false);
+                Add(flyout, "SocialMenuCopyLink", CopyGlyph, () =>
+                {
+                    CopyLink(link, announcer);
+                    return Task.CompletedTask;
+                }, true);
+            }
+
+            if (!string.IsNullOrWhiteSpace(copyText))
+            {
+                Add(flyout, "SocialMenuCopyText", CopyGlyph, () =>
+                {
+                    CopyText(copyText, announcer);
+                    return Task.CompletedTask;
+                }, false);
+            }
+
+            if (link == null) return;
 
             if (DataTransferManager.IsSupported())
             {
@@ -501,6 +515,15 @@ namespace Fort.ind_UWP
             Clipboard.SetContent(package);
 
             AutomationHelper.AnnounceStatus(announcer, LocalizedStrings.Get("SocialLinkCopiedAnnouncement"), "SocialLinkCopied");
+        }
+
+        private static void CopyText(string text, UIElement announcer)
+        {
+            var package = new DataPackage();
+            package.SetText(text);
+            Clipboard.SetContent(package);
+
+            AutomationHelper.AnnounceStatus(announcer, LocalizedStrings.Get("SocialTextCopiedAnnouncement"), "SocialTextCopied");
         }
 
         private static void Share(string title, Uri link)
