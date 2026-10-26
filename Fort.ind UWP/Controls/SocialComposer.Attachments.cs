@@ -52,27 +52,116 @@ namespace Fort.ind_UWP
             else UpdateState();
         }
 
-        private async void AttachButton_Click(object sender, RoutedEventArgs e)
+        private async void AttachButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
         {
             try
             {
-                var picker = new FileOpenPicker
-                {
-                    ViewMode = PickerViewMode.Thumbnail,
-                    SuggestedStartLocation = PickerLocationId.PicturesLibrary
-                };
-                foreach (var type in s_pickerTypes)
-                {
-                    picker.FileTypeFilter.Add(type);
-                }
-
-                var files = await picker.PickMultipleFilesAsync();
-                if (files != null && files.Count > 0) await AddItemsAsync(new List<IStorageItem>(files));
+                await PickFromPcAsync();
             }
             catch (Exception ex)
             {
                 AppLog.Error("SocialComposer: could not pick files", ex);
             }
+        }
+
+        private async void AttachFromPcItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await PickFromPcAsync();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialComposer: could not pick files", ex);
+            }
+        }
+
+        private async Task PickFromPcAsync()
+        {
+            var picker = new FileOpenPicker
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary
+            };
+            foreach (var type in s_pickerTypes)
+            {
+                picker.FileTypeFilter.Add(type);
+            }
+
+            var files = await picker.PickMultipleFilesAsync();
+            if (files != null && files.Count > 0) await AddItemsAsync(new List<IStorageItem>(files));
+        }
+
+        private async void AttachFromDriveItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await PickFromDriveAsync();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialComposer: could not attach from the drive", ex);
+            }
+        }
+
+        private async Task PickFromDriveAsync()
+        {
+            if (!await SocialPermissions.EnsureAsync(this, SocialPermissions.ReadDrive, SocialSignInPrompt.Drive)) return;
+
+            var room = AppConstants.SocialAttachmentLimit - _attachments.Count;
+            if (room <= 0) return;
+
+            var attachedIds = _attachments.Where(item => item.File != null).Select(item => item.File.Id);
+            var picker = new SocialDrivePicker(attachedIds, room);
+            var dialog = new ContentDialog
+            {
+                Title = LocalizedStrings.Get("SocialDriveDialogTitle"),
+                Content = picker,
+                PrimaryButtonText = LocalizedStrings.Get("SocialDriveAttachButton"),
+                CloseButtonText = LocalizedStrings.Get("DialogCancel"),
+                DefaultButton = ContentDialogButton.Primary,
+                IsPrimaryButtonEnabled = false
+            };
+            picker.SelectionCountChanged += (sender, args) =>
+            {
+                var count = picker.SelectedCount;
+                dialog.IsPrimaryButtonEnabled = count > 0;
+                dialog.PrimaryButtonText = count > 0
+                                           ? LocalizedStrings.Format("SocialDriveAttachCountFormat", count)
+                                           : LocalizedStrings.Get("SocialDriveAttachButton");
+            };
+            picker.PermissionDenied += (sender, args) => dialog.Hide();
+
+            var result = await DialogService.ShowAsync(this, dialog);
+            if (picker.WasDenied)
+            {
+                await SocialPermissions.HandleDeniedAsync(this, SocialPermissions.ReadDrive, SocialSignInPrompt.Drive);
+                return;
+            }
+
+            if (result == ContentDialogResult.Primary) AddDriveFiles(picker.SelectedFiles);
+        }
+
+        private void AddDriveFiles(IReadOnlyList<SocialDriveFile> files)
+        {
+            var added = 0;
+            foreach (var file in files)
+            {
+                if (_attachments.Count >= AppConstants.SocialAttachmentLimit)
+                {
+                    AutomationHelper.AnnounceStatus(this,
+                                                    LocalizedStrings.Format("SocialAttachmentLimitFormat", AppConstants.SocialAttachmentLimit),
+                                                    "SocialAttachmentLimit");
+                    return;
+                }
+
+                if (_attachments.Any(item => item.File != null && item.File.Id == file.Id)) continue;
+
+                _attachments.Add(SocialAttachmentItem.ForFile(file));
+                added++;
+            }
+
+            if (added > 0) AutomationHelper.AnnounceStatus(this, LocalizedStrings.Format("SocialDriveAttachedFormat", added), "SocialDriveAttached");
         }
 
         public async Task AddItemsAsync(IReadOnlyList<IStorageItem> items)

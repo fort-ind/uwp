@@ -1003,6 +1003,46 @@ namespace Fort.ind_UWP
             return FileFrom(await PostAsync("drive/files/update", token, body, cancellationToken));
         }
 
+        public static async Task<SocialApiResult<IReadOnlyList<SocialDriveFile>>> GetDriveFilesAsync(
+            string token, string folderId, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            body.Add("folderId", string.IsNullOrEmpty(folderId) ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(folderId));
+            if (!string.IsNullOrEmpty(untilId))
+            {
+                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+            }
+
+            var response = await PostAsync("drive/files", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialDriveFile>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            return response.Value.ValueType == JsonValueType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialDriveFile>>.Succeeded(SocialDriveFile.ListFromJson(response.Value.GetArray()))
+                   : SocialApiResult<IReadOnlyList<SocialDriveFile>>.Failed(SocialApiStatus.Failed);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialDriveFolder>>> GetDriveFoldersAsync(
+            string token, string folderId, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            body.Add("folderId", string.IsNullOrEmpty(folderId) ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(folderId));
+
+            var response = await PostAsync("drive/folders", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialDriveFolder>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            return response.Value.ValueType == JsonValueType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialDriveFolder>>.Succeeded(SocialDriveFolder.ListFromJson(response.Value.GetArray()))
+                   : SocialApiResult<IReadOnlyList<SocialDriveFolder>>.Failed(SocialApiStatus.Failed);
+        }
+
         private static SocialApiResult<SocialDriveFile> FileFrom(SocialApiResult<IJsonValue> response)
         {
             if (response.Status != SocialApiStatus.Ok)

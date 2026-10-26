@@ -534,19 +534,19 @@ Open your profile and try again.</value>
   </data>
   <data name="TileLockOneNotification" xml:space="preserve">
     <value>1 new notification</value>
-    <comment>First line of the lock screen's detailed status when one fort.social notification is unread.</comment>
+    <comment></comment>
   </data>
   <data name="TileLockNotificationsFormat" xml:space="preserve">
     <value>{0} new notifications</value>
-    <comment>First line of the lock screen's detailed status. {0} is the unread count, always 2 or more.</comment>
+    <comment> </comment>
   </data>
   <data name="TileLockSource" xml:space="preserve">
     <value>on fort.social</value>
-    <comment>Second line of the lock screen's detailed status, under the count. fort.social is a proper name.</comment>
+    <comment></comment>
   </data>
   <data name="TileLockMoreFormat" xml:space="preserve">
     <value>and {0} more</value>
-    <comment>Last line of the lock screen's detailed status, under the names of who sent the newest notifications. {0} is how many other unread notifications there are.</comment>
+    <comment> </comment>
   </data>
   <data name="JumpTaskHomeName" xml:space="preserve">
     <value>home</value>
@@ -907,11 +907,11 @@ Open your profile and try again.</value>
   </data>
   <data name="BodyAcrylicSlider.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Content opacity</value>
-    <comment>Announced on focus, so it must agree with the value the slider reports: 100 is fully solid.</comment>
+    <comment></comment>
   </data>
   <data name="PaneAcrylicSlider.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Sidebar opacity</value>
-    <comment>Announced on focus, so it must agree with the value the slider reports: 100 is fully solid.</comment>
+    <comment></comment>
   </data>
   <data name="ThemeDarkRadio.Content" xml:space="preserve">
     <value>Dark</value>
@@ -962,7 +962,7 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="TileFeedDescription.Text" xml:space="preserve">
-    <value>Recent public posts from fort.social's local timeline take turns on the tile while you have no unread notifications. Replies, renotes with nothing added, posts with a content warning and posts with sensitive media are skipped. This works signed out too.</value>
+    <value>a rotating feed of posts from the local timeline :p this is a opt in setting (nsfw posts are not shown on the tile for obvious reasons)</value>
   </data>
   <data name="TileFeedAvatarsToggle.Header" xml:space="preserve">
     <value>Show authors' pictures</value>
@@ -974,7 +974,7 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="TileFeedAvatarsDescription.Text" xml:space="preserve">
-    <value>Shows each author's profile picture on the tile. Turn it off for text only.</value>
+    <value>if you also wanna see the authors pfp you can do so here :)</value>
   </data>
   <data name="TileFeedIntervalCombo.Header" xml:space="preserve">
     <value>Refresh local posts</value>
@@ -992,7 +992,7 @@ Open your profile and try again.</value>
     <value>Every 2 hours</value>
   </data>
   <data name="TileFeedIntervalDescription.Text" xml:space="preserve">
-    <value>Windows checks this often, even while fort.desktop is closed, and never more than every 15 minutes. If a check can't run, posts leave the tile after about three times this long.</value>
+    <value>Windows checks this often, even while fort.desktop is closed here you can choose the interval of how much windows ping pongs fort.social :p</value>
   </data>
   <data name="LockScreenSendersToggle.Header" xml:space="preserve">
     <value>Show who they're from on the lock screen</value>
@@ -1004,7 +1004,7 @@ Open your profile and try again.</value>
     <value>Off</value>
   </data>
   <data name="LockScreenSendersDescription.Text" xml:space="preserve">
-    <value>If fort.desktop shows detailed status on your lock screen, it says how many unread notifications you have. Turn this on to list who they're from instead. What people wrote never appears there.</value>
+    <value>turn this on if you wanna see the silly things without unlocking windows</value>
   </data>
   <data name="TintBlueButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Navy Blue background tint</value>
@@ -1851,7 +1851,7 @@ Open your profile and try again.</value>
     <value>Couldn't load the popular hashtags.</value>
   </data>
   <data name="SocialTagsEmpty" xml:space="preserve">
-    <value>No hashtags to show right now.</value>
+    <value>aww theres no tags to show :(</value>
   </data>
   <data name="SocialHashtagCountFormat" xml:space="preserve">
     <value>Used by {0}</value>
@@ -2983,7 +2983,7 @@ Open your profile and try again.</value>
     <value>Attach files</value>
   </data>
   <data name="SocialComposeAttachButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Attach files (or paste or drop them)</value>
+    <value>Attach files from this PC (or paste or drop them)</value>
   </data>
   <data name="SocialComposePollButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Poll</value>
@@ -4168,5 +4168,68 @@ Open your profile and try again.</value>
   </data>
   <data name="SearchItemBlockedAccounts" xml:space="preserve">
     <value>Blocked accounts</value>
+  </data>
+  <data name="SocialComposeAttachFromPc.Text" xml:space="preserve">
+    <value>From this PC…</value>
+  </data>
+  <data name="SocialComposeAttachFromDrive.Text" xml:space="preserve">
+    <value>From your drive…</value>
+  </data>
+  <data name="SocialSignInPromptDriveTitle" xml:space="preserve">
+    <value>Sign in again to attach files from your drive</value>
+  </data>
+  <data name="SocialDriveDialogTitle" xml:space="preserve">
+    <value>Attach from your drive</value>
+  </data>
+  <data name="SocialDriveAttachButton" xml:space="preserve">
+    <value>Attach</value>
+  </data>
+  <data name="SocialDriveAttachCountFormat" xml:space="preserve">
+    <value>Attach ({0})</value>
+  </data>
+  <data name="SocialDriveAttachedFormat" xml:space="preserve">
+    <value>Files attached from your drive: {0}</value>
+  </data>
+  <data name="SocialDriveRoot" xml:space="preserve">
+    <value>Drive</value>
+  </data>
+  <data name="SocialDrivePathSeparator" xml:space="preserve">
+    <value> › </value>
+  </data>
+  <data name="SocialDriveFolderAutomationFormat" xml:space="preserve">
+    <value>Folder {0}</value>
+  </data>
+  <data name="SocialDriveFileAttachedAutomationFormat" xml:space="preserve">
+    <value>{0}, already attached</value>
+  </data>
+  <data name="SocialDriveFileSensitiveAutomationFormat" xml:space="preserve">
+    <value>{0}, sensitive</value>
+  </data>
+  <data name="SocialDriveBackButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Up one folder</value>
+  </data>
+  <data name="SocialDriveBackButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Up one folder</value>
+  </data>
+  <data name="SocialDriveFolders.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+  <data name="SocialDriveFiles.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="SocialDriveAttachedBadge.Text" xml:space="preserve">
+    <value>Attached</value>
+  </data>
+  <data name="SocialDriveLoadMore.Content" xml:space="preserve">
+    <value>Load more</value>
+  </data>
+  <data name="SocialDriveRetry.Content" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="SocialDriveLoadFailed" xml:space="preserve">
+    <value>Your drive couldn't be loaded.</value>
+  </data>
+  <data name="SocialDriveEmpty" xml:space="preserve">
+    <value>This folder is empty.</value>
   </data>
 </root>

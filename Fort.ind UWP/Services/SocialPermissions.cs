@@ -21,7 +21,8 @@ namespace Fort.ind_UWP
         MuteUser,
         Block,
         FollowRequests,
-        MutedBlocked
+        MutedBlocked,
+        Drive
     }
 
     public static class SocialPermissions
@@ -44,6 +45,8 @@ namespace Fort.ind_UWP
 
         public const string WriteDrive = "write:drive";
 
+        public const string ReadDrive = "read:drive";
+
         public const string WriteAccount = "write:account";
 
         public const string WriteReportAbuse = "write:report-abuse";
@@ -62,7 +65,7 @@ namespace Fort.ind_UWP
                                         + WriteNotes + "," + WriteReactions + "," + WriteVotes + ","
                                         + ReadFavorites + "," + WriteFavorites + "," + WriteDrive + ","
                                         + WriteAccount + "," + WriteReportAbuse + "," + WriteMutes + "," + WriteBlocks + ","
-                                        + ReadFollowing + "," + ReadMutes + "," + ReadBlocks;
+                                        + ReadFollowing + "," + ReadMutes + "," + ReadBlocks + "," + ReadDrive;
 
         private static readonly string[] s_postingPermissions =
         {

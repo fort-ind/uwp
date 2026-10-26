@@ -154,6 +154,9 @@
     <Compile Include="Controls\SocialComposer.Ink.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialDrivePicker.xaml.cs">
+      <DependentUpon>SocialDrivePicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialProfileEditor.xaml.cs">
       <DependentUpon>SocialProfileEditor.xaml</DependentUpon>
     </Compile>
@@ -254,6 +257,8 @@
     <Compile Include="Models\SocialAttachmentItem.cs" />
     <Compile Include="Models\SocialComposeDraft.cs" />
     <Compile Include="Models\SocialDriveFile.cs" />
+    <Compile Include="Models\SocialDriveFolder.cs" />
+    <Compile Include="Models\SocialDrivePickerItem.cs" />
     <Compile Include="Models\SocialAnnouncement.cs" />
     <Compile Include="Models\SocialEmojiItem.cs" />
     <Compile Include="Models\SocialFeedCollection.cs" />
@@ -678,6 +683,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\SocialComposer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialDrivePicker.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

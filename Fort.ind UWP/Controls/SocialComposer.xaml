@@ -294,12 +294,22 @@
                                   Click="WarningToggle_Click">
                         <FontIcon Glyph="&#xE7BA;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                     </ToggleButton>
-                    <Button x:Uid="SocialComposeAttachButton"
-                            x:Name="AttachButton"
-                            Style="{StaticResource SocialToolButtonStyle}"
-                            Click="AttachButton_Click">
+                    <SplitButton x:Uid="SocialComposeAttachButton"
+                                 x:Name="AttachButton"
+                                 Style="{StaticResource SocialToolSplitButtonStyle}"
+                                 Click="AttachButton_Click">
                         <FontIcon Glyph="&#xE723;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                    </Button>
+                        <SplitButton.Flyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem x:Uid="SocialComposeAttachFromPc" Click="AttachFromPcItem_Click">
+                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE7F8;"/></MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem x:Uid="SocialComposeAttachFromDrive" Click="AttachFromDriveItem_Click">
+                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE753;"/></MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
                     <Button x:Uid="SocialComposeInkButton"
                             x:Name="InkButton"
                             Style="{StaticResource SocialToolButtonStyle}">

@@ -329,7 +329,7 @@
                                 <Setter Property="CornerRadius" Value="0"/>
                             </Style>
 
-                            <Style x:Key="SocialReactionSplitButtonStyle" TargetType="ToggleSplitButton">
+                            <Style x:Key="SocialSplitButtonStyle" TargetType="SplitButton">
                                 <Setter Property="Background" Value="Transparent"/>
                                 <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                                 <Setter Property="BorderBrush" Value="{ThemeResource ButtonRevealBorderBrush}"/>
@@ -343,7 +343,7 @@
                                 <Setter Property="IsTabStop" Value="True"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
-                                        <ControlTemplate TargetType="ToggleSplitButton">
+                                        <ControlTemplate TargetType="SplitButton">
                                             <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
                                                 <Grid.Resources>
                                                     <Style TargetType="Button">
@@ -548,6 +548,13 @@
                                         </ControlTemplate>
                                     </Setter.Value>
                                 </Setter>
+                            </Style>
+
+                            <Style x:Key="SocialReactionSplitButtonStyle" TargetType="ToggleSplitButton" BasedOn="{StaticResource SocialSplitButtonStyle}"/>
+
+                            <Style x:Key="SocialToolSplitButtonStyle" TargetType="SplitButton" BasedOn="{StaticResource SocialSplitButtonStyle}">
+                                <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+                                <Setter Property="Padding" Value="12,0,12,0"/>
                             </Style>
 
                             <Style x:Key="SocialMediaIconButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonRevealStyle}">
