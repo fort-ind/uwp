@@ -22,6 +22,8 @@ OR just run this :) doesn't make the actual app tho; just builds
 msbuild "Fort.ind UWP\Fort.ind UWP.csproj" /r /p:AppxPackageSigningEnabled=false /p:GenerateAppxPackageOnBuild=false
 ```
 for some reason, those flags are needed otherwise, it explodes :( for more ways to actually build+develop the app [read the docs](https://docs.fort1nd.com/docs/fort.uwp%20docs+dev/building)
+## ai disclousure
+claude was used to help fix a icon bug a while ago. otherwise all code your seeing is fully human written and ai free. ai code review tools were not used, contrubuitons are welcome- but if your gonna use AI please disclose that :)
 ## Credits to the really cool dependencies we used
 * [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows) 
 * [microsoft ui xaml](https://github.com/microsoft/microsoft-ui-XAML) 
