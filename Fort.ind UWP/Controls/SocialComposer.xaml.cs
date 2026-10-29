@@ -95,6 +95,7 @@ namespace Fort.ind_UWP
             Suggestions.Accepted += Suggestions_Accepted;
 
             Loaded += SocialComposer_Loaded;
+            Unloaded += SocialComposer_Unloaded;
         }
 
         public event EventHandler DraftChanged;
@@ -135,12 +136,18 @@ namespace Fort.ind_UWP
         {
             try
             {
+                AttachAudioPreview();
                 ShowAvatar();
             }
             catch (Exception ex)
             {
                 AppLog.Error("SocialComposer: could not show the avatar", ex);
             }
+        }
+
+        private void SocialComposer_Unloaded(object sender, RoutedEventArgs e)
+        {
+            DetachAudioPreview();
         }
 
         private void ShowAvatar()

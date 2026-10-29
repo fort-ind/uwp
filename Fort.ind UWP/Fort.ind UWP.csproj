@@ -154,6 +154,9 @@
     <Compile Include="Controls\SocialComposer.Ink.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialAudioBar.xaml.cs">
+      <DependentUpon>SocialAudioBar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialDrivePicker.xaml.cs">
       <DependentUpon>SocialDrivePicker.xaml</DependentUpon>
     </Compile>
@@ -259,6 +262,8 @@
     <Compile Include="Models\SocialDriveFile.cs" />
     <Compile Include="Models\SocialDriveFolder.cs" />
     <Compile Include="Models\SocialDrivePickerItem.cs" />
+    <Compile Include="Models\AudioPlaybackSnapshot.cs" />
+    <Compile Include="Models\SocialAudioPreviewState.cs" />
     <Compile Include="Models\SocialAnnouncement.cs" />
     <Compile Include="Models\SocialEmojiItem.cs" />
     <Compile Include="Models\SocialFeedCollection.cs" />
@@ -278,6 +283,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AccentColorService.cs" />
     <Compile Include="Services\AppearanceService.cs" />
+    <Compile Include="Services\AudioPlayerService.cs" />
     <Compile Include="Services\AvatarIconService.cs" />
     <Compile Include="Services\DialogService.cs" />
     <Compile Include="Services\FavoritesService.cs" />
@@ -329,6 +335,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.MultipleViews.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainPage.Audio.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Memory.cs">
@@ -683,6 +692,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\SocialComposer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialAudioBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

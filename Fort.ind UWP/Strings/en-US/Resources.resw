@@ -1945,6 +1945,38 @@ Open your profile and try again.</value>
   <data name="SocialMediaOpenInBrowser" xml:space="preserve">
     <value>Open in browser</value>
   </data>
+  <data name="SocialMediaAudioAutomation" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="SocialAudioAutomationFormat" xml:space="preserve">
+    <value>Audio, {0}</value>
+    <comment>An audio attachment's player. {0} is the file name.</comment>
+  </data>
+  <data name="SocialAudioPlay" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="SocialAudioPause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="SocialAudioSeek" xml:space="preserve">
+    <value>Seek</value>
+  </data>
+  <data name="SocialAudioVolume" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="SocialAudioMute" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="SocialAudioClose" xml:space="preserve">
+    <value>Stop and close player</value>
+  </data>
+  <data name="SocialAudioTimeFormat" xml:space="preserve">
+    <value>{0} / {1}</value>
+    <comment>Elapsed time and total length of an audio file, such as 1:23 / 4:05.</comment>
+  </data>
+  <data name="SocialAudioFailed" xml:space="preserve">
+    <value>This audio can't be played here.</value>
+  </data>
   <data name="SocialLightboxPositionFormat" xml:space="preserve">
     <value>{0} of {1}</value>
     <comment>{0} is the image being shown, {1} the number of images in the note.</comment>

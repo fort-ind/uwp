@@ -116,6 +116,21 @@
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Grid>
+                            <Button Width="28" Height="28"
+                                    MinWidth="0" MinHeight="0"
+                                    Padding="0"
+                                    Margin="2"
+                                    CornerRadius="0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Background="#99000000"
+                                    Foreground="White"
+                                    AutomationProperties.Name="{x:Bind Preview.Label, Mode=OneWay}"
+                                    ToolTipService.ToolTip="{x:Bind Preview.Label, Mode=OneWay}"
+                                    Visibility="{x:Bind local:SocialComposer.Shown(IsAudio)}"
+                                    Click="PreviewButton_Click">
+                                <FontIcon Glyph="{x:Bind Preview.Glyph, Mode=OneWay}" FontSize="12" IsTextScaleFactorEnabled="False"/>
+                            </Button>
                         </Grid>
                     </DataTemplate>
                 </GridView.ItemTemplate>

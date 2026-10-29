@@ -1,0 +1,122 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialAudioBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    HorizontalAlignment="Stretch"
+    IsTabStop="False">
+
+    <Grid x:Name="Root"
+          MinHeight="56"
+          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+          BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}">
+
+        <Grid x:Name="PlayerPanel"
+              Padding="4,0,4,0"
+              ColumnSpacing="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="PlayButton"
+                    Style="{StaticResource SocialToolButtonStyle}"
+                    Click="PlayButton_Click">
+                <FontIcon x:Name="PlayGlyph" Glyph="&#xE768;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+            </Button>
+
+            <Grid Grid.Column="1"
+                  Margin="4,6,4,6"
+                  VerticalAlignment="Center">
+                <StackPanel x:Name="NormalPanel">
+                    <TextBlock x:Name="TitleText"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               TextTrimming="CharacterEllipsis"
+                               TextWrapping="NoWrap"/>
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Slider x:Name="SeekSlider"
+                                IsEnabled="False"
+                                IsThumbToolTipEnabled="False"
+                                Minimum="0"
+                                Maximum="1"
+                                SmallChange="5"
+                                LargeChange="15"
+                                ValueChanged="SeekSlider_ValueChanged"/>
+                        <TextBlock x:Name="TimeText"
+                                   Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel x:Name="FailedPanel" Visibility="Collapsed">
+                    <TextBlock x:Name="FailedText"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               TextWrapping="Wrap"/>
+                    <Button x:Name="OpenButton"
+                            Style="{StaticResource TextBlockButtonStyle}"
+                            Padding="0"
+                            Click="OpenButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <Button x:Name="VolumeButton"
+                    Grid.Column="2"
+                    Style="{StaticResource SocialToolButtonStyle}">
+                <FontIcon x:Name="VolumeGlyph" Glyph="&#xE767;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                <Button.Flyout>
+                    <Flyout Placement="Top">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ToggleButton x:Name="MuteToggle"
+                                          Style="{StaticResource SocialToolToggleButtonStyle}"
+                                          Click="MuteToggle_Click">
+                                <FontIcon Glyph="&#xE74F;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                            </ToggleButton>
+                            <Slider x:Name="VolumeSlider"
+                                    Width="140"
+                                    VerticalAlignment="Center"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    ValueChanged="VolumeSlider_ValueChanged"/>
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button x:Name="CloseButton"
+                    Grid.Column="3"
+                    Visibility="Collapsed"
+                    Style="{StaticResource SocialToolButtonStyle}"
+                    Click="CloseButton_Click">
+                <FontIcon Glyph="&#xE711;" FontSize="12" IsTextScaleFactorEnabled="False"/>
+            </Button>
+        </Grid>
+
+        <Button x:Name="HiddenButton"
+                Visibility="Collapsed"
+                Style="{StaticResource SocialBareButtonStyle}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Click="HiddenButton_Click">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="12"
+                        Margin="8"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE7B3;" FontSize="20" IsTextScaleFactorEnabled="False"/>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="HiddenTitle" Style="{StaticResource BaseTextBlockStyle}"/>
+                    <TextBlock x:Name="HiddenHint"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                </StackPanel>
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>

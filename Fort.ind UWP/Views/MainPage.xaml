@@ -311,6 +311,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0">
@@ -372,6 +373,13 @@
                              VerticalAlignment="Top"
                              HorizontalAlignment="Stretch"
                              Canvas.ZIndex="1"/>
+
+                <Border x:Name="AudioPlayerHost"
+                        x:Load="False"
+                        Grid.Row="2"
+                        Visibility="Collapsed">
+                    <local:SocialAudioBar x:Name="MiniPlayer" IsMini="True"/>
+                </Border>
             </Grid>
 
         </NavigationView>

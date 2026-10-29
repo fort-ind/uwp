@@ -56,7 +56,15 @@ namespace Fort.ind_UWP
                 OnPropertyChanged("HasError");
                 OnPropertyChanged("AutomationName");
                 OnPropertyChanged("CanMarkUp");
+                OnPropertyChanged("CanPreview");
             }
+        }
+
+        public SocialAudioPreviewState Preview { get; } = new SocialAudioPreviewState();
+
+        public bool CanPreview
+        {
+            get { return _state == SocialAttachmentState.Done && _file != null && _file.Kind == SocialDriveFileKind.Audio; }
         }
 
         public bool MarkUpEnabled
@@ -119,6 +127,8 @@ namespace Fort.ind_UWP
                 OnPropertyChanged("HasDescription");
                 OnPropertyChanged("AutomationName");
                 OnPropertyChanged("CanMarkUp");
+                OnPropertyChanged("CanPreview");
+                Preview.Update(value, AudioPlayerService.Current);
                 if (_thumbnail == null && value != null) Thumbnail = RemoteThumbnail(value);
             }
         }
@@ -196,6 +206,7 @@ namespace Fort.ind_UWP
                 _file = file
             };
             item._thumbnail = RemoteThumbnail(file);
+            item.Preview.Update(file, AudioPlayerService.Current);
             return item;
         }
 

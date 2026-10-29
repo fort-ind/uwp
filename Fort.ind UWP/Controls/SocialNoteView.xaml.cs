@@ -46,6 +46,12 @@ namespace Fort.ind_UWP
 
         private readonly List<MediaTile> _tiles = new List<MediaTile>();
 
+        private readonly List<int> _gridIndexes = new List<int>();
+
+        private readonly List<int> _audioIndexes = new List<int>();
+
+        private readonly List<SocialAudioBar> _bars = new List<SocialAudioBar>();
+
         private SocialNoteItem _subscribed;
 
         private bool _isLoaded;
@@ -398,6 +404,7 @@ namespace Fort.ind_UWP
                 if (ContinueThreadButton != null) ContinueThreadButton.Visibility = Visibility.Collapsed;
                 SocialMediaLightbox.CloseFor(this);
                 StopVideos();
+                ClearAudio();
                 return;
             }
 
@@ -479,7 +486,24 @@ namespace Fort.ind_UWP
         private void RenderMedia(SocialNoteItem item)
         {
             var files = item.IsHidden ? null : item.Media;
-            if (files == null || files.Count == 0)
+            _gridIndexes.Clear();
+            _audioIndexes.Clear();
+            if (files != null)
+            {
+                for (var i = 0; i < files.Count; i++)
+                {
+                    if (files[i].Kind == SocialDriveFileKind.Audio) _audioIndexes.Add(i);
+                    else _gridIndexes.Add(i);
+                }
+            }
+
+            RenderMediaGrid(item, files);
+            RenderAudio(item, files);
+        }
+
+        private void RenderMediaGrid(SocialNoteItem item, IReadOnlyList<SocialDriveFile> files)
+        {
+            if (_gridIndexes.Count == 0)
             {
                 _mediaShown = 0;
                 if (MediaGrid != null)
@@ -493,7 +517,7 @@ namespace Fort.ind_UWP
             if (MediaGrid == null) FindName("MediaGrid");
             EnsureTiles();
 
-            _mediaShown = Math.Min(files.Count, AppConstants.SocialMediaGridLimit);
+            _mediaShown = Math.Min(_gridIndexes.Count, AppConstants.SocialMediaGridLimit);
             for (var i = 0; i < _tiles.Count; i++)
             {
                 var tile = _tiles[i];
@@ -504,18 +528,70 @@ namespace Fort.ind_UWP
                     continue;
                 }
 
-                tile.Show(files[i], i, _mediaShown, files.Count, item.IsMediaRevealed);
+                var fileIndex = _gridIndexes[i];
+                tile.Show(files[fileIndex], fileIndex, i, _mediaShown, _gridIndexes.Count, item.IsMediaRevealed);
             }
 
             LayoutTiles(_mediaShown);
 
-            var first = files[0];
+            var first = files[_gridIndexes[0]];
             _singleAspect = first.Width.HasValue && first.Height.HasValue
                             ? (double)first.Height.Value / first.Width.Value
                             : 9.0 / 16.0;
 
             MediaGrid.Visibility = Visibility.Visible;
             UpdateMediaHeight(MediaGrid.ActualWidth);
+        }
+
+        private void RenderAudio(SocialNoteItem item, IReadOnlyList<SocialDriveFile> files)
+        {
+            if (_audioIndexes.Count == 0)
+            {
+                ClearAudio();
+                return;
+            }
+
+            if (AudioPanel == null) FindName("AudioPanel");
+
+            while (_bars.Count < _audioIndexes.Count)
+            {
+                var added = new SocialAudioBar();
+                added.RevealRequested += AudioBar_RevealRequested;
+                AudioPanel.Children.Add(added);
+                _bars.Add(added);
+            }
+
+            for (var i = 0; i < _bars.Count; i++)
+            {
+                var bar = _bars[i];
+                if (i >= _audioIndexes.Count)
+                {
+                    bar.Clear();
+                    bar.Visibility = Visibility.Collapsed;
+                    continue;
+                }
+
+                var file = files[_audioIndexes[i]];
+                bar.Margin = new Thickness(0, i == 0 ? 0 : 4, 0, 0);
+                bar.Show(file, file.IsSensitive && !item.IsMediaRevealed);
+                bar.Visibility = Visibility.Visible;
+            }
+
+            AudioPanel.Visibility = Visibility.Visible;
+        }
+
+        private void ClearAudio()
+        {
+            if (AudioPanel == null) return;
+
+            AudioPanel.Visibility = Visibility.Collapsed;
+            foreach (var bar in _bars) bar.Clear();
+        }
+
+        private void AudioBar_RevealRequested(object sender, EventArgs e)
+        {
+            var item = Item;
+            if (item != null) item.IsMediaRevealed = true;
         }
 
         private void EnsureTiles()
@@ -543,17 +619,21 @@ namespace Fort.ind_UWP
         internal UIElement MediaAnchorFor(SocialNoteItem item, int fileIndex)
         {
             if (!_isLoaded || item == null || !ReferenceEquals(item, Item)) return null;
-            if (fileIndex < 0 || fileIndex >= _mediaShown || fileIndex >= _tiles.Count) return null;
 
-            return _tiles[fileIndex].AnchorFor(fileIndex);
+            var slot = _gridIndexes.IndexOf(fileIndex);
+            if (slot < 0 || slot >= _mediaShown || slot >= _tiles.Count) return null;
+
+            return _tiles[slot].AnchorFor(fileIndex);
         }
 
         internal ImageSource MediaPlaceholderFor(SocialNoteItem item, int fileIndex)
         {
             if (item == null || !ReferenceEquals(item, Item)) return null;
-            if (fileIndex < 0 || fileIndex >= _mediaShown || fileIndex >= _tiles.Count) return null;
 
-            return _tiles[fileIndex].ThumbnailFor(fileIndex);
+            var slot = _gridIndexes.IndexOf(fileIndex);
+            if (slot < 0 || slot >= _mediaShown || slot >= _tiles.Count) return null;
+
+            return _tiles[slot].ThumbnailFor(fileIndex);
         }
 
         private Binding TilePlate()
@@ -1048,11 +1128,11 @@ namespace Fort.ind_UWP
                 Button.Tag = null;
             }
 
-            public void Show(SocialDriveFile file, int index, int shown, int total, bool revealed)
+            public void Show(SocialDriveFile file, int fileIndex, int slot, int shown, int total, bool revealed)
             {
                 if (!ReferenceEquals(_video.File, file)) StopVideo();
 
-                Button.Tag = index;
+                Button.Tag = fileIndex;
 
                 var hidden = file.IsSensitive && !revealed;
                 var visual = file.IsVisual;
@@ -1068,7 +1148,7 @@ namespace Fort.ind_UWP
                 _fileName.Text = visual ? "" : (file.Name ?? "");
 
                 var extra = total - shown;
-                var isLastSlot = index == shown - 1 && extra > 0;
+                var isLastSlot = slot == shown - 1 && extra > 0;
                 _more.Visibility = isLastSlot && !hidden ? Visibility.Visible : Visibility.Collapsed;
                 _moreText.Text = isLastSlot ? LocalizedStrings.Format("SocialMediaMoreFormat", extra) : "";
 
@@ -1080,11 +1160,11 @@ namespace Fort.ind_UWP
                 }
                 else if (!string.IsNullOrWhiteSpace(file.Comment))
                 {
-                    name = LocalizedStrings.Format("SocialMediaTileAltAutomationFormat", kind, index + 1, total, file.Comment);
+                    name = LocalizedStrings.Format("SocialMediaTileAltAutomationFormat", kind, slot + 1, total, file.Comment);
                 }
                 else
                 {
-                    name = LocalizedStrings.Format("SocialMediaTileAutomationFormat", kind, index + 1, total);
+                    name = LocalizedStrings.Format("SocialMediaTileAutomationFormat", kind, slot + 1, total);
                 }
 
                 AutomationProperties.SetName(Button, name);

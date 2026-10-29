@@ -17,6 +17,14 @@ namespace Fort.ind_UWP
         {
             File = file;
             IsAttached = isAttached;
+            Preview.Update(file, AudioPlayerService.Current);
+        }
+
+        public SocialAudioPreviewState Preview { get; } = new SocialAudioPreviewState();
+
+        public bool IsAudio
+        {
+            get { return File.Kind == SocialDriveFileKind.Audio; }
         }
 
         public SocialDriveFile File { get; private set; }

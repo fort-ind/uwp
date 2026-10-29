@@ -64,6 +64,8 @@ namespace Fort.ind_UWP
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            AttachAudioHandler();
+
             if (!_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged += OnAuthStateChanged;
@@ -150,6 +152,8 @@ namespace Fort.ind_UWP
 
         private void MainPage_Unloaded(object sender, RoutedEventArgs e)
         {
+            DetachAudioHandler();
+
             if (_authHandlerAttached)
             {
                 ProfileService.AuthStateChanged -= OnAuthStateChanged;

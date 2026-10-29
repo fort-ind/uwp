@@ -67,6 +67,8 @@ namespace Fort.ind_UWP
         {
             if (file == null) return;
 
+            AudioPlayerService.Pause();
+
             var playing = PlayingInWindow;
             if (playing != null && !ReferenceEquals(playing, this)) playing.Stop();
             Stop();

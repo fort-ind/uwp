@@ -22,6 +22,11 @@ namespace Fort.ind_UWP
 
         private static volatile int s_mainViewId = -1;
 
+        public static CoreDispatcher MainDispatcher
+        {
+            get { return s_mainDispatcher; }
+        }
+
         public static bool IsSecondaryView
         {
             get
@@ -428,6 +433,7 @@ namespace Fort.ind_UWP
                 if (page != null) page.Release();
 
                 SocialInlineVideo.StopCurrentView();
+                AudioPlayerService.ForgetView(view.Id);
                 SocialEmojiPicker.ForgetCurrentView();
                 SearchItem.ForgetSubscribersOnView(view.Id);
                 SocialNoteHub.ForgetView(view.Id);

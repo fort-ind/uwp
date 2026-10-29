@@ -38,6 +38,42 @@ namespace Fort.ind_UWP
             { "INVALID_FILE_NAME", "SocialAttachmentBadName" }
         };
 
+        private Action<AudioPlaybackSnapshot> _audioHandler;
+
+        private bool _audioHandlerAttached;
+
+        private void AttachAudioPreview()
+        {
+            if (_audioHandlerAttached) return;
+
+            _audioHandler = OnAudioChanged;
+            AudioPlayerService.Subscribe(_audioHandler);
+            _audioHandlerAttached = true;
+            OnAudioChanged(AudioPlayerService.Current);
+        }
+
+        private void DetachAudioPreview()
+        {
+            if (!_audioHandlerAttached) return;
+
+            AudioPlayerService.Unsubscribe(_audioHandler);
+            _audioHandlerAttached = false;
+        }
+
+        private void OnAudioChanged(AudioPlaybackSnapshot snapshot)
+        {
+            foreach (var item in _attachments)
+            {
+                item.Preview.Update(item.File, snapshot);
+            }
+        }
+
+        private void PreviewAttachment_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (sender as FrameworkElement)?.DataContext as SocialAttachmentItem;
+            if (item != null && item.File != null) AudioPlayerService.PlayOrToggle(item.File);
+        }
+
         private void Attachments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)

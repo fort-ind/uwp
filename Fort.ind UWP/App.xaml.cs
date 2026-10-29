@@ -43,6 +43,15 @@ namespace Fort.ind_UWP
             {
                 AppLog.Error("App: background memory trim failed", ex);
             }
+
+            try
+            {
+                AudioPlayerService.OnEnteredBackground();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("App: could not pause audio in the background", ex);
+            }
         }
 
         public static bool ResumingFromTermination { get; private set; }

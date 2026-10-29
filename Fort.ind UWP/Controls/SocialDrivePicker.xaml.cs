@@ -74,8 +74,46 @@ namespace Fort.ind_UWP
             get { return _selected.Count; }
         }
 
+        private Action<AudioPlaybackSnapshot> _audioHandler;
+
+        private bool _audioHandlerAttached;
+
+        private void AttachAudioPreview()
+        {
+            if (_audioHandlerAttached) return;
+
+            _audioHandler = OnAudioChanged;
+            AudioPlayerService.Subscribe(_audioHandler);
+            _audioHandlerAttached = true;
+            OnAudioChanged(AudioPlayerService.Current);
+        }
+
+        private void DetachAudioPreview()
+        {
+            if (!_audioHandlerAttached) return;
+
+            AudioPlayerService.Unsubscribe(_audioHandler);
+            _audioHandlerAttached = false;
+        }
+
+        private void OnAudioChanged(AudioPlaybackSnapshot snapshot)
+        {
+            foreach (var item in _files)
+            {
+                item.Preview.Update(item.File, snapshot);
+            }
+        }
+
+        private void PreviewButton_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (sender as FrameworkElement)?.DataContext as SocialDrivePickerItem;
+            if (item != null) AudioPlayerService.PlayOrToggle(item.File);
+        }
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            AttachAudioPreview();
+
             if (_started) return;
 
             _started = true;
@@ -334,6 +372,7 @@ namespace Fort.ind_UWP
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
+            DetachAudioPreview();
             CancelLoad();
         }
     }

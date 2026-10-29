@@ -194,6 +194,11 @@
                         </Grid.RowDefinitions>
                     </Grid>
 
+                    <StackPanel x:Name="AudioPanel"
+                                x:Load="False"
+                                MaxWidth="560"
+                                HorizontalAlignment="Stretch"/>
+
                     <Button x:Name="LinkCardButton"
                             x:Load="False"
                             Style="{StaticResource ButtonRevealStyle}"

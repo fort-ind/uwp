@@ -88,6 +88,7 @@ namespace Fort.ind_UWP
         public const int SocialFeedTileMinimumExpiryHours = 3;
         public const int SocialFeedTileBackgroundSeconds = 25;
         public const string SettingLastNavTag = "LastNavTag";
+        public const string SettingAudioVolume = "AudioVolume";
 
         public const string SettingsSectionAppearance = "Appearance";
         public const string SettingsSectionTransparency = "Transparency";
