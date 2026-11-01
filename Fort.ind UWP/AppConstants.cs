@@ -149,7 +149,7 @@ namespace Fort.ind_UWP
         public const int SocialFeedCap = 200;
         public const int LowMemorySocialFeedCap = 100;
         public const int LowMemoryPageUnloadSeconds = 10;
-        public const double ListCacheLength = 4.0;
+        public const double ListCacheLength = 2.0;
         public const double LowMemoryListCacheLength = 1.0;
 
         public const int SocialThreadReplyDepthLimit = 4;

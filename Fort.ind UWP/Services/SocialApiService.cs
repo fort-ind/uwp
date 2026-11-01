@@ -310,8 +310,9 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialNotification>>.Failed(SocialApiStatus.Failed);
             }
 
+            var array = response.Value.GetArray();
             return SocialApiResult<IReadOnlyList<SocialNotification>>.Succeeded(
-                SocialNotification.ListFromJson(response.Value.GetArray()));
+                await Task.Run(() => SocialNotification.ListFromJson(array)));
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetMentionsAsync(
@@ -335,8 +336,9 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialNote>>.Failed(SocialApiStatus.Failed);
             }
 
+            var array = response.Value.GetArray();
             return SocialApiResult<IReadOnlyList<SocialNote>>.Succeeded(
-                SocialNote.ListFromJson(response.Value.GetArray()));
+                await Task.Run(() => SocialNote.ListFromJson(array)));
         }
 
         public static async Task<SocialApiResult<SocialMe>> GetMeAsync(string token, CancellationToken cancellationToken)
@@ -401,13 +403,13 @@ namespace Fort.ind_UWP
             switch (timeline)
             {
                 case SocialTimeline.Following:
-                    return NotesFrom(await PostAsync("notes/following", token, body, cancellationToken));
+                    return await NotesFromAsync(await PostAsync("notes/following", token, body, cancellationToken));
                 case SocialTimeline.Local:
-                    return NotesFrom(await PostOptionalTokenAsync("notes/local-timeline", token, body, cancellationToken));
+                    return await NotesFromAsync(await PostOptionalTokenAsync("notes/local-timeline", token, body, cancellationToken));
                 case SocialTimeline.Global:
-                    return NotesFrom(await PostOptionalTokenAsync("notes/global-timeline", token, body, cancellationToken));
+                    return await NotesFromAsync(await PostOptionalTokenAsync("notes/global-timeline", token, body, cancellationToken));
                 default:
-                    return NotesFrom(await PostAsync("notes/timeline", token, body, cancellationToken));
+                    return await NotesFromAsync(await PostAsync("notes/timeline", token, body, cancellationToken));
             }
         }
 
@@ -422,7 +424,7 @@ namespace Fort.ind_UWP
                 body.Add("untilId", JsonValue.CreateStringValue(untilId));
             }
 
-            return NotesFrom(await PostOptionalTokenAsync("notes/search-by-tag", token, body, cancellationToken));
+            return await NotesFromAsync(await PostOptionalTokenAsync("notes/search-by-tag", token, body, cancellationToken));
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialHashtag>>> GetPopularHashtagsAsync(
@@ -487,7 +489,7 @@ namespace Fort.ind_UWP
                 body.Add("untilId", JsonValue.CreateStringValue(untilId));
             }
 
-            return NotesFrom(await PostAsync("users/notes", token, body, cancellationToken));
+            return await NotesFromAsync(await PostAsync("users/notes", token, body, cancellationToken));
         }
 
         public static async Task<SocialApiResult<SocialUserDetail>> GetUserAsync(
@@ -735,14 +737,19 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialCustomEmoji>>.Failed(SocialApiStatus.Failed);
             }
 
-            var emojis = new List<SocialCustomEmoji>();
-            foreach (var value in list)
+            var emojis = await Task.Run(() =>
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                var parsed = new List<SocialCustomEmoji>();
+                foreach (var value in list)
+                {
+                    if (value.ValueType != JsonValueType.Object) continue;
 
-                var emoji = SocialCustomEmoji.FromJson(value.GetObject());
-                if (emoji != null) emojis.Add(emoji);
-            }
+                    var emoji = SocialCustomEmoji.FromJson(value.GetObject());
+                    if (emoji != null) parsed.Add(emoji);
+                }
+
+                return parsed;
+            });
 
             return SocialApiResult<IReadOnlyList<SocialCustomEmoji>>.Succeeded(emojis);
         }
@@ -773,7 +780,7 @@ namespace Fort.ind_UWP
             body.Add("showQuotes", JsonValue.CreateBooleanValue(false));
             body.Add("sinceId", JsonValue.CreateStringValue(string.IsNullOrEmpty(sinceId) ? noteId ?? "" : sinceId));
 
-            return NotesFrom(await PostAsync("notes/children", token, body, cancellationToken));
+            return await NotesFromAsync(await PostAsync("notes/children", token, body, cancellationToken));
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetConversationAsync(
@@ -783,7 +790,7 @@ namespace Fort.ind_UWP
             body.Add("noteId", JsonValue.CreateStringValue(noteId ?? ""));
             body.Add("limit", JsonValue.CreateNumberValue(limit));
 
-            return NotesFrom(await PostAsync("notes/conversation", token, body, cancellationToken));
+            return await NotesFromAsync(await PostAsync("notes/conversation", token, body, cancellationToken));
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetRenotesAsync(
@@ -807,7 +814,7 @@ namespace Fort.ind_UWP
                 body.Add("untilId", JsonValue.CreateStringValue(untilId));
             }
 
-            return NotesFrom(await PostAsync("notes/renotes", token, body, cancellationToken));
+            return await NotesFromAsync(await PostAsync("notes/renotes", token, body, cancellationToken));
         }
 
         public static Task<SocialApiResult<bool>> ReactAsync(string token, string noteId, string reaction, CancellationToken cancellationToken)
@@ -1174,8 +1181,9 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialReactionEntry>>.Failed(SocialApiStatus.Failed);
             }
 
+            var array = response.Value.GetArray();
             return SocialApiResult<IReadOnlyList<SocialReactionEntry>>.Succeeded(
-                SocialReactionEntry.ListFromJson(response.Value.GetArray()));
+                await Task.Run(() => SocialReactionEntry.ListFromJson(array)));
         }
 
         public static async Task<SocialApiResult<SocialLinkPreview>> GetUrlPreviewAsync(
@@ -1202,7 +1210,7 @@ namespace Fort.ind_UWP
                    : SocialApiResult<SocialLinkPreview>.Succeeded(preview);
         }
 
-        private static SocialApiResult<IReadOnlyList<SocialNote>> NotesFrom(SocialApiResult<IJsonValue> response)
+        private static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> NotesFromAsync(SocialApiResult<IJsonValue> response)
         {
             if (response.Status != SocialApiStatus.Ok)
             {
@@ -1214,7 +1222,8 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialNote>>.Failed(SocialApiStatus.Failed);
             }
 
-            return SocialApiResult<IReadOnlyList<SocialNote>>.Succeeded(SocialNote.ListFromJson(response.Value.GetArray()));
+            var array = response.Value.GetArray();
+            return SocialApiResult<IReadOnlyList<SocialNote>>.Succeeded(await Task.Run(() => SocialNote.ListFromJson(array)));
         }
 
         private static SocialApiResult<SocialUserDetail> UserFrom(SocialApiResult<IJsonValue> response)
@@ -1307,8 +1316,12 @@ namespace Fort.ind_UWP
                             return SocialApiResult<IJsonValue>.Succeeded(JsonValue.CreateNullValue());
                         }
 
-                        JsonValue parsed;
-                        if (!JsonValue.TryParse(text, out parsed))
+                        var parsed = await Task.Run(() =>
+                        {
+                            JsonValue value;
+                            return JsonValue.TryParse(text, out value) ? value : null;
+                        });
+                        if (parsed == null)
                         {
                             AppLog.Warning($"SocialApiService: {endpoint} returned something that is not JSON");
                             return SocialApiResult<IJsonValue>.Failed(SocialApiStatus.Failed);
