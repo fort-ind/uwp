@@ -575,6 +575,194 @@
                 </Grid>
             </PivotItem>
 
+            <PivotItem x:Uid="SocialCollectionsPivotItem" x:Name="CollectionsPivotItem">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <local:SocialTabStrip x:Uid="SocialCollectionsTabs"
+                                          x:Name="CollectionsTabStrip"
+                                          Margin="0,0,0,4">
+                        <local:SocialTabButton x:Name="ListsTab"
+                                               GroupName="SocialCollectionsTabs"
+                                               Style="{StaticResource SocialTabButtonStyle}"
+                                               Checked="CollectionsTab_Checked">
+                            <TextBlock x:Uid="SocialCollectionsListsTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                        </local:SocialTabButton>
+                        <local:SocialTabButton x:Name="AntennasTab"
+                                               GroupName="SocialCollectionsTabs"
+                                               Style="{StaticResource SocialTabButtonStyle}"
+                                               Checked="CollectionsTab_Checked">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock x:Uid="SocialCollectionsAntennasTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                                <Ellipse x:Name="AntennasTabDot"
+                                         Width="8" Height="8"
+                                         VerticalAlignment="Center"
+                                         Fill="{ThemeResource SystemControlForegroundAccentBrush}"
+                                         Visibility="Collapsed"
+                                         AutomationProperties.AccessibilityView="Raw"/>
+                            </StackPanel>
+                        </local:SocialTabButton>
+                    </local:SocialTabStrip>
+
+                    <Grid Grid.Row="1" ColumnSpacing="4" Margin="12,4,12,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox x:Uid="SocialCollectionPicker"
+                                  x:Name="CollectionPicker"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  SelectionChanged="CollectionPicker_SelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="local:SocialCollection">
+                                    <Grid ColumnSpacing="8" AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{x:Bind Name, Mode=OneWay}" TextTrimming="CharacterEllipsis"/>
+                                        <Ellipse Grid.Column="1"
+                                                 Width="8" Height="8"
+                                                 VerticalAlignment="Center"
+                                                 Fill="{ThemeResource SystemControlForegroundAccentBrush}"
+                                                 Visibility="{x:Bind UnreadVisibility, Mode=OneWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <Button x:Uid="SocialCollectionNewButton"
+                                x:Name="CollectionNewButton"
+                                Grid.Column="1"
+                                Style="{StaticResource ButtonRevealStyle}"
+                                Background="Transparent"
+                                Width="40" Height="40"
+                                MinWidth="40" MinHeight="40"
+                                Padding="0"
+                                CornerRadius="0"
+                                VerticalAlignment="Center"
+                                Click="CollectionNewButton_Click">
+                            <FontIcon Glyph="&#xE710;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                        </Button>
+
+                        <Button x:Uid="SocialCollectionMoreButton"
+                                x:Name="CollectionMoreButton"
+                                Grid.Column="2"
+                                Style="{StaticResource ButtonRevealStyle}"
+                                Background="Transparent"
+                                Width="40" Height="40"
+                                MinWidth="40" MinHeight="40"
+                                Padding="0"
+                                CornerRadius="0"
+                                VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE712;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem x:Uid="SocialListRenameItem" Click="CollectionRename_Click">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE70F;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutItem x:Uid="SocialListMembersItem" Click="CollectionMembers_Click">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE716;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                    <MenuFlyoutSeparator/>
+                                    <MenuFlyoutItem x:Uid="SocialListDeleteItem" Click="CollectionDelete_Click">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon Glyph="&#xE74D;"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <muxc:InfoBar x:Uid="SocialRefreshFailedInfoBar" x:Name="CollectionsRefreshFailedInfoBar"
+                                      Margin="0,4,0,8"
+                                      Severity="Warning"
+                                      IsOpen="False"
+                                      Visibility="Collapsed"
+                                      Closed="RefreshFailedInfoBar_Closed">
+                            <muxc:InfoBar.ActionButton>
+                                <Button x:Uid="SocialRefreshFailedRetryButton"
+                                        Click="RefreshFailedRetryButton_Click"/>
+                            </muxc:InfoBar.ActionButton>
+                        </muxc:InfoBar>
+
+                        <muxc:RefreshContainer x:Name="CollectionsRefreshContainer"
+                                               Grid.Row="1"
+                                               Visibility="Collapsed"
+                                               RefreshRequested="RefreshContainer_RefreshRequested">
+                            <ListView x:Uid="SocialCollectionsList" x:Name="CollectionsList"
+                                      ItemTemplate="{StaticResource SocialNoteItemTemplate}"
+                                      ItemContainerStyle="{StaticResource SocialFeedItemContainerStyle}"
+                                      SelectionMode="None"
+                                      IsItemClickEnabled="True"
+                                      ItemClick="NoteList_ItemClick">
+                                <i:Interaction.Behaviors>
+                                    <local:SocialContextMenuBehavior/>
+                                    <local:SocialNoteShortcutsBehavior/>
+                                    <local:SocialFeedListBehavior BackToNewest="{x:Bind CollectionsBackToNewestButton}"/>
+                                </i:Interaction.Behaviors>
+
+                                <ListView.Header>
+                                    <Button x:Name="CollectionsBackToNewestButton"
+                                            Margin="12,8,12,8"
+                                            HorizontalAlignment="Stretch"
+                                            Visibility="Collapsed"
+                                            Click="BackToNewestButton_Click">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE74A;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                                            <TextBlock x:Uid="SocialBackToNewest"/>
+                                        </StackPanel>
+                                    </Button>
+                                </ListView.Header>
+                            </ListView>
+                        </muxc:RefreshContainer>
+
+                        <ProgressRing x:Uid="SocialCollectionsLoading" x:Name="CollectionsLoadingRing"
+                                      Grid.Row="1"
+                                      Width="32" Height="32"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                        <StackPanel x:Name="CollectionsStatePanel"
+                                    Grid.Row="1"
+                                    Style="{StaticResource SocialStatePanelStyle}"
+                                    Visibility="Collapsed">
+                            <FontIcon x:Name="CollectionsStateGlyph"
+                                      FontSize="32"
+                                      HorizontalAlignment="Center"
+                                      Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Name="CollectionsStateText"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                            <Button x:Name="CollectionsStateButton"
+                                    HorizontalAlignment="Center"
+                                    Click="TimelineStateButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </PivotItem>
+
             <PivotItem x:Uid="SocialNotificationsPivotItem" x:Name="NotificationsPivotItem">
                 <Grid>
                     <Grid.RowDefinitions>

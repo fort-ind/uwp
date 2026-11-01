@@ -13,6 +13,8 @@ namespace Fort.ind_UWP
 {
     public sealed partial class SocialTagPage : Page, IReleasablePage, IReopenablePage, ITrimmablePage
     {
+        private const string SearchUnavailableCode = "UNAVAILABLE";
+
         private enum ListState
         {
             Loading,
@@ -37,6 +39,14 @@ namespace Fort.ind_UWP
 
         private bool _released;
 
+        private bool _localOnly;
+
+        private string _fileType;
+
+        private string _failedKey = "SocialTagFailed";
+
+        private bool _filtersReady;
+
         private bool IsReleased => _released;
 
         public SocialTagPage()
@@ -49,7 +59,12 @@ namespace Fort.ind_UWP
 
         internal bool Shows(string tag)
         {
-            return _args != null && string.Equals(_args.Tag, tag, StringComparison.OrdinalIgnoreCase);
+            return _args != null && !_args.IsSearch && string.Equals(_args.Tag, tag, StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal bool ShowsSearch(string query)
+        {
+            return _args != null && _args.IsSearch && string.Equals(_args.Tag, query, StringComparison.Ordinal);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -62,9 +77,11 @@ namespace Fort.ind_UWP
                 if (args == null) return;
 
                 _args = args;
-                var title = LocalizedStrings.Format("SocialTagTitleFormat", args.Tag);
-                CaptionText.Text = LocalizedStrings.Format("SocialTagCaptionFormat", args.Tag);
+                var title = LocalizedStrings.Format(args.IsSearch ? "SocialSearchTitleFormat" : "SocialTagTitleFormat", args.Tag);
+                CaptionText.Text = LocalizedStrings.Format(args.IsSearch ? "SocialSearchCaptionFormat" : "SocialTagCaptionFormat", args.Tag);
                 AutomationProperties.SetName(NoteList, title);
+                FilterPanel.Visibility = args.IsSearch ? Visibility.Visible : Visibility.Collapsed;
+                _filtersReady = true;
                 Load();
             }
             catch (Exception ex)
@@ -228,12 +245,15 @@ namespace Fort.ind_UWP
             try
             {
                 var emojiTask = SocialContentService.GetEmojiMapAsync();
-                var result = await SocialContentService.FetchTagNotesAsync(_args.Tag, null, _cancellation.Token);
+                var result = await FetchAsync(null, _cancellation.Token);
                 var emojis = await emojiTask;
                 if (version != _version || IsReleased) return;
 
                 if (result.Status != SocialApiStatus.Ok)
                 {
+                    _failedKey = _args.IsSearch && string.Equals(result.ErrorCode, SearchUnavailableCode, StringComparison.Ordinal)
+                                 ? "SocialSearchUnavailable"
+                                 : _args.IsSearch ? "SocialSearchFailed" : "SocialTagFailed";
                     SetState(ListState.Failed);
                     return;
                 }
@@ -253,11 +273,18 @@ namespace Fort.ind_UWP
             }
         }
 
+        private Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchAsync(string untilId, CancellationToken cancellationToken)
+        {
+            return _args.IsSearch
+                   ? SocialContentService.FetchSearchNotesAsync(_args.Tag, _localOnly, _fileType, untilId, cancellationToken)
+                   : SocialContentService.FetchTagNotesAsync(_args.Tag, untilId, cancellationToken);
+        }
+
         private async Task<IReadOnlyList<SocialNoteItem>> LoadMoreAsync(string untilId, CancellationToken cancellationToken)
         {
             if (_args == null || _released) return null;
 
-            var result = await SocialContentService.FetchTagNotesAsync(_args.Tag, untilId, cancellationToken);
+            var result = await FetchAsync(untilId, cancellationToken);
             if (result.Status != SocialApiStatus.Ok) return null;
 
             return SocialNoteItem.CreateAll(result.Value, SocialContentService.CachedEmojiMap, false);
@@ -278,18 +305,43 @@ namespace Fort.ind_UWP
             if (state == ListState.Empty)
             {
                 StateGlyph.Glyph = "";
-                StateText.Text = LocalizedStrings.Format("SocialTagEmptyFormat", _args == null ? "" : _args.Tag);
+                StateText.Text = LocalizedStrings.Format(_args != null && _args.IsSearch ? "SocialSearchEmptyFormat" : "SocialTagEmptyFormat",
+                                                         _args == null ? "" : _args.Tag);
                 StateButton.Visibility = Visibility.Collapsed;
             }
             else
             {
                 StateGlyph.Glyph = "";
-                StateText.Text = LocalizedStrings.Get("SocialTagFailed");
+                var unavailable = string.Equals(_failedKey, "SocialSearchUnavailable", StringComparison.Ordinal);
+                StateText.Text = LocalizedStrings.Get(_failedKey);
                 StateButton.Content = LocalizedStrings.Get("SocialRetryButton");
-                StateButton.Visibility = Visibility.Visible;
+                StateButton.Visibility = unavailable ? Visibility.Collapsed : Visibility.Visible;
             }
 
             AutomationHelper.AnnounceLiveRegion(StateText);
+        }
+
+        private void Filter_Changed(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!_filtersReady || _released || _args == null || !_args.IsSearch) return;
+
+                var item = FileTypeBox.SelectedItem as ComboBoxItem;
+                var type = item == null ? null : item.Tag as string;
+                _fileType = string.IsNullOrEmpty(type) ? null : type;
+                _localOnly = LocalOnlyBox.IsChecked.GetValueOrDefault();
+                Load();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialTagPage: could not apply the search filters", ex);
+            }
+        }
+
+        private void FilterSelection_Changed(object sender, SelectionChangedEventArgs e)
+        {
+            Filter_Changed(sender, e);
         }
 
         private void StateButton_Click(object sender, RoutedEventArgs e)

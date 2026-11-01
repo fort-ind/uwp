@@ -62,6 +62,13 @@ namespace Fort.ind_UWP
         public string AccountId { get; private set; }
 
         public string Tag { get; private set; }
+
+        public bool IsSearch { get; private set; }
+
+        public static SocialTagArgs ForSearch(string accountId, string query)
+        {
+            return new SocialTagArgs(accountId, query) { IsSearch = true };
+        }
     }
 
     public enum SocialComposeMode

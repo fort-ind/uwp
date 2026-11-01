@@ -22,7 +22,8 @@ namespace Fort.ind_UWP
         Block,
         FollowRequests,
         MutedBlocked,
-        Drive
+        Drive,
+        Lists
     }
 
     public static class SocialPermissions

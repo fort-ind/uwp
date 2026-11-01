@@ -96,7 +96,16 @@ namespace Fort.ind_UWP
                                   AppConstants.NavigationProfile);
         }
 
-        public static List<SearchItem> BuildSuggestions(string query, IReadOnlyList<SearchItem> items, SearchItem profileResult)
+        public static SearchItem BuildNoteSearchItem(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query) || query.Trim().Length < 2) return null;
+            if (SocialContentService.CurrentAccountId() == null) return null;
+
+            return new NoteSearchItem(query.Trim(), LocalizedStrings.Format("SearchNotesResultFormat", query.Trim()));
+        }
+
+        public static List<SearchItem> BuildSuggestions(string query, IReadOnlyList<SearchItem> items, SearchItem profileResult,
+                                                        SearchItem notesResult = null)
         {
             var filtered = items.Where(item => Matches(item, query))
                                 .Take(AppConstants.SearchSuggestionLimit)
@@ -108,6 +117,8 @@ namespace Fort.ind_UWP
             {
                 filtered.Add(profileResult);
             }
+
+            if (notesResult != null) filtered.Add(notesResult);
 
             return filtered;
         }

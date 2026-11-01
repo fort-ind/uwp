@@ -35,6 +35,7 @@ namespace Fort.ind_UWP
         private const string MuteUserGlyph = "\uE74F";
         private const string UnmuteUserGlyph = "\uE767";
         private const string BlockGlyph = "\uECE4";
+        private const string ListGlyph = "\uE8FD";
 
         private static readonly TimeSpan ShareRequestWindow = TimeSpan.FromSeconds(10);
 
@@ -96,7 +97,12 @@ namespace Fort.ind_UWP
             {
                 if (linkItems > 0 && flyout.SecondaryCount == linkItems) flyout.AddSeparator();
                 flyout.Add(LocalizedStrings.Format("SocialMenuViewUserFormat", person.Handle), PersonGlyph, person, ViewUserItem_Click, false);
-                if (SocialModerationService.CanModerate(person)) AddModerationSubmenu(flyout, person, announcer);
+                if (SocialModerationService.CanModerate(person))
+                {
+                    var listed = person;
+                    Add(flyout, "SocialMenuAddToList", ListGlyph, () => SocialCollectionService.ShowAddToListAsync(announcer, listed), false);
+                    AddModerationSubmenu(flyout, person, announcer);
+                }
             }
 
             if (note != null) AddOwnerItems(flyout, note, announcer);
@@ -284,6 +290,7 @@ namespace Fort.ind_UWP
             if (SocialModerationService.CanModerate(user))
             {
                 if (flyout.Items.Count > 0) flyout.Items.Add(new MenuFlyoutSeparator());
+                flyout.Items.Add(MenuItem("SocialMenuAddToList", ListGlyph, () => SocialCollectionService.ShowAddToListAsync(announcer, user)));
                 AddModerationItems(flyout.Items, user, announcer);
             }
 

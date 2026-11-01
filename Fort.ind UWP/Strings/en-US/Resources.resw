@@ -4259,9 +4259,244 @@ Open your profile and try again.</value>
     <value>Try again</value>
   </data>
   <data name="SocialDriveLoadFailed" xml:space="preserve">
-    <value>Your drive couldn't be loaded.</value>
+    <value>Your drive couldn't be loaded :(</value>
   </data>
   <data name="SocialDriveEmpty" xml:space="preserve">
-    <value>This folder is empty.</value>
+    <value>This folder is empty. :(</value>
+  </data>
+  <data name="SocialCollectionsPivotItem.Header" xml:space="preserve">
+    <value>Lists</value>
+    <comment>tab holding your lists and antennas.</comment>
+  </data>
+  <data name="SocialCollectionsTabs.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Lists and antennas</value>
+  </data>
+  <data name="SocialCollectionsListsTab.Text" xml:space="preserve">
+    <value>Lists</value>
+    <comment>Tab inside Social's Lists the lists you made.</comment>
+  </data>
+  <data name="SocialCollectionsAntennasTab.Text" xml:space="preserve">
+    <value>Antennas</value>
+    <comment>Tab inside Social's Lists: antennas, which collect matching notes for you.</comment>
+  </data>
+  <data name="SocialCollectionPicker.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Choose a list or antenna</value>
+  </data>
+  <data name="SocialCollectionNewButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>New list</value>
+  </data>
+  <data name="SocialCollectionNewButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>New list</value>
+  </data>
+  <data name="SocialCollectionMoreButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>List options</value>
+  </data>
+  <data name="SocialCollectionMoreButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>List options</value>
+  </data>
+  <data name="SocialListRenameItem.Text" xml:space="preserve">
+    <value>Rename…</value>
+  </data>
+  <data name="SocialListMembersItem.Text" xml:space="preserve">
+    <value>Members…</value>
+  </data>
+  <data name="SocialListDeleteItem.Text" xml:space="preserve">
+    <value>Delete list…</value>
+  </data>
+  <data name="SocialCollectionsList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Notes in the chosen list or antenna</value>
+  </data>
+  <data name="SocialCollectionsLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading the chosen list or antenna</value>
+  </data>
+  <data name="SocialListEmpty" xml:space="preserve">
+    <value>Nothing here yet. Notes from the people in this list show up here. :)</value>
+  </data>
+  <data name="SocialAntennaEmpty" xml:space="preserve">
+    <value>Nothing here yet. Notes that match this antenna show up here.</value>
+  </data>
+  <data name="SocialListsNone" xml:space="preserve">
+    <value>You haven't made any lists yet! :( go make one and add people :p</value>
+  </data>
+  <data name="SocialAntennasNone" xml:space="preserve">
+    <value>You have no antennas :( Antennas are set up on fort.social, and the notes they collect show up here!</value>
+  </data>
+  <data name="SocialCollectionsFailed" xml:space="preserve">
+    <value>Couldn't load your lists and antennas. :(</value>
+  </data>
+  <data name="SocialListCreateButton" xml:space="preserve">
+    <value>Create a list</value>
+  </data>
+  <data name="SocialCollectionUnreadAutomationFormat" xml:space="preserve">
+    <value>{0}, has unread notes</value>
+    <comment>{0} is a list or antenna name.</comment>
+  </data>
+  <data name="SocialListNewTitle" xml:space="preserve">
+    <value>New list</value>
+  </data>
+  <data name="SocialListNewConfirm" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="SocialListRenameTitle" xml:space="preserve">
+    <value>Rename list</value>
+  </data>
+  <data name="SocialListRenameConfirm" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="SocialListNamePlaceholder" xml:space="preserve">
+    <value>List name</value>
+  </data>
+  <data name="DialogDone" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="SocialListCreatedFormat" xml:space="preserve">
+    <value>Created the list {0}</value>
+    <comment>{0} is the list name.</comment>
+  </data>
+  <data name="SocialListCreateFailedTitle" xml:space="preserve">
+    <value>Couldn't create the list</value>
+  </data>
+  <data name="SocialListRenameFailedFormat" xml:space="preserve">
+    <value>Couldn't rename {0}</value>
+    <comment>{0} is the list name.</comment>
+  </data>
+  <data name="SocialListDeleteTitleFormat" xml:space="preserve">
+    <value>Delete {0}?</value>
+    <comment>{0} is the list name.</comment>
+  </data>
+  <data name="SocialListDeleteBody" xml:space="preserve">
+    <value>The list is deleted from fort.social.</value>
+  </data>
+  <data name="SocialListDeleteConfirm" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialListDeletedFormat" xml:space="preserve">
+    <value>Deleted the list {0}</value>
+    <comment>{0} is the list name.</comment>
+  </data>
+  <data name="SocialListDeleteFailedFormat" xml:space="preserve">
+    <value>Couldn't delete {0}</value>
+    <comment>{0} is the list name.</comment>
+  </data>
+  <data name="SocialListMembersTitleFormat" xml:space="preserve">
+    <value>Members of {0}</value>
+    <comment>{0} is the list name.</comment>
+  </data>
+  <data name="SocialListMembersSearch.PlaceholderText" xml:space="preserve">
+    <value>Add a person</value>
+  </data>
+  <data name="SocialListMembersSearch.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Add a person to the list</value>
+  </data>
+  <data name="SocialListMembersList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>People in the list</value>
+  </data>
+  <data name="SocialListMemberRemoveButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Remove from list</value>
+  </data>
+  <data name="SocialListMemberRemoveButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove from list</value>
+  </data>
+  <data name="SocialListMembersLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading the list's members</value>
+  </data>
+  <data name="SocialListMembersEmpty.Text" xml:space="preserve">
+    <value>Nobody is in this list yet :( add some cool people!</value>
+  </data>
+  <data name="SocialListMemberAddedFormat" xml:space="preserve">
+    <value>Added {0} to {1}</value>
+    <comment>{0} is a person, {1} the list.</comment>
+  </data>
+  <data name="SocialListMemberRemovedFormat" xml:space="preserve">
+    <value>Removed {0} from {1}</value>
+    <comment>{0} is a person, {1} the list.</comment>
+  </data>
+  <data name="SocialListMemberAddFailedFormat" xml:space="preserve">
+    <value>Couldn't add {0}.</value>
+    <comment>{0} is a person.</comment>
+  </data>
+  <data name="SocialListMemberRemoveFailedFormat" xml:space="preserve">
+    <value>Couldn't remove {0}.</value>
+    <comment>{0} is a person.</comment>
+  </data>
+  <data name="SocialListMemberBlockedFormat" xml:space="preserve">
+    <value>{0} has blocked you, so they can't be added to a list.</value>
+    <comment>{0} is a person.</comment>
+  </data>
+  <data name="SocialListFull" xml:space="preserve">
+    <value>This list is full.</value>
+  </data>
+  <data name="SocialListTooMany" xml:space="preserve">
+    <value>You have reached the max number of lists </value>
+  </data>
+  <data name="SocialListPermissionStatus" xml:space="preserve">
+    <value>Sign in again to change your lists.</value>
+  </data>
+  <data name="SocialListAddTitleFormat" xml:space="preserve">
+    <value>Add {0} to lists</value>
+    <comment>{0} is a person.</comment>
+  </data>
+  <data name="SocialListAddFailedTitleFormat" xml:space="preserve">
+    <value>Couldn't load your lists for {0}</value>
+    <comment>{0} is a person.</comment>
+  </data>
+  <data name="SocialListAddNoLists" xml:space="preserve">
+    <value>You haven't made any lists yet. Create one from Social › Lists.</value>
+  </data>
+  <data name="SocialSignInPromptListsTitle" xml:space="preserve">
+    <value>Sign in again to manage your lists</value>
+  </data>
+  <data name="SocialMenuAddToList" xml:space="preserve">
+    <value>Add to list…</value>
+    <comment>Menu item that opens a dialog for adding this person to one of your fort.social lists.</comment>
+  </data>
+  <data name="SearchNotesResultFormat" xml:space="preserve">
+    <value>Search fort.social notes for “{0}”</value>
+    <comment>{0} is what the user typed in the search box.</comment>
+  </data>
+  <data name="SocialSearchTitleFormat" xml:space="preserve">
+    <value>Search: {0}</value>
+    <comment>Header of the note search results page. {0} is the search text.</comment>
+  </data>
+  <data name="SocialSearchCaptionFormat" xml:space="preserve">
+    <value>Notes matching “{0}”</value>
+  </data>
+  <data name="SocialSearchEmptyFormat" xml:space="preserve">
+    <value>No notes found for “{0}”. Try other words, or turn off the filters above.</value>
+  </data>
+  <data name="SocialSearchFailed" xml:space="preserve">
+    <value>Couldn't search notes. Check your connection and try again.</value>
+  </data>
+  <data name="SocialSearchUnavailable" xml:space="preserve">
+    <value>fort.social has note search turned off for your account.</value>
+  </data>
+  <data name="SocialSearchTypeBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Only notes with</value>
+  </data>
+  <data name="SocialSearchTypeAny.Content" xml:space="preserve">
+    <value>Any notes</value>
+  </data>
+  <data name="SocialSearchTypeImage.Content" xml:space="preserve">
+    <value>With images</value>
+  </data>
+  <data name="SocialSearchTypeVideo.Content" xml:space="preserve">
+    <value>With video</value>
+  </data>
+  <data name="SocialSearchTypeAudio.Content" xml:space="preserve">
+    <value>With audio</value>
+  </data>
+  <data name="SocialSearchLocalOnly.Content" xml:space="preserve">
+    <value>Only from fort.social</value>
+    <comment>Check box that limits note search to this server.</comment>
+  </data>
+  <data name="DiagnosticsMemoryFormat" xml:space="preserve">
+    <value>Memory in use: {0} MB of {1} MB the system allows.</value>
+    <comment>{0} and {1} are megabyte counts.</comment>
+  </data>
+  <data name="DiagnosticsMemoryLowModeSuffix" xml:space="preserve">
+    <value>Low-memory mode is on.</value>
+  </data>
+  <data name="RefreshMemoryButtonText.Text" xml:space="preserve">
+    <value>Refresh memory use</value>
   </data>
 </root>

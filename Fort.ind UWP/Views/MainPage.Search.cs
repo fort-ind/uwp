@@ -93,8 +93,9 @@ namespace Fort.ind_UWP
                 var snapshot = _allSearchItems;
 
                 var profileResult = SearchCatalog.BuildProfileResultItem(ProfileService.CurrentUser);
+                var notesResult = SearchCatalog.BuildNoteSearchItem(query);
 
-                var results = await Task.Run(() => SearchCatalog.BuildSuggestions(query, snapshot, profileResult), cancellationToken);
+                var results = await Task.Run(() => SearchCatalog.BuildSuggestions(query, snapshot, profileResult, notesResult), cancellationToken);
 
                 if (!cancellationToken.IsCancellationRequested)
                 {
@@ -182,6 +183,12 @@ namespace Fort.ind_UWP
                 }
             }
 
+            if (ProfileService.CurrentUser != null && query.Length >= 2)
+            {
+                ShowNoteSearch(query);
+                return;
+            }
+
             NavigateToTag(AppConstants.NavigationGames);
 
             var games = ContentFrame.Content as GamesPage;
@@ -215,7 +222,34 @@ namespace Fort.ind_UWP
             var item = args.SelectedItem as SearchItem;
             if (item != null)
             {
-                sender.Text = item.Title;
+                var notes = item as NoteSearchItem;
+                sender.Text = notes != null ? notes.Query : item.Title;
+            }
+        }
+
+        private void ShowNoteSearch(string query)
+        {
+            try
+            {
+                var account = SocialContentService.CurrentAccountId();
+                if (account == null || string.IsNullOrWhiteSpace(query)) return;
+
+                if (HoldForUnsavedChanges(() => ShowNoteSearch(query))) return;
+
+                var current = ContentFrame.Content as SocialTagPage;
+                if (current != null && current.ShowsSearch(query)) return;
+
+                SelectNavItemForTag(AppConstants.NavigationSocial);
+                ClosePaneUnlessExpanded();
+
+                if (!ContentFrame.Navigate(typeof(SocialTagPage), SocialTagArgs.ForSearch(account, query)))
+                {
+                    AppLog.Warning("MainPage: navigation to the note search returned false");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MainPage: could not open the note search", ex);
             }
         }
 
@@ -227,7 +261,12 @@ namespace Fort.ind_UWP
                 return;
             }
 
-            if (!string.IsNullOrEmpty(item.Url))
+            var notes = item as NoteSearchItem;
+            if (notes != null)
+            {
+                ShowNoteSearch(notes.Query);
+            }
+            else if (!string.IsNullOrEmpty(item.Url))
             {
                 await WebLauncher.LaunchAsync(item.Url);
             }

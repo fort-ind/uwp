@@ -1,5 +1,7 @@
 using System;
+using System.Globalization;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
 
@@ -51,7 +53,38 @@ namespace Fort.ind_UWP
         private bool LoadDiagnosticsSection()
         {
             if (DiagnosticsSection == null) FindName("DiagnosticsSection");
-            return DiagnosticsSection != null;
+            if (DiagnosticsSection == null) return false;
+
+            UpdateMemoryReadout();
+            return true;
+        }
+
+        private static string MemoryLine()
+        {
+            const double megabyte = 1048576.0;
+            var used = (MemoryManager.AppMemoryUsage / megabyte).ToString("N0", CultureInfo.CurrentCulture);
+            var limit = (MemoryManager.AppMemoryUsageLimit / megabyte).ToString("N0", CultureInfo.CurrentCulture);
+            var line = LocalizedStrings.Format("DiagnosticsMemoryFormat", used, limit);
+            return MemoryService.IsLowMemoryMode ? line + " " + LocalizedStrings.Get("DiagnosticsMemoryLowModeSuffix") : line;
+        }
+
+        private void UpdateMemoryReadout()
+        {
+            try
+            {
+                DiagnosticsMemoryText.Text = MemoryLine();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SettingsAboutPage: could not read the memory use", ex);
+                DiagnosticsMemoryText.Text = "";
+            }
+        }
+
+        private void RefreshMemoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateMemoryReadout();
+            AutomationHelper.AnnounceStatus(this, DiagnosticsMemoryText.Text, "SettingsDiagnosticsMemory");
         }
 
         private async void CopyDiagnosticsButton_Click(object sender, RoutedEventArgs e)
@@ -61,7 +94,7 @@ namespace Fort.ind_UWP
 
             try
             {
-                var text = await AppLog.ReadDiagnosticsAsync();
+                var text = MemoryLine() + Environment.NewLine + await AppLog.ReadDiagnosticsAsync();
                 var package = new DataPackage();
                 package.SetText(text);
                 Clipboard.SetContent(package);

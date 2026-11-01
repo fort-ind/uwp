@@ -524,7 +524,7 @@ namespace Fort.ind_UWP
                 }
                 else if (tagArgs != null)
                 {
-                    TitleSubPage(LocalizedStrings.Format("SocialTagTitleFormat", tagArgs.Tag));
+                    TitleSubPage(LocalizedStrings.Format(tagArgs.IsSearch ? "SocialSearchTitleFormat" : "SocialTagTitleFormat", tagArgs.Tag));
                 }
                 else if (e.NavigationMode == NavigationMode.Back)
                 {

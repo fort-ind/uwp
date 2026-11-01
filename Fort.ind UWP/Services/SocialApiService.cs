@@ -36,7 +36,9 @@ namespace Fort.ind_UWP
         Home,
         Following,
         Local,
-        Global
+        Global,
+        List,
+        Antenna
     }
 
     public enum SocialFollowList
@@ -391,7 +393,7 @@ namespace Fort.ind_UWP
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetTimelineAsync(
-            string token, SocialTimeline timeline, string untilId, int limit, CancellationToken cancellationToken)
+            string token, SocialTimeline timeline, string sourceId, string untilId, int limit, CancellationToken cancellationToken)
         {
             JsonObject body = new JsonObject();
             body.Add("limit", JsonValue.CreateNumberValue(limit));
@@ -402,6 +404,12 @@ namespace Fort.ind_UWP
 
             switch (timeline)
             {
+                case SocialTimeline.List:
+                    body.Add("listId", JsonValue.CreateStringValue(sourceId ?? ""));
+                    return await NotesFromAsync(await PostAsync("notes/user-list-timeline", token, body, cancellationToken));
+                case SocialTimeline.Antenna:
+                    body.Add("antennaId", JsonValue.CreateStringValue(sourceId ?? ""));
+                    return await NotesFromAsync(await PostAsync("antennas/notes", token, body, cancellationToken));
                 case SocialTimeline.Following:
                     return await NotesFromAsync(await PostAsync("notes/following", token, body, cancellationToken));
                 case SocialTimeline.Local:
@@ -1137,6 +1145,132 @@ namespace Fort.ind_UWP
             }
 
             return SocialApiResult<IReadOnlyList<string>>.Succeeded(tags);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialCollection>>> GetCollectionsAsync(
+            string token, SocialCollectionKind kind, CancellationToken cancellationToken)
+        {
+            var endpoint = kind == SocialCollectionKind.List ? "users/lists/list" : "antennas/list";
+            var response = await PostAsync(endpoint, token, new JsonObject(), cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialCollection>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            if (response.Value.ValueType != JsonValueType.Array)
+            {
+                return SocialApiResult<IReadOnlyList<SocialCollection>>.Failed(SocialApiStatus.Failed);
+            }
+
+            return SocialApiResult<IReadOnlyList<SocialCollection>>.Succeeded(SocialCollection.AllFromJson(response.Value.GetArray(), kind));
+        }
+
+        public static async Task<SocialApiResult<SocialCollection>> CreateListAsync(string token, string name,
+                                                                                   CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("name", JsonValue.CreateStringValue(name ?? ""));
+
+            return ListFrom(await PostAsync("users/lists/create", token, body, cancellationToken));
+        }
+
+        public static async Task<SocialApiResult<SocialCollection>> UpdateListAsync(string token, string listId, string name,
+                                                                                   CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
+            body.Add("name", JsonValue.CreateStringValue(name ?? ""));
+
+            return ListFrom(await PostAsync("users/lists/update", token, body, cancellationToken));
+        }
+
+        private static SocialApiResult<SocialCollection> ListFrom(SocialApiResult<IJsonValue> response)
+        {
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<SocialCollection>.Failed(response.Status, response.ErrorCode);
+            }
+
+            var list = response.Value.ValueType == JsonValueType.Object
+                       ? SocialCollection.ListFromJson(response.Value.GetObject())
+                       : null;
+
+            return list == null
+                   ? SocialApiResult<SocialCollection>.Failed(SocialApiStatus.Failed)
+                   : SocialApiResult<SocialCollection>.Succeeded(list);
+        }
+
+        public static Task<SocialApiResult<bool>> DeleteListAsync(string token, string listId, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
+
+            return ActionAsync("users/lists/delete", token, body, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> ChangeListMemberAsync(string token, string listId, string userId, bool add,
+                                                                       CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
+            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+
+            return ActionAsync(add ? "users/lists/push" : "users/lists/pull", token, body, cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialFollowEntry>>> GetListMembersAsync(
+            string token, string listId, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            if (!string.IsNullOrEmpty(untilId))
+            {
+                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+            }
+
+            var response = await PostAsync("users/lists/get-memberships", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            if (response.Value.ValueType != JsonValueType.Array)
+            {
+                return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(SocialApiStatus.Failed);
+            }
+
+            var entries = new List<SocialFollowEntry>();
+            foreach (var value in response.Value.GetArray())
+            {
+                if (value.ValueType != JsonValueType.Object) continue;
+
+                var membership = value.GetObject();
+                var id = SocialJson.String(membership, "id");
+                var person = SocialJson.Object(membership, "user");
+                var detail = person == null ? null : SocialUserDetail.FromJson(person);
+                if (string.IsNullOrEmpty(id) || detail == null) continue;
+
+                entries.Add(new SocialFollowEntry(id, detail));
+            }
+
+            return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Succeeded(entries);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> SearchNotesAsync(
+            string token, string query, bool localOnly, string fileType, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JsonObject body = new JsonObject();
+            body.Add("query", JsonValue.CreateStringValue(query ?? ""));
+            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            if (localOnly) body.Add("host", JsonValue.CreateStringValue("."));
+            if (!string.IsNullOrEmpty(fileType)) body.Add("filetype", JsonValue.CreateStringValue(fileType));
+            if (!string.IsNullOrEmpty(untilId))
+            {
+                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+            }
+
+            return await NotesFromAsync(await PostOptionalTokenAsync("notes/search", token, body, cancellationToken));
         }
 
         private static JsonObject NoteBody(string noteId)

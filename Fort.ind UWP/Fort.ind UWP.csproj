@@ -175,6 +175,9 @@
     <Compile Include="Controls\SocialComposer.Poll.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialListMembers.xaml.cs">
+      <DependentUpon>SocialListMembers.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialRecipientBox.xaml.cs">
       <DependentUpon>SocialRecipientBox.xaml</DependentUpon>
     </Compile>
@@ -268,6 +271,8 @@
     <Compile Include="Models\SocialEmojiItem.cs" />
     <Compile Include="Models\SocialFeedCollection.cs" />
     <Compile Include="Models\SocialFeedItem.cs" />
+    <Compile Include="Models\NoteSearchItem.cs" />
+    <Compile Include="Models\SocialCollection.cs" />
     <Compile Include="Models\SocialHashtag.cs" />
     <Compile Include="Models\SocialLinkPreview.cs" />
     <Compile Include="Models\SocialNoteItem.cs" />
@@ -298,6 +303,7 @@
     <Compile Include="Services\SearchCatalog.cs" />
     <Compile Include="Services\SitemapService.cs" />
     <Compile Include="Services\SocialApiService.cs" />
+    <Compile Include="Services\SocialCollectionService.cs" />
     <Compile Include="Services\SocialContentService.cs" />
     <Compile Include="Services\SocialDiscoveryService.cs" />
     <Compile Include="Services\SocialDraftService.cs" />
@@ -437,6 +443,9 @@
       <DependentUpon>SocialPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SocialPage.Refresh.cs">
+      <DependentUpon>SocialPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialPage.Collections.cs">
       <DependentUpon>SocialPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SocialPage.Discovery.cs">
@@ -708,6 +717,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\SocialSuggestionList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialListMembers.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

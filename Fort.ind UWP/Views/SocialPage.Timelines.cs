@@ -35,7 +35,9 @@ namespace Fort.ind_UWP
                 FailedKey = failedKey;
             }
 
-            public SocialTimeline Timeline { get; }
+            public SocialTimeline Timeline { get; set; }
+
+            public string SourceId { get; set; }
 
             public PivotItem PivotItem { get; }
 
@@ -53,7 +55,7 @@ namespace Fort.ind_UWP
 
             public Button Button { get; }
 
-            public string EmptyKey { get; }
+            public string EmptyKey { get; set; }
 
             public string FailedKey { get; }
 
@@ -97,6 +99,8 @@ namespace Fort.ind_UWP
 
         private async Task<bool> LoadTimelineAsync(TimelineFeed feed, bool keepList)
         {
+            if (feed == _collections && string.IsNullOrEmpty(feed.SourceId)) return await LoadCollectionsAsync(feed, keepList);
+
             var version = ++feed.Version;
             feed.Requested = true;
             if (!keepList) SetTimelineState(feed, FeedState.Loading);
@@ -104,7 +108,7 @@ namespace Fort.ind_UWP
             try
             {
                 var emojiTask = SocialContentService.GetEmojiMapAsync();
-                var result = await SocialContentService.FetchTimelineAsync(feed.Timeline, null, CancellationToken.None);
+                var result = await SocialContentService.FetchTimelineAsync(feed.Timeline, feed.SourceId, null, CancellationToken.None);
                 var emojis = await emojiTask;
                 if (version != feed.Version) return true;
 
@@ -120,6 +124,7 @@ namespace Fort.ind_UWP
                 var items = SocialNoteItem.CreateAll(result.Value, emojis, false);
                 feed.Items.ReplaceAll(items, result.Value.Count > 0);
                 SetTimelineState(feed, items.Count == 0 ? FeedState.Empty : FeedState.Ready);
+                if (feed == _collections) MarkSelectedAntennaRead();
                 return true;
             }
             catch (Exception ex)
@@ -149,7 +154,7 @@ namespace Fort.ind_UWP
         private static async Task<IReadOnlyList<SocialNoteItem>> LoadMoreTimelineAsync(TimelineFeed feed, string untilId,
                                                                                        CancellationToken cancellationToken)
         {
-            var result = await SocialContentService.FetchTimelineAsync(feed.Timeline, untilId, cancellationToken);
+            var result = await SocialContentService.FetchTimelineAsync(feed.Timeline, feed.SourceId, untilId, cancellationToken);
             if (result.Status != SocialApiStatus.Ok) return null;
 
             return SocialNoteItem.CreateAll(result.Value, SocialContentService.CachedEmojiMap, false);
@@ -187,6 +192,10 @@ namespace Fort.ind_UWP
             if (feed.State == FeedState.NeedsPermission)
             {
                 OpenSignIn();
+            }
+            else if (feed == _collections && feed.State == FeedState.Empty && string.IsNullOrEmpty(feed.SourceId))
+            {
+                CreateCollection();
             }
             else
             {

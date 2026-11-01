@@ -95,6 +95,31 @@
                         </Button>
                     </Grid>
 
+                    <StackPanel x:Name="FilterPanel"
+                                Orientation="Horizontal"
+                                Spacing="16"
+                                Padding="12,8,12,8"
+                                BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                                BorderThickness="0,0,0,1"
+                                Visibility="Collapsed">
+                        <ComboBox x:Uid="SocialSearchTypeBox"
+                                  x:Name="FileTypeBox"
+                                  MinWidth="150"
+                                  VerticalAlignment="Center"
+                                  SelectedIndex="0"
+                                  SelectionChanged="FilterSelection_Changed">
+                            <ComboBoxItem x:Uid="SocialSearchTypeAny" Tag=""/>
+                            <ComboBoxItem x:Uid="SocialSearchTypeImage" Tag="image"/>
+                            <ComboBoxItem x:Uid="SocialSearchTypeVideo" Tag="video"/>
+                            <ComboBoxItem x:Uid="SocialSearchTypeAudio" Tag="audio"/>
+                        </ComboBox>
+                        <CheckBox x:Uid="SocialSearchLocalOnly"
+                                  x:Name="LocalOnlyBox"
+                                  VerticalAlignment="Center"
+                                  Checked="Filter_Changed"
+                                  Unchecked="Filter_Changed"/>
+                    </StackPanel>
+
                     <Button x:Name="BackToNewestButton"
                             Margin="12,8,12,8"
                             HorizontalAlignment="Stretch"

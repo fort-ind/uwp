@@ -24,7 +24,7 @@ namespace Fort.ind_UWP
 
         private const int ForYouIndex = 0;
 
-        private const int NotificationsIndex = 4;
+        private const int NotificationsIndex = 5;
 
         private static int LastPivotIndex { get; set; } = ForYouIndex;
 
@@ -37,6 +37,8 @@ namespace Fort.ind_UWP
         private readonly TimelineFeed _local;
 
         private readonly TimelineFeed _global;
+
+        private readonly TimelineFeed _collections;
 
         private readonly TimelineFeed[] _timelines;
 
@@ -110,9 +112,13 @@ namespace Fort.ind_UWP
                                     GlobalRefreshContainer, GlobalRefreshFailedInfoBar, GlobalLoadingRing, GlobalStatePanel,
                                      GlobalStateGlyph, GlobalStateText, GlobalStateButton,
                                      "SocialGlobalEmpty", "SocialGlobalFailed");
-            _timelines = new[] { _forYou, _following, _local, _global };
+            _collections = CreateTimeline(SocialTimeline.List, CollectionsPivotItem, CollectionsList,
+                                          CollectionsRefreshContainer, CollectionsRefreshFailedInfoBar, CollectionsLoadingRing, CollectionsStatePanel,
+                                          CollectionsStateGlyph, CollectionsStateText, CollectionsStateButton,
+                                          "SocialListEmpty", "SocialCollectionsFailed");
+            _timelines = new[] { _forYou, _following, _local, _global, _collections };
             InitializeRefreshes();
-            _signedInPivotItems = new[] { ForYouPivotItem, FollowingPivotItem, LocalPivotItem, GlobalPivotItem, NotificationsPivotItem };
+            _signedInPivotItems = new[] { ForYouPivotItem, FollowingPivotItem, LocalPivotItem, GlobalPivotItem, CollectionsPivotItem, NotificationsPivotItem };
 
             _notifications = new SocialFeedCollection<SocialFeedItem>(LoadMoreNotificationsAsync, SocialFeedPaging.FullPage, true);
             _mentions = new SocialFeedCollection<SocialFeedItem>(LoadMoreMentionsAsync, SocialFeedPaging.FullPage, true);
@@ -120,6 +126,7 @@ namespace Fort.ind_UWP
             MentionsList.ItemsSource = _mentions;
 
             ApplyNotificationsTab(LastShowedMentions);
+            ApplyCollectionKind(LastCollectionKind);
             _tabsReady = true;
 
             Loaded += SocialPage_Loaded;
@@ -365,6 +372,7 @@ namespace Fort.ind_UWP
                 feed.Requested = false;
                 feed.Items.ReplaceAll(new SocialNoteItem[0], false);
             }
+            ResetCollections();
             _notificationsVersion++;
             _mentionsVersion++;
             _notificationsRequested = false;
@@ -463,6 +471,7 @@ namespace Fort.ind_UWP
             if (feed != null)
             {
                 if (!feed.Requested) LoadTimeline(feed);
+                else if (feed == _collections) RefreshAntennaFlags();
                 return;
             }
 

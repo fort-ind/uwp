@@ -97,10 +97,10 @@ namespace Fort.ind_UWP
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchTimelineAsync(
-            SocialTimeline timeline, string untilId, CancellationToken cancellationToken)
+            SocialTimeline timeline, string sourceId, string untilId, CancellationToken cancellationToken)
         {
             var token = await MisskeyAuthService.TryGetTokenAsync();
-            return await SocialApiService.GetTimelineAsync(token, timeline, untilId, AppConstants.SocialFeedPageSize, cancellationToken);
+            return await SocialApiService.GetTimelineAsync(token, timeline, sourceId, untilId, AppConstants.SocialFeedPageSize, cancellationToken);
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchTagNotesAsync(
@@ -108,6 +108,14 @@ namespace Fort.ind_UWP
         {
             var token = await MisskeyAuthService.TryGetTokenAsync();
             return await SocialApiService.GetTagNotesAsync(token, tag, untilId, AppConstants.SocialFeedPageSize, cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchSearchNotesAsync(
+            string query, bool localOnly, string fileType, string untilId, CancellationToken cancellationToken)
+        {
+            var token = await MisskeyAuthService.TryGetTokenAsync();
+            return await SocialApiService.SearchNotesAsync(token, query, localOnly, fileType, untilId,
+                                                           AppConstants.SocialFeedPageSize, cancellationToken);
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchUserNotesAsync(

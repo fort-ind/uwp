@@ -65,7 +65,7 @@ namespace Fort.ind_UWP
             try
             {
                 var token = await MisskeyAuthService.TryGetTokenAsync();
-                var result = await SocialApiService.GetTimelineAsync(token, SocialTimeline.Local, null,
+                var result = await SocialApiService.GetTimelineAsync(token, SocialTimeline.Local, null, null,
                                                                      AppConstants.SocialFeedPageSize, cancellationToken);
                 if (result.Status != SocialApiStatus.Ok) return;
 
