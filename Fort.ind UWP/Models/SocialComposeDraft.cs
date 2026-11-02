@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -66,23 +66,23 @@ namespace Fort.ind_UWP
             return true;
         }
 
-        internal JsonObject ToJson()
+        internal JObject ToJson()
         {
-            var obj = new JsonObject();
-            var choices = new JsonArray();
+            var obj = new JObject();
+            var choices = new JArray();
             foreach (var choice in Choices)
             {
-                choices.Add(JsonValue.CreateStringValue(choice ?? ""));
+                choices.Add(new JValue(choice ?? ""));
             }
 
             obj.Add("choices", choices);
-            obj.Add("multiple", JsonValue.CreateBooleanValue(Multiple));
-            obj.Add("expiry", JsonValue.CreateStringValue(Expiry.ToString()));
+            obj.Add("multiple", new JValue(Multiple));
+            obj.Add("expiry", new JValue(Expiry.ToString()));
             SocialJson.Put(obj, "expiresAt", ExpiresAt.HasValue ? ExpiresAt.Value.ToString("o", CultureInfo.InvariantCulture) : null);
             return obj;
         }
 
-        internal static SocialDraftPoll FromJson(JsonObject obj)
+        internal static SocialDraftPoll FromJson(JObject obj)
         {
             if (obj == null) return null;
 
@@ -215,26 +215,26 @@ namespace Fort.ind_UWP
                               .SetEquals(note.VisibleUserIds ?? new string[0]));
         }
 
-        internal JsonObject ToJson()
+        internal JObject ToJson()
         {
-            var obj = new JsonObject();
+            var obj = new JObject();
             SocialJson.Put(obj, "text", Text);
             SocialJson.Put(obj, "cw", ContentWarning);
             SocialJson.Put(obj, "visibility", Visibility);
-            obj.Add("localOnly", JsonValue.CreateBooleanValue(LocalOnly));
+            obj.Add("localOnly", new JValue(LocalOnly));
             SocialJson.Put(obj, "reactionAcceptance", ReactionAcceptance);
             SocialJson.Put(obj, "quoteId", QuoteId);
             SocialJson.Put(obj, "replyId", ReplyId);
             SocialJson.Put(obj, "editId", EditId);
 
-            var recipients = new JsonArray();
+            var recipients = new JArray();
             foreach (var user in Recipients)
             {
                 recipients.Add(user.ToJson());
             }
             obj.Add("recipients", recipients);
 
-            var files = new JsonArray();
+            var files = new JArray();
             foreach (var file in Files)
             {
                 files.Add(file.ToJson());
@@ -245,7 +245,7 @@ namespace Fort.ind_UWP
             return obj;
         }
 
-        internal static SocialComposeDraft FromJson(JsonObject obj)
+        internal static SocialComposeDraft FromJson(JObject obj)
         {
             if (obj == null) return null;
 
@@ -255,7 +255,7 @@ namespace Fort.ind_UWP
             {
                 foreach (var value in users)
                 {
-                    var user = value.ValueType == JsonValueType.Object ? SocialUser.FromJson(value.GetObject()) : null;
+                    var user = value.Type == JTokenType.Object ? SocialUser.FromJson((JObject)value) : null;
                     if (user != null && !string.IsNullOrEmpty(user.Id)) recipients.Add(user);
                 }
             }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -42,7 +42,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        internal static SocialUser FromJson(JsonObject obj)
+        internal static SocialUser FromJson(JObject obj)
         {
             if (obj == null) return null;
 
@@ -62,21 +62,21 @@ namespace Fort.ind_UWP
             };
         }
 
-        internal JsonObject ToJson()
+        internal JObject ToJson()
         {
-            var obj = new JsonObject();
+            var obj = new JObject();
             SocialJson.Put(obj, "id", Id);
             SocialJson.Put(obj, "username", Username);
             SocialJson.Put(obj, "host", Host);
             SocialJson.Put(obj, "name", Name);
             SocialJson.Put(obj, "avatarUrl", AvatarUrl);
             SocialJson.Put(obj, "avatarBlurhash", AvatarBlurhash);
-            obj.Add("isBot", JsonValue.CreateBooleanValue(IsBot));
+            obj.Add("isBot", new JValue(IsBot));
 
-            var emojis = new JsonObject();
+            var emojis = new JObject();
             foreach (var pair in Emojis)
             {
-                emojis.Add(pair.Key, JsonValue.CreateStringValue(pair.Value ?? ""));
+                emojis.Add(pair.Key, new JValue(pair.Value ?? ""));
             }
             obj.Add("emojis", emojis);
             return obj;
@@ -172,12 +172,12 @@ namespace Fort.ind_UWP
             }
         }
 
-        internal static SocialNote FromJson(JsonObject obj)
+        internal static SocialNote FromJson(JObject obj)
         {
             return FromJson(obj, DefaultDepth);
         }
 
-        private static SocialNote FromJson(JsonObject obj, int depth)
+        private static SocialNote FromJson(JObject obj, int depth)
         {
             if (obj == null) return null;
 
@@ -228,21 +228,21 @@ namespace Fort.ind_UWP
             };
         }
 
-        public static SocialNote FromJsonValue(IJsonValue value)
+        public static SocialNote FromJsonValue(JToken value)
         {
-            return value != null && value.ValueType == JsonValueType.Object ? FromJson(value.GetObject()) : null;
+            return value != null && value.Type == JTokenType.Object ? FromJson((JObject)value) : null;
         }
 
-        public static IReadOnlyList<SocialNote> ListFromJson(JsonArray array)
+        public static IReadOnlyList<SocialNote> ListFromJson(JArray array)
         {
             var notes = new List<SocialNote>();
             if (array == null) return notes;
 
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var note = FromJson(value.GetObject());
+                var note = FromJson((JObject)value);
                 if (note != null) notes.Add(note);
             }
 
@@ -274,7 +274,7 @@ namespace Fort.ind_UWP
 
         public string AppBody { get; private set; }
 
-        public static SocialNotification FromJson(JsonObject obj)
+        public static SocialNotification FromJson(JObject obj)
         {
             if (obj == null) return null;
 
@@ -298,16 +298,16 @@ namespace Fort.ind_UWP
             };
         }
 
-        public static IReadOnlyList<SocialNotification> ListFromJson(JsonArray array)
+        public static IReadOnlyList<SocialNotification> ListFromJson(JArray array)
         {
             var notifications = new List<SocialNotification>();
             if (array == null) return notifications;
 
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var notification = FromJson(value.GetObject());
+                var notification = FromJson((JObject)value);
                 if (notification != null) notifications.Add(notification);
             }
 
@@ -327,55 +327,45 @@ namespace Fort.ind_UWP
             get { return s_emptyMap; }
         }
 
-        public static void Put(JsonObject obj, string key, string value)
+        public static void Put(JObject obj, string key, string value)
         {
-            obj.SetNamedValue(key, value == null ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(value));
+            obj[key] = value == null ? JValue.CreateNull() : new JValue(value);
         }
 
-        public static string String(JsonObject obj, string key)
+        public static string String(JObject obj, string key)
         {
-            if (obj == null || !obj.ContainsKey(key)) return null;
-
-            var value = obj.GetNamedValue(key);
-            return value.ValueType == JsonValueType.String ? value.GetString() : null;
+            var value = Token(obj, key);
+            return value != null && value.Type == JTokenType.String ? (string)value : null;
         }
 
-        public static JsonObject Object(JsonObject obj, string key)
+        public static JObject Object(JObject obj, string key)
         {
-            if (obj == null || !obj.ContainsKey(key)) return null;
-
-            var value = obj.GetNamedValue(key);
-            return value.ValueType == JsonValueType.Object ? value.GetObject() : null;
+            var value = Token(obj, key);
+            return value != null && value.Type == JTokenType.Object ? (JObject)value : null;
         }
 
-        public static JsonArray Array(JsonObject obj, string key)
+        public static JArray Array(JObject obj, string key)
         {
-            if (obj == null || !obj.ContainsKey(key)) return null;
-
-            var value = obj.GetNamedValue(key);
-            return value.ValueType == JsonValueType.Array ? value.GetArray() : null;
+            var value = Token(obj, key);
+            return value != null && value.Type == JTokenType.Array ? (JArray)value : null;
         }
 
-        public static int? Int(JsonObject obj, string key)
+        public static int? Int(JObject obj, string key)
         {
-            if (obj == null || !obj.ContainsKey(key)) return null;
+            var value = Token(obj, key);
+            if (!JsonText.IsNumber(value)) return null;
 
-            var value = obj.GetNamedValue(key);
-            if (value.ValueType != JsonValueType.Number) return null;
-
-            var number = value.GetNumber();
+            var number = (double)value;
             if (double.IsNaN(number)) return null;
             if (number >= int.MaxValue) return int.MaxValue;
             if (number <= int.MinValue) return int.MinValue;
             return (int)number;
         }
 
-        public static bool? Bool(JsonObject obj, string key)
+        public static bool? Bool(JObject obj, string key)
         {
-            if (obj == null || !obj.ContainsKey(key)) return null;
-
-            var value = obj.GetNamedValue(key);
-            return value.ValueType == JsonValueType.Boolean ? value.GetBoolean() : (bool?)null;
+            var value = Token(obj, key);
+            return value != null && value.Type == JTokenType.Boolean ? (bool)value : (bool?)null;
         }
 
         public static IReadOnlyList<string> EmptyList
@@ -383,7 +373,7 @@ namespace Fort.ind_UWP
             get { return s_emptyList; }
         }
 
-        public static IReadOnlyList<string> StringList(JsonObject obj, string key)
+        public static IReadOnlyList<string> StringList(JObject obj, string key)
         {
             var array = Array(obj, key);
             if (array == null || array.Count == 0) return s_emptyList;
@@ -391,16 +381,16 @@ namespace Fort.ind_UWP
             var result = new List<string>(array.Count);
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.String) continue;
+                if (value.Type != JTokenType.String) continue;
 
-                var text = value.GetString();
+                var text = (string)value;
                 if (!string.IsNullOrEmpty(text)) result.Add(text);
             }
 
             return result.Count == 0 ? s_emptyList : result;
         }
 
-        public static IReadOnlyDictionary<string, string> StringMap(JsonObject obj, string key)
+        public static IReadOnlyDictionary<string, string> StringMap(JObject obj, string key)
         {
             var map = Object(obj, key);
             if (map == null || map.Count == 0) return s_emptyMap;
@@ -408,9 +398,9 @@ namespace Fort.ind_UWP
             var result = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var pair in map)
             {
-                if (pair.Value.ValueType != JsonValueType.String) continue;
+                if (pair.Value.Type != JTokenType.String) continue;
 
-                var text = pair.Value.GetString();
+                var text = (string)pair.Value;
                 if (!string.IsNullOrEmpty(pair.Key) && !string.IsNullOrEmpty(text))
                 {
                     result[pair.Key] = text;
@@ -420,7 +410,7 @@ namespace Fort.ind_UWP
             return result.Count == 0 ? s_emptyMap : result;
         }
 
-        public static DateTimeOffset Date(JsonObject obj, string key)
+        public static DateTimeOffset Date(JObject obj, string key)
         {
             DateTimeOffset parsed;
             var raw = String(obj, key);
@@ -431,6 +421,12 @@ namespace Fort.ind_UWP
             }
 
             return DateTimeOffset.MinValue;
+        }
+
+        private static JToken Token(JObject obj, string key)
+        {
+            JToken value;
+            return obj != null && obj.TryGetValue(key, out value) ? value : null;
         }
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.Web;
@@ -11,7 +11,7 @@ namespace Fort.ind_UWP
 {
     public sealed class SocialStreamEventArgs : EventArgs
     {
-        public SocialStreamEventArgs(string type, JsonObject body)
+        public SocialStreamEventArgs(string type, JObject body)
         {
             Type = type;
             Body = body;
@@ -19,12 +19,12 @@ namespace Fort.ind_UWP
 
         public string Type { get; }
 
-        public JsonObject Body { get; }
+        public JObject Body { get; }
     }
 
     public sealed class SocialNoteStreamEventArgs : EventArgs
     {
-        public SocialNoteStreamEventArgs(string noteId, string type, JsonObject body)
+        public SocialNoteStreamEventArgs(string noteId, string type, JObject body)
         {
             NoteId = noteId;
             Type = type;
@@ -35,7 +35,7 @@ namespace Fort.ind_UWP
 
         public string Type { get; }
 
-        public JsonObject Body { get; }
+        public JObject Body { get; }
     }
 
     public sealed class SocialStream : IDisposable
@@ -99,9 +99,9 @@ namespace Fort.ind_UWP
 
                 if (_channel != null)
                 {
-                    JsonObject body = new JsonObject();
-                    body.Add("channel", JsonValue.CreateStringValue(_channel));
-                    body.Add("id", JsonValue.CreateStringValue(_channelId));
+                    JObject body = new JObject();
+                    body.Add("channel", new JValue(_channel));
+                    body.Add("id", new JValue(_channelId));
 
                     await WriteAsync(socket, "connect", body, cancellationToken);
                 }
@@ -118,7 +118,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        public async Task<bool> SendAsync(string type, JsonObject body)
+        public async Task<bool> SendAsync(string type, JObject body)
         {
             MessageWebSocket socket;
             lock (_lock)
@@ -141,11 +141,11 @@ namespace Fort.ind_UWP
             }
         }
 
-        private async Task WriteAsync(MessageWebSocket socket, string type, JsonObject body, CancellationToken cancellationToken)
+        private async Task WriteAsync(MessageWebSocket socket, string type, JObject body, CancellationToken cancellationToken)
         {
-            JsonObject message = new JsonObject();
-            message.Add("type", JsonValue.CreateStringValue(type));
-            message.Add("body", body ?? new JsonObject());
+            JObject message = new JObject();
+            message.Add("type", new JValue(type));
+            message.Add("body", body ?? new JObject());
 
             await _sendGate.WaitAsync(cancellationToken);
             try
@@ -153,7 +153,7 @@ namespace Fort.ind_UWP
                 using (var writer = new DataWriter(socket.OutputStream))
                 {
                     writer.UnicodeEncoding = UnicodeEncoding.Utf8;
-                    writer.WriteString(message.Stringify());
+                    writer.WriteString(JsonText.Write(message));
                     await writer.StoreAsync().AsTask(cancellationToken);
                     writer.DetachStream();
                 }
@@ -184,8 +184,8 @@ namespace Fort.ind_UWP
 
             try
             {
-                JsonObject message;
-                if (!JsonObject.TryParse(text, out message)) return;
+                JObject message;
+                if (!JsonText.TryParseObject(text, out message)) return;
 
                 var messageType = SocialJson.String(message, "type");
                 if (string.Equals(messageType, "noteUpdated", StringComparison.Ordinal))

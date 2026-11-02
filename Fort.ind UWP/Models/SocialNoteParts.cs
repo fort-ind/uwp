@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -16,16 +16,16 @@ namespace Fort.ind_UWP
 
         public int Count { get; private set; }
 
-        internal static IReadOnlyList<SocialReactionCount> ListFromJson(JsonObject reactions)
+        internal static IReadOnlyList<SocialReactionCount> ListFromJson(JObject reactions)
         {
             var list = new List<SocialReactionCount>();
             if (reactions == null) return list;
 
             foreach (var pair in reactions)
             {
-                if (pair.Value.ValueType != JsonValueType.Number) continue;
+                if (!JsonText.IsNumber(pair.Value)) continue;
 
-                var number = pair.Value.GetNumber();
+                var number = (double)pair.Value;
                 if (double.IsNaN(number) || number <= 0) continue;
 
                 var key = SocialReactions.Normalize(pair.Key);
@@ -84,16 +84,16 @@ namespace Fort.ind_UWP
 
         public string Type { get; private set; }
 
-        internal static IReadOnlyList<SocialReactionEntry> ListFromJson(JsonArray array)
+        internal static IReadOnlyList<SocialReactionEntry> ListFromJson(JArray array)
         {
             var entries = new List<SocialReactionEntry>();
             if (array == null) return entries;
 
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var obj = value.GetObject();
+                var obj = (JObject)value;
                 var id = SocialJson.String(obj, "id");
                 var user = SocialUser.FromJson(SocialJson.Object(obj, "user"));
                 var type = SocialReactions.Normalize(SocialJson.String(obj, "type"));
@@ -191,7 +191,7 @@ namespace Fort.ind_UWP
             return new SocialPoll(Multiple, ExpiresAt, choices);
         }
 
-        internal static SocialPoll FromJson(JsonObject obj)
+        internal static SocialPoll FromJson(JObject obj)
         {
             if (obj == null) return null;
 
@@ -201,9 +201,9 @@ namespace Fort.ind_UWP
             {
                 foreach (var value in array)
                 {
-                    if (value.ValueType != JsonValueType.Object) continue;
+                    if (value.Type != JTokenType.Object) continue;
 
-                    var choice = value.GetObject();
+                    var choice = (JObject)value;
                     choices.Add(new SocialPollChoice(SocialJson.String(choice, "text") ?? "",
                                                      Math.Max(0, SocialJson.Int(choice, "votes") ?? 0),
                                                      SocialJson.Bool(choice, "isVoted").GetValueOrDefault()));

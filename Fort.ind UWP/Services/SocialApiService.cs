@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Storage.Streams;
 using Windows.Web;
 using Windows.Web.Http;
@@ -153,7 +153,7 @@ namespace Fort.ind_UWP
             return new SocialRelation(UserId, IsMuted, IsRenoteMuted, value);
         }
 
-        internal static SocialRelation FromJson(JsonObject obj)
+        internal static SocialRelation FromJson(JObject obj)
         {
             var id = SocialJson.String(obj, "id");
             if (string.IsNullOrEmpty(id)) return null;
@@ -293,12 +293,12 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNotification>>> GetNotificationsAsync(
             string token, string untilId, int limit, bool markAsRead, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("markAsRead", JsonValue.CreateBooleanValue(markAsRead));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
+            body.Add("markAsRead", new JValue(markAsRead));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var response = await PostAsync("i/notifications", token, body, cancellationToken);
@@ -307,12 +307,12 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialNotification>>.Failed(response.Status);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialNotification>>.Failed(SocialApiStatus.Failed);
             }
 
-            var array = response.Value.GetArray();
+            var array = (JArray)response.Value;
             return SocialApiResult<IReadOnlyList<SocialNotification>>.Succeeded(
                 await Task.Run(() => SocialNotification.ListFromJson(array)));
         }
@@ -320,11 +320,11 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetMentionsAsync(
             string token, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var response = await PostAsync("notes/mentions", token, body, cancellationToken);
@@ -333,60 +333,58 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialNote>>.Failed(response.Status);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialNote>>.Failed(SocialApiStatus.Failed);
             }
 
-            var array = response.Value.GetArray();
+            var array = (JArray)response.Value;
             return SocialApiResult<IReadOnlyList<SocialNote>>.Succeeded(
                 await Task.Run(() => SocialNote.ListFromJson(array)));
         }
 
         public static async Task<SocialApiResult<SocialMe>> GetMeAsync(string token, CancellationToken cancellationToken)
         {
-            var response = await PostAsync("i", token, new JsonObject(), cancellationToken);
+            var response = await PostAsync("i", token, new JObject(), cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<SocialMe>.Failed(response.Status);
             }
 
-            if (response.Value.ValueType != JsonValueType.Object)
+            if (response.Value.Type != JTokenType.Object)
             {
                 return SocialApiResult<SocialMe>.Failed(SocialApiStatus.Failed);
             }
 
-            var me = response.Value.GetObject();
+            var me = (JObject)response.Value;
             var count = ReadUnreadCount(me);
             if (!count.HasValue) return SocialApiResult<SocialMe>.Failed(SocialApiStatus.Failed);
 
             return SocialApiResult<SocialMe>.Succeeded(new SocialMe(count.Value, MisskeyAuthService.ParseCurrentUser(me)));
         }
 
-        public static async Task<SocialApiResult<UserProfile>> UpdateProfileAsync(string token, JsonObject changes, CancellationToken cancellationToken)
+        public static async Task<SocialApiResult<UserProfile>> UpdateProfileAsync(string token, JObject changes, CancellationToken cancellationToken)
         {
-            var response = await PostAsync("i/update", token, changes ?? new JsonObject(), cancellationToken);
+            var response = await PostAsync("i/update", token, changes ?? new JObject(), cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<UserProfile>.Failed(response.Status, response.ErrorCode);
             }
 
-            var profile = response.Value.ValueType == JsonValueType.Object
-                          ? MisskeyAuthService.ParseCurrentUser(response.Value.GetObject())
+            var profile = response.Value.Type == JTokenType.Object
+                          ? MisskeyAuthService.ParseCurrentUser((JObject)response.Value)
                           : null;
             return profile == null
                    ? SocialApiResult<UserProfile>.Failed(SocialApiStatus.Failed)
                    : SocialApiResult<UserProfile>.Succeeded(profile);
         }
 
-        public static int? ReadUnreadCount(JsonObject me)
+        public static int? ReadUnreadCount(JObject me)
         {
-            if (me == null || !me.ContainsKey("unreadNotificationsCount")) return null;
+            JToken value;
+            if (me == null || !me.TryGetValue("unreadNotificationsCount", out value) || !JsonText.IsNumber(value)) return null;
 
-            var value = me.GetNamedValue("unreadNotificationsCount");
-            if (value.ValueType != JsonValueType.Number) return null;
-
-            var number = value.GetNumber();
+            var number = (double)value;
             if (double.IsNaN(number) || number < 0) return null;
 
             return number > int.MaxValue ? int.MaxValue : (int)number;
@@ -395,20 +393,20 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetTimelineAsync(
             string token, SocialTimeline timeline, string sourceId, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             switch (timeline)
             {
                 case SocialTimeline.List:
-                    body.Add("listId", JsonValue.CreateStringValue(sourceId ?? ""));
+                    body.Add("listId", new JValue(sourceId ?? ""));
                     return await NotesFromAsync(await PostAsync("notes/user-list-timeline", token, body, cancellationToken));
                 case SocialTimeline.Antenna:
-                    body.Add("antennaId", JsonValue.CreateStringValue(sourceId ?? ""));
+                    body.Add("antennaId", new JValue(sourceId ?? ""));
                     return await NotesFromAsync(await PostAsync("antennas/notes", token, body, cancellationToken));
                 case SocialTimeline.Following:
                     return await NotesFromAsync(await PostAsync("notes/following", token, body, cancellationToken));
@@ -424,12 +422,12 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetTagNotesAsync(
             string token, string tag, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("tag", JsonValue.CreateStringValue(tag ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("tag", new JValue(tag ?? ""));
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             return await NotesFromAsync(await PostOptionalTokenAsync("notes/search-by-tag", token, body, cancellationToken));
@@ -438,9 +436,9 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialHashtag>>> GetPopularHashtagsAsync(
             int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("sort", JsonValue.CreateStringValue("+mentionedUsers"));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
+            body.Add("sort", new JValue("+mentionedUsers"));
 
             var response = await PostOptionalTokenAsync("hashtags/list", null, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
@@ -448,17 +446,17 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialHashtag>>.Failed(response.Status, response.ErrorCode);
             }
 
-            return response.Value.ValueType == JsonValueType.Array
-                   ? SocialApiResult<IReadOnlyList<SocialHashtag>>.Succeeded(SocialHashtag.ListFromJson(response.Value.GetArray()))
+            return response.Value.Type == JTokenType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialHashtag>>.Succeeded(SocialHashtag.ListFromJson((JArray)response.Value))
                    : SocialApiResult<IReadOnlyList<SocialHashtag>>.Failed(SocialApiStatus.Failed);
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialAnnouncement>>> GetAnnouncementsAsync(
             string token, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("isActive", JsonValue.CreateBooleanValue(true));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
+            body.Add("isActive", new JValue(true));
 
             var response = await PostOptionalTokenAsync("announcements", token, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
@@ -466,16 +464,16 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialAnnouncement>>.Failed(response.Status, response.ErrorCode);
             }
 
-            return response.Value.ValueType == JsonValueType.Array
-                   ? SocialApiResult<IReadOnlyList<SocialAnnouncement>>.Succeeded(SocialAnnouncement.ListFromJson(response.Value.GetArray()))
+            return response.Value.Type == JTokenType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialAnnouncement>>.Succeeded(SocialAnnouncement.ListFromJson((JArray)response.Value))
                    : SocialApiResult<IReadOnlyList<SocialAnnouncement>>.Failed(SocialApiStatus.Failed);
         }
 
         public static async Task<SocialApiResult<bool>> ReadAnnouncementAsync(
             string token, string announcementId, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("announcementId", JsonValue.CreateStringValue(announcementId ?? ""));
+            JObject body = new JObject();
+            body.Add("announcementId", new JValue(announcementId ?? ""));
 
             var response = await PostAsync("i/read-announcement", token, body, cancellationToken);
             return response.Status == SocialApiStatus.Ok
@@ -486,15 +484,15 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetUserNotesAsync(
             string token, string userId, SocialUserNotesTab tab, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("withReplies", JsonValue.CreateBooleanValue(tab == SocialUserNotesTab.Replies));
-            body.Add("withFiles", JsonValue.CreateBooleanValue(tab == SocialUserNotesTab.Media));
-            body.Add("withRenotes", JsonValue.CreateBooleanValue(tab != SocialUserNotesTab.Media));
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
+            body.Add("limit", new JValue(limit));
+            body.Add("withReplies", new JValue(tab == SocialUserNotesTab.Replies));
+            body.Add("withFiles", new JValue(tab == SocialUserNotesTab.Media));
+            body.Add("withRenotes", new JValue(tab != SocialUserNotesTab.Media));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             return await NotesFromAsync(await PostAsync("users/notes", token, body, cancellationToken));
@@ -503,8 +501,8 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<SocialUserDetail>> GetUserAsync(
             string token, string userId, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
 
             return UserFrom(await PostAsync("users/show", token, body, cancellationToken));
         }
@@ -512,9 +510,9 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<SocialUserDetail>> GetUserByHandleAsync(
             string token, string username, string host, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("username", JsonValue.CreateStringValue(username ?? ""));
-            body.Add("host", string.IsNullOrWhiteSpace(host) ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(host));
+            JObject body = new JObject();
+            body.Add("username", new JValue(username ?? ""));
+            body.Add("host", string.IsNullOrWhiteSpace(host) ? JValue.CreateNull() : new JValue(host));
 
             return UserFrom(await PostAsync("users/show", token, body, cancellationToken));
         }
@@ -522,12 +520,12 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialFollowEntry>>> GetFollowListAsync(
             string token, string userId, SocialFollowList list, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var followers = list == SocialFollowList.Followers;
@@ -537,17 +535,17 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(response.Status);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(SocialApiStatus.Failed);
             }
 
             var entries = new List<SocialFollowEntry>();
-            foreach (var value in response.Value.GetArray())
+            foreach (var value in (JArray)response.Value)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var following = value.GetObject();
+                var following = (JObject)value;
                 var id = SocialJson.String(following, "id");
                 var person = SocialJson.Object(following, followers ? "follower" : "followee");
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);
@@ -577,11 +575,11 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialModerationEntry>>> GetModerationListAsync(
             string token, SocialModerationList list, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var endpoint = list == SocialModerationList.Muted ? "mute/list"
@@ -595,17 +593,17 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialModerationEntry>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialModerationEntry>>.Failed(SocialApiStatus.Failed);
             }
 
             var entries = new List<SocialModerationEntry>();
-            foreach (var value in response.Value.GetArray())
+            foreach (var value in (JArray)response.Value)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var record = value.GetObject();
+                var record = (JObject)value;
                 var id = SocialJson.String(record, "id");
                 var person = SocialJson.Object(record, personKey);
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);
@@ -635,11 +633,11 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialFollowEntry>>> GetFollowRequestsAsync(
             string token, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var response = await PostAsync("following/requests/list", token, body, cancellationToken);
@@ -648,17 +646,17 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(SocialApiStatus.Failed);
             }
 
             var entries = new List<SocialFollowEntry>();
-            foreach (var value in response.Value.GetArray())
+            foreach (var value in (JArray)response.Value)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var request = value.GetObject();
+                var request = (JObject)value;
                 var id = SocialJson.String(request, "id");
                 var person = SocialJson.Object(request, "follower");
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);
@@ -672,8 +670,8 @@ namespace Fort.ind_UWP
 
         public static async Task<SocialApiResult<SocialRelation>> GetRelationAsync(string token, string userId, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
 
             var response = await PostAsync("users/relation", token, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
@@ -681,8 +679,8 @@ namespace Fort.ind_UWP
                 return SocialApiResult<SocialRelation>.Failed(response.Status, response.ErrorCode);
             }
 
-            var relation = response.Value.ValueType == JsonValueType.Object
-                           ? SocialRelation.FromJson(response.Value.GetObject())
+            var relation = response.Value.Type == JTokenType.Object
+                           ? SocialRelation.FromJson((JObject)response.Value)
                            : null;
 
             return relation == null
@@ -693,11 +691,11 @@ namespace Fort.ind_UWP
         public static Task<SocialApiResult<bool>> MuteUserAsync(string token, string userId, DateTimeOffset? expiresAt,
                                                                 CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
             body.Add("expiresAt", expiresAt.HasValue
-                                  ? JsonValue.CreateNumberValue(expiresAt.Value.ToUnixTimeMilliseconds())
-                                  : JsonValue.CreateNullValue());
+                                  ? new JValue(expiresAt.Value.ToUnixTimeMilliseconds())
+                                  : JValue.CreateNull());
 
             return ActionAsync("mute/create", token, body, cancellationToken);
         }
@@ -720,8 +718,8 @@ namespace Fort.ind_UWP
         private static async Task<SocialApiResult<bool>> UserActionAsync(string endpoint, string token, string userId,
                                                                         CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
 
             var response = await PostAsync(endpoint, token, body, cancellationToken);
             return response.Status == SocialApiStatus.Ok
@@ -732,13 +730,13 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialCustomEmoji>>> GetEmojisAsync(
             string token, CancellationToken cancellationToken)
         {
-            var response = await PostOptionalTokenAsync("emojis", token, new JsonObject(), cancellationToken);
+            var response = await PostOptionalTokenAsync("emojis", token, new JObject(), cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<IReadOnlyList<SocialCustomEmoji>>.Failed(response.Status);
             }
 
-            var root = response.Value.ValueType == JsonValueType.Object ? response.Value.GetObject() : null;
+            var root = response.Value.Type == JTokenType.Object ? (JObject)response.Value : null;
             var list = SocialJson.Array(root, "emojis");
             if (list == null)
             {
@@ -750,9 +748,9 @@ namespace Fort.ind_UWP
                 var parsed = new List<SocialCustomEmoji>();
                 foreach (var value in list)
                 {
-                    if (value.ValueType != JsonValueType.Object) continue;
+                    if (value.Type != JTokenType.Object) continue;
 
-                    var emoji = SocialCustomEmoji.FromJson(value.GetObject());
+                    var emoji = SocialCustomEmoji.FromJson((JObject)value);
                     if (emoji != null) parsed.Add(emoji);
                 }
 
@@ -764,8 +762,8 @@ namespace Fort.ind_UWP
 
         public static async Task<SocialApiResult<SocialNote>> GetNoteAsync(string token, string noteId, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("noteId", JsonValue.CreateStringValue(noteId ?? ""));
+            JObject body = new JObject();
+            body.Add("noteId", new JValue(noteId ?? ""));
 
             var response = await PostAsync("notes/show", token, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
@@ -782,11 +780,11 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetChildrenAsync(
             string token, string noteId, string sinceId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("noteId", JsonValue.CreateStringValue(noteId ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("showQuotes", JsonValue.CreateBooleanValue(false));
-            body.Add("sinceId", JsonValue.CreateStringValue(string.IsNullOrEmpty(sinceId) ? noteId ?? "" : sinceId));
+            JObject body = new JObject();
+            body.Add("noteId", new JValue(noteId ?? ""));
+            body.Add("limit", new JValue(limit));
+            body.Add("showQuotes", new JValue(false));
+            body.Add("sinceId", new JValue(string.IsNullOrEmpty(sinceId) ? noteId ?? "" : sinceId));
 
             return await NotesFromAsync(await PostAsync("notes/children", token, body, cancellationToken));
         }
@@ -794,9 +792,9 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetConversationAsync(
             string token, string noteId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("noteId", JsonValue.CreateStringValue(noteId ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("noteId", new JValue(noteId ?? ""));
+            body.Add("limit", new JValue(limit));
 
             return await NotesFromAsync(await PostAsync("notes/conversation", token, body, cancellationToken));
         }
@@ -810,16 +808,16 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> GetRenotesAsync(
             string token, string noteId, string userId, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("noteId", JsonValue.CreateStringValue(noteId ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("noteId", new JValue(noteId ?? ""));
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(userId))
             {
-                body.Add("userId", JsonValue.CreateStringValue(userId));
+                body.Add("userId", new JValue(userId));
             }
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             return await NotesFromAsync(await PostAsync("notes/renotes", token, body, cancellationToken));
@@ -827,8 +825,8 @@ namespace Fort.ind_UWP
 
         public static Task<SocialApiResult<bool>> ReactAsync(string token, string noteId, string reaction, CancellationToken cancellationToken)
         {
-            JsonObject body = NoteBody(noteId);
-            body.Add("reaction", JsonValue.CreateStringValue(reaction ?? ""));
+            JObject body = NoteBody(noteId);
+            body.Add("reaction", new JValue(reaction ?? ""));
 
             return ActionAsync("notes/reactions/create", token, body, cancellationToken);
         }
@@ -841,10 +839,10 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<SocialNote>> RenoteAsync(string token, string noteId, string visibility, bool localOnly,
                                                                          CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("renoteId", JsonValue.CreateStringValue(noteId ?? ""));
-            body.Add("visibility", JsonValue.CreateStringValue(visibility ?? "public"));
-            body.Add("localOnly", JsonValue.CreateBooleanValue(localOnly));
+            JObject body = new JObject();
+            body.Add("renoteId", new JValue(noteId ?? ""));
+            body.Add("visibility", new JValue(visibility ?? "public"));
+            body.Add("localOnly", new JValue(localOnly));
 
             var response = await PostAsync("notes/create", token, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
@@ -852,7 +850,7 @@ namespace Fort.ind_UWP
                 return SocialApiResult<SocialNote>.Failed(response.Status, response.ErrorCode);
             }
 
-            var root = response.Value.ValueType == JsonValueType.Object ? response.Value.GetObject() : null;
+            var root = response.Value.Type == JTokenType.Object ? (JObject)response.Value : null;
             var created = SocialNote.FromJson(SocialJson.Object(root, "createdNote"));
             return created == null
                    ? SocialApiResult<SocialNote>.Failed(SocialApiStatus.Failed)
@@ -886,17 +884,17 @@ namespace Fort.ind_UWP
 
         public static Task<SocialApiResult<bool>> VoteAsync(string token, string noteId, int choice, CancellationToken cancellationToken)
         {
-            JsonObject body = NoteBody(noteId);
-            body.Add("choice", JsonValue.CreateNumberValue(choice));
+            JObject body = NoteBody(noteId);
+            body.Add("choice", new JValue(choice));
 
             return ActionAsync("notes/polls/vote", token, body, cancellationToken);
         }
 
         public static Task<SocialApiResult<bool>> ReportAsync(string token, string userId, string comment, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
-            body.Add("comment", JsonValue.CreateStringValue(comment ?? ""));
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
+            body.Add("comment", new JValue(comment ?? ""));
 
             return ActionAsync("users/report-abuse", token, body, cancellationToken);
         }
@@ -909,7 +907,7 @@ namespace Fort.ind_UWP
                 return SocialApiResult<SocialNoteState>.Failed(response.Status, response.ErrorCode);
             }
 
-            var root = response.Value.ValueType == JsonValueType.Object ? response.Value.GetObject() : null;
+            var root = response.Value.Type == JTokenType.Object ? (JObject)response.Value : null;
             if (root == null) return SocialApiResult<SocialNoteState>.Failed(SocialApiStatus.Failed);
 
             return SocialApiResult<SocialNoteState>.Succeeded(
@@ -919,11 +917,11 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialFavoriteEntry>>> GetFavoritesAsync(
             string token, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var response = await PostAsync("i/favorites", token, body, cancellationToken);
@@ -932,17 +930,17 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialFavoriteEntry>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialFavoriteEntry>>.Failed(SocialApiStatus.Failed);
             }
 
             var entries = new List<SocialFavoriteEntry>();
-            foreach (var value in response.Value.GetArray())
+            foreach (var value in (JArray)response.Value)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var favorite = value.GetObject();
+                var favorite = (JObject)value;
                 var id = SocialJson.String(favorite, "id");
                 var note = SocialNote.FromJson(SocialJson.Object(favorite, "note"));
                 if (string.IsNullOrEmpty(id) || note == null) continue;
@@ -953,17 +951,17 @@ namespace Fort.ind_UWP
             return SocialApiResult<IReadOnlyList<SocialFavoriteEntry>>.Succeeded(entries);
         }
 
-        public static Task<SocialApiResult<SocialNote>> CreateNoteAsync(string token, JsonObject body, CancellationToken cancellationToken)
+        public static Task<SocialApiResult<SocialNote>> CreateNoteAsync(string token, JObject body, CancellationToken cancellationToken)
         {
             return CreatedNoteAsync("notes/create", token, body, cancellationToken);
         }
 
-        public static Task<SocialApiResult<SocialNote>> EditNoteAsync(string token, JsonObject body, CancellationToken cancellationToken)
+        public static Task<SocialApiResult<SocialNote>> EditNoteAsync(string token, JObject body, CancellationToken cancellationToken)
         {
             return CreatedNoteAsync("notes/edit", token, body, cancellationToken);
         }
 
-        private static async Task<SocialApiResult<SocialNote>> CreatedNoteAsync(string endpoint, string token, JsonObject body,
+        private static async Task<SocialApiResult<SocialNote>> CreatedNoteAsync(string endpoint, string token, JObject body,
                                                                                CancellationToken cancellationToken)
         {
             var response = await PostAsync(endpoint, token, body, cancellationToken);
@@ -972,7 +970,7 @@ namespace Fort.ind_UWP
                 return SocialApiResult<SocialNote>.Failed(response.Status, response.ErrorCode);
             }
 
-            var root = response.Value.ValueType == JsonValueType.Object ? response.Value.GetObject() : null;
+            var root = response.Value.Type == JTokenType.Object ? (JObject)response.Value : null;
             var created = SocialNote.FromJson(SocialJson.Object(root, "createdNote"));
             return created == null
                    ? SocialApiResult<SocialNote>.Failed(SocialApiStatus.Failed)
@@ -1010,10 +1008,10 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<SocialDriveFile>> UpdateFileAsync(string token, string fileId, string comment, bool isSensitive,
                                                                                   CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("fileId", JsonValue.CreateStringValue(fileId ?? ""));
-            body.Add("comment", string.IsNullOrWhiteSpace(comment) ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(comment));
-            body.Add("isSensitive", JsonValue.CreateBooleanValue(isSensitive));
+            JObject body = new JObject();
+            body.Add("fileId", new JValue(fileId ?? ""));
+            body.Add("comment", string.IsNullOrWhiteSpace(comment) ? JValue.CreateNull() : new JValue(comment));
+            body.Add("isSensitive", new JValue(isSensitive));
 
             return FileFrom(await PostAsync("drive/files/update", token, body, cancellationToken));
         }
@@ -1021,12 +1019,12 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialDriveFile>>> GetDriveFilesAsync(
             string token, string folderId, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("folderId", string.IsNullOrEmpty(folderId) ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(folderId));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
+            body.Add("folderId", string.IsNullOrEmpty(folderId) ? JValue.CreateNull() : new JValue(folderId));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var response = await PostAsync("drive/files", token, body, cancellationToken);
@@ -1035,17 +1033,17 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialDriveFile>>.Failed(response.Status, response.ErrorCode);
             }
 
-            return response.Value.ValueType == JsonValueType.Array
-                   ? SocialApiResult<IReadOnlyList<SocialDriveFile>>.Succeeded(SocialDriveFile.ListFromJson(response.Value.GetArray()))
+            return response.Value.Type == JTokenType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialDriveFile>>.Succeeded(SocialDriveFile.ListFromJson((JArray)response.Value))
                    : SocialApiResult<IReadOnlyList<SocialDriveFile>>.Failed(SocialApiStatus.Failed);
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialDriveFolder>>> GetDriveFoldersAsync(
             string token, string folderId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("folderId", string.IsNullOrEmpty(folderId) ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(folderId));
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
+            body.Add("folderId", string.IsNullOrEmpty(folderId) ? JValue.CreateNull() : new JValue(folderId));
 
             var response = await PostAsync("drive/folders", token, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
@@ -1053,19 +1051,19 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialDriveFolder>>.Failed(response.Status, response.ErrorCode);
             }
 
-            return response.Value.ValueType == JsonValueType.Array
-                   ? SocialApiResult<IReadOnlyList<SocialDriveFolder>>.Succeeded(SocialDriveFolder.ListFromJson(response.Value.GetArray()))
+            return response.Value.Type == JTokenType.Array
+                   ? SocialApiResult<IReadOnlyList<SocialDriveFolder>>.Succeeded(SocialDriveFolder.ListFromJson((JArray)response.Value))
                    : SocialApiResult<IReadOnlyList<SocialDriveFolder>>.Failed(SocialApiStatus.Failed);
         }
 
-        private static SocialApiResult<SocialDriveFile> FileFrom(SocialApiResult<IJsonValue> response)
+        private static SocialApiResult<SocialDriveFile> FileFrom(SocialApiResult<JToken> response)
         {
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<SocialDriveFile>.Failed(response.Status, response.ErrorCode);
             }
 
-            var file = response.Value.ValueType == JsonValueType.Object ? SocialDriveFile.FromJson(response.Value.GetObject()) : null;
+            var file = response.Value.Type == JTokenType.Object ? SocialDriveFile.FromJson((JObject)response.Value) : null;
             return file == null
                    ? SocialApiResult<SocialDriveFile>.Failed(SocialApiStatus.Failed)
                    : SocialApiResult<SocialDriveFile>.Succeeded(file);
@@ -1074,11 +1072,11 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialUser>>> SearchUsersAsync(string token, string username, string host, int limit,
                                                                                              CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("username", JsonValue.CreateStringValue(username ?? ""));
-            body.Add("host", string.IsNullOrWhiteSpace(host) ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(host));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            body.Add("detail", JsonValue.CreateBooleanValue(false));
+            JObject body = new JObject();
+            body.Add("username", new JValue(username ?? ""));
+            body.Add("host", string.IsNullOrWhiteSpace(host) ? JValue.CreateNull() : new JValue(host));
+            body.Add("limit", new JValue(limit));
+            body.Add("detail", new JValue(false));
 
             return UsersFrom(await PostAsync("users/search-by-username-and-host", token, body, cancellationToken));
         }
@@ -1086,34 +1084,34 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialUser>>> GetUsersAsync(string token, IReadOnlyList<string> userIds,
                                                                                           CancellationToken cancellationToken)
         {
-            var ids = new JsonArray();
+            var ids = new JArray();
             foreach (var id in userIds.Where(id => !string.IsNullOrEmpty(id)))
             {
-                ids.Add(JsonValue.CreateStringValue(id));
+                ids.Add(new JValue(id));
             }
 
-            JsonObject body = new JsonObject();
+            JObject body = new JObject();
             body.Add("userIds", ids);
 
             return UsersFrom(await PostAsync("users/show", token, body, cancellationToken));
         }
 
-        private static SocialApiResult<IReadOnlyList<SocialUser>> UsersFrom(SocialApiResult<IJsonValue> response)
+        private static SocialApiResult<IReadOnlyList<SocialUser>> UsersFrom(SocialApiResult<JToken> response)
         {
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<IReadOnlyList<SocialUser>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialUser>>.Failed(SocialApiStatus.Failed);
             }
 
             var users = new List<SocialUser>();
-            foreach (var value in response.Value.GetArray())
+            foreach (var value in (JArray)response.Value)
             {
-                var user = value.ValueType == JsonValueType.Object ? SocialUser.FromJson(value.GetObject()) : null;
+                var user = value.Type == JTokenType.Object ? SocialUser.FromJson((JObject)value) : null;
                 if (user != null) users.Add(user);
             }
 
@@ -1123,9 +1121,9 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<string>>> SearchHashtagsAsync(string token, string query, int limit,
                                                                                             CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("query", JsonValue.CreateStringValue(query ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("query", new JValue(query ?? ""));
+            body.Add("limit", new JValue(limit));
 
             var response = await PostAsync("hashtags/search", token, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
@@ -1133,15 +1131,15 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<string>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<string>>.Failed(SocialApiStatus.Failed);
             }
 
             var tags = new List<string>();
-            foreach (var value in response.Value.GetArray())
+            foreach (var value in (JArray)response.Value)
             {
-                if (value.ValueType == JsonValueType.String && value.GetString().Length > 0) tags.Add(value.GetString());
+                if (value.Type == JTokenType.String && ((string)value).Length > 0) tags.Add((string)value);
             }
 
             return SocialApiResult<IReadOnlyList<string>>.Succeeded(tags);
@@ -1151,25 +1149,25 @@ namespace Fort.ind_UWP
             string token, SocialCollectionKind kind, CancellationToken cancellationToken)
         {
             var endpoint = kind == SocialCollectionKind.List ? "users/lists/list" : "antennas/list";
-            var response = await PostAsync(endpoint, token, new JsonObject(), cancellationToken);
+            var response = await PostAsync(endpoint, token, new JObject(), cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<IReadOnlyList<SocialCollection>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialCollection>>.Failed(SocialApiStatus.Failed);
             }
 
-            return SocialApiResult<IReadOnlyList<SocialCollection>>.Succeeded(SocialCollection.AllFromJson(response.Value.GetArray(), kind));
+            return SocialApiResult<IReadOnlyList<SocialCollection>>.Succeeded(SocialCollection.AllFromJson((JArray)response.Value, kind));
         }
 
         public static async Task<SocialApiResult<SocialCollection>> CreateListAsync(string token, string name,
                                                                                    CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("name", JsonValue.CreateStringValue(name ?? ""));
+            JObject body = new JObject();
+            body.Add("name", new JValue(name ?? ""));
 
             return ListFrom(await PostAsync("users/lists/create", token, body, cancellationToken));
         }
@@ -1177,22 +1175,22 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<SocialCollection>> UpdateListAsync(string token, string listId, string name,
                                                                                    CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
-            body.Add("name", JsonValue.CreateStringValue(name ?? ""));
+            JObject body = new JObject();
+            body.Add("listId", new JValue(listId ?? ""));
+            body.Add("name", new JValue(name ?? ""));
 
             return ListFrom(await PostAsync("users/lists/update", token, body, cancellationToken));
         }
 
-        private static SocialApiResult<SocialCollection> ListFrom(SocialApiResult<IJsonValue> response)
+        private static SocialApiResult<SocialCollection> ListFrom(SocialApiResult<JToken> response)
         {
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<SocialCollection>.Failed(response.Status, response.ErrorCode);
             }
 
-            var list = response.Value.ValueType == JsonValueType.Object
-                       ? SocialCollection.ListFromJson(response.Value.GetObject())
+            var list = response.Value.Type == JTokenType.Object
+                       ? SocialCollection.ListFromJson((JObject)response.Value)
                        : null;
 
             return list == null
@@ -1202,8 +1200,8 @@ namespace Fort.ind_UWP
 
         public static Task<SocialApiResult<bool>> DeleteListAsync(string token, string listId, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
+            JObject body = new JObject();
+            body.Add("listId", new JValue(listId ?? ""));
 
             return ActionAsync("users/lists/delete", token, body, cancellationToken);
         }
@@ -1211,9 +1209,9 @@ namespace Fort.ind_UWP
         public static Task<SocialApiResult<bool>> ChangeListMemberAsync(string token, string listId, string userId, bool add,
                                                                        CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
-            body.Add("userId", JsonValue.CreateStringValue(userId ?? ""));
+            JObject body = new JObject();
+            body.Add("listId", new JValue(listId ?? ""));
+            body.Add("userId", new JValue(userId ?? ""));
 
             return ActionAsync(add ? "users/lists/push" : "users/lists/pull", token, body, cancellationToken);
         }
@@ -1221,12 +1219,12 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialFollowEntry>>> GetListMembersAsync(
             string token, string listId, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("listId", JsonValue.CreateStringValue(listId ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("listId", new JValue(listId ?? ""));
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var response = await PostAsync("users/lists/get-memberships", token, body, cancellationToken);
@@ -1235,17 +1233,17 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialFollowEntry>>.Failed(SocialApiStatus.Failed);
             }
 
             var entries = new List<SocialFollowEntry>();
-            foreach (var value in response.Value.GetArray())
+            foreach (var value in (JArray)response.Value)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var membership = value.GetObject();
+                var membership = (JObject)value;
                 var id = SocialJson.String(membership, "id");
                 var person = SocialJson.Object(membership, "user");
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);
@@ -1260,27 +1258,27 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> SearchNotesAsync(
             string token, string query, bool localOnly, string fileType, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("query", JsonValue.CreateStringValue(query ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
-            if (localOnly) body.Add("host", JsonValue.CreateStringValue("."));
-            if (!string.IsNullOrEmpty(fileType)) body.Add("filetype", JsonValue.CreateStringValue(fileType));
+            JObject body = new JObject();
+            body.Add("query", new JValue(query ?? ""));
+            body.Add("limit", new JValue(limit));
+            if (localOnly) body.Add("host", new JValue("."));
+            if (!string.IsNullOrEmpty(fileType)) body.Add("filetype", new JValue(fileType));
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             return await NotesFromAsync(await PostOptionalTokenAsync("notes/search", token, body, cancellationToken));
         }
 
-        private static JsonObject NoteBody(string noteId)
+        private static JObject NoteBody(string noteId)
         {
-            JsonObject body = new JsonObject();
-            body.Add("noteId", JsonValue.CreateStringValue(noteId ?? ""));
+            JObject body = new JObject();
+            body.Add("noteId", new JValue(noteId ?? ""));
             return body;
         }
 
-        private static async Task<SocialApiResult<bool>> ActionAsync(string endpoint, string token, JsonObject body,
+        private static async Task<SocialApiResult<bool>> ActionAsync(string endpoint, string token, JObject body,
                                                                     CancellationToken cancellationToken)
         {
             var response = await PostAsync(endpoint, token, body, cancellationToken);
@@ -1292,16 +1290,16 @@ namespace Fort.ind_UWP
         public static async Task<SocialApiResult<IReadOnlyList<SocialReactionEntry>>> GetReactionsAsync(
             string token, string noteId, string type, string untilId, int limit, CancellationToken cancellationToken)
         {
-            JsonObject body = new JsonObject();
-            body.Add("noteId", JsonValue.CreateStringValue(noteId ?? ""));
-            body.Add("limit", JsonValue.CreateNumberValue(limit));
+            JObject body = new JObject();
+            body.Add("noteId", new JValue(noteId ?? ""));
+            body.Add("limit", new JValue(limit));
             if (!string.IsNullOrEmpty(type))
             {
-                body.Add("type", JsonValue.CreateStringValue(type));
+                body.Add("type", new JValue(type));
             }
             if (!string.IsNullOrEmpty(untilId))
             {
-                body.Add("untilId", JsonValue.CreateStringValue(untilId));
+                body.Add("untilId", new JValue(untilId));
             }
 
             var response = await PostAsync("notes/reactions", token, body, cancellationToken);
@@ -1310,12 +1308,12 @@ namespace Fort.ind_UWP
                 return SocialApiResult<IReadOnlyList<SocialReactionEntry>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialReactionEntry>>.Failed(SocialApiStatus.Failed);
             }
 
-            var array = response.Value.GetArray();
+            var array = (JArray)response.Value;
             return SocialApiResult<IReadOnlyList<SocialReactionEntry>>.Succeeded(
                 await Task.Run(() => SocialReactionEntry.ListFromJson(array)));
         }
@@ -1335,8 +1333,8 @@ namespace Fort.ind_UWP
                 return SocialApiResult<SocialLinkPreview>.Failed(response.Status);
             }
 
-            var preview = response.Value.ValueType == JsonValueType.Object
-                          ? SocialLinkPreview.FromJson(response.Value.GetObject(), url)
+            var preview = response.Value.Type == JTokenType.Object
+                          ? SocialLinkPreview.FromJson((JObject)response.Value, url)
                           : null;
 
             return preview == null
@@ -1344,31 +1342,31 @@ namespace Fort.ind_UWP
                    : SocialApiResult<SocialLinkPreview>.Succeeded(preview);
         }
 
-        private static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> NotesFromAsync(SocialApiResult<IJsonValue> response)
+        private static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> NotesFromAsync(SocialApiResult<JToken> response)
         {
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<IReadOnlyList<SocialNote>>.Failed(response.Status, response.ErrorCode);
             }
 
-            if (response.Value.ValueType != JsonValueType.Array)
+            if (response.Value.Type != JTokenType.Array)
             {
                 return SocialApiResult<IReadOnlyList<SocialNote>>.Failed(SocialApiStatus.Failed);
             }
 
-            var array = response.Value.GetArray();
+            var array = (JArray)response.Value;
             return SocialApiResult<IReadOnlyList<SocialNote>>.Succeeded(await Task.Run(() => SocialNote.ListFromJson(array)));
         }
 
-        private static SocialApiResult<SocialUserDetail> UserFrom(SocialApiResult<IJsonValue> response)
+        private static SocialApiResult<SocialUserDetail> UserFrom(SocialApiResult<JToken> response)
         {
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<SocialUserDetail>.Failed(response.Status);
             }
 
-            var detail = response.Value.ValueType == JsonValueType.Object
-                         ? SocialUserDetail.FromJson(response.Value.GetObject())
+            var detail = response.Value.Type == JTokenType.Object
+                         ? SocialUserDetail.FromJson((JObject)response.Value)
                          : null;
 
             return detail == null
@@ -1376,30 +1374,30 @@ namespace Fort.ind_UWP
                    : SocialApiResult<SocialUserDetail>.Succeeded(detail);
         }
 
-        private static Task<SocialApiResult<IJsonValue>> PostAsync(string endpoint, string token, JsonObject body,
+        private static Task<SocialApiResult<JToken>> PostAsync(string endpoint, string token, JObject body,
                                                                   CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                return Task.FromResult(SocialApiResult<IJsonValue>.Failed(SocialApiStatus.TokenRejected));
+                return Task.FromResult(SocialApiResult<JToken>.Failed(SocialApiStatus.TokenRejected));
             }
 
-            body.SetNamedValue("i", JsonValue.CreateStringValue(token));
+            body["i"] = new JValue(token);
             Uri uri = new Uri($"https://{MisskeyAuthService.InstanceHost}/api/{endpoint}");
 
-            return SendAsync(endpoint, uri, body.Stringify(), cancellationToken);
+            return SendAsync(endpoint, uri, JsonText.Write(body), cancellationToken);
         }
 
-        private static Task<SocialApiResult<IJsonValue>> PostOptionalTokenAsync(string endpoint, string token, JsonObject body,
+        private static Task<SocialApiResult<JToken>> PostOptionalTokenAsync(string endpoint, string token, JObject body,
                                                                                CancellationToken cancellationToken)
         {
             if (!string.IsNullOrWhiteSpace(token)) return PostAsync(endpoint, token, body, cancellationToken);
 
             Uri uri = new Uri($"https://{MisskeyAuthService.InstanceHost}/api/{endpoint}");
-            return SendAsync(endpoint, uri, body.Stringify(), cancellationToken);
+            return SendAsync(endpoint, uri, JsonText.Write(body), cancellationToken);
         }
 
-        private static Task<SocialApiResult<IJsonValue>> SendAsync(string endpoint, Uri uri, string jsonBody,
+        private static Task<SocialApiResult<JToken>> SendAsync(string endpoint, Uri uri, string jsonBody,
                                                                   CancellationToken cancellationToken)
         {
             Func<IHttpContent> content = null;
@@ -1411,14 +1409,14 @@ namespace Fort.ind_UWP
             return SendContentAsync(endpoint, uri, content, RequestTimeout, null, cancellationToken);
         }
 
-        private static async Task<SocialApiResult<IJsonValue>> SendContentAsync(string endpoint, Uri uri, Func<IHttpContent> contentFactory,
+        private static async Task<SocialApiResult<JToken>> SendContentAsync(string endpoint, Uri uri, Func<IHttpContent> contentFactory,
                                                                                TimeSpan deadline, IProgress<HttpProgress> progress,
                                                                                CancellationToken cancellationToken)
         {
             if (IsHeldOff(endpoint))
             {
                 AppLog.Warning($"SocialApiService: {endpoint} not sent; fort.social asked to wait");
-                return SocialApiResult<IJsonValue>.Failed(SocialApiStatus.RateLimited, RateLimitCode);
+                return SocialApiResult<JToken>.Failed(SocialApiStatus.RateLimited, RateLimitCode);
             }
 
             using (var timeout = new CancellationTokenSource(deadline))
@@ -1442,26 +1440,26 @@ namespace Fort.ind_UWP
                             if (status == SocialApiStatus.RateLimited) HoldOff(endpoint, RetryDelay(response));
 
                             AppLog.Warning($"SocialApiService: {endpoint} answered {(int)response.StatusCode} {errorCode} ({status})");
-                            return SocialApiResult<IJsonValue>.Failed(status, errorCode);
+                            return SocialApiResult<JToken>.Failed(status, errorCode);
                         }
 
                         if (string.IsNullOrWhiteSpace(text))
                         {
-                            return SocialApiResult<IJsonValue>.Succeeded(JsonValue.CreateNullValue());
+                            return SocialApiResult<JToken>.Succeeded(JValue.CreateNull());
                         }
 
                         var parsed = await Task.Run(() =>
                         {
-                            JsonValue value;
-                            return JsonValue.TryParse(text, out value) ? value : null;
+                            JToken value;
+                            return JsonText.TryParse(text, out value) ? value : null;
                         });
                         if (parsed == null)
                         {
                             AppLog.Warning($"SocialApiService: {endpoint} returned something that is not JSON");
-                            return SocialApiResult<IJsonValue>.Failed(SocialApiStatus.Failed);
+                            return SocialApiResult<JToken>.Failed(SocialApiStatus.Failed);
                         }
 
-                        return SocialApiResult<IJsonValue>.Succeeded(parsed);
+                        return SocialApiResult<JToken>.Succeeded(parsed);
                     }
                 }
                 catch (Exception ex)
@@ -1472,7 +1470,7 @@ namespace Fort.ind_UWP
                                  ? SocialApiStatus.Unreachable
                                  : SocialApiStatus.Failed;
                     AppLog.Error($"SocialApiService: {endpoint} failed ({status})", ex);
-                    return SocialApiResult<IJsonValue>.Failed(status);
+                    return SocialApiResult<JToken>.Failed(status);
                 }
             }
         }
@@ -1536,8 +1534,8 @@ namespace Fort.ind_UWP
 
         private static string ReadErrorCode(string body)
         {
-            JsonObject parsed;
-            if (string.IsNullOrEmpty(body) || !JsonObject.TryParse(body, out parsed)) return null;
+            JObject parsed;
+            if (string.IsNullOrEmpty(body) || !JsonText.TryParseObject(body, out parsed)) return null;
 
             return SocialJson.String(SocialJson.Object(parsed, "error"), "code");
         }

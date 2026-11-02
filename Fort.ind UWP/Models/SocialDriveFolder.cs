@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -20,7 +20,7 @@ namespace Fort.ind_UWP
             get { return LocalizedStrings.Format("SocialDriveFolderAutomationFormat", Name); }
         }
 
-        internal static SocialDriveFolder FromJson(JsonObject obj)
+        internal static SocialDriveFolder FromJson(JObject obj)
         {
             if (obj == null) return null;
 
@@ -34,16 +34,16 @@ namespace Fort.ind_UWP
             };
         }
 
-        internal static IReadOnlyList<SocialDriveFolder> ListFromJson(JsonArray array)
+        internal static IReadOnlyList<SocialDriveFolder> ListFromJson(JArray array)
         {
             if (array == null || array.Count == 0) return s_none;
 
             var folders = new List<SocialDriveFolder>();
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var folder = FromJson(value.GetObject());
+                var folder = FromJson((JObject)value);
                 if (folder != null) folders.Add(folder);
             }
 

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.UI.Xaml;
 
 namespace Fort.ind_UWP
@@ -77,7 +77,7 @@ namespace Fort.ind_UWP
             IsPublic = isPublic;
         }
 
-        public static SocialCollection ListFromJson(JsonObject obj)
+        public static SocialCollection ListFromJson(JObject obj)
         {
             var id = SocialJson.String(obj, "id");
             var name = SocialJson.String(obj, "name");
@@ -90,7 +90,7 @@ namespace Fort.ind_UWP
             };
         }
 
-        public static SocialCollection AntennaFromJson(JsonObject obj)
+        public static SocialCollection AntennaFromJson(JObject obj)
         {
             var id = SocialJson.String(obj, "id");
             var name = SocialJson.String(obj, "name");
@@ -102,16 +102,16 @@ namespace Fort.ind_UWP
             };
         }
 
-        public static IReadOnlyList<SocialCollection> AllFromJson(JsonArray array, SocialCollectionKind kind)
+        public static IReadOnlyList<SocialCollection> AllFromJson(JArray array, SocialCollectionKind kind)
         {
             var collections = new List<SocialCollection>(array.Count);
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
                 var collection = kind == SocialCollectionKind.List
-                                 ? ListFromJson(value.GetObject())
-                                 : AntennaFromJson(value.GetObject());
+                                 ? ListFromJson((JObject)value)
+                                 : AntennaFromJson((JObject)value);
                 if (collection != null) collections.Add(collection);
             }
 

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -23,7 +23,7 @@ namespace Fort.ind_UWP
 
         public bool IsSensitive { get; private set; }
 
-        internal static SocialCustomEmoji FromJson(JsonObject obj)
+        internal static SocialCustomEmoji FromJson(JObject obj)
         {
             var name = SocialJson.String(obj, "name");
             var url = SocialJson.String(obj, "url");

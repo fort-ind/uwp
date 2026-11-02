@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -48,7 +48,7 @@ namespace Fort.ind_UWP
             get { return Kind == SocialDriveFileKind.Image || Kind == SocialDriveFileKind.Gif || Kind == SocialDriveFileKind.Video; }
         }
 
-        internal static SocialDriveFile FromJson(JsonObject obj)
+        internal static SocialDriveFile FromJson(JObject obj)
         {
             if (obj == null) return null;
 
@@ -75,35 +75,35 @@ namespace Fort.ind_UWP
             };
         }
 
-        internal JsonObject ToJson()
+        internal JObject ToJson()
         {
-            var obj = new JsonObject();
+            var obj = new JObject();
             SocialJson.Put(obj, "id", Id);
             SocialJson.Put(obj, "type", Type);
             SocialJson.Put(obj, "name", Name);
-            obj.Add("isSensitive", JsonValue.CreateBooleanValue(IsSensitive));
+            obj.Add("isSensitive", new JValue(IsSensitive));
             SocialJson.Put(obj, "blurhash", Blurhash);
             SocialJson.Put(obj, "url", Url);
             SocialJson.Put(obj, "thumbnailUrl", ThumbnailUrl);
             SocialJson.Put(obj, "comment", Comment);
 
-            var properties = new JsonObject();
-            if (Width.HasValue) properties.Add("width", JsonValue.CreateNumberValue(Width.Value));
-            if (Height.HasValue) properties.Add("height", JsonValue.CreateNumberValue(Height.Value));
+            var properties = new JObject();
+            if (Width.HasValue) properties.Add("width", new JValue(Width.Value));
+            if (Height.HasValue) properties.Add("height", new JValue(Height.Value));
             obj.Add("properties", properties);
             return obj;
         }
 
-        internal static IReadOnlyList<SocialDriveFile> ListFromJson(JsonArray array)
+        internal static IReadOnlyList<SocialDriveFile> ListFromJson(JArray array)
         {
             if (array == null || array.Count == 0) return s_none;
 
             var files = new List<SocialDriveFile>();
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var file = FromJson(value.GetObject());
+                var file = FromJson((JObject)value);
                 if (file != null) files.Add(file);
             }
 

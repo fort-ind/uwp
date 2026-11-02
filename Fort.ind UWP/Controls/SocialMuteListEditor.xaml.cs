@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Controls;
@@ -109,7 +109,7 @@ namespace Fort.ind_UWP
             {
                 if (_busy) return;
 
-                IJsonValue value;
+                JToken value;
                 string canonical;
                 if (!TryBuild(out value, out canonical)) return;
 
@@ -145,7 +145,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private bool TryBuild(out IJsonValue value, out string canonical)
+        private bool TryBuild(out JToken value, out string canonical)
         {
             value = null;
             canonical = null;
@@ -173,10 +173,10 @@ namespace Fort.ind_UWP
                 return false;
             }
 
-            var array = new JsonArray();
+            var array = new JArray();
             foreach (var host in hosts)
             {
-                array.Add(JsonValue.CreateStringValue(host));
+                array.Add(new JValue(host));
             }
 
             value = array;

@@ -239,6 +239,7 @@
     <Compile Include="Helpers\ColorHelper.cs" />
     <Compile Include="Helpers\CountText.cs" />
     <Compile Include="Helpers\Debouncer.cs" />
+    <Compile Include="Helpers\JsonText.cs" />
     <Compile Include="Helpers\LocalizedStrings.cs" />
     <Compile Include="Helpers\MfmInlineBuilder.cs" />
     <Compile Include="Helpers\MfmText.cs" />

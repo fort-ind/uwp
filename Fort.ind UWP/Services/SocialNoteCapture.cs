@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -166,8 +166,8 @@ namespace Fort.ind_UWP
             {
                 foreach (var id in ids)
                 {
-                    JsonObject body = new JsonObject();
-                    body.Add("id", JsonValue.CreateStringValue(id));
+                    JObject body = new JObject();
+                    body.Add("id", new JValue(id));
                     if (!await stream.SendAsync(type, body)) return;
                 }
             }

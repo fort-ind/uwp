@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Windows.Data.Json;
 using Windows.Storage;
 
 namespace Fort.ind_UWP
@@ -52,8 +50,8 @@ namespace Fort.ind_UWP
                 if (!s_drafts.TryGetValue(account, out drafts) || !drafts.TryGetValue(slot, out text)) return null;
             }
 
-            JsonObject parsed;
-            return JsonObject.TryParse(text, out parsed) ? SocialComposeDraft.FromJson(parsed) : null;
+            JObject parsed;
+            return JsonText.TryParseObject(text, out parsed) ? SocialComposeDraft.FromJson(parsed) : null;
         }
 
         public static void Save(string account, string slot, SocialComposeDraft draft)
@@ -66,7 +64,7 @@ namespace Fort.ind_UWP
                 return;
             }
 
-            var text = draft.ToJson().Stringify();
+            var text = JsonText.Write(draft.ToJson());
             lock (s_lock)
             {
                 Dictionary<string, string> drafts;
@@ -202,7 +200,7 @@ namespace Fort.ind_UWP
                 if (file != null)
                 {
                     var text = await FileIO.ReadTextAsync(file);
-                    var loaded = ParseStore(ParseFile(text));
+                    var loaded = ParseStore(JsonText.ParseObject(text));
                     lock (s_lock)
                     {
                         foreach (var pair in s_drafts)
@@ -232,14 +230,6 @@ namespace Fort.ind_UWP
             return new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
         }
 
-        private static JObject ParseFile(string text)
-        {
-            using (var reader = new JsonTextReader(new StringReader(text)) { DateParseHandling = DateParseHandling.None })
-            {
-                return JObject.Load(reader);
-            }
-        }
-
         private static Dictionary<string, Dictionary<string, string>> ParseStore(JObject root)
         {
             var store = NewStore();
@@ -248,7 +238,7 @@ namespace Fort.ind_UWP
                 var slots = new Dictionary<string, string>(StringComparer.Ordinal);
                 foreach (var slot in ((JObject)account.Value).Properties().Where(pair => pair.Value.Type == JTokenType.Object))
                 {
-                    slots[slot.Name] = slot.Value.ToString(Formatting.None);
+                    slots[slot.Name] = JsonText.Write(slot.Value);
                 }
 
                 if (slots.Count > 0) store[account.Name] = slots;

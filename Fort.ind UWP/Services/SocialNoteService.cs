@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -166,7 +166,7 @@ namespace Fort.ind_UWP
             return string.IsNullOrEmpty(noteId) ? null : new SocialNoteChange(SocialNoteChangeKind.PinChanged, noteId) { Flag = pinned };
         }
 
-        public static SocialNoteChange FromStream(string noteId, string type, JsonObject body)
+        public static SocialNoteChange FromStream(string noteId, string type, JObject body)
         {
             if (string.IsNullOrEmpty(noteId) || string.IsNullOrEmpty(type)) return null;
 

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Security.Credentials;
 using Windows.UI.ViewManagement;
 using Windows.Web.Http;
@@ -313,20 +313,20 @@ namespace Fort.ind_UWP
                         response.EnsureSuccessStatusCode();
 
                         var body = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
-                        var json = JsonObject.Parse(body);
+                        var json = JsonText.ParseObject(body);
 
-                        if (!json.GetNamedBoolean("ok", false))
+                        if (!SocialJson.Bool(json, "ok").GetValueOrDefault())
                         {
                             return MisskeyAuthResult.Failed("SignInErrorNotApproved");
                         }
 
-                        var token = json.GetNamedString("token", "");
+                        var token = SocialJson.String(json, "token") ?? "";
                         if (string.IsNullOrWhiteSpace(token))
                         {
                             return MisskeyAuthResult.Failed("SignInErrorNoToken");
                         }
 
-                        var profile = ParseUser(GetNamedObjectOrNull(json, "user"), false);
+                        var profile = ParseUser(SocialJson.Object(json, "user"), false);
                         if (profile == null)
                         {
                             return MisskeyAuthResult.Failed("SignInErrorNoAccount");
@@ -351,10 +351,10 @@ namespace Fort.ind_UWP
             try
             {
                 Uri uri = new Uri($"https://{InstanceHost}/api/i");
-                JsonObject bodyJson = new JsonObject();
-                bodyJson.Add("i", JsonValue.CreateStringValue(token));
+                JObject bodyJson = new JObject();
+                bodyJson.Add("i", new JValue(token));
 
-                using (HttpStringContent content = new HttpStringContent(bodyJson.Stringify(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"))
+                using (HttpStringContent content = new HttpStringContent(JsonText.Write(bodyJson), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"))
                 using (var cts = new CancellationTokenSource(RequestTimeout))
                 {
                     using (var response = await s_client.Value.PostAsync(uri, content).AsTask(cts.Token))
@@ -373,7 +373,7 @@ namespace Fort.ind_UWP
                         }
 
                         var body = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
-                        var me = JsonObject.Parse(body);
+                        var me = JsonText.ParseObject(body);
                         var profile = ParseUser(me, true);
                         return profile != null
                                ? MisskeyUserFetchResult.Succeeded(profile, SocialApiService.ReadUnreadCount(me))
@@ -388,12 +388,12 @@ namespace Fort.ind_UWP
             }
         }
 
-        public static UserProfile ParseCurrentUser(JsonObject me)
+        public static UserProfile ParseCurrentUser(JObject me)
         {
             return ParseUser(me, true);
         }
 
-        private static UserProfile ParseUser(JsonObject obj, bool viewerIsSelf)
+        private static UserProfile ParseUser(JObject obj, bool viewerIsSelf)
         {
             if (obj == null) return null;
 
@@ -426,35 +426,24 @@ namespace Fort.ind_UWP
             return profile;
         }
 
-        private static string JsonString(JsonObject obj, string key)
+        private static string JsonString(JObject obj, string key)
         {
-            if (obj == null || !obj.ContainsKey(key)) return null;
-            var v = obj.GetNamedValue(key);
-            if (v.ValueType != JsonValueType.String) return null;
-            return v.GetString();
+            return SocialJson.String(obj, key);
         }
 
-        private static int? JsonVisibleCount(JsonObject obj, string countKey, string visibilityKey, bool viewerIsSelf)
+        private static int? JsonVisibleCount(JObject obj, string countKey, string visibilityKey, bool viewerIsSelf)
         {
             if (!viewerIsSelf && !string.Equals(JsonString(obj, visibilityKey), "public", StringComparison.Ordinal))
             {
                 return null;
             }
 
-            if (obj == null || !obj.ContainsKey(countKey)) return null;
-            var v = obj.GetNamedValue(countKey);
-            if (v.ValueType != JsonValueType.Number) return null;
+            JToken v;
+            if (obj == null || !obj.TryGetValue(countKey, out v) || !JsonText.IsNumber(v)) return null;
 
-            var number = v.GetNumber();
+            var number = (double)v;
             if (double.IsNaN(number) || number < 0 || number > int.MaxValue) return null;
             return (int)number;
-        }
-
-        private static JsonObject GetNamedObjectOrNull(JsonObject obj, string key)
-        {
-            if (obj == null || !obj.ContainsKey(key)) return null;
-            if (obj.GetNamedValue(key).ValueType != JsonValueType.Object) return null;
-            return obj.GetNamedObject(key);
         }
 
         #region Token Storage

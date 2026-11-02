@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.UI.Xaml;
 
 namespace Fort.ind_UWP
@@ -136,58 +136,58 @@ namespace Fort.ind_UWP
             return prefix + typed;
         }
 
-        public static JsonObject BuildReplyBody(SocialNote parent, SocialReplyDefaults defaults, string text)
+        public static JObject BuildReplyBody(SocialNote parent, SocialReplyDefaults defaults, string text)
         {
             var draft = SocialComposeDraft.Create(text, null, defaults.Visibility, defaults.LocalOnly, null, null, null, null,
                                                   null, parent.Id, null);
             var body = BuildBody(draft);
             if (draft.Visibility == DirectVisibility)
             {
-                var ids = new JsonArray();
+                var ids = new JArray();
                 foreach (var id in defaults.RecipientIds)
                 {
-                    ids.Add(JsonValue.CreateStringValue(id));
+                    ids.Add(new JValue(id));
                 }
-                body.SetNamedValue("visibleUserIds", ids);
+                body["visibleUserIds"] = ids;
             }
 
             return body;
         }
 
-        public static JsonObject BuildBody(SocialComposeDraft draft)
+        public static JObject BuildBody(SocialComposeDraft draft)
         {
-            var body = new JsonObject();
+            var body = new JObject();
             var text = NormalizeText(draft.Text);
-            body.Add("text", text.Trim().Length == 0 ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(text));
-            body.Add("cw", draft.HasContentWarning ? JsonValue.CreateStringValue(NormalizeText(draft.ContentWarning)) : JsonValue.CreateNullValue());
-            body.Add("visibility", JsonValue.CreateStringValue(draft.Visibility));
+            body.Add("text", text.Trim().Length == 0 ? JValue.CreateNull() : new JValue(text));
+            body.Add("cw", draft.HasContentWarning ? new JValue(NormalizeText(draft.ContentWarning)) : JValue.CreateNull());
+            body.Add("visibility", new JValue(draft.Visibility));
 
             var direct = draft.Visibility == DirectVisibility;
-            body.Add("localOnly", JsonValue.CreateBooleanValue(draft.LocalOnly && !direct));
+            body.Add("localOnly", new JValue(draft.LocalOnly && !direct));
             body.Add("reactionAcceptance", draft.ReactionAcceptance == null
-                                           ? JsonValue.CreateNullValue()
-                                           : JsonValue.CreateStringValue(draft.ReactionAcceptance));
+                                           ? JValue.CreateNull()
+                                           : new JValue(draft.ReactionAcceptance));
 
             if (direct)
             {
-                var ids = new JsonArray();
+                var ids = new JArray();
                 foreach (var user in draft.Recipients)
                 {
-                    ids.Add(JsonValue.CreateStringValue(user.Id));
+                    ids.Add(new JValue(user.Id));
                 }
                 body.Add("visibleUserIds", ids);
             }
 
-            if (draft.ReplyId != null) body.Add("replyId", JsonValue.CreateStringValue(draft.ReplyId));
-            if (draft.QuoteId != null) body.Add("renoteId", JsonValue.CreateStringValue(draft.QuoteId));
-            if (draft.EditId != null) body.Add("editId", JsonValue.CreateStringValue(draft.EditId));
+            if (draft.ReplyId != null) body.Add("replyId", new JValue(draft.ReplyId));
+            if (draft.QuoteId != null) body.Add("renoteId", new JValue(draft.QuoteId));
+            if (draft.EditId != null) body.Add("editId", new JValue(draft.EditId));
 
             if (draft.Files.Count > 0)
             {
-                var files = new JsonArray();
+                var files = new JArray();
                 foreach (var file in draft.Files)
                 {
-                    files.Add(JsonValue.CreateStringValue(file.Id));
+                    files.Add(new JValue(file.Id));
                 }
                 body.Add("fileIds", files);
             }
@@ -198,35 +198,35 @@ namespace Fort.ind_UWP
             return body;
         }
 
-        private static JsonObject PollBody(SocialDraftPoll poll)
+        private static JObject PollBody(SocialDraftPoll poll)
         {
             if (poll == null || poll.FilledChoices < 2) return null;
 
-            var choices = new JsonArray();
+            var choices = new JArray();
             foreach (var choice in poll.Choices.Where(choice => !string.IsNullOrWhiteSpace(choice)))
             {
-                choices.Add(JsonValue.CreateStringValue(choice.Trim()));
+                choices.Add(new JValue(choice.Trim()));
             }
 
-            var body = new JsonObject();
+            var body = new JObject();
             body.Add("choices", choices);
-            body.Add("multiple", JsonValue.CreateBooleanValue(poll.Multiple));
+            body.Add("multiple", new JValue(poll.Multiple));
 
             var duration = SocialDraftPoll.DurationOf(poll.Expiry);
             if (poll.Expiry == SocialPollExpiry.Custom && poll.ExpiresAt.HasValue)
             {
-                body.Add("expiresAt", JsonValue.CreateNumberValue(poll.ExpiresAt.Value.ToUnixTimeMilliseconds()));
-                body.Add("expiredAfter", JsonValue.CreateNullValue());
+                body.Add("expiresAt", new JValue(poll.ExpiresAt.Value.ToUnixTimeMilliseconds()));
+                body.Add("expiredAfter", JValue.CreateNull());
             }
             else if (duration.HasValue)
             {
-                body.Add("expiresAt", JsonValue.CreateNullValue());
-                body.Add("expiredAfter", JsonValue.CreateNumberValue(duration.Value.TotalMilliseconds));
+                body.Add("expiresAt", JValue.CreateNull());
+                body.Add("expiredAfter", new JValue((long)duration.Value.TotalMilliseconds));
             }
             else
             {
-                body.Add("expiresAt", JsonValue.CreateNullValue());
-                body.Add("expiredAfter", JsonValue.CreateNullValue());
+                body.Add("expiresAt", JValue.CreateNull());
+                body.Add("expiredAfter", JValue.CreateNull());
             }
 
             return body;

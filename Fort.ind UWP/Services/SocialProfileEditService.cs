@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.Web.Http;
@@ -115,15 +115,15 @@ namespace Fort.ind_UWP
             {
                 token = await MisskeyAuthService.TryGetTokenAsync();
 
-                var body = new JsonObject();
+                var body = new JObject();
                 if (edit.NameChanged) body.Add("name", OptionalText(edit.Name));
                 if (edit.BioChanged) body.Add("description", OptionalText(edit.Bio));
                 if (edit.LocationChanged) body.Add("location", OptionalText(edit.Location));
                 if (edit.BirthdayChanged)
                 {
                     body.Add("birthday", string.IsNullOrEmpty(edit.Birthday)
-                                             ? JsonValue.CreateNullValue()
-                                             : (IJsonValue)JsonValue.CreateStringValue(edit.Birthday));
+                                             ? JValue.CreateNull()
+                                             : new JValue(edit.Birthday));
                 }
                 if (edit.FieldsChanged) body.Add("fields", FieldsJson(edit.Fields));
 
@@ -134,7 +134,7 @@ namespace Fort.ind_UWP
                 {
                     var avatar = await UploadAsync(token, edit.Avatar, done, total, progress);
                     if (avatar.Status != SocialApiStatus.Ok) return await ReportAsync(owner, avatar.Status, avatar.ErrorCode, SocialPermissions.WriteDrive);
-                    body.Add("avatarId", JsonValue.CreateStringValue(avatar.Value.Id));
+                    body.Add("avatarId", new JValue(avatar.Value.Id));
                     done += edit.Avatar.Size;
                 }
 
@@ -142,7 +142,7 @@ namespace Fort.ind_UWP
                 {
                     var banner = await UploadAsync(token, edit.Banner, done, total, progress);
                     if (banner.Status != SocialApiStatus.Ok) return await ReportAsync(owner, banner.Status, banner.ErrorCode, SocialPermissions.WriteDrive);
-                    body.Add("bannerId", JsonValue.CreateStringValue(banner.Value.Id));
+                    body.Add("bannerId", new JValue(banner.Value.Id));
                 }
 
                 if (progress != null && hasImages) progress.Report(1);
@@ -162,15 +162,15 @@ namespace Fort.ind_UWP
 
         public static Task<bool> SetFlagAsync(UIElement owner, string field, bool value)
         {
-            return SetSettingAsync(owner, field, JsonValue.CreateBooleanValue(value));
+            return SetSettingAsync(owner, field, new JValue(value));
         }
 
         public static Task<bool> SetChoiceAsync(UIElement owner, string field, string value)
         {
-            return SetSettingAsync(owner, field, JsonValue.CreateStringValue(value));
+            return SetSettingAsync(owner, field, new JValue(value));
         }
 
-        public static Task<bool> SetValueAsync(UIElement owner, string field, IJsonValue value)
+        public static Task<bool> SetValueAsync(UIElement owner, string field, JToken value)
         {
             return SetSettingAsync(owner, field, value);
         }
@@ -178,10 +178,10 @@ namespace Fort.ind_UWP
         public static Task<bool> SetTextAsync(UIElement owner, string field, string text)
         {
             var normalized = SocialPostService.NormalizeText(text).Trim();
-            return SetSettingAsync(owner, field, normalized.Length == 0 ? JsonValue.CreateNullValue() : (IJsonValue)JsonValue.CreateStringValue(normalized));
+            return SetSettingAsync(owner, field, normalized.Length == 0 ? JValue.CreateNull() : new JValue(normalized));
         }
 
-        private static async Task<bool> SetSettingAsync(UIElement owner, string field, IJsonValue value)
+        private static async Task<bool> SetSettingAsync(UIElement owner, string field, JToken value)
         {
             if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteAccount, SocialSignInPrompt.Profile)) return false;
 
@@ -190,7 +190,7 @@ namespace Fort.ind_UWP
             try
             {
                 token = await MisskeyAuthService.TryGetTokenAsync();
-                var body = new JsonObject();
+                var body = new JObject();
                 body.Add(field, value);
                 result = await SocialApiService.UpdateProfileAsync(token, body, CancellationToken.None);
             }
@@ -259,26 +259,26 @@ namespace Fort.ind_UWP
             return cleaned;
         }
 
-        private static JsonArray FieldsJson(IReadOnlyList<SocialUserField> fields)
+        private static JArray FieldsJson(IReadOnlyList<SocialUserField> fields)
         {
-            var array = new JsonArray();
+            var array = new JArray();
             foreach (var field in CleanFields(fields))
             {
                 if (field.Name.Length == 0 || field.Value.Length == 0) continue;
 
-                var entry = new JsonObject();
-                entry.Add("name", JsonValue.CreateStringValue(field.Name));
-                entry.Add("value", JsonValue.CreateStringValue(field.Value));
+                var entry = new JObject();
+                entry.Add("name", new JValue(field.Name));
+                entry.Add("value", new JValue(field.Value));
                 array.Add(entry);
             }
 
             return array;
         }
 
-        private static IJsonValue OptionalText(string text)
+        private static JValue OptionalText(string text)
         {
             var normalized = SocialPostService.NormalizeText(text).Trim();
-            return normalized.Length == 0 ? JsonValue.CreateNullValue() : JsonValue.CreateStringValue(normalized);
+            return normalized.Length == 0 ? JValue.CreateNull() : new JValue(normalized);
         }
 
         private static async Task<SocialApiResult<SocialDriveFile>> UploadAsync(string token, SocialProfileImage image, double done, double total,

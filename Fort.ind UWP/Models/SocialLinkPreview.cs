@@ -1,4 +1,4 @@
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -20,7 +20,7 @@ namespace Fort.ind_UWP
 
         public bool IsSensitive { get; private set; }
 
-        internal static SocialLinkPreview FromJson(JsonObject obj, string requestedUrl)
+        internal static SocialLinkPreview FromJson(JObject obj, string requestedUrl)
         {
             if (obj == null) return null;
 

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -65,10 +65,10 @@ namespace Fort.ind_UWP
         {
             if (profile == null || string.IsNullOrWhiteSpace(profile.UserId)) return null;
 
-            JsonObject obj;
-            if (string.IsNullOrEmpty(profile.DetailJson) || !JsonObject.TryParse(profile.DetailJson, out obj))
+            JObject obj;
+            if (string.IsNullOrEmpty(profile.DetailJson) || !JsonText.TryParseObject(profile.DetailJson, out obj))
             {
-                obj = new JsonObject();
+                obj = new JObject();
             }
 
             var config = SocialJson.Object(obj, NotificationConfigField);
@@ -89,7 +89,7 @@ namespace Fort.ind_UWP
                 CarefulBot = SocialJson.Bool(obj, CarefulBotField).GetValueOrDefault(),
                 NotesFollowersOnlyBefore = SocialJson.Int(obj, NotesFollowersOnlyBeforeField),
                 NotesHiddenBefore = SocialJson.Int(obj, NotesHiddenBeforeField),
-                NotificationConfigJson = config == null ? null : config.Stringify()
+                NotificationConfigJson = config == null ? null : JsonText.Write(config)
             };
         }
 
@@ -110,24 +110,24 @@ namespace Fort.ind_UWP
 
         public string NotificationRule(string notificationType)
         {
-            JsonObject config;
-            if (string.IsNullOrEmpty(NotificationConfigJson) || !JsonObject.TryParse(NotificationConfigJson, out config)) return SocialNotificationRules.All;
+            JObject config;
+            if (string.IsNullOrEmpty(NotificationConfigJson) || !JsonText.TryParseObject(NotificationConfigJson, out config)) return SocialNotificationRules.All;
 
             var rule = SocialJson.Object(config, notificationType);
             return SocialJson.String(rule, "type") ?? SocialNotificationRules.All;
         }
 
-        public JsonObject NotificationConfigWith(string notificationType, string rule)
+        public JObject NotificationConfigWith(string notificationType, string rule)
         {
-            JsonObject config;
-            if (string.IsNullOrEmpty(NotificationConfigJson) || !JsonObject.TryParse(NotificationConfigJson, out config))
+            JObject config;
+            if (string.IsNullOrEmpty(NotificationConfigJson) || !JsonText.TryParseObject(NotificationConfigJson, out config))
             {
-                config = new JsonObject();
+                config = new JObject();
             }
 
-            var entry = new JsonObject();
-            entry.SetNamedValue("type", JsonValue.CreateStringValue(rule));
-            config.SetNamedValue(notificationType, entry);
+            var entry = new JObject();
+            entry["type"] = new JValue(rule);
+            config[notificationType] = entry;
             return config;
         }
     }

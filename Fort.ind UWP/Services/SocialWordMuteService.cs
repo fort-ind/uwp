@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -105,8 +105,8 @@ namespace Fort.ind_UWP
             if (ReferenceEquals(snapshot.Source, source) || string.Equals(snapshot.Source, source, StringComparison.Ordinal)) return snapshot;
 
             var built = new Snapshot { Source = source };
-            JsonObject obj;
-            if (!string.IsNullOrEmpty(source) && JsonObject.TryParse(source, out obj))
+            JObject obj;
+            if (!string.IsNullOrEmpty(source) && JsonText.TryParseObject(source, out obj))
             {
                 built.Soft = SocialMuteWordSet.FromJson(SocialJson.Array(obj, SocialAccountSettings.MutedWordsField));
                 built.Hard = SocialMuteWordSet.FromJson(SocialJson.Array(obj, SocialAccountSettings.HardMutedWordsField));

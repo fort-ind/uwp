@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -38,26 +38,26 @@ namespace Fort.ind_UWP
             get { return _rules.Count; }
         }
 
-        public static SocialMuteWordSet FromJson(JsonArray array)
+        public static SocialMuteWordSet FromJson(JArray array)
         {
             if (array == null || array.Count == 0) return Empty;
 
             var rules = new List<Rule>();
             foreach (var entry in array)
             {
-                if (entry.ValueType == JsonValueType.Array)
+                if (entry.Type == JTokenType.Array)
                 {
                     var words = new List<string>();
-                    foreach (var word in entry.GetArray())
+                    foreach (var word in (JArray)entry)
                     {
-                        if (word.ValueType == JsonValueType.String && word.GetString().Length > 0) words.Add(word.GetString());
+                        if (word.Type == JTokenType.String && ((string)word).Length > 0) words.Add((string)word);
                     }
 
                     if (words.Count > 0) rules.Add(new Rule { Keywords = words.ToArray() });
                 }
-                else if (entry.ValueType == JsonValueType.String)
+                else if (entry.Type == JTokenType.String)
                 {
-                    var rule = RegexRule(entry.GetString());
+                    var rule = RegexRule((string)entry);
                     if (rule != null) rules.Add(rule);
                 }
             }
@@ -95,21 +95,21 @@ namespace Fort.ind_UWP
             return rules.Count == 0 ? Empty : new SocialMuteWordSet(rules);
         }
 
-        public JsonArray ToJson()
+        public JArray ToJson()
         {
-            var array = new JsonArray();
+            var array = new JArray();
             foreach (var rule in _rules)
             {
                 if (rule.Pattern != null)
                 {
-                    array.Add(JsonValue.CreateStringValue(rule.Source));
+                    array.Add(new JValue(rule.Source));
                     continue;
                 }
 
-                var words = new JsonArray();
+                var words = new JArray();
                 foreach (var word in rule.Keywords)
                 {
-                    words.Add(JsonValue.CreateStringValue(word));
+                    words.Add(new JValue(word));
                 }
 
                 array.Add(words);

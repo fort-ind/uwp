@@ -1,5 +1,5 @@
 using System;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -44,10 +44,10 @@ namespace Fort.ind_UWP
         {
             if (profile == null || string.IsNullOrWhiteSpace(profile.UserId)) return null;
 
-            JsonObject obj;
-            if (string.IsNullOrEmpty(profile.DetailJson) || !JsonObject.TryParse(profile.DetailJson, out obj))
+            JObject obj;
+            if (string.IsNullOrEmpty(profile.DetailJson) || !JsonText.TryParseObject(profile.DetailJson, out obj))
             {
-                obj = new JsonObject();
+                obj = new JObject();
             }
 
             return new SocialPrivacySettings

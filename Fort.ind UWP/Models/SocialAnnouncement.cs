@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -22,7 +22,7 @@ namespace Fort.ind_UWP
 
         public DateTimeOffset CreatedAt { get; private set; }
 
-        public static SocialAnnouncement FromJson(JsonObject obj)
+        public static SocialAnnouncement FromJson(JObject obj)
         {
             var id = SocialJson.String(obj, "id");
             if (string.IsNullOrEmpty(id)) return null;
@@ -42,14 +42,14 @@ namespace Fort.ind_UWP
             };
         }
 
-        public static IReadOnlyList<SocialAnnouncement> ListFromJson(JsonArray array)
+        public static IReadOnlyList<SocialAnnouncement> ListFromJson(JArray array)
         {
             var announcements = new List<SocialAnnouncement>(array.Count);
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var announcement = FromJson(value.GetObject());
+                var announcement = FromJson((JObject)value);
                 if (announcement != null) announcements.Add(announcement);
             }
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -33,7 +33,7 @@ namespace Fort.ind_UWP
             get { return LocalizedStrings.Format("SocialHashtagAutomationFormat", Label, CountText); }
         }
 
-        public static SocialHashtag FromJson(JsonObject obj)
+        public static SocialHashtag FromJson(JObject obj)
         {
             var tag = SocialJson.String(obj, "tag");
             if (string.IsNullOrWhiteSpace(tag)) return null;
@@ -45,14 +45,14 @@ namespace Fort.ind_UWP
             };
         }
 
-        public static IReadOnlyList<SocialHashtag> ListFromJson(JsonArray array)
+        public static IReadOnlyList<SocialHashtag> ListFromJson(JArray array)
         {
             var tags = new List<SocialHashtag>(array.Count);
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var tag = FromJson(value.GetObject());
+                var tag = FromJson((JObject)value);
                 if (tag != null && tag.MentionedUsers > 0) tags.Add(tag);
             }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -311,7 +311,7 @@ namespace Fort.ind_UWP
                 _privacyBusy.Add(combo);
                 combo.IsEnabled = false;
 
-                var value = tag == NoneTag ? JsonValue.CreateNullValue() : (IJsonValue)JsonValue.CreateStringValue(tag);
+                var value = tag == NoneTag ? JValue.CreateNull() : (JToken)new JValue(tag);
                 var applied = await SocialProfileEditService.SetValueAsync(this, SocialAccountSettings.LangField, value);
                 if (!applied)
                 {
@@ -352,9 +352,9 @@ namespace Fort.ind_UWP
                 _privacyBusy.Add(combo);
                 combo.IsEnabled = false;
 
-                IJsonValue value = tag == NoneTag
-                                   ? JsonValue.CreateNullValue()
-                                   : JsonValue.CreateNumberValue(int.Parse(tag, CultureInfo.InvariantCulture));
+                JToken value = tag == NoneTag
+                                   ? JValue.CreateNull()
+                                   : new JValue(int.Parse(tag, CultureInfo.InvariantCulture));
                 var applied = await SocialProfileEditService.SetValueAsync(this, field, value);
                 if (!applied)
                 {

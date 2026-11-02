@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
@@ -125,7 +125,7 @@ namespace Fort.ind_UWP
             return false;
         }
 
-        internal static SocialUserDetail FromJson(JsonObject obj)
+        internal static SocialUserDetail FromJson(JObject obj)
         {
             var user = SocialUser.FromJson(obj);
             if (user == null || string.IsNullOrWhiteSpace(user.Id)) return null;
@@ -158,35 +158,35 @@ namespace Fort.ind_UWP
             };
         }
 
-        internal static string ToCacheJson(JsonObject obj)
+        internal static string ToCacheJson(JObject obj)
         {
             if (obj == null) return null;
 
-            var subset = new JsonObject();
+            var subset = new JObject();
             foreach (var key in CachedKeys)
             {
-                IJsonValue value;
-                if (obj.TryGetValue(key, out value) && value != null && value.ValueType != JsonValueType.Null)
+                JToken value;
+                if (obj.TryGetValue(key, out value) && value != null && value.Type != JTokenType.Null)
                 {
-                    subset.SetNamedValue(key, value);
+                    subset[key] = value.DeepClone();
                 }
             }
 
-            return subset.Stringify();
+            return JsonText.Write(subset);
         }
 
         public static SocialUserDetail FromProfile(UserProfile profile)
         {
             if (profile == null || string.IsNullOrWhiteSpace(profile.UserId)) return null;
 
-            JsonObject cached;
-            if (!string.IsNullOrEmpty(profile.DetailJson) && JsonObject.TryParse(profile.DetailJson, out cached))
+            JObject cached;
+            if (!string.IsNullOrEmpty(profile.DetailJson) && JsonText.TryParseObject(profile.DetailJson, out cached))
             {
                 var detail = FromJson(cached);
                 if (detail != null && string.Equals(detail.User.Id, profile.UserId, StringComparison.Ordinal)) return detail;
             }
 
-            var obj = new JsonObject();
+            var obj = new JObject();
             PutString(obj, "id", profile.UserId);
             PutString(obj, "username", profile.Username);
             PutString(obj, "host", profile.Host);
@@ -196,8 +196,8 @@ namespace Fort.ind_UWP
             PutString(obj, "bannerUrl", profile.BannerUrl);
             PutString(obj, "bannerBlurhash", profile.BannerBlurhash);
 
-            if (profile.FollowingCount.HasValue) obj.SetNamedValue("followingCount", JsonValue.CreateNumberValue(profile.FollowingCount.Value));
-            if (profile.FollowersCount.HasValue) obj.SetNamedValue("followersCount", JsonValue.CreateNumberValue(profile.FollowersCount.Value));
+            if (profile.FollowingCount.HasValue) obj["followingCount"] = new JValue(profile.FollowingCount.Value);
+            if (profile.FollowersCount.HasValue) obj["followersCount"] = new JValue(profile.FollowersCount.Value);
 
             if (profile.CreatedDate > DateTime.MinValue)
             {
@@ -207,21 +207,21 @@ namespace Fort.ind_UWP
             return FromJson(obj);
         }
 
-        private static void PutString(JsonObject obj, string key, string value)
+        private static void PutString(JObject obj, string key, string value)
         {
-            if (!string.IsNullOrEmpty(value)) obj.SetNamedValue(key, JsonValue.CreateStringValue(value));
+            if (!string.IsNullOrEmpty(value)) obj[key] = new JValue(value);
         }
 
-        private static IReadOnlyList<SocialRole> RolesFromJson(JsonArray array)
+        private static IReadOnlyList<SocialRole> RolesFromJson(JArray array)
         {
             var roles = new List<SocialRole>();
             if (array == null) return roles;
 
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var role = value.GetObject();
+                var role = (JObject)value;
                 var name = SocialJson.String(role, "name");
                 if (string.IsNullOrWhiteSpace(name)) continue;
 
@@ -234,16 +234,16 @@ namespace Fort.ind_UWP
             return roles;
         }
 
-        private static IReadOnlyList<SocialUserField> FieldsFromJson(JsonArray array)
+        private static IReadOnlyList<SocialUserField> FieldsFromJson(JArray array)
         {
             var fields = new List<SocialUserField>();
             if (array == null) return fields;
 
             foreach (var value in array)
             {
-                if (value.ValueType != JsonValueType.Object) continue;
+                if (value.Type != JTokenType.Object) continue;
 
-                var field = value.GetObject();
+                var field = (JObject)value;
                 var name = SocialJson.String(field, "name");
                 var text = SocialJson.String(field, "value");
                 if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(text)) continue;

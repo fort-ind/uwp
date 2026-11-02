@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Data.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 
@@ -152,8 +152,8 @@ namespace Fort.ind_UWP
 
                     var body = await response.Content.ReadAsStringAsync().AsTask(cts.Token);
 
-                    JsonObject release;
-                    if (!JsonObject.TryParse(body, out release)) return null;
+                    JObject release;
+                    if (!JsonText.TryParseObject(body, out release)) return null;
 
                     if (JsonBoolean(release, "draft") || JsonBoolean(release, "prerelease")) return null;
 
@@ -167,18 +167,18 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static Version ReleaseVersion(JsonObject release)
+        private static Version ReleaseVersion(JObject release)
         {
             Version fromAssets = null;
 
-            IJsonValue assets;
-            if (release.TryGetValue("assets", out assets) && assets.ValueType == JsonValueType.Array)
+            JToken assets;
+            if (release.TryGetValue("assets", out assets) && assets.Type == JTokenType.Array)
             {
-                foreach (var asset in assets.GetArray())
+                foreach (var asset in (JArray)assets)
                 {
-                    if (asset.ValueType != JsonValueType.Object) continue;
+                    if (asset.Type != JTokenType.Object) continue;
 
-                    var version = TryParsePackageVersion(JsonString(asset.GetObject(), "name"));
+                    var version = TryParsePackageVersion(JsonString((JObject)asset, "name"));
                     if (version != null && (fromAssets == null || version > fromAssets))
                     {
                         fromAssets = version;
@@ -262,18 +262,18 @@ namespace Fort.ind_UWP
             return !string.IsNullOrEmpty(raw) && Version.TryParse(raw, out parsed) ? parsed : null;
         }
 
-        private static string JsonString(JsonObject obj, string key)
+        private static string JsonString(JObject obj, string key)
         {
-            IJsonValue value;
-            if (obj == null || !obj.TryGetValue(key, out value) || value.ValueType != JsonValueType.String) return null;
-            return value.GetString();
+            JToken value;
+            if (obj == null || !obj.TryGetValue(key, out value) || value.Type != JTokenType.String) return null;
+            return (string)value;
         }
 
-        private static bool JsonBoolean(JsonObject obj, string key)
+        private static bool JsonBoolean(JObject obj, string key)
         {
-            IJsonValue value;
-            if (obj == null || !obj.TryGetValue(key, out value) || value.ValueType != JsonValueType.Boolean) return false;
-            return value.GetBoolean();
+            JToken value;
+            if (obj == null || !obj.TryGetValue(key, out value) || value.Type != JTokenType.Boolean) return false;
+            return (bool)value;
         }
     }
 
