@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Windows.Data.Json;
 using Windows.Storage;
 
@@ -199,7 +202,7 @@ namespace Fort.ind_UWP
                 if (file != null)
                 {
                     var text = await FileIO.ReadTextAsync(file);
-                    var loaded = ParseStore(JsonObject.Parse(text));
+                    var loaded = ParseStore(ParseFile(text));
                     lock (s_lock)
                     {
                         foreach (var pair in s_drafts)
@@ -229,18 +232,26 @@ namespace Fort.ind_UWP
             return new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
         }
 
-        private static Dictionary<string, Dictionary<string, string>> ParseStore(JsonObject root)
+        private static JObject ParseFile(string text)
+        {
+            using (var reader = new JsonTextReader(new StringReader(text)) { DateParseHandling = DateParseHandling.None })
+            {
+                return JObject.Load(reader);
+            }
+        }
+
+        private static Dictionary<string, Dictionary<string, string>> ParseStore(JObject root)
         {
             var store = NewStore();
-            foreach (var account in root.Where(pair => pair.Value != null && pair.Value.ValueType == JsonValueType.Object))
+            foreach (var account in root.Properties().Where(pair => pair.Value.Type == JTokenType.Object))
             {
                 var slots = new Dictionary<string, string>(StringComparer.Ordinal);
-                foreach (var slot in account.Value.GetObject().Where(pair => pair.Value != null && pair.Value.ValueType == JsonValueType.Object))
+                foreach (var slot in ((JObject)account.Value).Properties().Where(pair => pair.Value.Type == JTokenType.Object))
                 {
-                    slots[slot.Key] = slot.Value.Stringify();
+                    slots[slot.Name] = slot.Value.ToString(Formatting.None);
                 }
 
-                if (slots.Count > 0) store[account.Key] = slots;
+                if (slots.Count > 0) store[account.Name] = slots;
             }
 
             return store;
@@ -255,13 +266,13 @@ namespace Fort.ind_UWP
                 if (!firstAccount) builder.Append(',');
                 firstAccount = false;
 
-                builder.Append(JsonValue.CreateStringValue(account.Key).Stringify()).Append(":{");
+                builder.Append(JsonConvert.ToString(account.Key)).Append(":{");
                 var firstSlot = true;
                 foreach (var slot in account.Value)
                 {
                     if (!firstSlot) builder.Append(',');
                     firstSlot = false;
-                    builder.Append(JsonValue.CreateStringValue(slot.Key).Stringify()).Append(':').Append(slot.Value);
+                    builder.Append(JsonConvert.ToString(slot.Key)).Append(':').Append(slot.Value);
                 }
                 builder.Append('}');
             }
