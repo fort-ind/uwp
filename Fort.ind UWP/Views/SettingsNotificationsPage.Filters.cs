@@ -71,15 +71,15 @@ namespace Fort.ind_UWP
         {
             if (_filterCombos.Count > 0) return;
 
-            foreach (var type in SocialNotificationRules.Types)
+            var combos = SocialNotificationRules.Types.Select(type => new ComboBox
             {
-                var combo = new ComboBox
-                {
-                    Header = LocalizedStrings.Get("SocialNotificationFilterType_" + type),
-                    Tag = type,
-                    MinWidth = 200,
-                    Margin = new Thickness(0, 14, 0, 0)
-                };
+                Header = LocalizedStrings.Get("SocialNotificationFilterType_" + type),
+                Tag = type,
+                MinWidth = 200,
+                Margin = new Thickness(0, 14, 0, 0)
+            });
+            foreach (var combo in combos)
+            {
                 AutomationProperties.SetName(combo, combo.Header as string);
                 combo.SelectionChanged += FilterCombo_SelectionChanged;
                 _filterCombos.Add(combo);

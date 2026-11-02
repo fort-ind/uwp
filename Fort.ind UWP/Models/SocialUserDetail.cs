@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
@@ -217,11 +218,8 @@ namespace Fort.ind_UWP
             var roles = new List<SocialRole>();
             if (array == null) return roles;
 
-            foreach (var value in array)
+            foreach (var role in array.OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var role = (JObject)value;
                 var name = SocialJson.String(role, "name");
                 if (string.IsNullOrWhiteSpace(name)) continue;
 
@@ -239,11 +237,8 @@ namespace Fort.ind_UWP
             var fields = new List<SocialUserField>();
             if (array == null) return fields;
 
-            foreach (var value in array)
+            foreach (var field in array.OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var field = (JObject)value;
                 var name = SocialJson.String(field, "name");
                 var text = SocialJson.String(field, "value");
                 if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(text)) continue;

@@ -104,7 +104,7 @@ namespace Fort.ind_UWP
         private static string ResolveWebCacheFolder()
         {
             var packageDataRoot = Path.GetDirectoryName(ApplicationData.Current.LocalFolder.Path);
-            return Path.Combine(packageDataRoot, LocalStorageService.PackageWebCacheFolderName, WebCacheFolderName);
+            return PathJoin.Of(packageDataRoot, LocalStorageService.PackageWebCacheFolderName, WebCacheFolderName);
         }
 
         private static string[] ResolveFolders()
@@ -113,8 +113,8 @@ namespace Fort.ind_UWP
             return new[]
             {
                 ResolveWebCacheFolder(),
-                Path.Combine(local, AvatarIconService.ToastFolderName),
-                Path.Combine(local, AvatarIconService.TileFolderName)
+                PathJoin.Of(local, AvatarIconService.ToastFolderName),
+                PathJoin.Of(local, AvatarIconService.TileFolderName)
             };
         }
 

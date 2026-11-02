@@ -541,11 +541,8 @@ namespace Fort.ind_UWP
             }
 
             var entries = new List<SocialFollowEntry>();
-            foreach (var value in (JArray)response.Value)
+            foreach (var following in ((JArray)response.Value).OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var following = (JObject)value;
                 var id = SocialJson.String(following, "id");
                 var person = SocialJson.Object(following, followers ? "follower" : "followee");
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);
@@ -599,11 +596,8 @@ namespace Fort.ind_UWP
             }
 
             var entries = new List<SocialModerationEntry>();
-            foreach (var value in (JArray)response.Value)
+            foreach (var record in ((JArray)response.Value).OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var record = (JObject)value;
                 var id = SocialJson.String(record, "id");
                 var person = SocialJson.Object(record, personKey);
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);
@@ -652,11 +646,8 @@ namespace Fort.ind_UWP
             }
 
             var entries = new List<SocialFollowEntry>();
-            foreach (var value in (JArray)response.Value)
+            foreach (var request in ((JArray)response.Value).OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var request = (JObject)value;
                 var id = SocialJson.String(request, "id");
                 var person = SocialJson.Object(request, "follower");
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);
@@ -746,13 +737,7 @@ namespace Fort.ind_UWP
             var emojis = await Task.Run(() =>
             {
                 var parsed = new List<SocialCustomEmoji>();
-                foreach (var value in list)
-                {
-                    if (value.Type != JTokenType.Object) continue;
-
-                    var emoji = SocialCustomEmoji.FromJson((JObject)value);
-                    if (emoji != null) parsed.Add(emoji);
-                }
+                parsed.AddRange(list.OfType<JObject>().Select(value => SocialCustomEmoji.FromJson(value)).Where(emoji => emoji != null));
 
                 return parsed;
             });
@@ -936,11 +921,8 @@ namespace Fort.ind_UWP
             }
 
             var entries = new List<SocialFavoriteEntry>();
-            foreach (var value in (JArray)response.Value)
+            foreach (var favorite in ((JArray)response.Value).OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var favorite = (JObject)value;
                 var id = SocialJson.String(favorite, "id");
                 var note = SocialNote.FromJson(SocialJson.Object(favorite, "note"));
                 if (string.IsNullOrEmpty(id) || note == null) continue;
@@ -1137,10 +1119,8 @@ namespace Fort.ind_UWP
             }
 
             var tags = new List<string>();
-            foreach (var value in (JArray)response.Value)
-            {
-                if (value.Type == JTokenType.String && ((string)value).Length > 0) tags.Add((string)value);
-            }
+            tags.AddRange(((JArray)response.Value).Where(node => node.Type == JTokenType.String && ((string)node).Length > 0)
+                                                  .Select(node => (string)node));
 
             return SocialApiResult<IReadOnlyList<string>>.Succeeded(tags);
         }
@@ -1239,11 +1219,8 @@ namespace Fort.ind_UWP
             }
 
             var entries = new List<SocialFollowEntry>();
-            foreach (var value in (JArray)response.Value)
+            foreach (var membership in ((JArray)response.Value).OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var membership = (JObject)value;
                 var id = SocialJson.String(membership, "id");
                 var person = SocialJson.Object(membership, "user");
                 var detail = person == null ? null : SocialUserDetail.FromJson(person);

@@ -50,15 +50,14 @@ namespace Fort.ind_UWP
         {
             var me = SocialContentService.CurrentAccountId();
             List<string> matched = null;
-            foreach (var candidate in new[] { note, note.Reply, note.Renote })
+            var found = new[] { note, note.Reply, note.Renote }
+                .Where(item => item != null && (me == null || !string.Equals(item.UserId, me, StringComparison.Ordinal)))
+                .Select(candidate => set.Match(TextOf(candidate)))
+                .Where(words => words != null);
+            foreach (var hit in found)
             {
-                if (candidate == null || (me != null && string.Equals(candidate.UserId, me, StringComparison.Ordinal))) continue;
-
-                var found = set.Match(TextOf(candidate));
-                if (found == null) continue;
-
                 if (matched == null) matched = new List<string>();
-                matched.AddRange(found.Where(word => !matched.Contains(word)));
+                matched.AddRange(hit.Where(word => !matched.Contains(word)));
             }
 
             return matched;

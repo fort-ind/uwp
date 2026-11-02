@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -262,10 +263,8 @@ namespace Fort.ind_UWP
         private static JArray FieldsJson(IReadOnlyList<SocialUserField> fields)
         {
             var array = new JArray();
-            foreach (var field in CleanFields(fields))
+            foreach (var field in CleanFields(fields).Where(candidate => candidate.Name.Length > 0 && candidate.Value.Length > 0))
             {
-                if (field.Name.Length == 0 || field.Value.Length == 0) continue;
-
                 var entry = new JObject();
                 entry.Add("name", new JValue(field.Name));
                 entry.Add("value", new JValue(field.Value));

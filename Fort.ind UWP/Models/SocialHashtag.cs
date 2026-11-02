@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
@@ -48,13 +49,7 @@ namespace Fort.ind_UWP
         public static IReadOnlyList<SocialHashtag> ListFromJson(JArray array)
         {
             var tags = new List<SocialHashtag>(array.Count);
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.Object) continue;
-
-                var tag = FromJson((JObject)value);
-                if (tag != null && tag.MentionedUsers > 0) tags.Add(tag);
-            }
+            tags.AddRange(array.OfType<JObject>().Select(value => FromJson(value)).Where(tag => tag != null && tag.MentionedUsers > 0));
 
             return tags;
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
@@ -238,13 +239,7 @@ namespace Fort.ind_UWP
             var notes = new List<SocialNote>();
             if (array == null) return notes;
 
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.Object) continue;
-
-                var note = FromJson((JObject)value);
-                if (note != null) notes.Add(note);
-            }
+            notes.AddRange(array.OfType<JObject>().Select(value => FromJson(value)).Where(note => note != null));
 
             return notes;
         }
@@ -303,13 +298,7 @@ namespace Fort.ind_UWP
             var notifications = new List<SocialNotification>();
             if (array == null) return notifications;
 
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.Object) continue;
-
-                var notification = FromJson((JObject)value);
-                if (notification != null) notifications.Add(notification);
-            }
+            notifications.AddRange(array.OfType<JObject>().Select(value => FromJson(value)).Where(notification => notification != null));
 
             return notifications;
         }
@@ -379,13 +368,7 @@ namespace Fort.ind_UWP
             if (array == null || array.Count == 0) return s_emptyList;
 
             var result = new List<string>(array.Count);
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.String) continue;
-
-                var text = (string)value;
-                if (!string.IsNullOrEmpty(text)) result.Add(text);
-            }
+            result.AddRange(array.Where(token => token.Type == JTokenType.String).Select(token => (string)token).Where(text => !string.IsNullOrEmpty(text)));
 
             return result.Count == 0 ? s_emptyList : result;
         }
@@ -396,14 +379,12 @@ namespace Fort.ind_UWP
             if (map == null || map.Count == 0) return s_emptyMap;
 
             var result = new Dictionary<string, string>(StringComparer.Ordinal);
-            foreach (var pair in map)
+            foreach (var property in map.Properties().Where(entry => entry.Value.Type == JTokenType.String))
             {
-                if (pair.Value.Type != JTokenType.String) continue;
-
-                var text = (string)pair.Value;
-                if (!string.IsNullOrEmpty(pair.Key) && !string.IsNullOrEmpty(text))
+                var text = (string)property.Value;
+                if (!string.IsNullOrEmpty(property.Name) && !string.IsNullOrEmpty(text))
                 {
-                    result[pair.Key] = text;
+                    result[property.Name] = text;
                 }
             }
 

@@ -132,7 +132,7 @@ namespace Fort.ind_UWP
             if (panel == null) return;
 
             var length = MemoryService.ListCacheLength;
-            if (panel.CacheLength != length) panel.CacheLength = length;
+            if (!panel.CacheLength.Equals(length)) panel.CacheLength = length;
         }
     }
 }

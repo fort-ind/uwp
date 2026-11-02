@@ -253,6 +253,7 @@
     <Compile Include="Helpers\SocialModerationText.cs" />
     <Compile Include="Helpers\SocialReactions.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
+    <Compile Include="Helpers\PathJoin.cs" />
     <Compile Include="Helpers\VisibilityHelper.cs" />
     <Compile Include="Helpers\VisualTreeSearch.cs" />
     <Compile Include="Helpers\InkRecognition.cs" />

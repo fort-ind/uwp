@@ -8,7 +8,7 @@ namespace Fort.ind_UWP
 {
     public sealed partial class SettingsAboutPage : Page, IShellContentPage, ISettingsSubpage
     {
-        private bool _loadingSettings = true;
+        private readonly bool _loadingSettings = true;
 
         private bool _updateCheckInProgress = false;
 

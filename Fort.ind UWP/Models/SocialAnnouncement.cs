@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
@@ -45,13 +46,7 @@ namespace Fort.ind_UWP
         public static IReadOnlyList<SocialAnnouncement> ListFromJson(JArray array)
         {
             var announcements = new List<SocialAnnouncement>(array.Count);
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.Object) continue;
-
-                var announcement = FromJson((JObject)value);
-                if (announcement != null) announcements.Add(announcement);
-            }
+            announcements.AddRange(array.OfType<JObject>().Select(value => FromJson(value)).Where(announcement => announcement != null));
 
             return announcements;
         }

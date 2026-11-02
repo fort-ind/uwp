@@ -144,14 +144,14 @@ namespace Fort.ind_UWP
                 Margin = new Thickness(0, 8, 0, 0)
             };
             var panel = new StackPanel();
-            foreach (var list in fetched.Value)
+            var boxes = fetched.Value.Select(list => new CheckBox
             {
-                var box = new CheckBox
-                {
-                    Content = list.Name,
-                    Tag = list,
-                    IsChecked = list.UserIds.Contains(user.Id)
-                };
+                Content = list.Name,
+                Tag = list,
+                IsChecked = list.UserIds.Contains(user.Id)
+            });
+            foreach (var box in boxes)
+            {
                 box.Click += (sender, args) => AddToListBoxClicked(sender as CheckBox, user, name, status);
                 panel.Children.Add(box);
             }

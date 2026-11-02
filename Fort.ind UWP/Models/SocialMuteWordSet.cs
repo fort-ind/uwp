@@ -48,10 +48,8 @@ namespace Fort.ind_UWP
                 if (entry.Type == JTokenType.Array)
                 {
                     var words = new List<string>();
-                    foreach (var word in (JArray)entry)
-                    {
-                        if (word.Type == JTokenType.String && ((string)word).Length > 0) words.Add((string)word);
-                    }
+                    words.AddRange(((JArray)entry).Where(word => word.Type == JTokenType.String && ((string)word).Length > 0)
+                                                  .Select(word => (string)word));
 
                     if (words.Count > 0) rules.Add(new Rule { Keywords = words.ToArray() });
                 }
@@ -69,11 +67,8 @@ namespace Fort.ind_UWP
         {
             badLine = null;
             var rules = new List<Rule>();
-            foreach (var raw in SplitLines(text))
+            foreach (var line in SplitLines(text).Select(raw => raw.Trim()).Where(trimmed => trimmed.Length > 0))
             {
-                var line = raw.Trim();
-                if (line.Length == 0) continue;
-
                 if (s_regexLine.IsMatch(line))
                 {
                     var rule = RegexRule(line);

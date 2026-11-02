@@ -226,7 +226,7 @@ namespace Fort.ind_UWP
                 _isUnread = isUnread
             };
             item._timeText = RelativeTime.Short(item.CreatedAt, DateTimeOffset.Now);
-            if (item.IsFollowRequest) item._requestState = SocialFollowRequestService.StateOf(user.Id);
+            if (user != null && item.IsFollowRequest) item._requestState = SocialFollowRequestService.StateOf(user.Id);
 
             return item;
         }

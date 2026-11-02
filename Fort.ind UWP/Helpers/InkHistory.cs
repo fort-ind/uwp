@@ -53,7 +53,7 @@ namespace Fort.ind_UWP
 
         public void RecordMoved(IEnumerable<InkStroke> strokes, Point offset)
         {
-            if (offset.X == 0 && offset.Y == 0) return;
+            if (offset.Equals(default(Point))) return;
             Push(new Operation(OperationKind.Move, SlotsFor(strokes), offset));
         }
 

@@ -56,7 +56,8 @@ namespace Fort.ind_UWP
             HandwritePad.Reset();
             HandwritePad.Visibility = Visibility.Visible;
             ForgetLastWord();
-            if (Editor.FocusState == FocusState.Unfocused) FocusEditorAt(Editor.SelectionStart);
+            var focusState = Editor.FocusState;
+            if (focusState == FocusState.Unfocused) FocusEditorAt(Editor.SelectionStart);
         }
 
         private void HideHandwritePad()

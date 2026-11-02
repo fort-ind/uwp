@@ -118,11 +118,11 @@ namespace Fort.ind_UWP
                     if (folder == null) return;
 
                     Directory.CreateDirectory(folder);
-                    var path = Path.Combine(folder, FileName);
+                    var path = PathJoin.Of(folder, FileName);
                     var current = new FileInfo(path);
                     if (current.Exists && current.Length > MaxFileBytes)
                     {
-                        var previous = Path.Combine(folder, PreviousFileName);
+                        var previous = PathJoin.Of(folder, PreviousFileName);
                         if (File.Exists(previous)) File.Delete(previous);
                         File.Move(path, previous);
                     }
@@ -173,7 +173,7 @@ namespace Fort.ind_UWP
 
             try
             {
-                s_folder = Path.Combine(ApplicationData.Current.LocalFolder.Path, FolderName);
+                s_folder = PathJoin.Of(ApplicationData.Current.LocalFolder.Path, FolderName);
             }
             catch (Exception ex)
             {
@@ -190,7 +190,7 @@ namespace Fort.ind_UWP
                 var folder = Folder();
                 if (folder == null) return;
 
-                var path = Path.Combine(folder, name);
+                var path = PathJoin.Of(folder, name);
                 if (File.Exists(path)) text.Append(File.ReadAllText(path, Encoding.UTF8));
             }
             catch (Exception ex)

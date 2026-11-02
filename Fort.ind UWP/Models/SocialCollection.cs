@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using Windows.UI.Xaml;
 
@@ -105,15 +106,9 @@ namespace Fort.ind_UWP
         public static IReadOnlyList<SocialCollection> AllFromJson(JArray array, SocialCollectionKind kind)
         {
             var collections = new List<SocialCollection>(array.Count);
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.Object) continue;
-
-                var collection = kind == SocialCollectionKind.List
-                                 ? ListFromJson((JObject)value)
-                                 : AntennaFromJson((JObject)value);
-                if (collection != null) collections.Add(collection);
-            }
+            collections.AddRange(array.OfType<JObject>()
+                                      .Select(value => kind == SocialCollectionKind.List ? ListFromJson(value) : AntennaFromJson(value))
+                                      .Where(collection => collection != null));
 
             return collections;
         }

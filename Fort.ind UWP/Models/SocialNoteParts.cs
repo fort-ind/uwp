@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
@@ -21,14 +22,12 @@ namespace Fort.ind_UWP
             var list = new List<SocialReactionCount>();
             if (reactions == null) return list;
 
-            foreach (var pair in reactions)
+            foreach (var property in reactions.Properties().Where(entry => JsonText.IsNumber(entry.Value)))
             {
-                if (!JsonText.IsNumber(pair.Value)) continue;
-
-                var number = (double)pair.Value;
+                var number = (double)property.Value;
                 if (double.IsNaN(number) || number <= 0) continue;
 
-                var key = SocialReactions.Normalize(pair.Key);
+                var key = SocialReactions.Normalize(property.Name);
                 if (string.IsNullOrEmpty(key)) continue;
 
                 var count = number >= int.MaxValue ? int.MaxValue : (int)number;
@@ -89,11 +88,8 @@ namespace Fort.ind_UWP
             var entries = new List<SocialReactionEntry>();
             if (array == null) return entries;
 
-            foreach (var value in array)
+            foreach (var obj in array.OfType<JObject>())
             {
-                if (value.Type != JTokenType.Object) continue;
-
-                var obj = (JObject)value;
                 var id = SocialJson.String(obj, "id");
                 var user = SocialUser.FromJson(SocialJson.Object(obj, "user"));
                 var type = SocialReactions.Normalize(SocialJson.String(obj, "type"));
@@ -199,11 +195,8 @@ namespace Fort.ind_UWP
             var choices = new List<SocialPollChoice>();
             if (array != null)
             {
-                foreach (var value in array)
+                foreach (var choice in array.OfType<JObject>())
                 {
-                    if (value.Type != JTokenType.Object) continue;
-
-                    var choice = (JObject)value;
                     choices.Add(new SocialPollChoice(SocialJson.String(choice, "text") ?? "",
                                                      Math.Max(0, SocialJson.Int(choice, "votes") ?? 0),
                                                      SocialJson.Bool(choice, "isVoted").GetValueOrDefault()));

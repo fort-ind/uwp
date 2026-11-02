@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -174,10 +175,8 @@ namespace Fort.ind_UWP
             JToken assets;
             if (release.TryGetValue("assets", out assets) && assets.Type == JTokenType.Array)
             {
-                foreach (var asset in (JArray)assets)
+                foreach (var asset in ((JArray)assets).Where(token => token.Type == JTokenType.Object))
                 {
-                    if (asset.Type != JTokenType.Object) continue;
-
                     var version = TryParsePackageVersion(JsonString((JObject)asset, "name"));
                     if (version != null && (fromAssets == null || version > fromAssets))
                     {

@@ -178,9 +178,9 @@ namespace Fort.ind_UWP
             {
                 if (!TryRequestRefresh(_notificationsRefresh)) LoadNotifications();
             }
-            else if (ReferenceEquals(sender, MentionsBackToNewestButton))
+            else if (ReferenceEquals(sender, MentionsBackToNewestButton) && !TryRequestRefresh(_mentionsRefresh))
             {
-                if (!TryRequestRefresh(_mentionsRefresh)) LoadMentions();
+                LoadMentions();
             }
         }
 

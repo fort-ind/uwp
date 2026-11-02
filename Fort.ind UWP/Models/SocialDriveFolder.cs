@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
@@ -39,13 +40,7 @@ namespace Fort.ind_UWP
             if (array == null || array.Count == 0) return s_none;
 
             var folders = new List<SocialDriveFolder>();
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.Object) continue;
-
-                var folder = FromJson((JObject)value);
-                if (folder != null) folders.Add(folder);
-            }
+            folders.AddRange(array.OfType<JObject>().Select(value => FromJson(value)).Where(folder => folder != null));
 
             return folders.Count == 0 ? s_none : folders;
         }

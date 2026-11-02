@@ -150,7 +150,7 @@ namespace Fort.ind_UWP
             RequestPanel.Visibility = Visibility.Collapsed;
             RequestOutcomeText.Visibility = Visibility.Collapsed;
 
-            var list = item.Moderation.Value;
+            var list = item.Moderation.GetValueOrDefault();
             var detail = SocialModerationText.Detail(item);
             DetailText.Text = detail;
             DetailText.Visibility = string.IsNullOrEmpty(detail) ? Visibility.Collapsed : Visibility.Visible;

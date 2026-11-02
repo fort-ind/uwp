@@ -41,9 +41,8 @@ namespace Fort.ind_UWP
 
         private void InitializeRefreshes()
         {
-            foreach (var feed in _timelines)
+            foreach (var timeline in _timelines)
             {
-                var timeline = feed;
                 timeline.Refresh.RefreshAsync = () => LoadTimelineAsync(timeline, true);
             }
 

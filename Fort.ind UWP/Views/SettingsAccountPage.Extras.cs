@@ -274,14 +274,7 @@ namespace Fort.ind_UWP
                 box.IsEnabled = false;
 
                 var applied = await SocialProfileEditService.SetTextAsync(this, AccountFieldOf(box), text);
-                if (!applied)
-                {
-                    box.Text = stored;
-                }
-                else
-                {
-                    box.Text = text;
-                }
+                box.Text = applied ? text : stored;
             }
             catch (Exception ex)
             {

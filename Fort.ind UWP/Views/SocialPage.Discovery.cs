@@ -120,17 +120,17 @@ namespace Fort.ind_UWP
             _shownAnnouncementIds = ids;
 
             AnnouncementsPanel.Children.Clear();
-            foreach (var announcement in announcements)
+            var bars = announcements.Select(announcement => new muxc.InfoBar
             {
-                var bar = new muxc.InfoBar
-                {
-                    Title = announcement.Title,
-                    Message = announcement.Text,
-                    Severity = SeverityOf(announcement),
-                    IsClosable = true,
-                    IsOpen = true,
-                    Tag = announcement
-                };
+                Title = announcement.Title,
+                Message = announcement.Text,
+                Severity = SeverityOf(announcement),
+                IsClosable = true,
+                IsOpen = true,
+                Tag = announcement
+            });
+            foreach (var bar in bars)
+            {
                 bar.Closed += AnnouncementBar_Closed;
                 AnnouncementsPanel.Children.Add(bar);
             }

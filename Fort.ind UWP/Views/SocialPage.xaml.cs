@@ -56,7 +56,7 @@ namespace Fort.ind_UWP
 
         private bool _showingMentions;
 
-        private bool _tabsReady;
+        private readonly bool _tabsReady;
 
         private string _shownUserId;
 

@@ -179,8 +179,8 @@ namespace Fort.ind_UWP
                     appData.LocalCacheFolder.Path,
                     appData.TemporaryFolder.Path,
                     appData.RoamingFolder.Path,
-                    Path.Combine(packageDataRoot, PackageSettingsFolderName),
-                    Path.Combine(packageDataRoot, PackageWebCacheFolderName)
+                    PathJoin.Of(packageDataRoot, PackageSettingsFolderName),
+                    PathJoin.Of(packageDataRoot, PackageWebCacheFolderName)
                 };
             }
             catch (Exception ex)

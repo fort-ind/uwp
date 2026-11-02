@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
@@ -99,13 +100,7 @@ namespace Fort.ind_UWP
             if (array == null || array.Count == 0) return s_none;
 
             var files = new List<SocialDriveFile>();
-            foreach (var value in array)
-            {
-                if (value.Type != JTokenType.Object) continue;
-
-                var file = FromJson((JObject)value);
-                if (file != null) files.Add(file);
-            }
+            files.AddRange(array.OfType<JObject>().Select(value => FromJson(value)).Where(file => file != null));
 
             return files.Count == 0 ? s_none : files;
         }
