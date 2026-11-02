@@ -18,6 +18,7 @@ namespace Fort.ind_UWP
             LoadSettingsControls();
 
             Loaded += SettingsNotificationsPage_Loaded;
+            Unloaded += SettingsNotificationsPage_Unloaded;
         }
 
         public Control ContentRegion
@@ -37,12 +38,18 @@ namespace Fort.ind_UWP
             {
                 UpdateTileNotificationsVisibility();
                 UpdateBackgroundDeniedNotice(false);
+                AttachFilters();
                 RevealPendingSection();
             }
             catch (Exception ex)
             {
                 AppLog.Error("SettingsNotificationsPage: Loaded failed", ex);
             }
+        }
+
+        private void SettingsNotificationsPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            DetachFilters();
         }
 
         private void LoadSettingsControls()
@@ -288,6 +295,9 @@ namespace Fort.ind_UWP
             {
                 case AppConstants.SettingsSectionNotifications:
                     SettingsSectionReveal.Reveal(PageScrollViewer, NotificationsSection);
+                    break;
+                case AppConstants.SettingsSectionNotificationFilters:
+                    SettingsSectionReveal.Reveal(PageScrollViewer, NotificationFiltersSection);
                     break;
                 case AppConstants.SettingsSectionTile:
                     SettingsSectionReveal.Reveal(PageScrollViewer, TileSection);

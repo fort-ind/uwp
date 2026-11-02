@@ -145,6 +145,9 @@ namespace Fort.ind_UWP
                 case AppConstants.SettingsSectionPrivacy:
                     SettingsSectionReveal.Reveal(PageScrollViewer, PrivacySection);
                     break;
+                case AppConstants.SettingsSectionPosting:
+                    SettingsSectionReveal.Reveal(PageScrollViewer, PostingSection);
+                    break;
                 case AppConstants.SettingsSectionMutedBlocked:
                     SettingsSectionReveal.Reveal(PageScrollViewer, MutedBlockedSection);
                     break;

@@ -4499,4 +4499,241 @@ Open your profile and try again.</value>
   <data name="RefreshMemoryButtonText.Text" xml:space="preserve">
     <value>Refresh memory use</value>
   </data>
+  <data name="SocialNoteMutedFormat" xml:space="preserve">
+    <value>Muted: {0}</value>
+    <comment>Shown in place of a note that contains one of your muted words. {0} is the matched words, comma separated.</comment>
+  </data>
+  <data name="SocialProfileErrorInvalidRegexp" xml:space="preserve">
+    <value>One of those patterns isn't a valid regular expression. Check the lines that start and end with a slash.</value>
+  </data>
+  <data name="SocialProfileErrorTooManyMutedWords" xml:space="preserve">
+    <value>That list is longer than fort.social allows. Remove some words and try again.</value>
+  </data>
+  <data name="MuteEditorSaveButton.Content" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="MuteEditorRevertButton.Content" xml:space="preserve">
+    <value>Revert</value>
+  </data>
+  <data name="MuteEditorInvalidPatternFormat" xml:space="preserve">
+    <value>This line isn't a valid pattern: {0}</value>
+    <comment>{0} is the line the user typed.</comment>
+  </data>
+  <data name="MuteEditorInvalidHostFormat" xml:space="preserve">
+    <value>"{0}" isn't a server address. Write just the domain, such as example.social.</value>
+    <comment>{0} is the line the user typed.</comment>
+  </data>
+  <data name="SocialModerationWordsTab.Text" xml:space="preserve">
+    <value>Words</value>
+  </data>
+  <data name="SocialModerationInstancesTab.Text" xml:space="preserve">
+    <value>Instances</value>
+  </data>
+  <data name="SocialMuteWordsNote.Text" xml:space="preserve">
+    <value>Write one rule per line. Separate words with spaces to match notes that contain all of them. Surround a pattern with slashes to use a regular expression, for example /colou?r/i. Word mutes are case-sensitive and match any part of a word.</value>
+  </data>
+  <data name="SocialMuteSoftHeading" xml:space="preserve">
+    <value>Muted words</value>
+  </data>
+  <data name="SocialMuteSoftDescription" xml:space="preserve">
+    <value>A note that contains one of these is collapsed, with a line saying which word matched. You can still choose to show it.</value>
+  </data>
+  <data name="SocialMuteHardHeading" xml:space="preserve">
+    <value>Hidden words</value>
+  </data>
+  <data name="SocialMuteHardDescription" xml:space="preserve">
+    <value>A note that contains one of these is left out of your timelines completely.</value>
+  </data>
+  <data name="SocialMuteInstancesHeading" xml:space="preserve">
+    <value>Muted instances</value>
+  </data>
+  <data name="SocialMuteInstancesDescription" xml:space="preserve">
+    <value>Notes and renotes from these servers are hidden from your timelines, including replies to someone on a muted server. Write one server per line, such as example.social.</value>
+  </data>
+  <data name="PrivacyCarefulBotToggle.Header" xml:space="preserve">
+    <value>Approve follow requests from bots</value>
+  </data>
+  <data name="PrivacyCarefulBotToggleDescription.Text" xml:space="preserve">
+    <value>An account that is marked as a bot has to ask before it can follow you, even when your account isn't locked.</value>
+  </data>
+  <data name="PrivacyFollowedMessageBox.Header" xml:space="preserve">
+    <value>Message when someone follows you</value>
+  </data>
+  <data name="PrivacyFollowedMessageBoxDescription.Text" xml:space="preserve">
+    <value>A short message shown to the person who follows you. If you approve follow requests, it is shown when you approve one. Press Enter or leave the box to save.</value>
+  </data>
+  <data name="PrivacyNoIndexToggle.Header" xml:space="preserve">
+    <value>Keep my public notes out of note search</value>
+  </data>
+  <data name="PrivacyNoIndexToggleDescription.Text" xml:space="preserve">
+    <value>Stops note search on fort.social from indexing your public notes.</value>
+  </data>
+  <data name="PrivacyRssToggle.Header" xml:space="preserve">
+    <value>RSS feed</value>
+  </data>
+  <data name="PrivacyRssToggleDescription.Text" xml:space="preserve">
+    <value>Makes an RSS feed with your basic profile details and public notes. People can follow it without a follow request.</value>
+  </data>
+  <data name="PrivacyRequireSigninToggle.Header" xml:space="preserve">
+    <value>Require sign-in to see my content</value>
+  </data>
+  <data name="PrivacyRequireSigninToggleDescription.Text" xml:space="preserve">
+    <value>Only signed-in people can see your notes. This keeps crawlers from collecting them, but your notes won't show in link previews or embeds, or on servers that don't support note quotes.</value>
+  </data>
+  <data name="PrivacyRequireSigninConfirmTitle" xml:space="preserve">
+    <value>Require sign-in to see your content?</value>
+  </data>
+  <data name="PrivacyRequireSigninConfirmBody" xml:space="preserve">
+    <value>Your notes won't be shown in link previews (OGP), embedded in web pages, or on servers that don't support note quotes. Turn this on only if you understand that.</value>
+  </data>
+  <data name="PrivacyRequireSigninConfirmPrimary" xml:space="preserve">
+    <value>Turn on</value>
+  </data>
+  <data name="SocialPrivacyOlderNotesHeading.Text" xml:space="preserve">
+    <value>Older notes</value>
+  </data>
+  <data name="PrivacyNotesFollowersOnlyCombo.Header" xml:space="preserve">
+    <value>Show older notes only to followers</value>
+  </data>
+  <data name="PrivacyNotesFollowersOnlyComboDescription.Text" xml:space="preserve">
+    <value>Notes older than this can only be seen by your followers. If you turn it off again, the notes go back to how they were posted.</value>
+  </data>
+  <data name="PrivacyNotesHiddenCombo.Header" xml:space="preserve">
+    <value>Make older notes private</value>
+  </data>
+  <data name="PrivacyNotesHiddenComboDescription.Text" xml:space="preserve">
+    <value>Notes older than this can only be seen by you. If you turn it off again, the notes go back to how they were posted.</value>
+  </data>
+  <data name="SocialOlderNotesNever" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="SocialOlderNotesOneHour" xml:space="preserve">
+    <value>After 1 hour</value>
+  </data>
+  <data name="SocialOlderNotesOneDay" xml:space="preserve">
+    <value>After 1 day</value>
+  </data>
+  <data name="SocialOlderNotesThreeDays" xml:space="preserve">
+    <value>After 3 days</value>
+  </data>
+  <data name="SocialOlderNotesOneWeek" xml:space="preserve">
+    <value>After 1 week</value>
+  </data>
+  <data name="SocialOlderNotesOneMonth" xml:space="preserve">
+    <value>After 1 month</value>
+  </data>
+  <data name="SocialOlderNotesThreeMonths" xml:space="preserve">
+    <value>After 3 months</value>
+  </data>
+  <data name="SocialOlderNotesOneYear" xml:space="preserve">
+    <value>After 1 year</value>
+  </data>
+  <data name="SocialOlderNotesCustom" xml:space="preserve">
+    <value>On a date set on fort.social</value>
+  </data>
+  <data name="SocialPostingHeading.Text" xml:space="preserve">
+    <value>Posting</value>
+  </data>
+  <data name="PostingDefaultCwBox.Header" xml:space="preserve">
+    <value>Default content warning</value>
+  </data>
+  <data name="PostingDefaultCwBoxDescription.Text" xml:space="preserve">
+    <value>Filled in as the content warning of every new note and reply you write here. Leave it empty for none. Press Enter or leave the box to save.</value>
+  </data>
+  <data name="PostingDefaultSensitiveToggle.Header" xml:space="preserve">
+    <value>Mark my media as sensitive by default</value>
+  </data>
+  <data name="PostingDefaultSensitiveToggleDescription.Text" xml:space="preserve">
+    <value>New uploads start out marked as sensitive. You can still unmark a file.</value>
+  </data>
+  <data name="PostingAlwaysNsfwToggle.Header" xml:space="preserve">
+    <value>Always mark my media as sensitive</value>
+  </data>
+  <data name="PostingAlwaysNsfwToggleDescription.Text" xml:space="preserve">
+    <value>Every upload is marked as sensitive and can't be unmarked.</value>
+  </data>
+  <data name="PostingAutoSensitiveToggle.Header" xml:space="preserve">
+    <value>Let fort.social mark sensitive media</value>
+  </data>
+  <data name="PostingAutoSensitiveToggleDescription.Text" xml:space="preserve">
+    <value>Allows automatic detection and marking of sensitive media where possible. Even if this is off, the server may do it for everyone.</value>
+  </data>
+  <data name="PostingLanguageCombo.Header" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="PostingLanguageComboDescription.Text" xml:space="preserve">
+    <value>The language of your fort.social profile.</value>
+  </data>
+  <data name="PostingLanguageNone" xml:space="preserve">
+    <value>Not set</value>
+  </data>
+  <data name="SearchItemMutedWords" xml:space="preserve">
+    <value>Muted words</value>
+  </data>
+  <data name="SearchItemMutedInstances" xml:space="preserve">
+    <value>Muted instances</value>
+  </data>
+  <data name="SearchItemPosting" xml:space="preserve">
+    <value>Default content warning</value>
+  </data>
+  <data name="SearchItemSensitiveMedia" xml:space="preserve">
+    <value>Sensitive media</value>
+  </data>
+  <data name="SearchItemOlderNotes" xml:space="preserve">
+    <value>Older notes</value>
+  </data>
+  <data name="SocialNotificationFiltersHeading.Text" xml:space="preserve">
+    <value>Notification filters</value>
+  </data>
+  <data name="SocialNotificationFiltersDescription.Text" xml:space="preserve">
+    <value>Choose whose activity can notify you. This is saved on fort.social, so it also changes the notification list, toasts and badge on your other devices.</value>
+  </data>
+  <data name="SocialNotificationFilterType_follow" xml:space="preserve">
+    <value>New followers</value>
+  </data>
+  <data name="SocialNotificationFilterType_mention" xml:space="preserve">
+    <value>Mentions</value>
+  </data>
+  <data name="SocialNotificationFilterType_reply" xml:space="preserve">
+    <value>Replies</value>
+  </data>
+  <data name="SocialNotificationFilterType_renote" xml:space="preserve">
+    <value>Renotes</value>
+  </data>
+  <data name="SocialNotificationFilterType_quote" xml:space="preserve">
+    <value>Quotes</value>
+  </data>
+  <data name="SocialNotificationFilterType_reaction" xml:space="preserve">
+    <value>Reactions</value>
+  </data>
+  <data name="SocialNotificationFilterType_pollEnded" xml:space="preserve">
+    <value>Polls that have ended</value>
+  </data>
+  <data name="SocialNotificationFilterType_receiveFollowRequest" xml:space="preserve">
+    <value>Follow requests</value>
+  </data>
+  <data name="SocialNotificationRule_all" xml:space="preserve">
+    <value>Everyone</value>
+  </data>
+  <data name="SocialNotificationRule_following" xml:space="preserve">
+    <value>People you follow</value>
+  </data>
+  <data name="SocialNotificationRule_follower" xml:space="preserve">
+    <value>People who follow you</value>
+  </data>
+  <data name="SocialNotificationRule_mutualFollow" xml:space="preserve">
+    <value>People you follow who follow you back</value>
+  </data>
+  <data name="SocialNotificationRule_followingOrFollower" xml:space="preserve">
+    <value>People you follow or who follow you</value>
+  </data>
+  <data name="SocialNotificationRule_never" xml:space="preserve">
+    <value>No one</value>
+  </data>
+  <data name="SocialNotificationRule_list" xml:space="preserve">
+    <value>People on a list (set on fort.social)</value>
+  </data>
+  <data name="SearchItemNotificationFilters" xml:space="preserve">
+    <value>Notification filters</value>
+  </data>
 </root>

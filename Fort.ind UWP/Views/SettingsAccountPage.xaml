@@ -77,6 +77,15 @@
                         <TextBlock x:Uid="PrivacyAutoAcceptToggleDescription"
                                    Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyCarefulBotToggle" x:Name="PrivacyCarefulBotToggle" Margin="0,14,0,0" Toggled="AccountToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyCarefulBotToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <TextBox x:Uid="PrivacyFollowedMessageBox" x:Name="PrivacyFollowedMessageBox" Margin="0,14,0,0"
+                                 MaxLength="256" LostFocus="AccountText_LostFocus" KeyDown="AccountText_KeyDown"/>
+                        <TextBlock x:Uid="PrivacyFollowedMessageBoxDescription" Margin="0,4,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,32,0,0">
                             <FontIcon Glyph="&#xE890;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
                             <TextBlock x:Uid="SocialPrivacyVisibilityHeading" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
@@ -119,6 +128,33 @@
                         <TextBlock x:Uid="PrivacyPreventAiToggleDescription"
                                    Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyNoIndexToggle" x:Name="PrivacyNoIndexToggle" Margin="0,14,0,0" Toggled="AccountToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyNoIndexToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyRssToggle" x:Name="PrivacyRssToggle" Margin="0,14,0,0" Toggled="AccountToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyRssToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PrivacyRequireSigninToggle" x:Name="PrivacyRequireSigninToggle" Margin="0,14,0,0" Toggled="AccountToggle_Toggled"/>
+                        <TextBlock x:Uid="PrivacyRequireSigninToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,32,0,0">
+                            <FontIcon Glyph="&#xE81C;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="SocialPrivacyOlderNotesHeading" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                        </StackPanel>
+                        <ComboBox x:Uid="PrivacyNotesFollowersOnlyCombo" x:Name="PrivacyNotesFollowersOnlyCombo" Margin="0,8,0,0" MinWidth="200"
+                                  SelectionChanged="OlderNotesCombo_SelectionChanged"/>
+                        <TextBlock x:Uid="PrivacyNotesFollowersOnlyComboDescription" Margin="0,4,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ComboBox x:Uid="PrivacyNotesHiddenCombo" x:Name="PrivacyNotesHiddenCombo" Margin="0,14,0,0" MinWidth="200"
+                                  SelectionChanged="OlderNotesCombo_SelectionChanged"/>
+                        <TextBlock x:Uid="PrivacyNotesHiddenComboDescription" Margin="0,4,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,32,0,0">
                             <FontIcon Glyph="&#xE8BD;" FontSize="14" Opacity="0.7" AutomationProperties.AccessibilityView="Raw"/>
                             <TextBlock x:Uid="SocialPrivacyChatHeading" Style="{StaticResource BodyTextBlockStyle}" FontWeight="SemiBold"
@@ -133,6 +169,33 @@
                             <ComboBoxItem x:Uid="SocialPrivacyChatNone" Tag="none"/>
                         </ComboBox>
                         <TextBlock x:Uid="PrivacyChatScopeComboDescription" Margin="0,4,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PostingSection" Margin="0,0,0,40" Visibility="Collapsed">
+                        <TextBlock x:Uid="SocialPostingHeading" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <TextBox x:Uid="PostingDefaultCwBox" x:Name="PostingDefaultCwBox"
+                                 LostFocus="AccountText_LostFocus" KeyDown="AccountText_KeyDown"/>
+                        <TextBlock x:Uid="PostingDefaultCwBoxDescription" Margin="0,4,0,0"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PostingDefaultSensitiveToggle" x:Name="PostingDefaultSensitiveToggle" Margin="0,14,0,0" Toggled="AccountToggle_Toggled"/>
+                        <TextBlock x:Uid="PostingDefaultSensitiveToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PostingAlwaysNsfwToggle" x:Name="PostingAlwaysNsfwToggle" Margin="0,14,0,0" Toggled="AccountToggle_Toggled"/>
+                        <TextBlock x:Uid="PostingAlwaysNsfwToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ToggleSwitch x:Uid="PostingAutoSensitiveToggle" x:Name="PostingAutoSensitiveToggle" Margin="0,14,0,0" Toggled="AccountToggle_Toggled"/>
+                        <TextBlock x:Uid="PostingAutoSensitiveToggleDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <ComboBox x:Uid="PostingLanguageCombo" x:Name="PostingLanguageCombo" Margin="0,14,0,0" MinWidth="200"
+                                  SelectionChanged="LanguageCombo_SelectionChanged"/>
+                        <TextBlock x:Uid="PostingLanguageComboDescription" Margin="0,4,0,0"
                                    Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                     </StackPanel>
@@ -162,7 +225,30 @@
                                                    Checked="ModerationTab_Checked">
                                 <TextBlock x:Uid="SocialModerationBlockedTab" Style="{StaticResource BaseTextBlockStyle}"/>
                             </local:SocialTabButton>
+                            <local:SocialTabButton x:Name="WordsTab"
+                                                   GroupName="SocialModerationTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="ModerationTab_Checked">
+                                <TextBlock x:Uid="SocialModerationWordsTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                            </local:SocialTabButton>
+                            <local:SocialTabButton x:Name="InstancesTab"
+                                                   GroupName="SocialModerationTabs"
+                                                   Style="{StaticResource SocialTabButtonStyle}"
+                                                   Checked="ModerationTab_Checked">
+                                <TextBlock x:Uid="SocialModerationInstancesTab" Style="{StaticResource BaseTextBlockStyle}"/>
+                            </local:SocialTabButton>
                         </local:SocialTabStrip>
+
+                        <StackPanel x:Name="MuteWordsPanel" Margin="0,16,0,0" Visibility="Collapsed">
+                            <TextBlock x:Uid="SocialMuteWordsNote" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <local:SocialMuteListEditor x:Name="MutedWordsEditor" Margin="0,16,0,0"/>
+                            <local:SocialMuteListEditor x:Name="HardMutedWordsEditor" Margin="0,24,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="MuteInstancesPanel" Margin="0,16,0,0" Visibility="Collapsed">
+                            <local:SocialMuteListEditor x:Name="MutedInstancesEditor"/>
+                        </StackPanel>
 
                         <ListView x:Name="ModerationList"
                                   ItemTemplate="{StaticResource ModerationItemTemplate}"
@@ -173,7 +259,7 @@
                                   ScrollViewer.VerticalScrollMode="Disabled"
                                   ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
 
-                        <Grid Margin="0,12,0,0">
+                        <Grid x:Name="ModerationFooter" Margin="0,12,0,0">
                             <ProgressRing x:Uid="SocialModerationLoading"
                                           x:Name="ModerationLoadingRing"
                                           Width="24" Height="24"

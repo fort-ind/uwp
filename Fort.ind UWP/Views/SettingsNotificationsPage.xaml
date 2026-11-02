@@ -76,6 +76,15 @@
                                          Click="SocialNotificationsLockScreenLink_Click"/>
                     </StackPanel>
 
+                    <StackPanel x:Name="NotificationFiltersSection" Margin="0,0,0,40" Visibility="Collapsed">
+                        <TextBlock x:Uid="SocialNotificationFiltersHeading" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>
+                        <TextBlock x:Uid="SocialNotificationFiltersDescription"
+                                   Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <StackPanel x:Name="NotificationFilterRows" Margin="0,8,0,0"/>
+                    </StackPanel>
+
                     <StackPanel x:Name="TileSection">
                         <TextBlock x:Uid="MainLiveTile2" Style="{StaticResource SubtitleTextBlockStyle}"
                                    AutomationProperties.HeadingLevel="Level2" Margin="0,0,0,16"/>

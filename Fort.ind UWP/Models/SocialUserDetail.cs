@@ -49,7 +49,11 @@ namespace Fort.ind_UWP
             "description", "location", "birthday", "createdAt", "bannerUrl", "bannerBlurhash", "fields",
             "notesCount", "followingCount", "followersCount", "followingVisibility", "followersVisibility",
             "isLocked", "roles", "isCat", "speakAsCat", "autoAcceptFollowed", "publicReactions",
-            "hideOnlineStatus", "isExplorable", "noCrawle", "preventAiLearning", "chatScope"
+            "hideOnlineStatus", "isExplorable", "noCrawle", "preventAiLearning", "chatScope",
+            "mutedWords", "hardMutedWords", "mutedInstances", "notificationRecieveConfig", "defaultCW",
+            "defaultSensitive", "alwaysMarkNsfw", "autoSensitive", "lang", "followedMessage",
+            "requireSigninToViewContents", "enableRss", "noindex", "carefulBot",
+            "makeNotesFollowersOnlyBefore", "makeNotesHiddenBefore"
         };
 
         private SocialUserDetail()

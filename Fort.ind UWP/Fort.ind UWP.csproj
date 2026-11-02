@@ -142,6 +142,9 @@
     <Compile Include="Behaviors\WindowActivationStateBehavior.cs" />
     <Compile Include="Controls\ExpanderHeaderButton.cs" />
     <Compile Include="Controls\InlineInkLayer.cs" />
+    <Compile Include="Controls\SocialMuteListEditor.xaml.cs">
+      <DependentUpon>SocialMuteListEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialCharacterRing.xaml.cs">
       <DependentUpon>SocialCharacterRing.xaml</DependentUpon>
     </Compile>
@@ -258,6 +261,8 @@
     <Compile Include="Models\GameGroup.cs" />
     <Compile Include="Models\SearchItem.cs" />
     <Compile Include="Models\SettingsCategory.cs" />
+    <Compile Include="Models\SocialAccountSettings.cs" />
+    <Compile Include="Models\SocialMuteWordSet.cs" />
     <Compile Include="Models\SocialPrivacySettings.cs" />
     <Compile Include="Models\SocialProfileFieldRow.cs" />
     <Compile Include="Models\SocialAttachmentItem.cs" />
@@ -320,6 +325,7 @@
     <Compile Include="Services\SocialPermissions.cs" />
     <Compile Include="Services\SocialPostService.cs" />
     <Compile Include="Services\SocialProfileEditService.cs" />
+    <Compile Include="Services\SocialWordMuteService.cs" />
     <Compile Include="Services\SocialStream.cs" />
     <Compile Include="Services\SocialFeedTileService.cs" />
     <Compile Include="Services\SocialTileService.cs" />
@@ -398,7 +404,13 @@
     <Compile Include="Views\SettingsAccountPage.Moderation.cs">
       <DependentUpon>SettingsAccountPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SettingsAccountPage.Extras.cs">
+      <DependentUpon>SettingsAccountPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SettingsNotificationsPage.xaml.cs">
+      <DependentUpon>SettingsNotificationsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsNotificationsPage.Filters.cs">
       <DependentUpon>SettingsNotificationsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsPersonalizationPage.xaml.cs">
@@ -693,6 +705,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SocialUserListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialMuteListEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

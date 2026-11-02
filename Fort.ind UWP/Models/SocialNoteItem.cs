@@ -32,6 +32,8 @@ namespace Fort.ind_UWP
 
         private bool _isMediaRevealed;
 
+        private bool _isMuteRevealed;
+
         private SocialLinkPreview _linkPreview;
 
         private bool _linkPreviewRequested;
@@ -267,6 +269,22 @@ namespace Fort.ind_UWP
             set { SetProperty(ref _isMediaRevealed, value); }
         }
 
+        public IReadOnlyList<string> MutedWords { get; private set; }
+
+        public bool IsMuted
+        {
+            get { return MutedWords != null && MutedWords.Count > 0 && !_isMuteRevealed; }
+        }
+
+        public bool IsMuteRevealed
+        {
+            get { return _isMuteRevealed; }
+            set
+            {
+                if (SetProperty(ref _isMuteRevealed, value)) OnPropertyChanged("AutomationName");
+            }
+        }
+
         public SocialLinkPreview LinkPreview
         {
             get { return _linkPreview; }
@@ -313,6 +331,10 @@ namespace Fort.ind_UWP
                 else if (IsHidden)
                 {
                     content = LocalizedStrings.Get("SocialHiddenNote");
+                }
+                else if (IsMuted)
+                {
+                    content = LocalizedStrings.Format("SocialNoteMutedFormat", string.Join(", ", MutedWords));
                 }
                 else if (HasContentWarning && !IsContentRevealed)
                 {
@@ -375,7 +397,7 @@ namespace Fort.ind_UWP
         {
             try
             {
-                if (_linkPreviewRequested || string.IsNullOrEmpty(LinkPreviewUrl)) return;
+                if (_linkPreviewRequested || IsMuted || string.IsNullOrEmpty(LinkPreviewUrl)) return;
                 _linkPreviewRequested = true;
 
                 var url = LinkPreviewUrl;
@@ -676,6 +698,7 @@ namespace Fort.ind_UWP
             AuthorHandle = note.User.Handle;
             BodySegments = body;
             ContentWarning = note.IsHidden || string.IsNullOrWhiteSpace(note.ContentWarning) ? null : note.ContentWarning.Trim();
+            MutedWords = note.IsHidden ? null : SocialWordMuteService.SoftMatches(note);
             IsReply = !string.IsNullOrEmpty(note.ReplyId);
             ReplyToUser = note.Reply == null ? null : note.Reply.User;
             TimeFull = RelativeTime.Full(note.CreatedAt);

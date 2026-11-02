@@ -79,15 +79,37 @@ namespace Fort.ind_UWP
 
             if (account == null) return;
 
-            var tab = TabFor(_moderationCurrent);
+            var tab = _mutePane == MutePane.Words ? WordsTab
+                      : _mutePane == MutePane.Instances ? InstancesTab
+                      : TabFor(_moderationCurrent);
             if (tab.IsChecked.GetValueOrDefault())
             {
-                ShowModerationList(_moderationCurrent);
+                ShowMutePane(_mutePane);
+                if (_mutePane == MutePane.People) ShowModerationList(_moderationCurrent);
             }
             else
             {
                 tab.IsChecked = true;
             }
+        }
+
+        private enum MutePane
+        {
+            People,
+            Words,
+            Instances
+        }
+
+        private MutePane _mutePane = MutePane.People;
+
+        private void ShowMutePane(MutePane pane)
+        {
+            _mutePane = pane;
+            var people = pane == MutePane.People;
+            ModerationList.Visibility = people ? Visibility.Visible : Visibility.Collapsed;
+            ModerationFooter.Visibility = people ? Visibility.Visible : Visibility.Collapsed;
+            MuteWordsPanel.Visibility = pane == MutePane.Words ? Visibility.Visible : Visibility.Collapsed;
+            MuteInstancesPanel.Visibility = pane == MutePane.Instances ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private SocialTabButton TabFor(SocialModerationList list)
@@ -104,6 +126,19 @@ namespace Fort.ind_UWP
         {
             try
             {
+                if (sender == WordsTab)
+                {
+                    ShowMutePane(MutePane.Words);
+                    return;
+                }
+
+                if (sender == InstancesTab)
+                {
+                    ShowMutePane(MutePane.Instances);
+                    return;
+                }
+
+                ShowMutePane(MutePane.People);
                 if (sender == RenoteMutedTab) ShowModerationList(SocialModerationList.RenoteMuted);
                 else if (sender == BlockedTab) ShowModerationList(SocialModerationList.Blocked);
                 else ShowModerationList(SocialModerationList.Muted);

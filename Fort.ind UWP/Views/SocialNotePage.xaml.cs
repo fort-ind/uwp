@@ -212,6 +212,7 @@ namespace Fort.ind_UWP
                 if (args.Note != null)
                 {
                     _focused = SocialNoteItem.Create(args.Note, SocialContentService.CachedEmojiMap, false);
+                    if (_focused != null) _focused.IsMuteRevealed = true;
                     ShowFocused();
                 }
 
@@ -454,6 +455,7 @@ namespace Fort.ind_UWP
                     if (_focused == null)
                     {
                         _focused = SocialNoteItem.Create(shown.Value, emojis, false);
+                        if (_focused != null) _focused.IsMuteRevealed = true;
                         ShowFocused();
                         ShowTab(_tab);
                     }

@@ -197,6 +197,11 @@ namespace Fort.ind_UWP
                 WarningBox.Text = draft.ContentWarning ?? "";
                 WarningToggle.IsChecked = draft.HasContentWarning;
                 WarningBox.Visibility = Shown(draft.HasContentWarning);
+                if (_context.Editing == null && _context.Mode != SocialComposerMode.Reply
+                    && string.IsNullOrWhiteSpace(draft.Text) && draft.Files.Count == 0 && draft.Poll == null)
+                {
+                    ApplyDefaultWarning();
+                }
 
                 _visibility = draft.Visibility;
                 _localOnly = draft.LocalOnly;
@@ -278,7 +283,8 @@ namespace Fort.ind_UWP
             _localOnly = defaults.LocalOnly;
             ApplyVisibility();
 
-            if (string.IsNullOrEmpty(Editor.Text) && !string.IsNullOrEmpty(defaults.Prefix))
+            var fresh = string.IsNullOrEmpty(Editor.Text);
+            if (fresh && !string.IsNullOrEmpty(defaults.Prefix))
             {
                 _loading = true;
                 Editor.Text = defaults.Prefix;
@@ -286,8 +292,32 @@ namespace Fort.ind_UWP
                 _loading = false;
             }
 
+            if (fresh) ApplyDefaultWarning();
+
             if (defaults.RecipientIds.Count > 0) AddRecipients(defaults.RecipientIds);
             UpdateState();
+        }
+
+        private void ApplyDefaultWarning()
+        {
+            if (WarningToggle.IsChecked.GetValueOrDefault() || !string.IsNullOrWhiteSpace(WarningBox.Text)) return;
+
+            var settings = SocialAccountSettings.FromProfile(ProfileService.CurrentUser);
+            var warning = settings == null || settings.DefaultCw == null ? null : settings.DefaultCw.Trim();
+            if (string.IsNullOrEmpty(warning)) return;
+
+            var wasLoading = _loading;
+            _loading = true;
+            try
+            {
+                WarningBox.Text = warning;
+                WarningToggle.IsChecked = true;
+                WarningBox.Visibility = Visibility.Visible;
+            }
+            finally
+            {
+                _loading = wasLoading;
+            }
         }
 
         public async void AddRecipients(IReadOnlyList<string> ids)

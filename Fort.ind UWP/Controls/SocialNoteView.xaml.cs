@@ -165,7 +165,8 @@ namespace Fort.ind_UWP
             RenderReactions(item);
             RenderPoll(item);
             ApplyContentWarning(item);
-            if (!ReferenceEquals(item.IsHidden ? null : item.LinkPreview, _drawnPreview)) RenderLinkCard(item);
+            ApplyMuted(item);
+            if (!ReferenceEquals(item.IsHidden || item.IsMuted ? null : item.LinkPreview, _drawnPreview)) RenderLinkCard(item);
         }
 
         private void MarkDrawn(SocialNoteItem item)
@@ -189,6 +190,7 @@ namespace Fort.ind_UWP
             RenderCounts(item);
             RenderContinuation(item);
             ApplyDeleted(item);
+            ApplyMuted(item);
 
             item.RequestLinkPreview();
         }
@@ -215,6 +217,12 @@ namespace Fort.ind_UWP
                         break;
                     case "IsMediaRevealed":
                         RenderMedia(item);
+                        break;
+                    case "IsMuteRevealed":
+                        RenderMedia(item);
+                        RenderLinkCard(item);
+                        ApplyMuted(item);
+                        item.RequestLinkPreview();
                         break;
                     case "LinkPreview":
                         RenderLinkCard(item);
@@ -427,6 +435,28 @@ namespace Fort.ind_UWP
             }
         }
 
+        private void ApplyMuted(SocialNoteItem item)
+        {
+            var muted = item.IsMuted && !item.IsDeleted;
+            if (muted && MutedPanel == null) FindName("MutedPanel");
+
+            if (muted)
+            {
+                MutedText.Text = LocalizedStrings.Format("SocialNoteMutedFormat", string.Join(", ", item.MutedWords));
+                MutedButton.Content = LocalizedStrings.Get("SocialShowContent");
+                MutedButton.IsExpanded = false;
+            }
+
+            if (MutedPanel != null) MutedPanel.Visibility = muted ? Visibility.Visible : Visibility.Collapsed;
+            NoteBody.Visibility = muted ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void MutedButton_Click(object sender, RoutedEventArgs e)
+        {
+            var item = Item;
+            if (item != null) item.IsMuteRevealed = true;
+        }
+
         private void ShowContentWarning(SocialNoteItem item)
         {
             if (!item.HasContentWarning)
@@ -485,7 +515,7 @@ namespace Fort.ind_UWP
 
         private void RenderMedia(SocialNoteItem item)
         {
-            var files = item.IsHidden ? null : item.Media;
+            var files = item.IsHidden || item.IsMuted ? null : item.Media;
             _gridIndexes.Clear();
             _audioIndexes.Clear();
             if (files != null)
@@ -756,7 +786,7 @@ namespace Fort.ind_UWP
 
         private void RenderLinkCard(SocialNoteItem item)
         {
-            var preview = item.IsHidden ? null : item.LinkPreview;
+            var preview = item.IsHidden || item.IsMuted ? null : item.LinkPreview;
             _drawnPreview = preview;
             if (preview == null)
             {

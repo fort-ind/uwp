@@ -84,7 +84,9 @@ namespace Fort.ind_UWP
             { "MAX_FILE_SIZE_EXCEEDED", "SocialProfileErrorTooLarge" },
             { "NO_FREE_SPACE", "SocialProfileErrorNoSpace" },
             { "INAPPROPRIATE", "SocialProfileErrorInappropriate" },
-            { "RATE_LIMIT_EXCEEDED", "SocialProfileErrorRateLimit" }
+            { "RATE_LIMIT_EXCEEDED", "SocialProfileErrorRateLimit" },
+            { "INVALID_REGEXP", "SocialProfileErrorInvalidRegexp" },
+            { "TOO_MANY_MUTED_WORDS", "SocialProfileErrorTooManyMutedWords" }
         };
 
         public static int Length(string text)
@@ -166,6 +168,17 @@ namespace Fort.ind_UWP
         public static Task<bool> SetChoiceAsync(UIElement owner, string field, string value)
         {
             return SetSettingAsync(owner, field, JsonValue.CreateStringValue(value));
+        }
+
+        public static Task<bool> SetValueAsync(UIElement owner, string field, IJsonValue value)
+        {
+            return SetSettingAsync(owner, field, value);
+        }
+
+        public static Task<bool> SetTextAsync(UIElement owner, string field, string text)
+        {
+            var normalized = SocialPostService.NormalizeText(text).Trim();
+            return SetSettingAsync(owner, field, normalized.Length == 0 ? JsonValue.CreateNullValue() : (IJsonValue)JsonValue.CreateStringValue(normalized));
         }
 
         private static async Task<bool> SetSettingAsync(UIElement owner, string field, IJsonValue value)

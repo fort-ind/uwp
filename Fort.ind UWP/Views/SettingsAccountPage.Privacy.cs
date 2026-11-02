@@ -97,6 +97,7 @@ namespace Fort.ind_UWP
         private void LoadPrivacy()
         {
             var settings = SocialPrivacySettings.FromProfile(ProfileService.CurrentUser);
+            LoadAccountExtras(SocialAccountSettings.FromProfile(ProfileService.CurrentUser));
             PrivacySection.Visibility = settings == null ? Visibility.Collapsed : Visibility.Visible;
             if (settings == null) return;
 

@@ -96,6 +96,8 @@ namespace Fort.ind_UWP
         public const string SettingsSectionProfile = "Profile";
         public const string SettingsSectionPrivacy = "Privacy";
         public const string SettingsSectionMutedBlocked = "MutedBlocked";
+        public const string SettingsSectionPosting = "Posting";
+        public const string SettingsSectionNotificationFilters = "NotificationFilters";
         public const string SettingsSectionNotifications = "Notifications";
         public const string SettingsSectionStorage = "Storage";
         public const string SettingsSectionTile = "Tile";

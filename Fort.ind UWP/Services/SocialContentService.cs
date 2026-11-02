@@ -8,6 +8,8 @@ namespace Fort.ind_UWP
 {
     public static class SocialContentService
     {
+        private const int HardMuteExtraPages = 4;
+
         private static readonly object s_lock = new object();
 
         private static readonly IReadOnlyDictionary<string, Uri> s_noEmojis = new Dictionary<string, Uri>(StringComparer.Ordinal);
@@ -100,7 +102,18 @@ namespace Fort.ind_UWP
             SocialTimeline timeline, string sourceId, string untilId, CancellationToken cancellationToken)
         {
             var token = await MisskeyAuthService.TryGetTokenAsync();
-            return await SocialApiService.GetTimelineAsync(token, timeline, sourceId, untilId, AppConstants.SocialFeedPageSize, cancellationToken);
+            for (var round = 0; ; round++)
+            {
+                var result = await SocialApiService.GetTimelineAsync(token, timeline, sourceId, untilId, AppConstants.SocialFeedPageSize, cancellationToken);
+                if (result.Status != SocialApiStatus.Ok || result.Value == null || result.Value.Count == 0) return result;
+
+                var kept = SocialWordMuteService.WithoutHardMuted(result.Value);
+                if (ReferenceEquals(kept, result.Value)) return result;
+
+                if (kept.Count > 0 || round >= HardMuteExtraPages) return SocialApiResult<IReadOnlyList<SocialNote>>.Succeeded(kept);
+
+                untilId = result.Value[result.Value.Count - 1].Id;
+            }
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialNote>>> FetchTagNotesAsync(
