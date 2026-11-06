@@ -4446,6 +4446,140 @@ Open your profile and try again.</value>
   <data name="SocialSignInPromptListsTitle" xml:space="preserve">
     <value>Sign in again to manage your lists</value>
   </data>
+  <data name="SocialSignInPromptScheduleTitle" xml:space="preserve">
+    <value>Sign in again to schedule notes</value>
+  </data>
+  <data name="SocialComposeScheduleMenuButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>More ways to post</value>
+  </data>
+  <data name="SocialComposeScheduleMenuButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>More ways to post</value>
+  </data>
+  <data name="SocialComposeScheduleItem.Text" xml:space="preserve">
+    <value>Schedule…</value>
+    <comment>Menu item beside the Post button that picks a date and time to post the note later.</comment>
+  </data>
+  <data name="SocialComposeScheduleLocalOnlyTip" xml:space="preserve">
+    <value>Scheduled notes can't be kept on this server only. Turn off Don't federate to schedule this note.</value>
+  </data>
+  <data name="SocialScheduleDialogTitle" xml:space="preserve">
+    <value>Schedule note</value>
+  </data>
+  <data name="SocialScheduleDialogConfirm" xml:space="preserve">
+    <value>Schedule</value>
+  </data>
+  <data name="SocialScheduleDateHeader" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="SocialScheduleTimeHeader" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="SocialScheduleInPast" xml:space="preserve">
+    <value>Pick a time at least a minute from now.</value>
+  </data>
+  <data name="SocialScheduleSendsAsFormat" xml:space="preserve">
+    <value>It will be posted as {0}, in your time zone.</value>
+    <comment>{0} is the note's visibility, such as Public or Followers.</comment>
+  </data>
+  <data name="SocialScheduleFailedTitle" xml:space="preserve">
+    <value>Couldn't schedule the note</value>
+  </data>
+  <data name="SocialScheduleErrorMax" xml:space="preserve">
+    <value>You already have as many scheduled notes as your account allows. Delete one from your scheduled notes, or wait for one to post. Your draft is kept.</value>
+  </data>
+  <data name="SocialScheduleErrorPast" xml:space="preserve">
+    <value>That time has already passed. Pick a later time. Your draft is kept.</value>
+  </data>
+  <data name="SocialScheduleCancelTitle" xml:space="preserve">
+    <value>Delete this scheduled note?</value>
+  </data>
+  <data name="SocialScheduleCancelBody" xml:space="preserve">
+    <value>It won't be posted, and it can't be brought back.</value>
+  </data>
+  <data name="SocialScheduleCancelConfirm" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialScheduleCancelFailedTitle" xml:space="preserve">
+    <value>Couldn't delete the scheduled note</value>
+  </data>
+  <data name="SocialScheduleReplaceFailedTitle" xml:space="preserve">
+    <value>The old scheduled note is still there</value>
+  </data>
+  <data name="SocialScheduleReplaceFailedBody" xml:space="preserve">
+    <value>Your new note was sent, but the scheduled note it replaces couldn't be removed. Delete it from your scheduled notes so it doesn't post twice.</value>
+  </data>
+  <data name="WindowTitleEditScheduled" xml:space="preserve">
+    <value>Edit scheduled note</value>
+  </data>
+  <data name="SocialProfileScheduledButtonContent" xml:space="preserve">
+    <value>Scheduled</value>
+    <comment>Button on your profile that opens the list of notes waiting to be posted.</comment>
+  </data>
+  <data name="SocialProfileScheduledCountFormat" xml:space="preserve">
+    <value>Scheduled ({0})</value>
+    <comment>{0} is how many notes are waiting to be posted.</comment>
+  </data>
+  <data name="SocialScheduledTitle.Text" xml:space="preserve">
+    <value>Scheduled notes</value>
+  </data>
+  <data name="SocialScheduledCaption.Text" xml:space="preserve">
+    <value>fort.social posts these for you at the time shown. Editing one replaces it.</value>
+  </data>
+  <data name="SocialScheduledEditButton.Content" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="SocialScheduledCancelButton.Content" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialScheduledLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading scheduled notes</value>
+  </data>
+  <data name="SocialScheduledEmpty" xml:space="preserve">
+    <value>You have no scheduled notes. Choose Schedule from the arrow beside Post to write one.</value>
+  </data>
+  <data name="SocialScheduledNeedPermission" xml:space="preserve">
+    <value>Sign in again to see and schedule notes.</value>
+  </data>
+  <data name="SocialScheduledSignInButton" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="SocialScheduledFailed" xml:space="preserve">
+    <value>Couldn't load your scheduled notes.</value>
+  </data>
+  <data name="SocialScheduledWhenFormat" xml:space="preserve">
+    <value>Posts {0}</value>
+    <comment>{0} is the date and time the note will be posted.</comment>
+  </data>
+  <data name="SocialScheduledWarningFormat" xml:space="preserve">
+    <value>Content warning: {0}</value>
+    <comment>{0} is the note's content warning.</comment>
+  </data>
+  <data name="SocialScheduledNoText" xml:space="preserve">
+    <value>(No text)</value>
+  </data>
+  <data name="SocialScheduledFilesFormat" xml:space="preserve">
+    <value>{0} attached</value>
+    <comment>{0} is how many files are attached to the scheduled note.</comment>
+  </data>
+  <data name="SocialScheduledPoll" xml:space="preserve">
+    <value>Poll</value>
+  </data>
+  <data name="SocialScheduledQuote" xml:space="preserve">
+    <value>Quote</value>
+  </data>
+  <data name="SocialScheduledReply" xml:space="preserve">
+    <value>Reply (can't be edited here)</value>
+  </data>
+  <data name="SocialScheduledInfoBar.Title" xml:space="preserve">
+    <value>Note scheduled</value>
+  </data>
+  <data name="SocialScheduledInfoBarMessageFormat" xml:space="preserve">
+    <value>It will be posted on {0}.</value>
+    <comment>{0} is the date and time the note will be posted.</comment>
+  </data>
+  <data name="SocialScheduledViewButton.Content" xml:space="preserve">
+    <value>View scheduled notes</value>
+  </data>
   <data name="SocialMenuAddToList" xml:space="preserve">
     <value>Add to list…</value>
     <comment>Menu item that opens a dialog for adding this person to one of your fort.social lists.</comment>
@@ -4453,6 +4587,10 @@ Open your profile and try again.</value>
   <data name="SearchNotesResultFormat" xml:space="preserve">
     <value>Search fort.social notes for “{0}”</value>
     <comment>{0} is what the user typed in the search box.</comment>
+  </data>
+  <data name="SearchTagOpenFormat" xml:space="preserve">
+    <value>Open #{0}</value>
+    <comment>Search suggestion that opens a hashtag's notes. {0} is the tag without its # sign.</comment>
   </data>
   <data name="SocialSearchTitleFormat" xml:space="preserve">
     <value>Search: {0}</value>

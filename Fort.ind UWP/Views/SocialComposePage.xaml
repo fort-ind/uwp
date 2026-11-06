@@ -13,6 +13,7 @@
         <local:SocialComposer x:Name="Composer"
                               DraftChanged="Composer_DraftChanged"
                               Posted="Composer_Posted"
+                              Scheduled="Composer_Scheduled"
                               Discarded="Composer_Discarded"/>
     </Grid>
 </Page>

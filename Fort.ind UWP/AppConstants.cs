@@ -253,6 +253,15 @@ namespace Fort.ind_UWP
 
         public const int SearchDebounceMilliseconds = 300;
         public const int SearchSuggestionLimit = 15;
+        public const int SearchTagSuggestionLimit = 5;
+        public const int SearchTagMinPlainLength = 3;
+        public const int SearchTagMinHashedLength = 1;
+        public const int SearchTagMaxLength = 100;
+        public const int SocialScheduledListLimit = 100;
+        public const int SocialScheduleMinimumLeadMinutes = 1;
+        public const int SocialScheduleMinuteIncrement = 5;
+        public const int SocialScheduleMaxYearsAhead = 3;
+        public const int SocialScheduledInfoBarSeconds = 10;
 
         public const int ContentBackStackLimit = 20;
 

@@ -943,6 +943,38 @@ namespace Fort.ind_UWP
             return CreatedNoteAsync("notes/edit", token, body, cancellationToken);
         }
 
+        public static Task<SocialApiResult<bool>> CreateScheduledNoteAsync(string token, JObject body, CancellationToken cancellationToken)
+        {
+            return ActionAsync("notes/schedule/create", token, body, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> DeleteScheduledNoteAsync(string token, string scheduleId, CancellationToken cancellationToken)
+        {
+            return ActionAsync("notes/schedule/delete", token, NoteBody(scheduleId), cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialScheduledNote>>> GetScheduledNotesAsync(string token,
+                                                                                                           CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("limit", new JValue(AppConstants.SocialScheduledListLimit));
+
+            var response = await PostAsync("notes/schedule/list", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialScheduledNote>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            if (response.Value.Type != JTokenType.Array)
+            {
+                return SocialApiResult<IReadOnlyList<SocialScheduledNote>>.Failed(SocialApiStatus.Failed);
+            }
+
+            var array = (JArray)response.Value;
+            var notes = await Task.Run(() => SocialScheduledNote.ListFromJson(array), cancellationToken);
+            return SocialApiResult<IReadOnlyList<SocialScheduledNote>>.Succeeded(notes);
+        }
+
         private static async Task<SocialApiResult<SocialNote>> CreatedNoteAsync(string endpoint, string token, JObject body,
                                                                                CancellationToken cancellationToken)
         {
@@ -1107,7 +1139,7 @@ namespace Fort.ind_UWP
             body.Add("query", new JValue(query ?? ""));
             body.Add("limit", new JValue(limit));
 
-            var response = await PostAsync("hashtags/search", token, body, cancellationToken);
+            var response = await PostOptionalTokenAsync("hashtags/search", token, body, cancellationToken);
             if (response.Status != SocialApiStatus.Ok)
             {
                 return SocialApiResult<IReadOnlyList<string>>.Failed(response.Status, response.ErrorCode);

@@ -198,6 +198,18 @@ namespace Fort.ind_UWP
             return body;
         }
 
+        public static JObject BuildScheduleBody(SocialComposeDraft draft, DateTimeOffset when)
+        {
+            var body = BuildBody(draft);
+            body.Remove("localOnly");
+            body.Remove("editId");
+
+            var schedule = new JObject();
+            schedule.Add("scheduledAt", new JValue(when.ToUnixTimeMilliseconds()));
+            body.Add("scheduleNote", schedule);
+            return body;
+        }
+
         private static JObject PollBody(SocialDraftPoll poll)
         {
             if (poll == null || poll.FilledChoices < 2) return null;

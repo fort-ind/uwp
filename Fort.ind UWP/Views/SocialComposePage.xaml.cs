@@ -16,6 +16,8 @@ namespace Fort.ind_UWP
 
         private const string RedraftSlotPrefix = "redraft:";
 
+        private const string ScheduledSlotPrefix = "scheduled:";
+
         private readonly Debouncer _sizeDebounce = new Debouncer();
 
         private SocialComposeArgs _args;
@@ -85,6 +87,7 @@ namespace Fort.ind_UWP
             {
                 case SocialComposeMode.Quote: return LocalizedStrings.Get("WindowTitleQuote");
                 case SocialComposeMode.Edit: return LocalizedStrings.Get("WindowTitleEditNote");
+                case SocialComposeMode.Scheduled: return LocalizedStrings.Get("WindowTitleEditScheduled");
                 default: return LocalizedStrings.Get("WindowTitleNewNote");
             }
         }
@@ -117,7 +120,8 @@ namespace Fort.ind_UWP
                             : null;
                 var editing = args.Mode == SocialComposeMode.Edit ? note : null;
 
-                Composer.Load(draft, new SocialComposeContext(SocialComposerMode.Window, null, quote, editing));
+                var replaces = args.ScheduledNote == null ? null : args.ScheduledNote.Id;
+                Composer.Load(draft, new SocialComposeContext(SocialComposerMode.Window, null, quote, editing, replaces));
 
                 if ((args.Mode == SocialComposeMode.Edit || args.Mode == SocialComposeMode.Redraft)
                     && note != null && note.Visibility == SocialPostService.DirectVisibility && draft.Recipients.Count == 0)
@@ -138,6 +142,8 @@ namespace Fort.ind_UWP
             var noteId = args.Note == null ? "" : args.Note.Id;
             switch (args.Mode)
             {
+                case SocialComposeMode.Scheduled:
+                    return ScheduledSlotPrefix + (args.ScheduledNote == null ? "" : args.ScheduledNote.Id);
                 case SocialComposeMode.Quote:
                     return QuoteSlotPrefix + noteId;
                 case SocialComposeMode.Edit:
@@ -156,6 +162,8 @@ namespace Fort.ind_UWP
 
             switch (args.Mode)
             {
+                case SocialComposeMode.Scheduled:
+                    return saved ?? (args.ScheduledNote == null ? SocialComposeDraft.Empty : args.ScheduledNote.ToDraft());
                 case SocialComposeMode.Edit:
                     return saved ?? SocialComposeDraft.FromNote(args.Note, null, true);
                 case SocialComposeMode.Redraft:
@@ -235,6 +243,19 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 AppLog.Error("SocialComposePage: could not finish after posting", ex);
+            }
+        }
+
+        private void Composer_Scheduled(object sender, DateTimeOffset when)
+        {
+            try
+            {
+                RememberVisibility(Composer.GetDraft());
+                Finish();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialComposePage: could not finish after scheduling", ex);
             }
         }
 

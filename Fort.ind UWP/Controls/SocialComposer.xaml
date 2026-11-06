@@ -384,17 +384,40 @@
 
                 <local:SocialCharacterRing x:Name="Ring" Grid.Column="1"/>
 
-                <Button x:Name="PostButton"
-                        Grid.Column="2"
-                        Style="{StaticResource AccentButtonStyle}"
-                        MinWidth="88"
-                        IsEnabled="False"
-                        Click="PostButton_Click">
-                    <Grid>
-                        <TextBlock x:Name="PostLabel" HorizontalAlignment="Center"/>
-                        <ProgressRing x:Name="PostRing" Width="16" Height="16" Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" Visibility="Collapsed"/>
-                    </Grid>
-                </Button>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button x:Name="PostButton"
+                            Style="{StaticResource AccentButtonStyle}"
+                            MinWidth="88"
+                            IsEnabled="False"
+                            Click="PostButton_Click">
+                        <Grid>
+                            <TextBlock x:Name="PostLabel" HorizontalAlignment="Center"/>
+                            <ProgressRing x:Name="PostRing" Width="16" Height="16" Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" Visibility="Collapsed"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Uid="SocialComposeScheduleMenuButton"
+                            x:Name="ScheduleMenuButton"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Margin="1,0,0,0"
+                            MinWidth="32"
+                            Padding="0"
+                            VerticalAlignment="Stretch"
+                            Visibility="Collapsed">
+                        <FontIcon Glyph="&#xE70D;"
+                                  FontSize="12"
+                                  IsTextScaleFactorEnabled="False"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="TopEdgeAlignedRight">
+                                <MenuFlyoutItem x:Uid="SocialComposeScheduleItem"
+                                                x:Name="ScheduleItem"
+                                                Click="ScheduleItem_Click">
+                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE787;"/></MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
             </Grid>
         </StackPanel>
 

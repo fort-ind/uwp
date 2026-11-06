@@ -95,6 +95,8 @@ namespace Fort.ind_UWP
 
             this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
+            ShowScheduledCount(null);
+
             _feeds.StateChanged += Feeds_StateChanged;
             Details.FollowListRequested += Details_FollowListRequested;
 
@@ -148,6 +150,7 @@ namespace Fort.ind_UWP
             }
 
             DetachFollowRequests();
+            DetachScheduled();
         }
 
         private async void OnNoteChanged(object sender, SocialNoteChange change)
@@ -264,6 +267,7 @@ namespace Fort.ind_UWP
             RefreshUI();
             CatchUpNoteChanges();
             AttachFollowRequests();
+            AttachScheduled();
 
             ProfileService.RefreshOnProfileVisit();
         }

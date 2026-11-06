@@ -591,6 +591,7 @@ namespace Fort.ind_UWP
                     var type = stack[i].SourcePageType;
                     if (type == typeof(LoginPage)
                         || type == typeof(SocialUserListPage)
+                        || type == typeof(SocialScheduledPage)
                         || (!intoThread && SocialThreads.IsInPlacePage(type)))
                     {
                         stack.RemoveAt(i);

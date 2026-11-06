@@ -90,6 +90,23 @@ namespace Fort.ind_UWP
             return await WindowManagerService.ShowKeyedAsync(request);
         }
 
+        public static async Task<bool> ShowScheduledComposeAsync(Windows.UI.Xaml.UIElement owner, SocialScheduledNote scheduled)
+        {
+            var account = SocialContentService.CurrentAccountId();
+            if (account == null || scheduled == null) return false;
+            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.WriteNotes, SocialSignInPrompt.Post)) return false;
+
+            var request = new WindowRequest(AppConstants.WindowKeyCompose,
+                                            SocialComposePage.TitleFor(SocialComposeMode.Scheduled),
+                                            null,
+                                            typeof(SocialComposePage),
+                                            SocialComposeArgs.ForScheduled(account, scheduled),
+                                            SocialComposePage.RememberedSize(),
+                                            true);
+
+            return await WindowManagerService.ShowKeyedAsync(request);
+        }
+
         private static async Task<bool> ShowOwnProfileAsync()
         {
             if (WindowManagerService.IsSecondaryView)

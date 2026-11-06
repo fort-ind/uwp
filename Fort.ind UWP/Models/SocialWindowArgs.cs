@@ -76,7 +76,8 @@ namespace Fort.ind_UWP
         New,
         Quote,
         Edit,
-        Redraft
+        Redraft,
+        Scheduled
     }
 
     public sealed class SocialComposeArgs
@@ -93,6 +94,23 @@ namespace Fort.ind_UWP
         public SocialComposeMode Mode { get; private set; }
 
         public SocialNote Note { get; private set; }
+
+        public SocialScheduledNote ScheduledNote { get; private set; }
+
+        public static SocialComposeArgs ForScheduled(string accountId, SocialScheduledNote scheduled)
+        {
+            return new SocialComposeArgs(accountId, SocialComposeMode.Scheduled, null) { ScheduledNote = scheduled };
+        }
+    }
+
+    public sealed class SocialScheduledArgs
+    {
+        public SocialScheduledArgs(string accountId)
+        {
+            AccountId = accountId;
+        }
+
+        public string AccountId { get; private set; }
     }
 
     public sealed class SocialUserListArgs

@@ -178,6 +178,9 @@
     <Compile Include="Controls\SocialComposer.Poll.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialComposer.Schedule.cs">
+      <DependentUpon>SocialComposer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialListMembers.xaml.cs">
       <DependentUpon>SocialListMembers.xaml</DependentUpon>
     </Compile>
@@ -279,6 +282,7 @@
     <Compile Include="Models\SocialFeedCollection.cs" />
     <Compile Include="Models\SocialFeedItem.cs" />
     <Compile Include="Models\NoteSearchItem.cs" />
+    <Compile Include="Models\TagSearchItem.cs" />
     <Compile Include="Models\SocialCollection.cs" />
     <Compile Include="Models\SocialHashtag.cs" />
     <Compile Include="Models\SocialLinkPreview.cs" />
@@ -289,6 +293,8 @@
     <Compile Include="Models\SocialProfileFeeds.cs" />
     <Compile Include="Models\SocialSuggestion.cs" />
     <Compile Include="Models\SocialUserDetail.cs" />
+    <Compile Include="Models\SocialScheduledItem.cs" />
+    <Compile Include="Models\SocialScheduledNote.cs" />
     <Compile Include="Models\SocialUserItem.cs" />
     <Compile Include="Models\SocialWindowArgs.cs" />
     <Compile Include="Models\UserProfile.cs" />
@@ -314,6 +320,7 @@
     <Compile Include="Services\SocialContentService.cs" />
     <Compile Include="Services\SocialDiscoveryService.cs" />
     <Compile Include="Services\SocialDraftService.cs" />
+    <Compile Include="Services\SocialScheduleService.cs" />
     <Compile Include="Services\SocialEmojiService.cs" />
     <Compile Include="Services\SocialFollowRequestService.cs" />
     <Compile Include="Services\SocialFollowService.cs" />
@@ -355,6 +362,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Memory.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainPage.Scheduled.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Navigation.cs">
@@ -476,6 +486,12 @@
     </Compile>
     <Compile Include="Views\ProfilePage.FollowRequests.cs">
       <DependentUpon>ProfilePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProfilePage.Scheduled.cs">
+      <DependentUpon>ProfilePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialScheduledPage.xaml.cs">
+      <DependentUpon>SocialScheduledPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -707,6 +723,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SocialUserListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialScheduledPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

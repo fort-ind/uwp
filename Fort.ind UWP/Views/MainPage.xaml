@@ -141,6 +141,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="UpdateInfoBar.Margin" Value="12,8,12,0"/>
+                        <Setter Target="SocialScheduledInfoBar.Margin" Value="12,8,12,0"/>
                         <Setter Target="SocialPermissionInfoBar.Margin" Value="12,8,12,0"/>
                         <Setter Target="SocialWritePermissionInfoBar.Margin" Value="12,8,12,0"/>
                         <Setter Target="SocialAccountPermissionInfoBar.Margin" Value="12,8,12,0"/>
@@ -152,6 +153,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="UpdateInfoBar.Margin" Value="24,8,24,0"/>
+                        <Setter Target="SocialScheduledInfoBar.Margin" Value="24,8,24,0"/>
                         <Setter Target="SocialPermissionInfoBar.Margin" Value="24,8,24,0"/>
                         <Setter Target="SocialWritePermissionInfoBar.Margin" Value="24,8,24,0"/>
                         <Setter Target="SocialAccountPermissionInfoBar.Margin" Value="24,8,24,0"/>
@@ -315,6 +317,18 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0">
+                    <muxc:InfoBar x:Uid="SocialScheduledInfoBar" x:Name="SocialScheduledInfoBar"
+                                  Margin="24,8,24,0"
+                                  Severity="Success"
+                                  IsOpen="False"
+                                  IsClosable="True"
+                                  Closed="SocialScheduledInfoBar_Closed">
+                        <muxc:InfoBar.ActionButton>
+                            <Button x:Uid="SocialScheduledViewButton"
+                                    Click="SocialScheduledViewButton_Click"/>
+                        </muxc:InfoBar.ActionButton>
+                    </muxc:InfoBar>
+
                     <muxc:InfoBar x:Uid="SocialPermissionInfoBar" x:Name="SocialPermissionInfoBar"
                                   Margin="24,8,24,0"
                                   Severity="Warning"

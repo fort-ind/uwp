@@ -110,8 +110,51 @@ namespace Fort.ind_UWP
             return new NoteSearchItem(query.Trim(), LocalizedStrings.Format("SearchNotesResultFormat", query.Trim()));
         }
 
+        public static string TagNameOf(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query)) return null;
+
+            var text = query.Trim();
+            var hashed = text.StartsWith("#", StringComparison.Ordinal);
+            var name = hashed ? text.Substring(1) : text;
+
+            var minimum = hashed ? AppConstants.SearchTagMinHashedLength : AppConstants.SearchTagMinPlainLength;
+            if (name.Length < minimum || name.Length > AppConstants.SearchTagMaxLength) return null;
+
+            return name.All(c => char.IsLetterOrDigit(c) || c == '_' || c == '-') ? name : null;
+        }
+
+        public static bool IsHashedQuery(string query)
+        {
+            return query != null && query.TrimStart().StartsWith("#", StringComparison.Ordinal);
+        }
+
+        public static SearchItem BuildOpenTagItem(string query)
+        {
+            var name = TagNameOf(query);
+            if (name == null || !IsHashedQuery(query)) return null;
+
+            return new TagSearchItem(name, LocalizedStrings.Format("SearchTagOpenFormat", name));
+        }
+
+        public static List<SearchItem> BuildTagSearchItems(string query, IReadOnlyList<string> tags)
+        {
+            var typed = TagNameOf(query);
+            var items = new List<SearchItem>();
+            if (tags == null) return items;
+
+            foreach (var tag in tags.Where(tag => !string.IsNullOrEmpty(tag)
+                                                  && !string.Equals(tag, typed, StringComparison.OrdinalIgnoreCase))
+                                    .Take(AppConstants.SearchTagSuggestionLimit))
+            {
+                items.Add(new TagSearchItem(tag, "#" + tag));
+            }
+
+            return items;
+        }
+
         public static List<SearchItem> BuildSuggestions(string query, IReadOnlyList<SearchItem> items, SearchItem profileResult,
-                                                        SearchItem notesResult = null)
+                                                        SearchItem notesResult = null, IReadOnlyList<SearchItem> tagResults = null)
         {
             var filtered = items.Where(item => Matches(item, query))
                                 .Take(AppConstants.SearchSuggestionLimit)
@@ -123,6 +166,8 @@ namespace Fort.ind_UWP
             {
                 filtered.Add(profileResult);
             }
+
+            if (tagResults != null) filtered.AddRange(tagResults);
 
             if (notesResult != null) filtered.Add(notesResult);
 

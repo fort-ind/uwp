@@ -115,6 +115,7 @@ namespace Fort.ind_UWP
             }
 
             AttachSignInAgainHandler();
+            AttachScheduledHandler();
             AttachMemoryHandler();
 
             UpdateProfileNavItem();
@@ -220,6 +221,7 @@ namespace Fort.ind_UWP
             }
 
             DetachSignInAgainHandler();
+            DetachScheduledHandler();
             DetachMemoryHandler();
 
             _searchDebounce.Cancel();

@@ -23,13 +23,17 @@ namespace Fort.ind_UWP
 
     public sealed class SocialComposeContext
     {
-        public SocialComposeContext(SocialComposerMode mode, SocialNote replyTo, SocialNote quote, SocialNote editing)
+        public SocialComposeContext(SocialComposerMode mode, SocialNote replyTo, SocialNote quote, SocialNote editing,
+                                    string replacesScheduledId = null)
         {
             Mode = mode;
             ReplyTo = replyTo;
             Quote = quote;
             Editing = editing;
+            ReplacesScheduledId = replacesScheduledId;
         }
+
+        public string ReplacesScheduledId { get; private set; }
 
         public SocialComposerMode Mode { get; private set; }
 
@@ -101,6 +105,8 @@ namespace Fort.ind_UWP
         public event EventHandler DraftChanged;
 
         public event EventHandler<SocialNote> Posted;
+
+        public event EventHandler<DateTimeOffset> Scheduled;
 
         public event EventHandler Discarded;
 
@@ -369,6 +375,7 @@ namespace Fort.ind_UWP
 
             PostLabel.Text = LocalizedStrings.Get(reply ? "SocialComposeReplyButton" : editing ? "SocialComposeSaveButton" : "SocialComposePostButton");
             AutomationProperties.SetName(PostButton, PostLabel.Text);
+            ScheduleMenuButton.Visibility = Shown(SchedulingOffered);
 
             if (reply)
             {
@@ -508,6 +515,7 @@ namespace Fort.ind_UWP
             Ring.Update(length, AppConstants.SocialNoteMaxLength);
 
             PostButton.IsEnabled = CanPost();
+            UpdateScheduleAvailability();
             AttachmentList.Visibility = Shown(_attachments.Count > 0);
             AttachButton.IsEnabled = _attachments.Count < AppConstants.SocialAttachmentLimit && !_posting;
             InkButton.IsEnabled = !_posting;
@@ -579,6 +587,8 @@ namespace Fort.ind_UWP
 
                 var result = await SocialPostService.PostAsync(this, GetDraft());
                 if (!result.Succeeded) return false;
+
+                await SocialScheduleService.RemoveReplacedAsync(this, _context.ReplacesScheduledId);
 
                 Posted?.Invoke(this, result.Note);
                 return true;
@@ -655,6 +665,7 @@ namespace Fort.ind_UWP
             DirectItem.IsChecked = direct;
             LocalOnlyItem.IsChecked = _localOnly && !direct;
             LocalOnlyItem.IsEnabled = !direct && _context.Editing == null;
+            UpdateScheduleAvailability();
 
             var glyph = GlyphFor(_visibility);
             var name = LocalizedStrings.Get(NameKeyFor(_visibility));
@@ -671,7 +682,7 @@ namespace Fort.ind_UWP
             RecipientBox.Visibility = Shown(direct && _context.Mode != SocialComposerMode.Reply);
         }
 
-        private static string GlyphFor(string visibility)
+        internal static string GlyphFor(string visibility)
         {
             switch (visibility)
             {
@@ -682,7 +693,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static string NameKeyFor(string visibility)
+        internal static string NameKeyFor(string visibility)
         {
             switch (visibility)
             {

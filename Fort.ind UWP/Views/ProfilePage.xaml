@@ -143,6 +143,8 @@
                                 x:Name="ManageButton"
                                 AccessKey="M"
                                 Click="ManageButton_Click"/>
+                        <Button x:Name="ScheduledButton"
+                                Click="ScheduledButton_Click"/>
                         <Button x:Uid="SocialProfileMoreButton" x:Name="MoreButton"
                                 VerticalAlignment="Stretch"
                                 Click="MoreButton_Click">

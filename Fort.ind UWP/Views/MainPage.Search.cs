@@ -94,14 +94,39 @@ namespace Fort.ind_UWP
 
                 var profileResult = SearchCatalog.BuildProfileResultItem(ProfileService.CurrentUser);
                 var notesResult = SearchCatalog.BuildNoteSearchItem(query);
+                var openTag = SearchCatalog.BuildOpenTagItem(query);
+                var openTags = openTag == null ? null : new List<SearchItem> { openTag };
 
-                var results = await Task.Run(() => SearchCatalog.BuildSuggestions(query, snapshot, profileResult, notesResult), cancellationToken);
+                var results = await Task.Run(() => SearchCatalog.BuildSuggestions(query, snapshot, profileResult, notesResult, openTags), cancellationToken);
 
-                if (!cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested) return;
+
+                sender.ItemsSource = results;
+
+                if (SearchCatalog.TagNameOf(query) == null)
                 {
-                    sender.ItemsSource = results;
                     AnnounceSearchResultCount(results.Count);
+                    return;
                 }
+
+                var found = await FetchTagNamesAsync(query, cancellationToken);
+                if (cancellationToken.IsCancellationRequested) return;
+
+                if (found.Count > 0)
+                {
+                    var tagItems = SearchCatalog.BuildTagSearchItems(query, found);
+                    if (openTags != null) tagItems.InsertRange(0, openTags);
+
+                    if (tagItems.Count > 0)
+                    {
+                        results = await Task.Run(() => SearchCatalog.BuildSuggestions(query, snapshot, profileResult, notesResult, tagItems), cancellationToken);
+                        if (cancellationToken.IsCancellationRequested) return;
+
+                        sender.ItemsSource = results;
+                    }
+                }
+
+                AnnounceSearchResultCount(results.Count);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -110,6 +135,28 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 AppLog.Error("MainPage: Debounced search failed", ex);
+            }
+        }
+
+        private static async Task<IReadOnlyList<string>> FetchTagNamesAsync(string query, CancellationToken cancellationToken)
+        {
+            var name = SearchCatalog.TagNameOf(query);
+            if (name == null) return new string[0];
+
+            try
+            {
+                var token = await MisskeyAuthService.TryGetTokenAsync();
+                var result = await SocialApiService.SearchHashtagsAsync(token, name, AppConstants.SearchTagSuggestionLimit + 1, cancellationToken);
+                return result.Status == SocialApiStatus.Ok ? result.Value : new string[0];
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MainPage: hashtag suggestions failed", ex);
+                return new string[0];
             }
         }
 
@@ -163,6 +210,16 @@ namespace Fort.ind_UWP
 
         private async Task SubmitFreeTextQueryAsync(string query)
         {
+            if (SearchCatalog.IsHashedQuery(query))
+            {
+                var tag = SearchCatalog.TagNameOf(query);
+                if (tag != null)
+                {
+                    ShowTag(tag);
+                    return;
+                }
+            }
+
             var destinations = SearchCatalog.GetStaticItems();
 
             var exact = FirstDestination(destinations,
@@ -223,7 +280,33 @@ namespace Fort.ind_UWP
             if (item != null)
             {
                 var notes = item as NoteSearchItem;
-                sender.Text = notes != null ? notes.Query : item.Title;
+                var tag = item as TagSearchItem;
+                sender.Text = notes != null ? notes.Query : tag != null ? "#" + tag.Tag : item.Title;
+            }
+        }
+
+        private void ShowTag(string tag)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(tag)) return;
+
+                if (HoldForUnsavedChanges(() => ShowTag(tag))) return;
+
+                var current = ContentFrame.Content as SocialTagPage;
+                if (current != null && current.Shows(tag)) return;
+
+                SelectNavItemForTag(AppConstants.NavigationSocial);
+                ClosePaneUnlessExpanded();
+
+                if (!ContentFrame.Navigate(typeof(SocialTagPage), new SocialTagArgs(SocialContentService.CurrentAccountId(), tag)))
+                {
+                    AppLog.Warning("MainPage: navigation to the hashtag page returned false");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MainPage: could not open the hashtag", ex);
             }
         }
 
@@ -262,9 +345,14 @@ namespace Fort.ind_UWP
             }
 
             var notes = item as NoteSearchItem;
+            var tag = item as TagSearchItem;
             if (notes != null)
             {
                 ShowNoteSearch(notes.Query);
+            }
+            else if (tag != null)
+            {
+                ShowTag(tag.Tag);
             }
             else if (!string.IsNullOrEmpty(item.Url))
             {
