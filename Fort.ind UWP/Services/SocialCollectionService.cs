@@ -144,11 +144,18 @@ namespace Fort.ind_UWP
                 Margin = new Thickness(0, 8, 0, 0)
             };
             var panel = new StackPanel();
-            var boxes = fetched.Value.Select(list => new CheckBox
+            var memberLimit = SocialPolicies.Current.ListMemberLimit;
+            var boxes = fetched.Value.Select(list =>
             {
-                Content = list.Name,
-                Tag = list,
-                IsChecked = list.UserIds.Contains(user.Id)
+                var member = list.UserIds.Contains(user.Id);
+                var full = !member && memberLimit.HasValue && list.UserIds.Count >= memberLimit.Value;
+                return new CheckBox
+                {
+                    Content = full ? LocalizedStrings.Format("SocialListFullNameFormat", list.Name) : list.Name,
+                    Tag = list,
+                    IsChecked = member,
+                    IsEnabled = !full
+                };
             });
             foreach (var box in boxes)
             {

@@ -335,6 +335,17 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static int? PinnedCount
+        {
+            get
+            {
+                lock (s_lock)
+                {
+                    return s_pinned == null ? (int?)null : s_pinned.Count;
+                }
+            }
+        }
+
         public static void RememberPinned(IEnumerable<string> noteIds)
         {
             var pinned = new HashSet<string>(StringComparer.Ordinal);

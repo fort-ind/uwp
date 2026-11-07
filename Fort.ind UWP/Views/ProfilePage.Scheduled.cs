@@ -2,6 +2,7 @@
 using System.Threading;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace Fort.ind_UWP
 {
@@ -78,8 +79,14 @@ namespace Fort.ind_UWP
                         ? LocalizedStrings.Format("SocialProfileScheduledCountFormat", count.Value)
                         : LocalizedStrings.Get("SocialProfileScheduledButtonContent");
 
+            var limit = SocialPolicies.Current.ScheduledNoteMax;
+            var detail = count.HasValue && count.Value > 0 && limit.HasValue
+                         ? LocalizedStrings.Format("SocialProfileScheduledCountOfFormat", count.Value, limit.Value)
+                         : null;
+
             ScheduledButton.Content = label;
-            Windows.UI.Xaml.Automation.AutomationProperties.SetName(ScheduledButton, label);
+            ToolTipService.SetToolTip(ScheduledButton, detail);
+            Windows.UI.Xaml.Automation.AutomationProperties.SetName(ScheduledButton, detail ?? label);
         }
 
         private void ScheduledButton_Click(object sender, RoutedEventArgs e)

@@ -113,8 +113,12 @@ namespace Fort.ind_UWP
 
         public static async Task ShowSignInInMainWindowAsync()
         {
+            if (!IsSecondaryView) CaptureMainView();
+
             var mainDispatcher = s_mainDispatcher;
             if (mainDispatcher == null) return;
+
+            var callerViewId = ApplicationView.GetForCurrentView().Id;
 
             await mainDispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -129,7 +133,7 @@ namespace Fort.ind_UWP
                 }
             });
 
-            await ApplicationViewSwitcher.SwitchAsync(s_mainViewId);
+            if (callerViewId != s_mainViewId) await ApplicationViewSwitcher.SwitchAsync(s_mainViewId);
         }
 
         public static async Task CloseAccountScopedWindowsAsync()

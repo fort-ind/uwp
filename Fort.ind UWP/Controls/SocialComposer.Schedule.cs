@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -17,17 +18,63 @@ namespace Fort.ind_UWP
             get { return _localOnly && _visibility != SocialPostService.DirectVisibility; }
         }
 
+        private int _scheduleCountVersion;
+
+        private int ScheduleCountVersion
+        {
+            get { return _scheduleCountVersion; }
+        }
+
+        private bool AtScheduleLimit
+        {
+            get
+            {
+                var limit = SocialPolicies.Current.ScheduledNoteMax;
+                var count = SocialScheduleService.KnownCount;
+                return limit.HasValue && count.HasValue && count.Value >= limit.Value;
+            }
+        }
+
         private bool CanSchedule()
         {
-            return SchedulingOffered && !LocalOnlyBlocksScheduling && CanPost();
+            return SchedulingOffered && !LocalOnlyBlocksScheduling && !AtScheduleLimit && CanPost();
         }
 
         private void UpdateScheduleAvailability()
         {
             ScheduleItem.IsEnabled = CanSchedule();
             ScheduleMenuButton.IsEnabled = !_posting;
-            ToolTipService.SetToolTip(ScheduleItem,
-                                      LocalOnlyBlocksScheduling ? LocalizedStrings.Get("SocialComposeScheduleLocalOnlyTip") : null);
+
+            string tip = null;
+            if (LocalOnlyBlocksScheduling)
+            {
+                tip = LocalizedStrings.Get("SocialComposeScheduleLocalOnlyTip");
+            }
+            else if (SchedulingOffered && AtScheduleLimit)
+            {
+                tip = LocalizedStrings.Format("SocialComposeScheduleLimitTip", SocialPolicies.Current.ScheduledNoteMax.GetValueOrDefault());
+            }
+
+            ToolTipService.SetToolTip(ScheduleItem, tip);
+        }
+
+        private async void RefreshScheduleCount()
+        {
+            try
+            {
+                if (!SchedulingOffered || !SocialPolicies.Current.ScheduledNoteMax.HasValue) return;
+                if (!SocialPermissions.Has(SocialPermissions.ReadNotesSchedule)) return;
+
+                var version = ++_scheduleCountVersion;
+                var result = await SocialScheduleService.FetchAsync(CancellationToken.None);
+                if (version != ScheduleCountVersion || result.Status != SocialApiStatus.Ok) return;
+
+                UpdateScheduleAvailability();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialComposer: could not count the scheduled notes", ex);
+            }
         }
 
         private async void ScheduleItem_Click(object sender, RoutedEventArgs e)

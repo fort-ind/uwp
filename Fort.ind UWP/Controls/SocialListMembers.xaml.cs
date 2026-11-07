@@ -241,6 +241,14 @@ namespace Fort.ind_UWP
 
                 if (suggestion == null || _busy || IsReleased) return;
 
+                var limit = SocialPolicies.Current.ListMemberLimit;
+                var already = _members.Any(member => string.Equals(member.User.Id, suggestion.User.Id, StringComparison.Ordinal));
+                if (limit.HasValue && !already && _members.Count >= limit.Value)
+                {
+                    ShowStatus(LocalizedStrings.Get("SocialListFull"));
+                    return;
+                }
+
                 _busy = true;
                 ShowStatus(null);
                 _searchDebounce.Cancel();

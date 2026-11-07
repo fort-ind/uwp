@@ -239,6 +239,7 @@ namespace Fort.ind_UWP
 
             if (_context.Mode == SocialComposerMode.Reply && !IsDraftEmpty()) SetExpanded(true);
             UpdateState();
+            RefreshScheduleCount();
 
             try
             {
@@ -520,6 +521,22 @@ namespace Fort.ind_UWP
             AttachButton.IsEnabled = _attachments.Count < AppConstants.SocialAttachmentLimit && !_posting;
             InkButton.IsEnabled = !_posting;
             UpdatePollWarning();
+            UpdateMentionWarning();
+        }
+
+        private void UpdateMentionWarning()
+        {
+            var limit = SocialPolicies.Current.MentionLimit;
+            var text = Editor.Text;
+            var mentions = 0;
+            if (limit.HasValue && !string.IsNullOrEmpty(text) && text.IndexOf('@') >= 0)
+            {
+                mentions = SocialPostService.CountMentions(text);
+            }
+
+            var over = limit.HasValue && mentions > limit.Value;
+            MentionLimitWarning.Visibility = Shown(over);
+            if (over) MentionLimitWarning.Text = LocalizedStrings.Format("SocialComposeMentionLimitFormat", mentions, limit.Value);
         }
 
         private bool CanPost()
@@ -657,8 +674,15 @@ namespace Fort.ind_UWP
 
         private void ApplyVisibility()
         {
+            var publicAllowed = SocialPolicies.Current.AllowsPublicNotes || _context.Editing != null;
+            if (!publicAllowed && _visibility == SocialNoteActionService.PublicVisibility)
+            {
+                _visibility = SocialNoteActionService.HomeVisibility;
+            }
+
             var direct = _visibility == SocialPostService.DirectVisibility;
 
+            PublicItem.IsEnabled = publicAllowed;
             PublicItem.IsChecked = _visibility == SocialNoteActionService.PublicVisibility;
             HomeItem.IsChecked = _visibility == SocialNoteActionService.HomeVisibility;
             FollowersItem.IsChecked = _visibility == SocialNoteActionService.FollowersVisibility;

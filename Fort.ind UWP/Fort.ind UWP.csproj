@@ -268,6 +268,7 @@
     <Compile Include="Models\SettingsCategory.cs" />
     <Compile Include="Models\SocialAccountSettings.cs" />
     <Compile Include="Models\SocialMuteWordSet.cs" />
+    <Compile Include="Models\SocialPolicies.cs" />
     <Compile Include="Models\SocialPrivacySettings.cs" />
     <Compile Include="Models\SocialProfileFieldRow.cs" />
     <Compile Include="Models\SocialAttachmentItem.cs" />

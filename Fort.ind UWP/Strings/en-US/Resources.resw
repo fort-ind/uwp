@@ -2821,6 +2821,10 @@ Open your profile and try again.</value>
   <data name="SocialMenuReport" xml:space="preserve">
     <value>Report</value>
   </data>
+  <data name="SocialMenuPinLimitFormat" xml:space="preserve">
+    <value>Pin to profile (limit of {0} reached)</value>
+    <comment>Disabled menu item: the account already has as many pinned notes as its role allows. {0} is that limit.</comment>
+  </data>
   <data name="SocialMenuPin" xml:space="preserve">
     <value>Pin to profile</value>
   </data>
@@ -2995,6 +2999,10 @@ Open your profile and try again.</value>
   </data>
   <data name="SocialComposePollEndTime.Header" xml:space="preserve">
     <value>End time</value>
+  </data>
+  <data name="SocialComposeMentionLimitFormat" xml:space="preserve">
+    <value>This note mentions {0} people, but your account allows {1} per note. fort.social will refuse it.</value>
+    <comment>Warning under the note's text box. {0} is how many different people are mentioned, {1} is the most the account's role allows.</comment>
   </data>
   <data name="SocialComposePollResetWarning.Text" xml:space="preserve">
     <value>Changing the poll resets its votes.</value>
@@ -4423,8 +4431,16 @@ Open your profile and try again.</value>
     <value>{0} has blocked you, so they can't be added to a list.</value>
     <comment>{0} is a person.</comment>
   </data>
+  <data name="SocialListFullNameFormat" xml:space="preserve">
+    <value>{0} (full)</value>
+    <comment>A list's name in Add to list when it already has as many people as the account allows. {0} is the list's name.</comment>
+  </data>
   <data name="SocialListFull" xml:space="preserve">
     <value>This list is full.</value>
+  </data>
+  <data name="SocialListTooManyFormat" xml:space="preserve">
+    <value>You already have {0} lists, the most your account allows. Delete one to make another.</value>
+    <comment>Shown instead of asking for a name when the account is at its list limit. {0} is that limit.</comment>
   </data>
   <data name="SocialListTooMany" xml:space="preserve">
     <value>You have reached the max number of lists </value>
@@ -4458,6 +4474,10 @@ Open your profile and try again.</value>
   <data name="SocialComposeScheduleItem.Text" xml:space="preserve">
     <value>Schedule…</value>
     <comment>Menu item beside the Post button that picks a date and time to post the note later.</comment>
+  </data>
+  <data name="SocialComposeScheduleLimitTip" xml:space="preserve">
+    <value>You have {0} scheduled notes, the most your account allows. Delete one on the Scheduled page to schedule another.</value>
+    <comment>Tooltip on the disabled Schedule menu item. {0} is the account's limit on scheduled notes.</comment>
   </data>
   <data name="SocialComposeScheduleLocalOnlyTip" xml:space="preserve">
     <value>Scheduled notes can't be kept on this server only. Turn off Don't federate to schedule this note.</value>
@@ -4518,6 +4538,10 @@ Open your profile and try again.</value>
   <data name="SocialProfileScheduledCountFormat" xml:space="preserve">
     <value>Scheduled ({0})</value>
     <comment>{0} is how many notes are waiting to be posted.</comment>
+  </data>
+  <data name="SocialProfileScheduledCountOfFormat" xml:space="preserve">
+    <value>{0} of {1} scheduled notes</value>
+    <comment>Tooltip and screen reader name of the Scheduled button on your profile. {0} is how many notes are waiting to be posted, {1} is the most the account may have waiting.</comment>
   </data>
   <data name="SocialScheduledTitle.Text" xml:space="preserve">
     <value>Scheduled notes</value>

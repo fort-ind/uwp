@@ -60,6 +60,7 @@ namespace Fort.ind_UWP
         public static bool CanRenoteAs(SocialNoteItem item, string visibility)
         {
             if (!CanRenote(item)) return false;
+            if (visibility == PublicVisibility && !SocialPolicies.Current.AllowsPublicNotes) return false;
 
             switch (item.Note.Visibility)
             {

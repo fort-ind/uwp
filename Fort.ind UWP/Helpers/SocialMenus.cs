@@ -264,7 +264,7 @@ namespace Fort.ind_UWP
             {
                 var pinned = await SocialNoteActionService.GetPinnedAsync(noteId);
                 if (pinned.HasValue) LabelPinItem(pin, pinned.Value);
-                pin.IsEnabled = true;
+                else pin.IsEnabled = true;
             }
             catch (Exception ex)
             {
@@ -276,6 +276,13 @@ namespace Fort.ind_UWP
         {
             pin.Text = LocalizedStrings.Get(pinned ? "SocialMenuUnpin" : "SocialMenuPin");
             pin.Glyph = pinned ? UnpinGlyph : PinGlyph;
+
+            var limit = SocialPolicies.Current.PinLimit;
+            var count = SocialNoteService.PinnedCount;
+            var full = !pinned && limit.HasValue && count.HasValue && count.Value >= limit.Value;
+            if (full) pin.Text = LocalizedStrings.Format("SocialMenuPinLimitFormat", limit.Value);
+
+            pin.IsEnabled = !full;
         }
 
         public static MenuFlyout BuildForUser(SocialUser user, string fallbackUrl, UIElement announcer)

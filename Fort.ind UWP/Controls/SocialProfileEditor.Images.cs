@@ -75,11 +75,11 @@ namespace Fort.ind_UWP
                     AppLog.Error("SocialProfileEditor: could not read the image's size", ex);
                 }
 
-                if (size > AppConstants.SocialUploadLimitBytes)
+                if (size > SocialPolicies.Current.UploadLimitBytes)
                 {
                     await DialogService.ShowMessageAsync(this,
                                                          LocalizedStrings.Get("SocialProfileImageTooLargeTitle"),
-                                                         LocalizedStrings.Format("SocialProfileImageTooLargeFormat", AppConstants.SocialUploadLimitBytes / (1024 * 1024)),
+                                                         LocalizedStrings.Format("SocialProfileImageTooLargeFormat", SocialPolicies.Current.UploadLimitMegabytes),
                                                          LocalizedStrings.Get("DialogOk"));
                     return;
                 }

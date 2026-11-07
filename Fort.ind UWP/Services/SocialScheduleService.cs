@@ -29,10 +29,40 @@ namespace Fort.ind_UWP
 
         public static event EventHandler<DateTimeOffset> Scheduled;
 
+        private static readonly object s_countLock = new object();
+
+        private static int? s_count;
+
+        private static string s_countAccount;
+
+        public static int? KnownCount
+        {
+            get
+            {
+                lock (s_countLock)
+                {
+                    return string.Equals(s_countAccount, SocialContentService.CurrentAccountId(), StringComparison.Ordinal) ? s_count : null;
+                }
+            }
+        }
+
         public static async Task<SocialApiResult<IReadOnlyList<SocialScheduledNote>>> FetchAsync(CancellationToken cancellationToken)
         {
+            var account = SocialContentService.CurrentAccountId();
             var token = await MisskeyAuthService.TryGetTokenAsync();
-            return await SocialApiService.GetScheduledNotesAsync(token, cancellationToken);
+            var result = await SocialApiService.GetScheduledNotesAsync(token, cancellationToken);
+            if (result.Status == SocialApiStatus.Ok) RememberCount(account, result.Value.Count);
+
+            return result;
+        }
+
+        private static void RememberCount(string account, int? count)
+        {
+            lock (s_countLock)
+            {
+                s_countAccount = account;
+                s_count = count;
+            }
         }
 
         public static async Task<SocialScheduleResult> ScheduleAsync(UIElement owner, SocialComposeDraft draft, DateTimeOffset when)
@@ -161,6 +191,8 @@ namespace Fort.ind_UWP
 
         private static void Raise(DateTimeOffset? scheduledAt)
         {
+            RememberCount(null, null);
+
             try
             {
                 Changed?.Invoke(null, EventArgs.Empty);

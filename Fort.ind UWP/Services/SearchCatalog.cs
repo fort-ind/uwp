@@ -106,6 +106,7 @@ namespace Fort.ind_UWP
         {
             if (string.IsNullOrWhiteSpace(query) || query.Trim().Length < 2) return null;
             if (SocialContentService.CurrentAccountId() == null) return null;
+            if (!SocialPolicies.Current.AllowsNoteSearch) return null;
 
             return new NoteSearchItem(query.Trim(), LocalizedStrings.Format("SearchNotesResultFormat", query.Trim()));
         }

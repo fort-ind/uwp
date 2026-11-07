@@ -103,6 +103,14 @@ namespace Fort.ind_UWP
 
             var version = ++feed.Version;
             feed.Requested = true;
+
+            if (!TimelineAllowed(feed.Timeline))
+            {
+                feed.Items.ReplaceAll(new SocialNoteItem[0], false);
+                SetTimelineState(feed, FeedState.Unavailable);
+                return true;
+            }
+
             if (!keepList) SetTimelineState(feed, FeedState.Loading);
 
             try
@@ -135,6 +143,17 @@ namespace Fort.ind_UWP
 
                 SetTimelineState(feed, FeedState.Failed);
                 return true;
+            }
+        }
+
+        private static bool TimelineAllowed(SocialTimeline timeline)
+        {
+            var policies = SocialPolicies.Current;
+            switch (timeline)
+            {
+                case SocialTimeline.Local: return policies.AllowsLocalTimeline;
+                case SocialTimeline.Global: return policies.AllowsGlobalTimeline;
+                default: return true;
             }
         }
 

@@ -235,6 +235,16 @@ namespace Fort.ind_UWP
         {
             try
             {
+                var limit = SocialPolicies.Current.ListLimit;
+                if (limit.HasValue && _lists != null && _lists.Count >= limit.Value)
+                {
+                    await DialogService.ShowMessageAsync(this,
+                                                         LocalizedStrings.Get("SocialListCreateFailedTitle"),
+                                                         LocalizedStrings.Format("SocialListTooManyFormat", limit.Value),
+                                                         LocalizedStrings.Get("DialogOk"));
+                    return;
+                }
+
                 var list = await SocialCollectionService.CreateListAsync(this);
                 if (list == null || IsSignedOut) return;
 

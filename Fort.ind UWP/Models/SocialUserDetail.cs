@@ -54,7 +54,7 @@ namespace Fort.ind_UWP
             "mutedWords", "hardMutedWords", "mutedInstances", "notificationRecieveConfig", "defaultCW",
             "defaultSensitive", "alwaysMarkNsfw", "autoSensitive", "lang", "followedMessage",
             "requireSigninToViewContents", "enableRss", "noindex", "carefulBot",
-            "makeNotesFollowersOnlyBefore", "makeNotesHiddenBefore"
+            "makeNotesFollowersOnlyBefore", "makeNotesHiddenBefore", "policies"
         };
 
         private SocialUserDetail()

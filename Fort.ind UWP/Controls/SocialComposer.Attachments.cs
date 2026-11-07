@@ -228,9 +228,9 @@ namespace Fort.ind_UWP
                 _attachments.Add(item);
                 LoadFileThumbnail(item, file);
 
-                if (size > AppConstants.SocialUploadLimitBytes)
+                if (size > SocialPolicies.Current.UploadLimitBytes)
                 {
-                    item.ErrorText = LocalizedStrings.Format("SocialAttachmentTooLargeFormat", AppConstants.SocialUploadLimitBytes / (1024 * 1024));
+                    item.ErrorText = LocalizedStrings.Format("SocialAttachmentTooLargeFormat", SocialPolicies.Current.UploadLimitMegabytes);
                     item.State = SocialAttachmentState.TooLarge;
                     UpdateState();
                     continue;
@@ -606,9 +606,9 @@ namespace Fort.ind_UWP
                 await item.LoadLocalThumbnailAsync(preview);
             }
 
-            if ((ulong)bytes.Length > AppConstants.SocialUploadLimitBytes)
+            if ((ulong)bytes.Length > SocialPolicies.Current.UploadLimitBytes)
             {
-                item.ErrorText = LocalizedStrings.Format("SocialAttachmentTooLargeFormat", AppConstants.SocialUploadLimitBytes / (1024 * 1024));
+                item.ErrorText = LocalizedStrings.Format("SocialAttachmentTooLargeFormat", SocialPolicies.Current.UploadLimitMegabytes);
                 item.State = SocialAttachmentState.TooLarge;
                 UpdateState();
                 return item;
