@@ -18,5 +18,8 @@
 <Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
   <Application>
     <Assembly Name="Fort.ind UWP" Dynamic="Required All" />
+    <Assembly Name="ColorCode.Core">
+      <Namespace Name="ColorCode.Compilation.Languages" Dynamic="Required Public" />
+    </Assembly>
   </Application>
 </Directives>

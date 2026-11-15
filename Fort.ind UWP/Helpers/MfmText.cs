@@ -11,7 +11,9 @@ namespace Fort.ind_UWP
         Link,
         Mention,
         Hashtag,
-        Emoji
+        Emoji,
+        InlineCode,
+        CodeBlock
     }
 
     public sealed class MfmSegment
@@ -35,6 +37,12 @@ namespace Fort.ind_UWP
         public string EmojiName { get; internal set; }
 
         public Uri EmojiUri { get; internal set; }
+
+        public string Language { get; internal set; }
+
+        public string DisplayText { get; internal set; }
+
+        public IReadOnlyList<CodeToken> CodeTokens { get; internal set; }
     }
 
     public static class MfmText
@@ -333,13 +341,40 @@ namespace Fort.ind_UWP
                     if (close < 0) return false;
 
                     var inner = _s.Substring(i + 3, close - i - 3);
+                    var tag = "";
                     var firstBreak = inner.IndexOf('\n');
-                    if (firstBreak >= 0 && inner.Substring(0, firstBreak).Trim().IndexOf(' ') < 0)
+                    var isBlock = firstBreak >= 0;
+                    if (isBlock)
                     {
-                        inner = inner.Substring(firstBreak + 1);
+                        var firstLine = inner.Substring(0, firstBreak).Trim();
+                        if (firstLine.Length == 0 || CodeHighlighter.IsLanguageTag(firstLine))
+                        {
+                            tag = firstLine;
+                            inner = inner.Substring(firstBreak + 1);
+                        }
                     }
-                    _text.Append(inner.TrimEnd('\n'));
+
+                    var code = inner.TrimEnd('\n');
                     next = close + 3;
+                    if (code.Length == 0) return true;
+
+                    FlushText();
+                    if (isBlock)
+                    {
+                        var highlight = CodeHighlighter.Analyze(code, tag);
+                        _segments.Add(new MfmSegment
+                        {
+                            Kind = MfmSegmentKind.CodeBlock,
+                            Text = code,
+                            Language = highlight.Label,
+                            DisplayText = highlight.DisplayText,
+                            CodeTokens = highlight.Tokens
+                        });
+                    }
+                    else
+                    {
+                        _segments.Add(new MfmSegment { Kind = MfmSegmentKind.InlineCode, Text = code });
+                    }
                     return true;
                 }
 
@@ -349,7 +384,8 @@ namespace Fort.ind_UWP
                     if (close <= i + 1) return false;
                     if (_s.IndexOf('\n', i + 1, close - i - 1) >= 0) return false;
 
-                    _text.Append(_s, i + 1, close - i - 1);
+                    FlushText();
+                    _segments.Add(new MfmSegment { Kind = MfmSegmentKind.InlineCode, Text = _s.Substring(i + 1, close - i - 1) });
                     next = close + 1;
                     return true;
                 }

@@ -148,6 +148,9 @@
     <Compile Include="Controls\SocialCharacterRing.xaml.cs">
       <DependentUpon>SocialCharacterRing.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialCodeBlock.xaml.cs">
+      <DependentUpon>SocialCodeBlock.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialComposer.xaml.cs">
       <DependentUpon>SocialComposer.xaml</DependentUpon>
     </Compile>
@@ -239,6 +242,8 @@
     <Compile Include="Helpers\Blurhash.cs" />
     <Compile Include="Helpers\BlurhashImage.cs" />
     <Compile Include="Helpers\CaptionButtonColors.cs" />
+    <Compile Include="Helpers\CodeHighlighter.cs" />
+    <Compile Include="Helpers\CodePalette.cs" />
     <Compile Include="Helpers\ColorHelper.cs" />
     <Compile Include="Helpers\CountText.cs" />
     <Compile Include="Helpers\Debouncer.cs" />
@@ -739,6 +744,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\SocialCodeBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\SocialComposer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -805,6 +814,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ColorCode.Core">
+      <Version>2.0.15</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
     </PackageReference>

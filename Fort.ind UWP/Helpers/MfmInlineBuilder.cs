@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation;
@@ -17,6 +18,9 @@ namespace Fort.ind_UWP
         public const double NameEmojiSize = 18;
 
         private const int LinkClickWindowMilliseconds = 400;
+
+        private static readonly ConditionalWeakTable<RichTextBlock, FillState> s_states =
+            new ConditionalWeakTable<RichTextBlock, FillState>();
 
         private static int s_lastLinkTicks;
 
@@ -37,17 +41,29 @@ namespace Fort.ind_UWP
         {
             target.Blocks.Clear();
 
+            FillState previous;
+            if (s_states.TryGetValue(target, out previous)) previous.Reset();
+
             var paragraph = new Paragraph();
-            Append(paragraph.Inlines, segments, interactive, emojiSize);
+            Append(paragraph.Inlines, segments, interactive, emojiSize, interactive ? target : null);
             target.Blocks.Add(paragraph);
         }
 
         public static void Append(InlineCollection inlines, IReadOnlyList<MfmSegment> segments, bool interactive, double emojiSize)
         {
+            Append(inlines, segments, interactive, emojiSize, null);
+        }
+
+        private static void Append(InlineCollection inlines, IReadOnlyList<MfmSegment> segments, bool interactive, double emojiSize, RichTextBlock owner)
+        {
             if (segments == null) return;
 
+            var afterBlock = false;
             foreach (var segment in segments)
             {
+                var followsBlock = afterBlock;
+                afterBlock = false;
+
                 switch (segment.Kind)
                 {
                     case MfmSegmentKind.Emoji:
@@ -65,11 +81,73 @@ namespace Fort.ind_UWP
                             AppendText(inlines, segment.Text);
                         }
                         break;
+                    case MfmSegmentKind.CodeBlock:
+                        if (owner == null)
+                        {
+                            AppendText(inlines, segment.Text);
+                            break;
+                        }
+
+                        DropTrailingBreak(inlines);
+                        inlines.Add(CodeBlockInline(segment, owner));
+                        afterBlock = true;
+                        break;
+                    case MfmSegmentKind.InlineCode:
+                        if (owner == null)
+                        {
+                            AppendText(inlines, segment.Text);
+                        }
+                        else
+                        {
+                            inlines.Add(InlineCodeRun(segment, owner));
+                        }
+                        break;
                     default:
-                        AppendText(inlines, segment.Text);
+                        AppendText(inlines, followsBlock ? WithoutLeadingBreak(segment.Text) : segment.Text);
                         break;
                 }
             }
+        }
+
+        private static void DropTrailingBreak(InlineCollection inlines)
+        {
+            if (inlines.Count > 0 && inlines[inlines.Count - 1] is LineBreak)
+            {
+                inlines.RemoveAt(inlines.Count - 1);
+            }
+        }
+
+        private static string WithoutLeadingBreak(string text)
+        {
+            return !string.IsNullOrEmpty(text) && text[0] == '\n' ? text.Substring(1) : text;
+        }
+
+        private static FillState StateOf(RichTextBlock owner)
+        {
+            return s_states.GetValue(owner, CreateState);
+        }
+
+        private static FillState CreateState(RichTextBlock owner)
+        {
+            return new FillState(owner);
+        }
+
+        private static Inline CodeBlockInline(MfmSegment segment, RichTextBlock owner)
+        {
+            var state = StateOf(owner);
+            var block = new SocialCodeBlock();
+            block.Load(segment, state.IsDark);
+            state.Add(block);
+            return new InlineUIContainer { Child = block };
+        }
+
+        private static Inline InlineCodeRun(MfmSegment segment, RichTextBlock owner)
+        {
+            var state = StateOf(owner);
+            var run = new Run { Text = segment.Text, FontFamily = new FontFamily(CodePalette.FontName) };
+            CodePalette.Paint(run, CodePalette.InlineCode(state.IsDark));
+            state.Add(run);
+            return run;
         }
 
         private static void AppendText(InlineCollection inlines, string text)
@@ -143,6 +221,95 @@ namespace Fort.ind_UWP
             ToolTipService.SetToolTip(image, segment.Text);
 
             return new InlineUIContainer { Child = image };
+        }
+
+        private sealed class FillState
+        {
+            private readonly RichTextBlock _target;
+
+            private readonly List<SocialCodeBlock> _blocks = new List<SocialCodeBlock>();
+
+            private readonly List<Run> _runs = new List<Run>();
+
+            public FillState(RichTextBlock target)
+            {
+                _target = target;
+                target.SizeChanged += OnSizeChanged;
+                target.ActualThemeChanged += OnActualThemeChanged;
+            }
+
+            public bool IsDark
+            {
+                get { return CodePalette.IsDark(_target); }
+            }
+
+            private double ContentWidth
+            {
+                get
+                {
+                    var width = _target.ActualWidth - _target.Padding.Left - _target.Padding.Right;
+                    return width > 0 ? width : 0;
+                }
+            }
+
+            public void Reset()
+            {
+                _blocks.Clear();
+                _runs.Clear();
+            }
+
+            public void Add(SocialCodeBlock block)
+            {
+                _blocks.Add(block);
+
+                var width = ContentWidth;
+                if (width > 0) block.Width = width;
+            }
+
+            public void Add(Run run)
+            {
+                _runs.Add(run);
+            }
+
+            private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+            {
+                try
+                {
+                    var width = ContentWidth;
+                    if (width <= 0) return;
+
+                    foreach (var block in _blocks)
+                    {
+                        block.Width = width;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Error("MfmInlineBuilder: sizing a code block failed", ex);
+                }
+            }
+
+            private void OnActualThemeChanged(FrameworkElement sender, object args)
+            {
+                try
+                {
+                    var dark = IsDark;
+                    foreach (var block in _blocks)
+                    {
+                        block.Recolor(dark);
+                    }
+
+                    var inlineBrush = CodePalette.InlineCode(dark);
+                    foreach (var run in _runs)
+                    {
+                        CodePalette.Paint(run, inlineBrush);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Error("MfmInlineBuilder: recolouring code failed", ex);
+                }
+            }
         }
     }
 }

@@ -1,0 +1,67 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialCodeBlock"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    HorizontalAlignment="Left"
+    IsTabStop="False">
+
+    <Border Background="{ThemeResource CodeBlockBackgroundBrush}"
+            BorderBrush="{ThemeResource CodeBlockBorderBrush}"
+            BorderThickness="1"
+            Margin="0,4,0,4">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Padding="12,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="LanguageText"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           Visibility="Collapsed"
+                           AutomationProperties.AccessibilityView="Raw"/>
+
+                <Button x:Name="CopyButton"
+                        x:Uid="SocialCodeCopyButton"
+                        Grid.Column="1"
+                        Style="{StaticResource SocialToolButtonStyle}"
+                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                        Width="32"
+                        Height="32"
+                        HorizontalAlignment="Right"
+                        Click="CopyButton_Click">
+                    <FontIcon x:Name="CopyGlyph" Glyph="&#xE8C8;" FontSize="14"/>
+                </Button>
+            </Grid>
+
+            <ScrollViewer x:Name="CodeScroller"
+                          Grid.Row="1"
+                          HorizontalScrollBarVisibility="Auto"
+                          HorizontalScrollMode="Auto"
+                          VerticalScrollBarVisibility="Disabled"
+                          VerticalScrollMode="Disabled"
+                          ZoomMode="Disabled"
+                          IsTabStop="True"
+                          UseSystemFocusVisuals="True">
+                <TextBlock x:Name="CodeText"
+                           FontFamily="Consolas"
+                           FontSize="13"
+                           TextWrapping="NoWrap"
+                           IsTextSelectionEnabled="False"
+                           Margin="12,0,12,12"/>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>

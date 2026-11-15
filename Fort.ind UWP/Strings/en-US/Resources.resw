@@ -4898,4 +4898,19 @@ Open your profile and try again.</value>
   <data name="SearchItemNotificationFilters" xml:space="preserve">
     <value>Notification filters</value>
   </data>
+  <data name="SocialCodeCopyButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Copy code</value>
+  </data>
+  <data name="SocialCodeCopyButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Copy code</value>
+  </data>
+  <data name="SocialCodeCopied" xml:space="preserve">
+    <value>Copied</value>
+  </data>
+  <data name="SocialCodeBlockName" xml:space="preserve">
+    <value>Code block</value>
+  </data>
+  <data name="SocialCodeBlockNameFormat" xml:space="preserve">
+    <value>{0} code block</value>
+  </data>
 </root>

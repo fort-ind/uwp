@@ -845,6 +845,9 @@
 
                                     <SolidColorBrush x:Key="CardBorderBrush" Color="#14FFFFFF"/>
 
+                                    <SolidColorBrush x:Key="CodeBlockBackgroundBrush" Color="#40000000"/>
+                                    <SolidColorBrush x:Key="CodeBlockBorderBrush" Color="#1FFFFFFF"/>
+
                                     <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="CardBackgroundBrush"/>
                                     <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="CardBorderBrush"/>
                                     <Thickness x:Key="InfoBarBorderThickness">1</Thickness>
@@ -918,6 +921,9 @@
 
                                     <SolidColorBrush x:Key="CardBorderBrush" Color="#22000000"/>
 
+                                    <SolidColorBrush x:Key="CodeBlockBackgroundBrush" Color="#14000000"/>
+                                    <SolidColorBrush x:Key="CodeBlockBorderBrush" Color="#1F000000"/>
+
                                     <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="CardBackgroundBrush"/>
                                     <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="CardBorderBrush"/>
                                     <Thickness x:Key="InfoBarBorderThickness">1</Thickness>
@@ -975,6 +981,8 @@
                                     <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                                     <SolidColorBrush x:Key="CardBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                                     <SolidColorBrush x:Key="CardBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+                                    <SolidColorBrush x:Key="CodeBlockBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+                                    <SolidColorBrush x:Key="CodeBlockBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
                                     <SolidColorBrush x:Key="InfoBarInformationalSeverityBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
                                     <SolidColorBrush x:Key="InfoBarBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
                                     <Thickness x:Key="InfoBarBorderThickness">2</Thickness>
