@@ -56,6 +56,8 @@ namespace Fort.ind_UWP
 
         public static bool ResumingFromTermination { get; private set; }
 
+        public static bool WindowShown { get; private set; }
+
         protected override async void OnLaunched(Windows.ApplicationModel.Activation.LaunchActivatedEventArgs e)
         {
             bool showStartupErrorDialog = false;
@@ -106,6 +108,7 @@ namespace Fort.ind_UWP
                     }
 
                     Window.Current.Activate();
+                    WindowShown = true;
 
                     if (isFirstNavigation)
                     {
@@ -175,6 +178,8 @@ namespace Fort.ind_UWP
         {
             try
             {
+                MemoryService.ApplyPrelaunchPolicy();
+
                 await LocalStorageService.InitializeAsync();
                 await ProfileService.TryRestoreSessionAsync();
                 StartSocialNotifications();
@@ -260,6 +265,7 @@ namespace Fort.ind_UWP
 
                 frame.Navigate(typeof(SocialSharePage), args.ShareOperation);
                 Window.Current.Activate();
+                WindowShown = true;
             }
             catch (Exception ex)
             {
@@ -405,7 +411,7 @@ namespace Fort.ind_UWP
                                    : null;
 
                 Frame rootFrame = Window.Current.Content as Frame;
-                var isColdStart = rootFrame == null;
+                var isColdStart = rootFrame == null || rootFrame.Content == null;
                 var toastTarget = ReadToastTarget(args);
 
                 if (isColdStart)
@@ -413,13 +419,17 @@ namespace Fort.ind_UWP
                     AccentColorService.ApplySavedAccent();
                     AccentColorService.ApplyActiveAccentToCurrentView();
 
-                    rootFrame = new Frame();
-                    rootFrame.NavigationFailed += OnNavigationFailed;
+                    if (rootFrame == null)
+                    {
+                        rootFrame = new Frame();
+                        rootFrame.NavigationFailed += OnNavigationFailed;
 
-                    ResumingFromTermination = args.PreviousExecutionState == ApplicationExecutionState.Terminated;
+                        ResumingFromTermination = args.PreviousExecutionState == ApplicationExecutionState.Terminated;
 
-                    ApplySavedTheme(rootFrame);
-                    Window.Current.Content = rootFrame;
+                        ApplySavedTheme(rootFrame);
+                        Window.Current.Content = rootFrame;
+                    }
+
                     rootFrame.Navigate(typeof(MainPage), toastTarget != null ? AppConstants.NavigationSocial : null);
                 }
                 else if (toastTarget != null)
@@ -428,10 +438,13 @@ namespace Fort.ind_UWP
                 }
 
                 Window.Current.Activate();
+                WindowShown = true;
 
                 if (isColdStart)
                 {
                     await rootFrame.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => { });
+
+                    MemoryService.ApplyPrelaunchPolicy();
 
                     await LocalStorageService.InitializeAsync();
                     await ProfileService.TryRestoreSessionAsync();
@@ -519,7 +532,7 @@ namespace Fort.ind_UWP
                 SocialNotificationService.OnSuspending();
                 SocialNoteCapture.OnSuspending();
 
-                if (!SocialNotificationService.OwnsBadge && !LiveTileService.TileCleared)
+                if (WindowShown && !SocialNotificationService.OwnsBadge && !LiveTileService.TileCleared)
                 {
                     LiveTileService.UpdateBadgeGlyph(LiveTileService.NewContentBadgeGlyph);
                 }

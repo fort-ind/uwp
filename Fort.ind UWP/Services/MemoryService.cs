@@ -1,4 +1,5 @@
 using System;
+using Windows.ApplicationModel.Core;
 using Windows.System;
 using Windows.System.Diagnostics;
 
@@ -84,6 +85,19 @@ namespace Fort.ind_UWP
         public static void SetLowMemoryChoice(LowMemoryModeChoice choice)
         {
             AppSettings.Write(AppConstants.SettingLowMemoryMode, choice.ToString());
+            ApplyPrelaunchPolicy();
+        }
+
+        public static void ApplyPrelaunchPolicy()
+        {
+            try
+            {
+                CoreApplication.EnablePrelaunch(!IsLowMemoryMode);
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MemoryService: could not set whether Windows may prelaunch the app", ex);
+            }
         }
 
         private static LowMemoryModeChoice ReadChoice()
