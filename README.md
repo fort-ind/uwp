@@ -27,3 +27,4 @@ claude was used to help fix a icon bug a while ago. otherwise all code your seei
 ## Credits to the really cool dependencies we used
 * [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows) 
 * [microsoft ui xaml](https://github.com/microsoft/microsoft-ui-XAML) 
+* [Win2D](https://github.com/microsoft/win2d)
