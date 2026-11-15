@@ -11,6 +11,9 @@ namespace Fort.ind_UWP
         private static readonly Lazy<DateTimeFormatter> s_timeFormatter =
             new Lazy<DateTimeFormatter>(() => new DateTimeFormatter("shorttime"));
 
+        private static readonly Lazy<DateTimeFormatter> s_longTimeFormatter =
+            new Lazy<DateTimeFormatter>(() => new DateTimeFormatter("longtime"));
+
         public static string Short(DateTimeOffset createdAt, DateTimeOffset now)
         {
             if (createdAt == DateTimeOffset.MinValue) return "";
@@ -49,6 +52,22 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 AppLog.Error("RelativeTime: could not format a full timestamp", ex);
+                return "";
+            }
+        }
+
+        public static string Detailed(DateTimeOffset time)
+        {
+            try
+            {
+                var local = time.ToLocalTime();
+                return LocalizedStrings.Format("SocialTimeFullFormat",
+                                               s_dateFormatter.Value.Format(local),
+                                               s_longTimeFormatter.Value.Format(local));
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("RelativeTime: could not format a detailed timestamp", ex);
                 return "";
             }
         }

@@ -4913,4 +4913,68 @@ Open your profile and try again.</value>
   <data name="SocialCodeBlockNameFormat" xml:space="preserve">
     <value>{0} code block</value>
   </data>
+  <data name="UnixTimeAgoNow" xml:space="preserve">
+    <value>Just now</value>
+    <comment>A time stamp inside a note (MFM unixtime) that is within a few seconds of now, past or future.</comment>
+  </data>
+  <data name="UnixTimeAgoSecondsFormat" xml:space="preserve">
+    <value>{0}s ago</value>
+    <comment>A time stamp inside a note that is {0} seconds in the past.</comment>
+  </data>
+  <data name="UnixTimeAgoMinutesFormat" xml:space="preserve">
+    <value>{0}m ago</value>
+    <comment>A time stamp inside a note that is {0} minutes in the past.</comment>
+  </data>
+  <data name="UnixTimeAgoHoursFormat" xml:space="preserve">
+    <value>{0}h ago</value>
+    <comment>A time stamp inside a note that is {0} hours in the past.</comment>
+  </data>
+  <data name="UnixTimeAgoDaysFormat" xml:space="preserve">
+    <value>{0}d ago</value>
+    <comment>A time stamp inside a note that is {0} days in the past.</comment>
+  </data>
+  <data name="UnixTimeAgoWeeksFormat" xml:space="preserve">
+    <value>{0}w ago</value>
+    <comment>A time stamp inside a note that is {0} weeks in the past.</comment>
+  </data>
+  <data name="UnixTimeAgoMonthsFormat" xml:space="preserve">
+    <value>{0}mo ago</value>
+    <comment>A time stamp inside a note that is {0} months in the past.</comment>
+  </data>
+  <data name="UnixTimeAgoYearsFormat" xml:space="preserve">
+    <value>{0}y ago</value>
+    <comment>A time stamp inside a note that is {0} years in the past.</comment>
+  </data>
+  <data name="UnixTimeInSecondsFormat" xml:space="preserve">
+    <value>In {0}s</value>
+    <comment>A time stamp inside a note that is {0} seconds in the future.</comment>
+  </data>
+  <data name="UnixTimeInMinutesFormat" xml:space="preserve">
+    <value>In {0}m</value>
+    <comment>A time stamp inside a note that is {0} minutes in the future.</comment>
+  </data>
+  <data name="UnixTimeInHoursFormat" xml:space="preserve">
+    <value>In {0}h</value>
+    <comment>A time stamp inside a note that is {0} hours in the future.</comment>
+  </data>
+  <data name="UnixTimeInDaysFormat" xml:space="preserve">
+    <value>In {0}d</value>
+    <comment>A time stamp inside a note that is {0} days in the future.</comment>
+  </data>
+  <data name="UnixTimeInWeeksFormat" xml:space="preserve">
+    <value>In {0}w</value>
+    <comment>A time stamp inside a note that is {0} weeks in the future.</comment>
+  </data>
+  <data name="UnixTimeInMonthsFormat" xml:space="preserve">
+    <value>In {0}mo</value>
+    <comment>A time stamp inside a note that is {0} months in the future.</comment>
+  </data>
+  <data name="UnixTimeInYearsFormat" xml:space="preserve">
+    <value>In {0}y</value>
+    <comment>A time stamp inside a note that is {0} years in the future.</comment>
+  </data>
+  <data name="UnixTimeLabelFormat" xml:space="preserve">
+    <value>{0} ({1})</value>
+    <comment>A time stamp inside a note, as its chip reads and as a screen reader says it. {0} is the date and time, {1} is how long ago or from now it is.</comment>
+  </data>
 </root>

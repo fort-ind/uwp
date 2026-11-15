@@ -13,7 +13,8 @@ namespace Fort.ind_UWP
         Hashtag,
         Emoji,
         InlineCode,
-        CodeBlock
+        CodeBlock,
+        UnixTime
     }
 
     public sealed class MfmSegment
@@ -43,6 +44,8 @@ namespace Fort.ind_UWP
         public string DisplayText { get; internal set; }
 
         public IReadOnlyList<CodeToken> CodeTokens { get; internal set; }
+
+        public DateTimeOffset Time { get; internal set; }
     }
 
     public static class MfmText
@@ -420,6 +423,23 @@ namespace Fort.ind_UWP
 
                     var close = MatchingBracket(i + 1, end);
                     if (close < 0) return false;
+
+                    var argumentStart = _s.IndexOf('.', i + 2, nameEnd - i - 2);
+                    var functionName = _s.Substring(i + 2, (argumentStart < 0 ? nameEnd : argumentStart) - (i + 2));
+                    DateTimeOffset moment;
+                    if (functionName == "unixtime"
+                        && UnixTimeText.TryParse(_s.Substring(nameEnd + 1, close - nameEnd - 1), out moment))
+                    {
+                        FlushText();
+                        _segments.Add(new MfmSegment
+                        {
+                            Kind = MfmSegmentKind.UnixTime,
+                            Text = RelativeTime.Detailed(moment),
+                            Time = moment
+                        });
+                        next = close + 1;
+                        return true;
+                    }
 
                     Run(nameEnd + 1, close, depth + 1);
                     next = close + 1;

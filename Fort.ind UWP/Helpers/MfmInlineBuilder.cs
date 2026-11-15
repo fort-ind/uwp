@@ -92,6 +92,9 @@ namespace Fort.ind_UWP
                         inlines.Add(CodeBlockInline(segment, owner));
                         afterBlock = true;
                         break;
+                    case MfmSegmentKind.UnixTime:
+                        inlines.Add(UnixTimeInline(segment));
+                        break;
                     case MfmSegmentKind.InlineCode:
                         if (owner == null)
                         {
@@ -139,6 +142,13 @@ namespace Fort.ind_UWP
             block.Load(segment, state.IsDark);
             state.Add(block);
             return new InlineUIContainer { Child = block };
+        }
+
+        private static Inline UnixTimeInline(MfmSegment segment)
+        {
+            var chip = new SocialTimeChip();
+            chip.Show(segment.Time);
+            return new InlineUIContainer { Child = chip };
         }
 
         private static Inline InlineCodeRun(MfmSegment segment, RichTextBlock owner)
