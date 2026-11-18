@@ -140,16 +140,29 @@
             <Setter Property="MaxWidth" Value="360"/>
             <Setter Property="Spacing" Value="12"/>
         </Style>
+
+        <Style x:Key="SocialPivotNarrowHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource SubtitleTextBlockStyle}">
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+
+        <DataTemplate x:Key="SocialPivotHeaderTemplate">
+            <TextBlock Text="{Binding}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SocialPivotNarrowHeaderTemplate">
+            <TextBlock Text="{Binding}" Style="{StaticResource SocialPivotNarrowHeaderStyle}"/>
+        </DataTemplate>
     </Page.Resources>
 
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="WindowWidthStates">
+            <VisualStateGroup x:Name="WindowWidthStates" CurrentStateChanged="WindowWidthStates_CurrentStateChanged">
                 <VisualState x:Name="NarrowState">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0"/>
@@ -157,6 +170,12 @@
                     <VisualState.Setters>
                         <Setter Target="SocialPivot.Margin" Value="0,0,0,0"/>
                         <Setter Target="AnnouncementsPanel.Margin" Value="0,0,0,0"/>
+                        <Setter Target="SocialPivot.HeaderTemplate" Value="{StaticResource SocialPivotNarrowHeaderTemplate}"/>
+                        <Setter Target="RightHeaderPanel.Spacing" Value="4"/>
+                        <Setter Target="NewNoteButton.Width" Value="40"/>
+                        <Setter Target="NewNoteButton.Height" Value="40"/>
+                        <Setter Target="NewNoteContent.Spacing" Value="0"/>
+                        <Setter Target="NewNoteLabel.Visibility" Value="Collapsed"/>
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="WideState">
@@ -175,18 +194,19 @@
                     Spacing="4"
                     Visibility="Collapsed"/>
 
+        <Border x:Name="NarrowActionsHost"
+                Grid.Row="1"
+                HorizontalAlignment="Right"
+                Margin="0,4,4,0"/>
+
         <Pivot x:Uid="SocialPivot" x:Name="SocialPivot"
-               Grid.Row="1"
+               Grid.Row="2"
                Visibility="Collapsed"
+               HeaderTemplate="{StaticResource SocialPivotHeaderTemplate}"
                SelectionChanged="SocialPivot_SelectionChanged">
-            <Pivot.HeaderTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                </DataTemplate>
-            </Pivot.HeaderTemplate>
 
             <Pivot.RightHeader>
-                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <StackPanel x:Name="RightHeaderPanel" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <Button x:Uid="SocialNewNoteButton" x:Name="NewNoteButton"
                         Style="{StaticResource AccentButtonStyle}"
                         VerticalAlignment="Center"
@@ -194,9 +214,9 @@
                     <Button.KeyboardAccelerators>
                         <KeyboardAccelerator Key="N" Modifiers="Control"/>
                     </Button.KeyboardAccelerators>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
+                    <StackPanel x:Name="NewNoteContent" Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE70F;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                        <TextBlock x:Uid="SocialNewNoteLabel"/>
+                        <TextBlock x:Uid="SocialNewNoteLabel" x:Name="NewNoteLabel"/>
                     </StackPanel>
                 </Button>
                 <Button x:Uid="SocialTagsButton" x:Name="SocialTagsButton"

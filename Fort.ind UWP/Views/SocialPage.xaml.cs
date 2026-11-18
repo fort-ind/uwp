@@ -146,9 +146,40 @@ namespace Fort.ind_UWP
             }
         }
 
+        private void WindowWidthStates_CurrentStateChanged(object sender, VisualStateChangedEventArgs e)
+        {
+            PlaceHeaderActions(ReferenceEquals(e.NewState, NarrowState));
+        }
+
+        private void PlaceHeaderActions(bool narrow)
+        {
+            try
+            {
+                var inRow = ReferenceEquals(NarrowActionsHost.Child, RightHeaderPanel);
+                if (narrow == inRow) return;
+
+                TagsFlyout.Hide();
+                if (narrow)
+                {
+                    SocialPivot.RightHeader = null;
+                    NarrowActionsHost.Child = RightHeaderPanel;
+                }
+                else
+                {
+                    NarrowActionsHost.Child = null;
+                    SocialPivot.RightHeader = RightHeaderPanel;
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialPage: moving the header buttons failed", ex);
+            }
+        }
+
         private void SocialPage_Loaded(object sender, RoutedEventArgs e)
         {
             _keepListsOnUnload = false;
+            PlaceHeaderActions(ReferenceEquals(WindowWidthStates.CurrentState, NarrowState));
 
             if (!_authHandlerAttached)
             {

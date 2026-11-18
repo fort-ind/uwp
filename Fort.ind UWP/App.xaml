@@ -885,6 +885,19 @@
                                     <SolidColorBrush x:Key="SystemControlHyperlinkTextBrush" Color="{ThemeResource SystemAccentColorLight2}"/>
                                     <SolidColorBrush x:Key="SocialReactedForegroundBrush" Color="{ThemeResource SystemAccentColorLight2}"/>
 
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackground" Color="{ThemeResource SystemChromeMediumLowColor}" Opacity="0.9"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackgroundPointerOver" Color="{ThemeResource SystemChromeMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackgroundPressed" Color="{ThemeResource SystemChromeHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForeground" Color="{ThemeResource SystemBaseMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForegroundPressed" Color="{ThemeResource SystemBaseHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackground" Color="{ThemeResource SystemChromeMediumLowColor}" Opacity="0.9"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackgroundPointerOver" Color="{ThemeResource SystemChromeMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackgroundPressed" Color="{ThemeResource SystemChromeHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForeground" Color="{ThemeResource SystemBaseMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForegroundPressed" Color="{ThemeResource SystemBaseHighColor}"/>
+
                                     <AcrylicBrush x:Key="LegacyTransientBackgroundBrush"
                                                   BackgroundSource="HostBackdrop"
                                                   TintColor="{ThemeResource SystemChromeAltHighColor}"
@@ -961,6 +974,19 @@
                                     <SolidColorBrush x:Key="SystemControlHyperlinkTextBrush" Color="{ThemeResource SystemAccentColorDark1}"/>
                                     <SolidColorBrush x:Key="SocialReactedForegroundBrush" Color="{ThemeResource SystemAccentColorDark1}"/>
 
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackground" Color="{ThemeResource SystemChromeMediumLowColor}" Opacity="0.9"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackgroundPointerOver" Color="{ThemeResource SystemChromeMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackgroundPressed" Color="{ThemeResource SystemChromeHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForeground" Color="{ThemeResource SystemBaseMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForegroundPressed" Color="{ThemeResource SystemBaseHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackground" Color="{ThemeResource SystemChromeMediumLowColor}" Opacity="0.9"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackgroundPointerOver" Color="{ThemeResource SystemChromeMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackgroundPressed" Color="{ThemeResource SystemChromeHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForeground" Color="{ThemeResource SystemBaseMediumHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForegroundPointerOver" Color="{ThemeResource SystemBaseHighColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForegroundPressed" Color="{ThemeResource SystemBaseHighColor}"/>
+
                                     <AcrylicBrush x:Key="LegacyTransientBackgroundBrush"
                                                   BackgroundSource="HostBackdrop"
                                                   TintColor="{ThemeResource SystemChromeAltHighColor}"
@@ -1012,6 +1038,19 @@
                                     <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource SystemColorHotlightColor}"/>
                                     <SolidColorBrush x:Key="SystemControlHyperlinkTextBrush" Color="{ThemeResource SystemColorHotlightColor}"/>
                                     <SolidColorBrush x:Key="SocialReactedForegroundBrush" Color="{ThemeResource SystemColorHotlightColor}"/>
+
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackground" Color="{ThemeResource SystemColorButtonFaceColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackgroundPointerOver" Color="{ThemeResource SystemColorHighlightColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonBackgroundPressed" Color="{ThemeResource SystemColorHighlightColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForeground" Color="{ThemeResource SystemColorButtonTextColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForegroundPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                                    <SolidColorBrush x:Key="PivotPreviousButtonForegroundPressed" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackground" Color="{ThemeResource SystemColorButtonFaceColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackgroundPointerOver" Color="{ThemeResource SystemColorHighlightColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonBackgroundPressed" Color="{ThemeResource SystemColorHighlightColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForeground" Color="{ThemeResource SystemColorButtonTextColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForegroundPointerOver" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                                    <SolidColorBrush x:Key="PivotNextButtonForegroundPressed" Color="{ThemeResource SystemColorHighlightTextColor}"/>
                                     <SolidColorBrush x:Key="ScrollViewerScrollBarSeparatorBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                                     <SolidColorBrush x:Key="SocialCommandBarFlyoutBackground" Color="{ThemeResource SystemColorWindowColor}"/>
                                 </ResourceDictionary>
