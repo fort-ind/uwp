@@ -297,7 +297,7 @@ namespace Fort.ind_UWP
             }
             catch
             {
-                numeric = "3.0.0";
+                numeric = "4.1.0";
             }
 
             return string.IsNullOrEmpty(VersionChannel) ? numeric : $"{numeric} {VersionChannel}";
