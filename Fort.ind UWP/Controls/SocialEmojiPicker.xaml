@@ -227,9 +227,8 @@
             </GridView.GroupStyle>
         </GridView>
 
-        <ProgressRing x:Name="LoadingRing"
+        <local:SocialLoadingIndicator x:Name="LoadingRing"
                       Grid.Row="2"
-                      Width="32" Height="32"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Center"/>
 

@@ -319,7 +319,7 @@ namespace Fort.ind_UWP
         {
             var segments = MfmText.Parse(NormalizeText(text), null, null, null);
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var segment in segments.Where(segment => segment.Kind == MfmSegmentKind.Mention && !string.IsNullOrEmpty(segment.Username)))
+            foreach (var segment in MfmText.Descendants(segments).Where(segment => segment.Kind == MfmSegmentKind.Mention && !string.IsNullOrEmpty(segment.Username)))
             {
                 var host = string.IsNullOrEmpty(segment.Host)
                            || string.Equals(segment.Host, MisskeyAuthService.InstanceHost, StringComparison.OrdinalIgnoreCase)
@@ -337,7 +337,7 @@ namespace Fort.ind_UWP
             var segments = MfmText.Parse(NormalizeText(text), null, null, null);
             var me = SocialContentService.CurrentAccountId();
 
-            foreach (var segment in segments.Where(segment => segment.Kind == MfmSegmentKind.Mention && !string.IsNullOrEmpty(segment.Username)))
+            foreach (var segment in MfmText.Descendants(segments).Where(segment => segment.Kind == MfmSegmentKind.Mention && !string.IsNullOrEmpty(segment.Username)))
             {
                 var host = string.IsNullOrEmpty(segment.Host)
                            || string.Equals(segment.Host, MisskeyAuthService.InstanceHost, StringComparison.OrdinalIgnoreCase)

@@ -172,9 +172,8 @@
                                     Click="NoteStateButton_Click"/>
                         </StackPanel>
 
-                        <ProgressRing x:Uid="SocialThreadLoading"
+                        <local:SocialLoadingIndicator x:Uid="SocialThreadLoading"
                                       x:Name="NoteLoadingRing"
-                                      Width="32" Height="32"
                                       Margin="0,24,0,24"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Top"/>
@@ -271,9 +270,8 @@
 
             <ListView.Footer>
                 <Grid x:Name="FooterHost" MinHeight="160" Padding="12,24,12,24">
-                    <ProgressRing x:Uid="SocialThreadTabLoading"
+                    <local:SocialLoadingIndicator x:Uid="SocialThreadTabLoading"
                                   x:Name="TabLoadingRing"
-                                  Width="32" Height="32"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Top"/>
 

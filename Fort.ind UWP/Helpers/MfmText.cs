@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Fort.ind_UWP
 {
@@ -14,7 +15,17 @@ namespace Fort.ind_UWP
         Emoji,
         InlineCode,
         CodeBlock,
-        UnixTime
+        UnixTime,
+        Bold,
+        Italic,
+        Strike,
+        Small,
+        Function,
+        Math,
+        Center,
+        Quote,
+        MathBlock,
+        Search
     }
 
     public sealed class MfmSegment
@@ -46,6 +57,39 @@ namespace Fort.ind_UWP
         public IReadOnlyList<CodeToken> CodeTokens { get; internal set; }
 
         public DateTimeOffset Time { get; internal set; }
+
+        public IReadOnlyList<MfmSegment> Children { get; internal set; }
+
+        public string FunctionName { get; internal set; }
+
+        public IReadOnlyDictionary<string, string> Arguments { get; internal set; }
+
+        public string Query { get; internal set; }
+
+        public bool IsBlock
+        {
+            get
+            {
+                return Kind == MfmSegmentKind.CodeBlock || Kind == MfmSegmentKind.Quote || Kind == MfmSegmentKind.Center
+                       || Kind == MfmSegmentKind.MathBlock || Kind == MfmSegmentKind.Search;
+            }
+        }
+
+        public bool IsSpoiler
+        {
+            get { return Kind == MfmSegmentKind.Function && FunctionName == "blur"; }
+        }
+
+        public string Argument(string name)
+        {
+            string value;
+            return Arguments != null && Arguments.TryGetValue(name, out value) ? value : null;
+        }
+
+        public bool HasArgument(string name)
+        {
+            return Arguments != null && Arguments.ContainsKey(name);
+        }
     }
 
     public static class MfmText
@@ -55,6 +99,11 @@ namespace Fort.ind_UWP
         private const int MaximumNesting = 16;
 
         private static readonly IReadOnlyList<MfmSegment> s_none = new MfmSegment[0];
+
+        private static readonly IReadOnlyDictionary<string, string> s_noArguments = new Dictionary<string, string>();
+
+        private static readonly Regex s_searchLine = new Regex(@"^(.+?)[ 　](検索|\[検索\]|Search|\[Search\])$",
+                                                               RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         private static readonly string[] s_innerTags = { "b", "i", "s", "small", "center" };
 
@@ -72,7 +121,7 @@ namespace Fort.ind_UWP
             }
 
             var scanner = new Scanner(text, new EmojiResolver(noteEmojis, localEmojis), MentionLookup(mentionHandles), true);
-            scanner.Run(0, text.Length, 0);
+            scanner.Run(0, text.Length, 0, true);
             return scanner.Finish();
         }
 
@@ -86,7 +135,7 @@ namespace Fort.ind_UWP
             }
 
             var scanner = new Scanner(name, new EmojiResolver(userEmojis, null), null, false);
-            scanner.Run(0, name.Length, 0);
+            scanner.Run(0, name.Length, 0, false);
             return scanner.Finish();
         }
 
@@ -100,6 +149,27 @@ namespace Fort.ind_UWP
                 builder.Append(segment.Text);
             }
             return builder.ToString();
+        }
+
+        public static IEnumerable<MfmSegment> Descendants(IReadOnlyList<MfmSegment> segments)
+        {
+            if (segments == null) yield break;
+
+            var pending = new Stack<IEnumerator<MfmSegment>>();
+            pending.Push(segments.GetEnumerator());
+            while (pending.Count > 0)
+            {
+                var current = pending.Peek();
+                if (!current.MoveNext())
+                {
+                    pending.Pop().Dispose();
+                    continue;
+                }
+
+                var segment = current.Current;
+                yield return segment;
+                if (segment.Children != null && segment.Children.Count > 0) pending.Push(segment.Children.GetEnumerator());
+            }
         }
 
         public static string PlainName(string name)
@@ -130,12 +200,28 @@ namespace Fort.ind_UWP
             if (segments.Count == 0) return "";
 
             var builder = new StringBuilder();
+            AppendPreview(builder, segments);
+            return PlainName(builder.ToString());
+        }
+
+        private static void AppendPreview(StringBuilder builder, IReadOnlyList<MfmSegment> segments)
+        {
             foreach (var segment in segments)
             {
-                builder.Append(segment.Kind == MfmSegmentKind.Link ? LinkPreviewText(segment) : segment.Text);
+                if (segment.Kind == MfmSegmentKind.Link)
+                {
+                    builder.Append(LinkPreviewText(segment));
+                }
+                else if (segment.Children != null && segment.Kind != MfmSegmentKind.Search)
+                {
+                    AppendPreview(builder, segment.Children);
+                    if (segment.IsBlock) builder.Append('\n');
+                }
+                else
+                {
+                    builder.Append(segment.Text);
+                }
             }
-
-            return PlainName(builder.ToString());
         }
 
         private static string LinkPreviewText(MfmSegment segment)
@@ -150,7 +236,21 @@ namespace Fort.ind_UWP
         {
             if (segments == null) return null;
 
-            return segments.FirstOrDefault(segment => segment.Kind == MfmSegmentKind.Link && !segment.IsSilent);
+            foreach (var segment in segments)
+            {
+                if (segment.Kind == MfmSegmentKind.Link)
+                {
+                    if (!segment.IsSilent) return segment;
+                    continue;
+                }
+
+                if (segment.Children == null || segment.IsSpoiler) continue;
+
+                var nested = FirstPreviewLink(segment.Children);
+                if (nested != null) return nested;
+            }
+
+            return null;
         }
 
         private static string CollapseSpaces(string text)
@@ -208,6 +308,21 @@ namespace Fort.ind_UWP
             return IsAsciiLetterOrDigit(ch) || ch == '_' || ch == '+' || ch == '-';
         }
 
+        private static bool IsFunctionNameChar(char ch)
+        {
+            return IsAsciiLetterOrDigit(ch) || ch == '_';
+        }
+
+        private static bool IsFunctionArgumentChar(char ch)
+        {
+            return IsAsciiLetterOrDigit(ch) || ch == '_' || ch == '.' || ch == ',' || ch == '=' || ch == '-' || ch == '#';
+        }
+
+        private static bool IsEmphasisChar(char ch)
+        {
+            return IsAsciiLetterOrDigit(ch) || ch == ' ' || ch == '\t';
+        }
+
         private static bool TryReadEmojiCode(string s, int start, int end, out int next)
         {
             next = start;
@@ -221,6 +336,22 @@ namespace Fort.ind_UWP
 
             next = j + 1;
             return true;
+        }
+
+        private static IReadOnlyDictionary<string, string> ParseArguments(string raw)
+        {
+            if (string.IsNullOrEmpty(raw)) return s_noArguments;
+
+            var arguments = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var part in raw.Split(','))
+            {
+                if (part.Length == 0) continue;
+
+                var split = part.IndexOf('=');
+                if (split < 0) arguments[part] = null;
+                else if (split > 0) arguments[part.Substring(0, split)] = part.Substring(split + 1);
+            }
+            return arguments;
         }
 
         private sealed class EmojiResolver
@@ -282,9 +413,9 @@ namespace Fort.ind_UWP
 
             private readonly bool _full;
 
-            private readonly List<MfmSegment> _segments = new List<MfmSegment>();
+            private List<MfmSegment> _segments = new List<MfmSegment>();
 
-            private readonly StringBuilder _text = new StringBuilder();
+            private StringBuilder _text = new StringBuilder();
 
             public Scanner(string s, EmojiResolver emoji, Dictionary<string, string> mentions, bool full)
             {
@@ -300,13 +431,15 @@ namespace Fort.ind_UWP
                 return _segments;
             }
 
-            public void Run(int start, int end, int depth)
+            public void Run(int start, int end, int depth, bool blocks)
             {
                 var i = start;
                 while (i < end)
                 {
                     int next;
-                    if ((_full && TryInlineCode(i, end, out next))
+                    if ((_full && blocks && (i == start || _s[i - 1] == '\n') && TryBlock(i, end, depth, out next))
+                        || (_full && TryInlineCode(i, end, out next))
+                        || (_full && TryMath(i, end, out next))
                         || (_full && TryWrapped(i, end, depth, out next))
                         || (_full && TryLink(i, end, out next))
                         || (_full && TryMention(i, end, out next))
@@ -322,6 +455,33 @@ namespace Fort.ind_UWP
                 }
             }
 
+            private List<MfmSegment> Collect(int start, int end, int depth)
+            {
+                var outerSegments = _segments;
+                var outerText = _text;
+                _segments = new List<MfmSegment>();
+                _text = new StringBuilder();
+                try
+                {
+                    Run(start, end, depth, false);
+                    FlushText();
+                    return _segments;
+                }
+                finally
+                {
+                    _segments = outerSegments;
+                    _text = outerText;
+                }
+            }
+
+            private void AddContainer(MfmSegment segment, IReadOnlyList<MfmSegment> children)
+            {
+                FlushText();
+                segment.Children = children;
+                if (segment.Text == null) segment.Text = PlainText(children);
+                _segments.Add(segment);
+            }
+
             private bool StartsWith(int index, int end, string token)
             {
                 return index + token.Length <= end && string.CompareOrdinal(_s, index, token, 0, token.Length) == 0;
@@ -332,6 +492,124 @@ namespace Fort.ind_UWP
                 if (from >= end) return -1;
                 var found = _s.IndexOf(token, from, end - from, StringComparison.Ordinal);
                 return found >= 0 && found + token.Length <= end ? found : -1;
+            }
+
+            private int LineEnd(int from, int end)
+            {
+                if (from >= end) return end;
+                var found = _s.IndexOf('\n', from, end - from);
+                return found < 0 ? end : found;
+            }
+
+            private bool TryBlock(int i, int end, int depth, out int next)
+            {
+                next = i;
+                switch (_s[i])
+                {
+                    case '>':
+                        if (TryQuote(i, end, depth, out next)) return true;
+                        break;
+                    case '<':
+                        if (TryCenter(i, end, depth, out next)) return true;
+                        break;
+                    case '\\':
+                        if (TryMathBlock(i, end, out next)) return true;
+                        break;
+                }
+
+                return TrySearch(i, end, out next);
+            }
+
+            private bool TryQuote(int i, int end, int depth, out int next)
+            {
+                next = i;
+                if (depth + 1 >= MaximumNesting) return false;
+
+                var lines = new List<string>();
+                var cursor = i;
+                var stop = i;
+                while (cursor < end && _s[cursor] == '>')
+                {
+                    var lineEnd = LineEnd(cursor, end);
+                    var line = _s.Substring(cursor + 1, lineEnd - cursor - 1);
+                    if (line.Length > 0 && line[0] == ' ') line = line.Substring(1);
+                    lines.Add(line);
+                    stop = lineEnd;
+                    cursor = lineEnd + 1;
+                }
+
+                var content = string.Join("\n", lines);
+                if (string.IsNullOrWhiteSpace(content)) return false;
+
+                var inner = new Scanner(content, _emoji, _mentions, true);
+                inner.Run(0, content.Length, depth + 1, true);
+
+                AddContainer(new MfmSegment { Kind = MfmSegmentKind.Quote }, inner.Finish());
+                next = stop;
+                return true;
+            }
+
+            private bool TryCenter(int i, int end, int depth, out int next)
+            {
+                next = i;
+                if (depth + 1 >= MaximumNesting || !StartsWith(i, end, "<center>")) return false;
+
+                var innerStart = i + "<center>".Length;
+                var close = IndexOf("</center>", innerStart, end);
+                if (close < 0) return false;
+
+                var after = close + "</center>".Length;
+                if (after < end && _s[after] != '\n') return false;
+
+                if (innerStart < close && _s[innerStart] == '\n') innerStart++;
+                var innerEnd = close;
+                if (innerEnd > innerStart && _s[innerEnd - 1] == '\n') innerEnd--;
+
+                var children = Collect(innerStart, innerEnd, depth + 1);
+                if (children.Count == 0) return false;
+
+                AddContainer(new MfmSegment { Kind = MfmSegmentKind.Center }, children);
+                next = after;
+                return true;
+            }
+
+            private bool TryMathBlock(int i, int end, out int next)
+            {
+                next = i;
+                if (!StartsWith(i, end, "\\[")) return false;
+
+                var close = IndexOf("\\]", i + 2, end);
+                if (close < 0) return false;
+
+                var after = close + 2;
+                if (after < end && _s[after] != '\n') return false;
+
+                var formula = _s.Substring(i + 2, close - i - 2).Trim('\n');
+                if (string.IsNullOrWhiteSpace(formula)) return false;
+
+                FlushText();
+                _segments.Add(new MfmSegment { Kind = MfmSegmentKind.MathBlock, Text = formula, DisplayText = formula.Replace("\t", "    ") });
+                next = after;
+                return true;
+            }
+
+            private bool TrySearch(int i, int end, out int next)
+            {
+                next = i;
+                var lineEnd = LineEnd(i, end);
+                if (lineEnd == i) return false;
+
+                var line = _s.Substring(i, lineEnd - i);
+                var match = s_searchLine.Match(line);
+                if (!match.Success) return false;
+
+                var query = match.Groups[1].Value;
+                if (string.IsNullOrWhiteSpace(query)) return false;
+
+                FlushText();
+                _segments.Add(new MfmSegment { Kind = MfmSegmentKind.Search, Text = line, Query = query.Trim() });
+                next = lineEnd;
+                return true;
             }
 
             private bool TryInlineCode(int i, int end, out int next)
@@ -406,55 +684,51 @@ namespace Fort.ind_UWP
                 return false;
             }
 
+            private bool TryMath(int i, int end, out int next)
+            {
+                next = i;
+                if (!StartsWith(i, end, "\\(")) return false;
+
+                var close = IndexOf("\\)", i + 2, end);
+                if (close <= i + 2) return false;
+                if (_s.IndexOf('\n', i + 2, close - i - 2) >= 0) return false;
+
+                FlushText();
+                _segments.Add(new MfmSegment { Kind = MfmSegmentKind.Math, Text = _s.Substring(i + 2, close - i - 2) });
+                next = close + 2;
+                return true;
+            }
+
             private bool TryWrapped(int i, int end, int depth, out int next)
             {
                 next = i;
-                if (depth >= MaximumNesting) return false;
+                if (depth + 1 >= MaximumNesting) return false;
 
-                if (StartsWith(i, end, "$["))
+                if (StartsWith(i, end, "$[")) return TryFunction(i, end, depth, out next);
+
+                if (StartsWith(i, end, "***") && TryDelimited(i, end, depth, "***", new MfmSegment { Kind = MfmSegmentKind.Function, FunctionName = "tada", Arguments = s_noArguments }, out next))
                 {
-                    var nameEnd = i + 2;
-                    while (nameEnd < end && (IsAsciiLetterOrDigit(_s[nameEnd]) || _s[nameEnd] == '_' || _s[nameEnd] == '.'
-                                             || _s[nameEnd] == '=' || _s[nameEnd] == ',' || _s[nameEnd] == '-'))
-                    {
-                        nameEnd++;
-                    }
-                    if (nameEnd == i + 2 || nameEnd >= end || _s[nameEnd] != ' ') return false;
-
-                    var close = MatchingBracket(i + 1, end);
-                    if (close < 0) return false;
-
-                    var argumentStart = _s.IndexOf('.', i + 2, nameEnd - i - 2);
-                    var functionName = _s.Substring(i + 2, (argumentStart < 0 ? nameEnd : argumentStart) - (i + 2));
-                    DateTimeOffset moment;
-                    if (functionName == "unixtime"
-                        && UnixTimeText.TryParse(_s.Substring(nameEnd + 1, close - nameEnd - 1), out moment))
-                    {
-                        FlushText();
-                        _segments.Add(new MfmSegment
-                        {
-                            Kind = MfmSegmentKind.UnixTime,
-                            Text = RelativeTime.Detailed(moment),
-                            Time = moment
-                        });
-                        next = close + 1;
-                        return true;
-                    }
-
-                    Run(nameEnd + 1, close, depth + 1);
-                    next = close + 1;
                     return true;
                 }
 
-                if (StartsWith(i, end, "**") || StartsWith(i, end, "~~"))
+                if (StartsWith(i, end, "**") && TryDelimited(i, end, depth, "**", new MfmSegment { Kind = MfmSegmentKind.Bold }, out next))
                 {
-                    var marker = _s.Substring(i, 2);
-                    var close = IndexOf(marker, i + 2, end);
-                    if (close <= i + 2) return false;
-
-                    Run(i + 2, close, depth + 1);
-                    next = close + 2;
                     return true;
+                }
+
+                if (StartsWith(i, end, "~~"))
+                {
+                    var close = IndexOf("~~", i + 2, end);
+                    if (close <= i + 2 || _s.IndexOf('\n', i + 2, close - i - 2) >= 0) return false;
+
+                    return TryDelimited(i, end, depth, "~~", new MfmSegment { Kind = MfmSegmentKind.Strike }, out next);
+                }
+
+                if (StartsWith(i, end, "__") && TryEmphasis(i, end, "__", MfmSegmentKind.Bold, out next)) return true;
+
+                if ((_s[i] == '*' || _s[i] == '_') && !(i > 0 && IsAsciiLetterOrDigit(_s[i - 1])))
+                {
+                    return TryEmphasis(i, end, _s[i].ToString(), MfmSegmentKind.Italic, out next);
                 }
 
                 if (_s[i] == '<')
@@ -468,13 +742,121 @@ namespace Fort.ind_UWP
                         var close = IndexOf(closeTag, i + open.Length, end);
                         if (close < 0) return false;
 
-                        Run(i + open.Length, close, depth + 1);
+                        if (tag == "center")
+                        {
+                            Run(i + open.Length, close, depth + 1, false);
+                        }
+                        else
+                        {
+                            var children = Collect(i + open.Length, close, depth + 1);
+                            if (children.Count == 0) return false;
+
+                            AddContainer(new MfmSegment { Kind = TagKind(tag) }, children);
+                        }
+
                         next = close + closeTag.Length;
                         return true;
                     }
                 }
 
                 return false;
+            }
+
+            private static MfmSegmentKind TagKind(string tag)
+            {
+                switch (tag)
+                {
+                    case "b":
+                        return MfmSegmentKind.Bold;
+                    case "i":
+                        return MfmSegmentKind.Italic;
+                    case "s":
+                        return MfmSegmentKind.Strike;
+                    default:
+                        return MfmSegmentKind.Small;
+                }
+            }
+
+            private bool TryDelimited(int i, int end, int depth, string marker, MfmSegment segment, out int next)
+            {
+                next = i;
+                var close = IndexOf(marker, i + marker.Length, end);
+                if (close <= i + marker.Length) return false;
+
+                var children = Collect(i + marker.Length, close, depth + 1);
+                if (children.Count == 0) return false;
+
+                AddContainer(segment, children);
+                next = close + marker.Length;
+                return true;
+            }
+
+            private bool TryEmphasis(int i, int end, string marker, MfmSegmentKind kind, out int next)
+            {
+                next = i;
+                var start = i + marker.Length;
+                var stop = start;
+                while (stop < end && IsEmphasisChar(_s[stop])) stop++;
+
+                if (stop == start || !StartsWith(stop, end, marker)) return false;
+                if (marker.Length == 1 && StartsWith(stop, end, marker + marker)) return false;
+
+                var text = _s.Substring(start, stop - start);
+                AddContainer(new MfmSegment { Kind = kind }, new[] { new MfmSegment { Kind = MfmSegmentKind.Text, Text = text } });
+                next = stop + marker.Length;
+                return true;
+            }
+
+            private bool TryFunction(int i, int end, int depth, out int next)
+            {
+                next = i;
+
+                var nameEnd = i + 2;
+                while (nameEnd < end && IsFunctionNameChar(_s[nameEnd])) nameEnd++;
+                if (nameEnd == i + 2) return false;
+
+                var functionName = _s.Substring(i + 2, nameEnd - i - 2);
+                var cursor = nameEnd;
+                string rawArguments = null;
+                if (cursor < end && _s[cursor] == '.')
+                {
+                    var argumentEnd = cursor + 1;
+                    while (argumentEnd < end && IsFunctionArgumentChar(_s[argumentEnd])) argumentEnd++;
+                    if (argumentEnd == cursor + 1) return false;
+
+                    rawArguments = _s.Substring(cursor + 1, argumentEnd - cursor - 1);
+                    cursor = argumentEnd;
+                }
+
+                if (cursor >= end || _s[cursor] != ' ') return false;
+
+                var close = MatchingBracket(i + 1, end);
+                if (close < 0) return false;
+
+                DateTimeOffset moment;
+                if (functionName == "unixtime"
+                    && UnixTimeText.TryParse(_s.Substring(cursor + 1, close - cursor - 1), out moment))
+                {
+                    FlushText();
+                    _segments.Add(new MfmSegment
+                    {
+                        Kind = MfmSegmentKind.UnixTime,
+                        Text = RelativeTime.Detailed(moment),
+                        Time = moment
+                    });
+                    next = close + 1;
+                    return true;
+                }
+
+                var children = Collect(cursor + 1, close, depth + 1);
+                AddContainer(new MfmSegment
+                {
+                    Kind = MfmSegmentKind.Function,
+                    FunctionName = functionName,
+                    Arguments = ParseArguments(rawArguments)
+                }, children);
+                next = close + 1;
+                return true;
             }
 
             private int MatchingBracket(int openIndex, int end)

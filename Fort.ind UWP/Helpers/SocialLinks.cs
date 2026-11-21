@@ -44,6 +44,12 @@ namespace Fort.ind_UWP
             return InstanceUrl("/tags/" + Uri.EscapeDataString(tag));
         }
 
+        public static string SearchUrl(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query)) return null;
+            return InstanceUrl("/search?q=" + Uri.EscapeDataString(query.Trim()));
+        }
+
         public static Uri StaticEmojiUri(string source)
         {
             var sourceUri = WebLauncher.TryCreateWebUri(source);

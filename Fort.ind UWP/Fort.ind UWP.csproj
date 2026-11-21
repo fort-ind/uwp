@@ -227,8 +227,17 @@
     <Compile Include="Controls\SocialProfileView.Actions.cs">
       <DependentUpon>SocialProfileView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialLoadingIndicator.xaml.cs">
+      <DependentUpon>SocialLoadingIndicator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialQuoteBlock.xaml.cs">
+      <DependentUpon>SocialQuoteBlock.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialReactionChip.cs" />
     <Compile Include="Controls\SocialReactionChipPanel.cs" />
+    <Compile Include="Controls\SocialSearchBlock.xaml.cs">
+      <DependentUpon>SocialSearchBlock.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SocialTabStrip.cs" />
     <Compile Include="Controls\SocialTimeChip.xaml.cs">
       <DependentUpon>SocialTimeChip.xaml</DependentUpon>
@@ -252,6 +261,7 @@
     <Compile Include="Helpers\Debouncer.cs" />
     <Compile Include="Helpers\JsonText.cs" />
     <Compile Include="Helpers\LocalizedStrings.cs" />
+    <Compile Include="Helpers\MfmEffects.cs" />
     <Compile Include="Helpers\MfmInlineBuilder.cs" />
     <Compile Include="Helpers\MfmText.cs" />
     <Compile Include="Helpers\RelativeTime.cs" />
@@ -753,6 +763,18 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\SocialTimeChip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialLoadingIndicator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialQuoteBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialSearchBlock.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

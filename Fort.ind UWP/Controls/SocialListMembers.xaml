@@ -102,9 +102,8 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <ProgressRing x:Uid="SocialListMembersLoading"
+            <local:SocialLoadingIndicator x:Uid="SocialListMembersLoading"
                           x:Name="LoadingRing"
-                          Width="32" Height="32"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"/>
 

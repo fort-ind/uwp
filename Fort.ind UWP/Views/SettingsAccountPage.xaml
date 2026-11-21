@@ -260,10 +260,9 @@
                                   ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
 
                         <Grid x:Name="ModerationFooter" Margin="0,12,0,0">
-                            <ProgressRing x:Uid="SocialModerationLoading"
+                            <local:SocialLoadingIndicator x:Uid="SocialModerationLoading"
                                           x:Name="ModerationLoadingRing"
-                                          Width="24" Height="24"
-                                          HorizontalAlignment="Left"/>
+                                          HorizontalAlignment="Left" RingSize="24"/>
                             <StackPanel x:Name="ModerationStatePanel" Visibility="Collapsed">
                                 <TextBlock x:Name="ModerationStateText"
                                            Style="{StaticResource BodyTextBlockStyle}"

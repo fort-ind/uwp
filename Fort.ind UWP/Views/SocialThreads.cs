@@ -57,6 +57,29 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static bool OpenSearch(DependencyObject origin, string query)
+        {
+            try
+            {
+                var text = query == null ? null : query.Trim();
+                var account = SocialContentService.CurrentAccountId();
+                if (string.IsNullOrEmpty(text) || account == null || !SocialPolicies.Current.AllowsNoteSearch) return false;
+
+                var page = PageOf(origin);
+                if (page == null || page.Frame == null) return false;
+
+                var current = page as SocialTagPage;
+                if (current != null && current.ShowsSearch(text)) return true;
+
+                return page.Frame.Navigate(typeof(SocialTagPage), SocialTagArgs.ForSearch(account, text));
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialThreads: could not open the note search", ex);
+                return false;
+            }
+        }
+
         public static bool IsInPlacePage(Type pageType)
         {
             return pageType == typeof(SocialNotePage) || pageType == typeof(SocialTagPage);

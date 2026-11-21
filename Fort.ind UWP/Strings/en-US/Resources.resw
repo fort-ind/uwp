@@ -4913,6 +4913,18 @@ Open your profile and try again.</value>
   <data name="SocialCodeBlockNameFormat" xml:space="preserve">
     <value>{0} code block</value>
   </data>
+  <data name="SocialMfmSearchButtonText.Text" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SocialMfmSearchButtonNameFormat" xml:space="preserve">
+    <value>Search fort.social for {0}</value>
+  </data>
+  <data name="SocialLoadingSlowText.Text" xml:space="preserve">
+    <value>fort.social is taking longer than usual to respond…</value>
+  </data>
+  <data name="SocialMfmSpoilerName" xml:space="preserve">
+    <value>Hidden text. Activate to show it.</value>
+  </data>
   <data name="UnixTimeAgoNow" xml:space="preserve">
     <value>Just now</value>
     <comment>A time stamp inside a note (MFM unixtime) that is within a few seconds of now, past or future.</comment>

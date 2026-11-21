@@ -656,7 +656,7 @@ namespace Fort.ind_UWP
                            "SocialMentionsEmpty", "SocialMentionsFailed");
         }
 
-        private static void ApplyFeedState(FeedState state, ListRefresh refresh, ProgressRing ring, StackPanel panel,
+        private static void ApplyFeedState(FeedState state, ListRefresh refresh, SocialLoadingIndicator ring, StackPanel panel,
                                            FontIcon glyph, TextBlock text, Button button,
                                            string emptyKey, string failedKey)
         {

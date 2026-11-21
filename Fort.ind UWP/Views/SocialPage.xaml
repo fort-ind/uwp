@@ -232,8 +232,7 @@
                         <Flyout x:Name="TagsFlyout" Placement="Bottom" Opening="TagsFlyout_Opening">
                             <StackPanel Width="280" Spacing="8">
                                 <TextBlock x:Uid="SocialTagsHeader" Style="{StaticResource BaseTextBlockStyle}"/>
-                                <ProgressRing x:Uid="SocialTagsLoading" x:Name="TagsLoadingRing"
-                                              Width="32" Height="32"
+                                <local:SocialLoadingIndicator x:Uid="SocialTagsLoading" x:Name="TagsLoadingRing"
                                               HorizontalAlignment="Center"
                                               IsActive="False"
                                               Visibility="Collapsed"/>
@@ -323,9 +322,8 @@
                         </ListView>
                     </muxc:RefreshContainer>
 
-                    <ProgressRing x:Uid="SocialForYouLoading" x:Name="ForYouLoadingRing"
+                    <local:SocialLoadingIndicator x:Uid="SocialForYouLoading" x:Name="ForYouLoadingRing"
                                   Grid.Row="1"
-                                  Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="ForYouStatePanel"
@@ -400,9 +398,8 @@
                         </ListView>
                     </muxc:RefreshContainer>
 
-                    <ProgressRing x:Uid="SocialFollowingLoading" x:Name="FollowingLoadingRing"
+                    <local:SocialLoadingIndicator x:Uid="SocialFollowingLoading" x:Name="FollowingLoadingRing"
                                   Grid.Row="1"
-                                  Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="FollowingStatePanel"
@@ -477,9 +474,8 @@
                         </ListView>
                     </muxc:RefreshContainer>
 
-                    <ProgressRing x:Uid="SocialLocalLoading" x:Name="LocalLoadingRing"
+                    <local:SocialLoadingIndicator x:Uid="SocialLocalLoading" x:Name="LocalLoadingRing"
                                   Grid.Row="1"
-                                  Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="LocalStatePanel"
@@ -568,9 +564,8 @@
                         </ListView>
                     </muxc:RefreshContainer>
 
-                    <ProgressRing x:Uid="SocialGlobalLoading" x:Name="GlobalLoadingRing"
+                    <local:SocialLoadingIndicator x:Uid="SocialGlobalLoading" x:Name="GlobalLoadingRing"
                                   Grid.Row="2"
-                                  Width="32" Height="32"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                     <StackPanel x:Name="GlobalStatePanel"
@@ -755,9 +750,8 @@
                             </ListView>
                         </muxc:RefreshContainer>
 
-                        <ProgressRing x:Uid="SocialCollectionsLoading" x:Name="CollectionsLoadingRing"
+                        <local:SocialLoadingIndicator x:Uid="SocialCollectionsLoading" x:Name="CollectionsLoadingRing"
                                       Grid.Row="1"
-                                      Width="32" Height="32"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                         <StackPanel x:Name="CollectionsStatePanel"
@@ -855,9 +849,8 @@
                             </ListView>
                         </muxc:RefreshContainer>
 
-                        <ProgressRing x:Uid="SocialNotificationsLoading" x:Name="NotificationsLoadingRing"
+                        <local:SocialLoadingIndicator x:Uid="SocialNotificationsLoading" x:Name="NotificationsLoadingRing"
                                       Grid.Row="1"
-                                      Width="32" Height="32"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                         <StackPanel x:Name="NotificationsStatePanel"
@@ -929,9 +922,8 @@
                             </ListView>
                         </muxc:RefreshContainer>
 
-                        <ProgressRing x:Uid="SocialMentionsLoading" x:Name="MentionsLoadingRing"
+                        <local:SocialLoadingIndicator x:Uid="SocialMentionsLoading" x:Name="MentionsLoadingRing"
                                       Grid.Row="1"
-                                      Width="32" Height="32"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                         <StackPanel x:Name="MentionsStatePanel"

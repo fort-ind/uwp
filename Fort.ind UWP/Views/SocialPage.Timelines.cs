@@ -18,7 +18,7 @@ namespace Fort.ind_UWP
 
         private sealed class TimelineFeed
         {
-            public TimelineFeed(SocialTimeline timeline, PivotItem pivotItem, ListRefresh refresh, ProgressRing ring,
+            public TimelineFeed(SocialTimeline timeline, PivotItem pivotItem, ListRefresh refresh, SocialLoadingIndicator ring,
                                 StackPanel panel, FontIcon glyph, TextBlock text, Button button,
                                 string emptyKey, string failedKey)
             {
@@ -45,7 +45,7 @@ namespace Fort.ind_UWP
 
             public ListView List { get; }
 
-            public ProgressRing Ring { get; }
+            public SocialLoadingIndicator Ring { get; }
 
             public StackPanel Panel { get; }
 
@@ -74,7 +74,7 @@ namespace Fort.ind_UWP
         }
 
         private TimelineFeed CreateTimeline(SocialTimeline timeline, PivotItem pivotItem, ListView list,
-                                            MuxcRefreshContainer container, MuxcInfoBar failedBar, ProgressRing ring,
+                                            MuxcRefreshContainer container, MuxcInfoBar failedBar, SocialLoadingIndicator ring,
                                             StackPanel panel, FontIcon glyph, TextBlock text, Button button,
                                             string emptyKey, string failedKey)
         {
