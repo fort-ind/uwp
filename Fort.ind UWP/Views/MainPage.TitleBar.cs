@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace Fort.ind_UWP
 {
@@ -64,16 +64,21 @@ namespace Fort.ind_UWP
 
             if (!ApiContracts.Has1809)
             {
-                AddNavViewPart(pads, VisualTreeSearch.FindDescendantByName(NavView, "TogglePaneTopPadding"), "TogglePaneTopPadding");
-                AddNavViewPart(pads, VisualTreeSearch.FindDescendantByName(NavView, "ContentPaneTopPadding"), "ContentPaneTopPadding");
+                AddNavViewPart(pads, FindNavViewPart("TogglePaneTopPadding"), "TogglePaneTopPadding");
+                AddNavViewPart(pads, FindNavViewPart("ContentPaneTopPadding"), "ContentPaneTopPadding");
             }
 
-            var contentGrid = VisualTreeSearch.FindDescendantByName(NavView, "ContentGrid") as Grid;
-            var hasContentPadding = contentGrid != null
-                                    && contentGrid.Children.OfType<FrameworkElement>().Any(child => child.Name == "ContentTopPadding");
-            if (!hasContentPadding) AddNavViewPart(pads, contentGrid, "ContentGrid");
+            if (FindNavViewPart("ContentTopPadding") == null) AddNavViewPart(pads, FindNavViewPart("ContentGrid"), "ContentGrid");
 
             return pads;
+        }
+
+        private FrameworkElement FindNavViewPart(string name)
+        {
+            if (VisualTreeHelper.GetChildrenCount(NavView) == 0) return null;
+
+            var templateRoot = VisualTreeHelper.GetChild(NavView, 0) as FrameworkElement;
+            return templateRoot == null ? null : templateRoot.FindName(name) as FrameworkElement;
         }
 
         private static void AddNavViewPart(List<FrameworkElement> pads, FrameworkElement part, string name)
