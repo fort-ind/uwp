@@ -32,7 +32,8 @@ namespace Fort.ind_UWP
         private static readonly ConditionalWeakTable<RichTextBlock, FillState> s_states =
             new ConditionalWeakTable<RichTextBlock, FillState>();
 
-        private static readonly FontFamily s_codeFont = new FontFamily(CodePalette.FontName);
+        [ThreadStatic]
+        private static FontFamily t_codeFont;
 
         private static int s_lastLinkTicks;
 
@@ -40,6 +41,11 @@ namespace Fort.ind_UWP
 
         [ThreadStatic]
         private static SolidColorBrush[] t_paletteBrushes;
+
+        private static FontFamily CodeFont
+        {
+            get { return t_codeFont ?? (t_codeFont = new FontFamily(CodePalette.FontName)); }
+        }
 
         public static bool WasLinkJustInvoked
         {
@@ -106,7 +112,7 @@ namespace Fort.ind_UWP
         private static FontFamily FontFor(MfmSegment function)
         {
             if (function.HasArgument("serif")) return new FontFamily("Times New Roman");
-            if (function.HasArgument("monospace")) return s_codeFont;
+            if (function.HasArgument("monospace")) return CodeFont;
             if (function.HasArgument("cursive")) return new FontFamily("Comic Sans MS");
             if (function.HasArgument("fantasy")) return new FontFamily("Impact");
             return null;
@@ -653,7 +659,7 @@ namespace Fort.ind_UWP
             {
                 var run = new Run { Text = text };
                 Apply(run, style);
-                run.FontFamily = s_codeFont;
+                run.FontFamily = CodeFont;
                 if (style.Foreground == null)
                 {
                     CodePalette.Paint(run, CodePalette.InlineCode(_state.IsDark));
@@ -687,7 +693,7 @@ namespace Fort.ind_UWP
                 var bitmap = new BitmapImage();
                 bitmap.DecodePixelType = DecodePixelType.Logical;
                 bitmap.DecodePixelHeight = (int)Math.Ceiling(size);
-                bitmap.UriSource = segment.EmojiUri;
+                RemoteImage.SetUri(bitmap, segment.EmojiUri);
 
                 var image = new Image
                 {

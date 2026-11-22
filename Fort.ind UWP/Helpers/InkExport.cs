@@ -18,22 +18,30 @@ namespace Fort.ind_UWP
 
         public static async Task<SoftwareBitmap> DecodePhotoAsync(IRandomAccessStream stream, uint maximumSide)
         {
-            var decoder = await BitmapDecoder.CreateAsync(stream);
-            var longest = Math.Max(decoder.PixelWidth, decoder.PixelHeight);
-            var scale = longest > maximumSide ? (double)maximumSide / longest : 1.0;
-
-            var transform = new BitmapTransform
+            var decodable = await RemoteImage.ToSystemDecodableAsync(stream);
+            try
             {
-                ScaledWidth = (uint)Math.Max(1, Math.Round(decoder.PixelWidth * scale)),
-                ScaledHeight = (uint)Math.Max(1, Math.Round(decoder.PixelHeight * scale)),
-                InterpolationMode = BitmapInterpolationMode.Fant
-            };
+                var decoder = await BitmapDecoder.CreateAsync(decodable);
+                var longest = Math.Max(decoder.PixelWidth, decoder.PixelHeight);
+                var scale = longest > maximumSide ? (double)maximumSide / longest : 1.0;
 
-            return await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8,
-                                                        BitmapAlphaMode.Premultiplied,
-                                                        transform,
-                                                        ExifOrientationMode.RespectExifOrientation,
-                                                        ColorManagementMode.DoNotColorManage);
+                var transform = new BitmapTransform
+                {
+                    ScaledWidth = (uint)Math.Max(1, Math.Round(decoder.PixelWidth * scale)),
+                    ScaledHeight = (uint)Math.Max(1, Math.Round(decoder.PixelHeight * scale)),
+                    InterpolationMode = BitmapInterpolationMode.Fant
+                };
+
+                return await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8,
+                                                            BitmapAlphaMode.Premultiplied,
+                                                            transform,
+                                                            ExifOrientationMode.RespectExifOrientation,
+                                                            ColorManagementMode.DoNotColorManage);
+            }
+            finally
+            {
+                if (!ReferenceEquals(decodable, stream)) decodable.Dispose();
+            }
         }
 
         public static async Task<byte[]> RenderAsync(IReadOnlyList<InkStroke> strokes,

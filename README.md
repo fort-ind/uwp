@@ -28,3 +28,4 @@ claude was used to help fix a icon bug a while ago. otherwise all code your seei
 * [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows) 
 * [microsoft ui xaml](https://github.com/microsoft/microsoft-ui-XAML) 
 * [Win2D](https://github.com/microsoft/win2d)
+* [ImageSharp](https://github.com/SixLabors/ImageSharp) 2.1 (Apache-2.0), for WebP pictures on Windows versions without Microsoft's WebP extension

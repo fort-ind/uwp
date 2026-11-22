@@ -809,7 +809,7 @@ namespace Fort.ind_UWP
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.DecodePixelType = DecodePixelType.Logical;
                 bitmap.DecodePixelWidth = LinkThumbnailSize;
-                bitmap.UriSource = thumbnail;
+                RemoteImage.SetUri(bitmap, thumbnail);
                 LinkThumbImage.Source = bitmap;
                 LinkThumbHost.Visibility = Visibility.Visible;
             }
@@ -875,7 +875,7 @@ namespace Fort.ind_UWP
             bitmap.DecodePixelType = DecodePixelType.Logical;
             bitmap.DecodePixelWidth = (int)QuoteAvatarSize;
             bitmap.DecodePixelHeight = (int)QuoteAvatarSize;
-            bitmap.UriSource = uri;
+            RemoteImage.SetUri(bitmap, uri);
             return bitmap;
         }
 
@@ -1222,7 +1222,7 @@ namespace Fort.ind_UWP
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.DecodePixelType = DecodePixelType.Logical;
                 bitmap.DecodePixelWidth = decodeWidth;
-                bitmap.UriSource = uri;
+                RemoteImage.SetUri(bitmap, uri);
                 return bitmap;
             }
 

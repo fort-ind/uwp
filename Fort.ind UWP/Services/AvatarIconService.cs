@@ -414,7 +414,8 @@ namespace Fort.ind_UWP
                 return null;
             }
 
-            using (var stream = downloaded)
+            using (downloaded)
+            using (var stream = await RemoteImage.ToSystemDecodableAsync(downloaded))
             {
                 var decoder = await BitmapDecoder.CreateAsync(stream);
                 if (decoder.PixelWidth == 0 || decoder.PixelHeight == 0)

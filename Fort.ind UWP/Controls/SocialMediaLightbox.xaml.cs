@@ -613,7 +613,6 @@ namespace Fort.ind_UWP
             private BitmapImage CreateBitmap(Uri uri, int decodeWidth)
             {
                 var bitmap = new BitmapImage();
-                bitmap.ImageOpened += Bitmap_ImageOpened;
                 bitmap.ImageFailed += Bitmap_ImageFailed;
                 if (decodeWidth > 0)
                 {
@@ -621,7 +620,7 @@ namespace Fort.ind_UWP
                     bitmap.DecodePixelWidth = decodeWidth;
                 }
                 _decodedWidth = decodeWidth;
-                bitmap.UriSource = uri;
+                RemoteImage.SetUri(bitmap, uri, () => Bitmap_ImageOpened(bitmap, null));
                 return bitmap;
             }
 
@@ -674,7 +673,7 @@ namespace Fort.ind_UWP
                 AutomationProperties.SetAccessibilityView(_detail, Windows.UI.Xaml.Automation.Peers.AccessibilityView.Raw);
                 Picture.Children.Add(_detail);
                 _detail.Source = bitmap;
-                bitmap.UriSource = uri;
+                RemoteImage.SetUri(bitmap, uri);
             }
 
             private void DropDetail()

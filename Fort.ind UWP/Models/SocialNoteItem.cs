@@ -305,7 +305,7 @@ namespace Fort.ind_UWP
                 bitmap.DecodePixelType = DecodePixelType.Logical;
                 bitmap.DecodePixelWidth = AvatarDecodeSize;
                 bitmap.DecodePixelHeight = AvatarDecodeSize;
-                bitmap.UriSource = uri;
+                RemoteImage.SetUri(bitmap, uri);
                 _avatar = bitmap;
                 return _avatar;
             }

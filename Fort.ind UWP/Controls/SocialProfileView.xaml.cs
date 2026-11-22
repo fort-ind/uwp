@@ -303,13 +303,13 @@ namespace Fort.ind_UWP
             AvatarPicture.DisplayName = name ?? "";
 
             var avatarUri = user == null ? null : WebLauncher.TryCreateFetchUri(user.AvatarUrl);
-            if (avatarUri != null && (AvatarPicture.ProfilePicture as BitmapImage)?.UriSource != avatarUri)
+            if (avatarUri != null && RemoteImage.SourceOf(AvatarPicture.ProfilePicture as BitmapImage) != avatarUri)
             {
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.DecodePixelType = DecodePixelType.Logical;
                 bitmap.DecodePixelWidth = AvatarDecodeSize;
                 bitmap.DecodePixelHeight = AvatarDecodeSize;
-                bitmap.UriSource = avatarUri;
+                RemoteImage.SetUri(bitmap, avatarUri);
                 AvatarPicture.ProfilePicture = bitmap;
             }
         }
@@ -328,14 +328,13 @@ namespace Fort.ind_UWP
                 return;
             }
 
-            if (_bannerBitmap != null && _bannerBitmap.UriSource == bannerUri) return;
+            if (_bannerBitmap != null && RemoteImage.SourceOf(_bannerBitmap) == bannerUri) return;
 
             BitmapImage bitmap = new BitmapImage();
             bitmap.DecodePixelType = DecodePixelType.Logical;
             bitmap.DecodePixelWidth = BannerDecodeWidth;
-            bitmap.ImageOpened += BannerBitmap_ImageOpened;
-            bitmap.UriSource = bannerUri;
             _bannerBitmap = bitmap;
+            RemoteImage.SetUri(bitmap, bannerUri, () => BannerBitmap_ImageOpened(bitmap, null));
 
             BannerImage.Opacity = 0;
             BannerImage.Fill = new ImageBrush { ImageSource = bitmap, Stretch = Stretch.UniformToFill };

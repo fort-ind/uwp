@@ -211,7 +211,7 @@ namespace Fort.ind_UWP
                 var bitmap = new BitmapImage();
                 bitmap.DecodePixelType = DecodePixelType.Logical;
                 bitmap.DecodePixelHeight = RoleIconSize;
-                bitmap.UriSource = iconUri;
+                RemoteImage.SetUri(bitmap, iconUri);
 
                 var icon = new Image
                 {

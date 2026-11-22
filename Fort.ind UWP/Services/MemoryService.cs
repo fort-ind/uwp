@@ -174,6 +174,15 @@ namespace Fort.ind_UWP
 
             try
             {
+                RemoteImage.ReleaseMemory();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MemoryService: could not release the picture decoder's memory", ex);
+            }
+
+            try
+            {
                 var handler = TrimRequested;
                 if (handler != null) handler(null, new MemoryTrimEventArgs(includeCurrentPages));
             }

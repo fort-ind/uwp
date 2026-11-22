@@ -110,7 +110,7 @@ namespace Fort.ind_UWP
             BitmapImage bitmap = new BitmapImage();
             bitmap.DecodePixelType = DecodePixelType.Logical;
             bitmap.DecodePixelHeight = ThumbnailDecodeSize;
-            bitmap.UriSource = uri;
+            RemoteImage.SetUri(bitmap, uri);
             return bitmap;
         }
     }

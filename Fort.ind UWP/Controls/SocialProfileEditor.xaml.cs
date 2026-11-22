@@ -451,7 +451,7 @@ namespace Fort.ind_UWP
             bitmap.DecodePixelType = DecodePixelType.Logical;
             bitmap.DecodePixelWidth = AvatarDecodeSize;
             bitmap.DecodePixelHeight = AvatarDecodeSize;
-            bitmap.UriSource = uri;
+            RemoteImage.SetUri(bitmap, uri);
             AvatarPicture.ProfilePicture = bitmap;
         }
 
@@ -472,7 +472,7 @@ namespace Fort.ind_UWP
             BitmapImage bitmap = new BitmapImage();
             bitmap.DecodePixelType = DecodePixelType.Logical;
             bitmap.DecodePixelWidth = BannerDecodeWidth;
-            bitmap.UriSource = uri;
+            RemoteImage.SetUri(bitmap, uri);
             BannerImage.Fill = new ImageBrush { ImageSource = bitmap, Stretch = Stretch.UniformToFill };
         }
 
