@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Windows.ApplicationModel.Core;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -126,6 +127,7 @@ namespace Fort.ind_UWP
                 UpdateAppTitleVisibility(NavView.IsPaneOpen);
 
                 AlignPaneToggleButton();
+                ApplyNavViewTitleBarPadding(CoreApplication.GetCurrentView().TitleBar);
                 MarkNavigationPaneLandmark();
 
                 if (!SocialNotificationService.OwnsBadge)

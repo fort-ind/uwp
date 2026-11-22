@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -9,6 +11,10 @@ namespace Fort.ind_UWP
 {
     public sealed partial class MainPage : Page
     {
+        private List<FrameworkElement> _navViewTitleBarPads;
+
+        private bool _titleBarHidden;
+
         private void SetupTitleBar()
         {
             var coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
@@ -34,6 +40,52 @@ namespace Fort.ind_UWP
             TitleBarLeftInset.Width = new GridLength(coreTitleBar.SystemOverlayLeftInset);
             TitleBarRightInset.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
             TitleBarBackButton.Margin = new Thickness(coreTitleBar.SystemOverlayLeftInset, 0, 0, 0);
+
+            ApplyNavViewTitleBarPadding(coreTitleBar);
+        }
+
+        private void ApplyNavViewTitleBarPadding(CoreApplicationViewTitleBar coreTitleBar)
+        {
+            if (coreTitleBar == null || !_navViewInitialized) return;
+
+            if (_navViewTitleBarPads == null) _navViewTitleBarPads = FindNavViewTitleBarPads();
+
+            var top = _titleBarHidden ? 0 : coreTitleBar.Height;
+            var margin = new Thickness(0, top, 0, 0);
+            foreach (var pad in _navViewTitleBarPads)
+            {
+                if (!pad.Margin.Equals(margin)) pad.Margin = margin;
+            }
+        }
+
+        private List<FrameworkElement> FindNavViewTitleBarPads()
+        {
+            var pads = new List<FrameworkElement>();
+
+            if (!ApiContracts.Has1809)
+            {
+                AddNavViewPart(pads, VisualTreeSearch.FindDescendantByName(NavView, "TogglePaneTopPadding"), "TogglePaneTopPadding");
+                AddNavViewPart(pads, VisualTreeSearch.FindDescendantByName(NavView, "ContentPaneTopPadding"), "ContentPaneTopPadding");
+            }
+
+            var contentGrid = VisualTreeSearch.FindDescendantByName(NavView, "ContentGrid") as Grid;
+            var hasContentPadding = contentGrid != null
+                                    && contentGrid.Children.OfType<FrameworkElement>().Any(child => child.Name == "ContentTopPadding");
+            if (!hasContentPadding) AddNavViewPart(pads, contentGrid, "ContentGrid");
+
+            return pads;
+        }
+
+        private static void AddNavViewPart(List<FrameworkElement> pads, FrameworkElement part, string name)
+        {
+            if (part != null)
+            {
+                pads.Add(part);
+            }
+            else
+            {
+                AppLog.Warning("MainPage: the NavigationView template has no " + name + "; its title bar padding is not applied");
+            }
         }
 
         private void OnTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
@@ -55,6 +107,9 @@ namespace Fort.ind_UWP
                 var visibility = sender.IsVisible ? Visibility.Visible : Visibility.Collapsed;
                 AppTitleBar.Visibility = visibility;
                 TitleBarBackButton.Visibility = visibility;
+
+                _titleBarHidden = !sender.IsVisible;
+                ApplyNavViewTitleBarPadding(sender);
             }
             catch (Exception ex)
             {
