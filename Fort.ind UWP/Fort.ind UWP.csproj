@@ -262,6 +262,7 @@
     <Compile Include="Helpers\Debouncer.cs" />
     <Compile Include="Helpers\RemoteImage.cs" />
     <Compile Include="Helpers\ElementLoadedState.cs" />
+    <Compile Include="Helpers\IconFont.cs" />
     <Compile Include="Helpers\JsonText.cs" />
     <Compile Include="Helpers\LocalizedStrings.cs" />
     <Compile Include="Helpers\MfmEffects.cs" />

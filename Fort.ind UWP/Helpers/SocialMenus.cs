@@ -35,10 +35,17 @@ namespace Fort.ind_UWP
         private const string ModerateGlyph = "\uE8F8";
         private const string MuteUserGlyph = "\uE74F";
         private const string UnmuteUserGlyph = "\uE767";
-        private const string BlockGlyph = "\uECE4";
+        private const string PreferredBlockGlyph = "\uECE4";
+
+        private const string FallbackBlockGlyph = "\uE25B";
         private const string ListGlyph = "\uE8FD";
 
         private static readonly TimeSpan ShareRequestWindow = TimeSpan.FromSeconds(10);
+
+        private static string BlockGlyph
+        {
+            get { return IconFont.Pick(PreferredBlockGlyph, FallbackBlockGlyph); }
+        }
 
         public static MenuFlyout Build(object item, UIElement announcer)
         {
