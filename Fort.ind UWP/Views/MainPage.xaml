@@ -215,7 +215,6 @@
                 Click="TitleBarBackButton_Click"/>
 
         <NavigationView x:Name="NavView"
-                         PaneDisplayMode="Auto"
                          CompactPaneLength="48"
                          OpenPaneLength="320"
                          IsBackButtonVisible="Collapsed"

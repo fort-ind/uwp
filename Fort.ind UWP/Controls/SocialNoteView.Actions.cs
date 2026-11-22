@@ -5,6 +5,8 @@ using Windows.UI.Xaml.Automation;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
+using MuxcSplitButton = Microsoft.UI.Xaml.Controls.SplitButton;
+using MuxcSplitButtonClickEventArgs = Microsoft.UI.Xaml.Controls.SplitButtonClickEventArgs;
 
 namespace Fort.ind_UWP
 {
@@ -174,7 +176,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private async void ReactButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
+        private async void ReactButton_Click(MuxcSplitButton sender, MuxcSplitButtonClickEventArgs args)
         {
             try
             {

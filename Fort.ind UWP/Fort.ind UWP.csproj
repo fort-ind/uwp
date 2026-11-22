@@ -12,7 +12,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.19041.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -246,6 +246,7 @@
       <DependentUpon>SocialUserRow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\TagWrapPanel.cs" />
+    <Compile Include="Helpers\ApiContracts.cs" />
     <Compile Include="Helpers\AppLog.cs" />
     <Compile Include="Helpers\AppRestart.cs" />
     <Compile Include="Helpers\AppSettings.cs" />
@@ -259,6 +260,7 @@
     <Compile Include="Helpers\ColorHelper.cs" />
     <Compile Include="Helpers\CountText.cs" />
     <Compile Include="Helpers\Debouncer.cs" />
+    <Compile Include="Helpers\ElementLoadedState.cs" />
     <Compile Include="Helpers\JsonText.cs" />
     <Compile Include="Helpers\LocalizedStrings.cs" />
     <Compile Include="Helpers\MfmEffects.cs" />
@@ -850,17 +852,11 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Toolkit.Uwp">
-      <Version>7.1.3</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
       <Version>7.1.3</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Animations">
-      <Version>7.1.3</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Media">
-      <Version>7.1.3</Version>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
+      <Version>6.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.7.3</Version>

@@ -5,6 +5,7 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     HorizontalAlignment="Stretch">
 
@@ -351,10 +352,10 @@
                                 </StackPanel>
                             </Button>
 
-                            <ToggleSplitButton x:Name="ReactButton"
-                                               Grid.Column="2"
-                                               Style="{StaticResource SocialReactionSplitButtonStyle}"
-                                               Click="ReactButton_Click">
+                            <muxc:ToggleSplitButton x:Name="ReactButton"
+                                                    Grid.Column="2"
+                                                    Style="{StaticResource SocialReactionSplitButtonStyle}"
+                                                    Click="ReactButton_Click">
                                 <StackPanel Orientation="Horizontal">
                                     <Grid Width="16" Height="16" VerticalAlignment="Center">
                                         <FontIcon x:Name="LikeIcon" Glyph="&#xEB51;" FontSize="14" IsTextScaleFactorEnabled="False"/>
@@ -381,10 +382,10 @@
                                                Style="{StaticResource CaptionTextBlockStyle}"
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <ToggleSplitButton.Flyout>
+                                <muxc:ToggleSplitButton.Flyout>
                                     <Flyout x:Name="ReactFlyout" Opening="ReactFlyout_Opening"/>
-                                </ToggleSplitButton.Flyout>
-                            </ToggleSplitButton>
+                                </muxc:ToggleSplitButton.Flyout>
+                            </muxc:ToggleSplitButton>
 
                             <Button x:Uid="SocialNoteMoreButton"
                                     x:Name="MoreButton"

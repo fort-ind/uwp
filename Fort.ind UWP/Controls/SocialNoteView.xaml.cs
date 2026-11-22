@@ -123,7 +123,7 @@ namespace Fort.ind_UWP
 
         private void SocialNoteView_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (IsLoaded) return;
+            if (this.IsLoadedNow()) return;
 
             _isLoaded = false;
             Subscribe(null);

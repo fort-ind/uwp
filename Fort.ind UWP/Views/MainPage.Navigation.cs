@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -150,7 +152,7 @@ namespace Fort.ind_UWP
             }
             else
             {
-                var invokedItem = args.InvokedItemContainer as NavigationViewItem;
+                var invokedItem = InvokedNavItem(args);
                 if (invokedItem != null)
                 {
                     var tag = invokedItem.Tag?.ToString() ?? AppConstants.NavigationLatestNews;
@@ -159,6 +161,22 @@ namespace Fort.ind_UWP
             }
 
             ClosePaneUnlessExpanded();
+        }
+
+        private NavigationViewItem InvokedNavItem(NavigationViewItemInvokedEventArgs args)
+        {
+            if (ApiContracts.Has1809) return InvokedContainer(args);
+
+            var focused = FocusManager.GetFocusedElement() as NavigationViewItem;
+            if (focused != null && Equals(focused.Content, args.InvokedItem) && NavView.MenuItems.Contains(focused)) return focused;
+
+            return NavView.MenuItems.OfType<NavigationViewItem>().FirstOrDefault(item => Equals(item.Content, args.InvokedItem));
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static NavigationViewItem InvokedContainer(NavigationViewItemInvokedEventArgs args)
+        {
+            return args.InvokedItemContainer as NavigationViewItem;
         }
 
         private bool ClosePaneUnlessExpanded()

@@ -5,6 +5,7 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
@@ -225,7 +226,7 @@
                         Width="40" Height="40"
                         MinWidth="40" MinHeight="40"
                         Padding="0"
-                        CornerRadius="0"
+                        contract7Present:CornerRadius="0"
                         VerticalAlignment="Center">
                     <FontIcon Glyph="&#xE1CB;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                     <Button.Flyout>
@@ -261,7 +262,7 @@
                         Width="40" Height="40"
                         MinWidth="40" MinHeight="40"
                         Padding="0"
-                        CornerRadius="0"
+                        contract7Present:CornerRadius="0"
                         VerticalAlignment="Center"
                         Click="SocialRefreshButton_Click">
                     <Button.KeyboardAccelerators>
@@ -661,7 +662,7 @@
                                 Width="40" Height="40"
                                 MinWidth="40" MinHeight="40"
                                 Padding="0"
-                                CornerRadius="0"
+                                contract7Present:CornerRadius="0"
                                 VerticalAlignment="Center"
                                 Click="CollectionNewButton_Click">
                             <FontIcon Glyph="&#xE710;" FontSize="16" IsTextScaleFactorEnabled="False"/>
@@ -675,7 +676,7 @@
                                 Width="40" Height="40"
                                 MinWidth="40" MinHeight="40"
                                 Padding="0"
-                                CornerRadius="0"
+                                contract7Present:CornerRadius="0"
                                 VerticalAlignment="Center">
                             <FontIcon Glyph="&#xE712;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                             <Button.Flyout>

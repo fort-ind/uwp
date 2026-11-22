@@ -177,7 +177,7 @@ namespace Fort.ind_UWP
 
             public override void AddSubmenu(string text, string glyph, Action<IList<MenuFlyoutItemBase>> fill)
             {
-                var menu = new MenuFlyout { Placement = FlyoutPlacementMode.RightEdgeAlignedTop };
+                var menu = new MenuFlyout { Placement = ApiContracts.Has1809 ? FlyoutPlacementMode.RightEdgeAlignedTop : FlyoutPlacementMode.Right };
                 fill(menu.Items);
                 CloseOnClick(menu.Items);
 

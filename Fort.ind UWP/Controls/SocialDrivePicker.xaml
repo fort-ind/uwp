@@ -5,6 +5,7 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
     mc:Ignorable="d"
     Loaded="UserControl_Loaded"
     Unloaded="UserControl_Unloaded">
@@ -52,7 +53,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="local:SocialDriveFolder">
-                        <Button CornerRadius="0"
+                        <Button contract7Present:CornerRadius="0"
                                 MaxWidth="220"
                                 AutomationProperties.Name="{x:Bind AutomationName}"
                                 ToolTipService.ToolTip="{x:Bind Name}"
@@ -120,7 +121,7 @@
                                     MinWidth="0" MinHeight="0"
                                     Padding="0"
                                     Margin="2"
-                                    CornerRadius="0"
+                                    contract7Present:CornerRadius="0"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     Background="#99000000"
@@ -137,7 +138,7 @@
                 <GridView.Footer>
                     <Button x:Uid="SocialDriveLoadMore"
                             x:Name="LoadMoreButton"
-                            CornerRadius="0"
+                            contract7Present:CornerRadius="0"
                             Margin="0,4,0,8"
                             HorizontalAlignment="Center"
                             Visibility="Collapsed"
@@ -161,7 +162,7 @@
                            TextWrapping="Wrap"/>
                 <Button x:Uid="SocialDriveRetry"
                         x:Name="RetryButton"
-                        CornerRadius="0"
+                        contract7Present:CornerRadius="0"
                         Margin="0,12,0,0"
                         HorizontalAlignment="Center"
                         Click="RetryButton_Click"/>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Graphics.Display;
@@ -132,7 +133,7 @@ namespace Fort.ind_UWP
             if (anchor != null)
             {
                 _pendingOpen = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate(OpenAnimationKey, anchor);
-                _pendingOpen.Configuration = new GravityConnectedAnimationConfiguration();
+                if (ApiContracts.Has1809) UseGravity(_pendingOpen);
             }
             else
             {
@@ -194,11 +195,23 @@ namespace Fort.ind_UWP
             if (anchor == null) return false;
 
             var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate(CloseAnimationKey, slot.Picture);
-            animation.Configuration = new DirectConnectedAnimationConfiguration();
+            if (ApiContracts.Has1809) UseDirect(animation);
             if (animation.TryStart(anchor)) return true;
 
             animation.Cancel();
             return false;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void UseGravity(ConnectedAnimation animation)
+        {
+            animation.Configuration = new GravityConnectedAnimationConfiguration();
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void UseDirect(ConnectedAnimation animation)
+        {
+            animation.Configuration = new DirectConnectedAnimationConfiguration();
         }
 
         private void CloseStoryboard_Completed(object sender, object e)

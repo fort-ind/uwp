@@ -6,6 +6,7 @@
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Width="344"
     Height="432">
@@ -112,7 +113,6 @@
             <Setter Property="Padding" Value="0"/>
             <Setter Property="MinWidth" Value="0"/>
             <Setter Property="MinHeight" Value="0"/>
-            <Setter Property="CornerRadius" Value="0"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
@@ -196,21 +196,21 @@
                 </i:Interaction.Behaviors>
             </TextBox>
 
-            <DropDownButton x:Uid="SocialEmojiPickerSkinTone"
-                            x:Name="ToneButton"
-                            Grid.Column="1"
-                            Padding="8,4,8,4">
+            <muxc:DropDownButton x:Uid="SocialEmojiPickerSkinTone"
+                                 x:Name="ToneButton"
+                                 Grid.Column="1"
+                                 Padding="8,4,8,4">
                 <TextBlock x:Name="ToneText"
                            FontFamily="Segoe UI Emoji"
                            FontSize="16"
                            IsTextScaleFactorEnabled="False"
                            AutomationProperties.AccessibilityView="Raw"/>
-                <DropDownButton.Flyout>
+                <muxc:DropDownButton.Flyout>
                     <Flyout x:Name="ToneFlyout">
                         <StackPanel x:Name="TonePanel" Orientation="Horizontal" Spacing="4"/>
                     </Flyout>
-                </DropDownButton.Flyout>
-            </DropDownButton>
+                </muxc:DropDownButton.Flyout>
+            </muxc:DropDownButton>
         </Grid>
 
         <GridView x:Uid="SocialEmojiPickerGrid"

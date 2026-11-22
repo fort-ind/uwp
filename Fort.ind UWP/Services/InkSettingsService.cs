@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Windows.UI.Core;
 using Windows.UI.Input.Inking;
@@ -87,9 +88,11 @@ namespace Fort.ind_UWP
         {
             get
             {
+                if (!ApiContracts.Has1809) return null;
+
                 try
                 {
-                    var name = PenAndInkSettings.GetDefault().FontFamilyName;
+                    var name = ReadHandwritingFontName();
                     return string.IsNullOrWhiteSpace(name) ? null : name;
                 }
                 catch (Exception ex)
@@ -98,6 +101,12 @@ namespace Fort.ind_UWP
                     return null;
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static string ReadHandwritingFontName()
+        {
+            return PenAndInkSettings.GetDefault().FontFamilyName;
         }
 
         private static void WriteAndBump(string key, object value)

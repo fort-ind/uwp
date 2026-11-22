@@ -80,6 +80,8 @@ namespace Fort.ind_UWP
 
         private bool _loading;
 
+        private bool _emojiFlyoutOpen;
+
         private int _recipientsLoading;
 
         public SocialComposer()
@@ -427,7 +429,7 @@ namespace Fort.ind_UWP
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Low, () => { });
                 var focused = FocusManager.GetFocusedElement() as DependencyObject;
                 if (focused != null && VisualTreeSearch.IsDescendantOf(focused, this)) return;
-                if (EmojiFlyout.IsOpen || Suggestions.IsOpen) return;
+                if (_emojiFlyoutOpen || Suggestions.IsOpen) return;
 
                 if (IsDraftEmpty()) SetExpanded(false);
             }
@@ -811,6 +813,8 @@ namespace Fort.ind_UWP
 
         private void EmojiFlyout_Opening(object sender, object e)
         {
+            _emojiFlyoutOpen = true;
+
             try
             {
                 var picker = SocialEmojiPicker.ForCurrentView();
@@ -821,6 +825,11 @@ namespace Fort.ind_UWP
             {
                 AppLog.Error("SocialComposer: could not open the emoji picker", ex);
             }
+        }
+
+        private void EmojiFlyout_Closed(object sender, object e)
+        {
+            _emojiFlyoutOpen = false;
         }
 
         private void InsertEmoji(string key)

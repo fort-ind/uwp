@@ -5,6 +5,7 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:localContract7Present="using:Fort.ind_UWP?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Background="Transparent">
@@ -117,7 +118,7 @@
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
-                                    CornerRadius="0"
+                                    localContract7Present:CornerRadius="0"
                                     Padding="16,12"
                                     AutomationProperties.HeadingLevel="Level2"
                                     Click="UpdatesHeader_Click">
@@ -215,7 +216,7 @@
                                     HorizontalAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch"
                                     MinWidth="0"
-                                    CornerRadius="0"
+                                    localContract7Present:CornerRadius="0"
                                     Padding="16,12"
                                     AutomationProperties.HeadingLevel="Level2"
                                     Click="WelcomeHeader_Click">

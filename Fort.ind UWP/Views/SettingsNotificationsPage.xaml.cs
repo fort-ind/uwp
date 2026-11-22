@@ -283,7 +283,7 @@ namespace Fort.ind_UWP
         public void RevealSection(string section)
         {
             _pendingRevealSection = section;
-            if (IsLoaded) RevealPendingSection();
+            if (this.IsLoadedNow()) RevealPendingSection();
         }
 
         private void RevealPendingSection()

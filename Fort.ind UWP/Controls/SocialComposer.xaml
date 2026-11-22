@@ -4,6 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Fort.ind_UWP"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
+    xmlns:contract7NotPresent="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,7)"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -31,16 +34,18 @@
                       HorizontalScrollMode="Disabled"
                       Padding="0,0,4,0">
             <StackPanel x:Name="BodyPanel" Padding="0,4,0,0">
-                <DropDownButton x:Uid="SocialComposeVisibilityButton"
-                                x:Name="VisibilityButton"
-                                Margin="0,0,0,8"
-                                Padding="10,4,10,4">
+                <muxc:DropDownButton x:Uid="SocialComposeVisibilityButton"
+                                     x:Name="VisibilityButton"
+                                     Margin="0,0,0,8"
+                                     Padding="10,4,10,4">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon x:Name="VisibilityGlyph" FontSize="14" IsTextScaleFactorEnabled="False"/>
                         <TextBlock x:Name="VisibilityLabel"/>
                     </StackPanel>
-                    <DropDownButton.Flyout>
-                        <MenuFlyout x:Name="VisibilityMenu" Placement="BottomEdgeAlignedLeft">
+                    <muxc:DropDownButton.Flyout>
+                        <MenuFlyout x:Name="VisibilityMenu"
+                                    contract7Present:Placement="BottomEdgeAlignedLeft"
+                                    contract7NotPresent:Placement="Bottom">
                             <ToggleMenuFlyoutItem x:Uid="SocialComposeVisibilityPublic" x:Name="PublicItem" Tag="public" Click="VisibilityItem_Click">
                                 <ToggleMenuFlyoutItem.Icon><FontIcon Glyph="&#xE774;"/></ToggleMenuFlyoutItem.Icon>
                             </ToggleMenuFlyoutItem>
@@ -58,8 +63,8 @@
                                 <ToggleMenuFlyoutItem.Icon><FontIcon Glyph="&#xE909;"/></ToggleMenuFlyoutItem.Icon>
                             </ToggleMenuFlyoutItem>
                         </MenuFlyout>
-                    </DropDownButton.Flyout>
-                </DropDownButton>
+                    </muxc:DropDownButton.Flyout>
+                </muxc:DropDownButton>
 
                 <local:SocialRecipientBox x:Name="RecipientBox"
                                           Margin="0,0,0,8"
@@ -217,7 +222,7 @@
                                         MinWidth="0" MinHeight="0"
                                         Padding="0"
                                         Margin="2"
-                                        CornerRadius="0"
+                                        contract7Present:CornerRadius="0"
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Bottom"
                                         Background="#99000000"
@@ -307,21 +312,22 @@
                             Style="{StaticResource SocialToolButtonStyle}">
                         <FontIcon Glyph="&#xE76E;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                         <Button.Flyout>
-                            <Flyout x:Name="EmojiFlyout" Opening="EmojiFlyout_Opening"/>
+                            <Flyout x:Name="EmojiFlyout" Opening="EmojiFlyout_Opening" Closed="EmojiFlyout_Closed"/>
                         </Button.Flyout>
                     </Button>
                     <ToggleButton x:Uid="SocialComposeWarningButton"
                                   x:Name="WarningToggle"
                                   Style="{StaticResource SocialToolToggleButtonStyle}"
+                                  contract7Present:CornerRadius="0"
                                   Click="WarningToggle_Click">
                         <FontIcon Glyph="&#xE7BA;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                     </ToggleButton>
-                    <SplitButton x:Uid="SocialComposeAttachButton"
-                                 x:Name="AttachButton"
-                                 Style="{StaticResource SocialToolSplitButtonStyle}"
-                                 Click="AttachButton_Click">
+                    <muxc:SplitButton x:Uid="SocialComposeAttachButton"
+                                      x:Name="AttachButton"
+                                      Style="{StaticResource SocialToolSplitButtonStyle}"
+                                      Click="AttachButton_Click">
                         <FontIcon Glyph="&#xE723;" FontSize="16" IsTextScaleFactorEnabled="False"/>
-                        <SplitButton.Flyout>
+                        <muxc:SplitButton.Flyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem x:Uid="SocialComposeAttachFromPc" Click="AttachFromPcItem_Click">
                                     <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE7F8;"/></MenuFlyoutItem.Icon>
@@ -330,8 +336,8 @@
                                     <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE753;"/></MenuFlyoutItem.Icon>
                                 </MenuFlyoutItem>
                             </MenuFlyout>
-                        </SplitButton.Flyout>
-                    </SplitButton>
+                        </muxc:SplitButton.Flyout>
+                    </muxc:SplitButton>
                     <Button x:Uid="SocialComposeInkButton"
                             x:Name="InkButton"
                             Style="{StaticResource SocialToolButtonStyle}">
@@ -350,12 +356,14 @@
                     <ToggleButton x:Uid="SocialComposePollButton"
                                   x:Name="PollToggle"
                                   Style="{StaticResource SocialToolToggleButtonStyle}"
+                                  contract7Present:CornerRadius="0"
                                   Click="PollToggle_Click">
                         <FontIcon Glyph="&#xE8FD;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                     </ToggleButton>
                     <ToggleButton x:Uid="SocialComposePreviewButton"
                                   x:Name="PreviewToggle"
                                   Style="{StaticResource SocialToolToggleButtonStyle}"
+                                  contract7Present:CornerRadius="0"
                                   Click="PreviewToggle_Click">
                         <FontIcon Glyph="&#xE890;" FontSize="16" IsTextScaleFactorEnabled="False"/>
                     </ToggleButton>
@@ -421,7 +429,8 @@
                                   IsTextScaleFactorEnabled="False"
                                   AutomationProperties.AccessibilityView="Raw"/>
                         <Button.Flyout>
-                            <MenuFlyout Placement="TopEdgeAlignedRight">
+                            <MenuFlyout contract7Present:Placement="TopEdgeAlignedRight"
+                                        contract7NotPresent:Placement="Top">
                                 <MenuFlyoutItem x:Uid="SocialComposeScheduleItem"
                                                 x:Name="ScheduleItem"
                                                 Click="ScheduleItem_Click">

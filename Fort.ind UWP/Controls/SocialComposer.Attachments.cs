@@ -17,6 +17,8 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.Web.Http;
+using MuxcSplitButton = Microsoft.UI.Xaml.Controls.SplitButton;
+using MuxcSplitButtonClickEventArgs = Microsoft.UI.Xaml.Controls.SplitButtonClickEventArgs;
 
 namespace Fort.ind_UWP
 {
@@ -88,7 +90,7 @@ namespace Fort.ind_UWP
             else UpdateState();
         }
 
-        private async void AttachButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
+        private async void AttachButton_Click(MuxcSplitButton sender, MuxcSplitButtonClickEventArgs args)
         {
             try
             {

@@ -5,6 +5,7 @@
     xmlns:local="using:Fort.ind_UWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     mc:Ignorable="d"
     Background="Transparent">
@@ -22,7 +23,7 @@
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Left"
                         Padding="12,10"
-                        CornerRadius="0"
+                        contract7Present:CornerRadius="0"
                         Click="HomeFavoriteItem_Click">
                     <StackPanel Orientation="Horizontal" Spacing="12">
                         <TextBlock Text="{x:Bind Icon}"
@@ -47,7 +48,7 @@
                               Width="40" Height="40"
                               MinWidth="40" MinHeight="40"
                               Padding="0"
-                              CornerRadius="0"
+                              contract7Present:CornerRadius="0"
                               VerticalAlignment="Center"
                               Margin="4,0,0,0"
                               Checked="HomeFavoriteToggle_Checked"

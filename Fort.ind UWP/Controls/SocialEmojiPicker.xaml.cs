@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
@@ -397,6 +398,7 @@ namespace Fort.ind_UWP
                     Tag = group.Id,
                     Content = StripIcon(group)
                 };
+                ApplySquareCorners(button);
                 AutomationProperties.SetName(button, group.Title);
                 ToolTipService.SetToolTip(button, group.Title);
                 button.Click += StripButton_Click;
@@ -595,12 +597,24 @@ namespace Fort.ind_UWP
                     }
                 };
 
+                ApplySquareCorners(button);
                 var name = LocalizedStrings.Get("SocialEmojiSkinTone" + tone);
                 AutomationProperties.SetName(button, name);
                 ToolTipService.SetToolTip(button, name);
                 button.Click += ToneOption_Click;
                 TonePanel.Children.Add(button);
             }
+        }
+
+        private static void ApplySquareCorners(Control control)
+        {
+            if (ApiContracts.Has1809) SetSquareCorners(control);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void SetSquareCorners(Control control)
+        {
+            control.CornerRadius = new CornerRadius(0);
         }
 
         private void UpdateToneButton()

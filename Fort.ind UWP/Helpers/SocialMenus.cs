@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
@@ -46,7 +47,8 @@ namespace Fort.ind_UWP
 
         public static FlyoutBase BuildContext(object item, UIElement announcer)
         {
-            return Build(SocialMenuSink.ForCommandBar(), item, announcer);
+            var sink = ApiContracts.Has1809 ? SocialMenuSink.ForCommandBar() : SocialMenuSink.ForMenu();
+            return Build(sink, item, announcer);
         }
 
         private static FlyoutBase Build(SocialMenuSink flyout, object item, UIElement announcer)
@@ -457,6 +459,26 @@ namespace Fort.ind_UWP
         {
             if (flyout == null || target == null) return;
 
+            if (ApiContracts.Has1809)
+            {
+                ShowExpandedAt(flyout, target, point);
+                return;
+            }
+
+            var menu = flyout as MenuFlyout;
+            if (menu != null)
+            {
+                ShowAt(menu, target, point);
+            }
+            else
+            {
+                flyout.ShowAt(target);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void ShowExpandedAt(FlyoutBase flyout, FrameworkElement target, Point? point)
+        {
             var options = new FlyoutShowOptions { ShowMode = FlyoutShowMode.Standard };
             if (point.HasValue) options.Position = point.Value;
             flyout.ShowAt(target, options);

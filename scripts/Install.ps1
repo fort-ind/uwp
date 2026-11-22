@@ -101,10 +101,10 @@ Write-Status "Running with Administrator privileges" "Success"
 
 Write-Section "Windows Version"
 $osVersion = [System.Environment]::OSVersion.Version
-$minVersion = [Version]"10.0.17763"  # Windows 10 version 1809
+$minVersion = [Version]"10.0.17134"
 
 if ($osVersion -lt $minVersion) {
-    Write-Status "Windows 10 version 1809 (build 17763) or later is required." "Error"
+    Write-Status "Windows 10 version 1803 (build 17134) or later is required." "Error"
     Write-Status "Your version: $($osVersion.ToString())" "Error"
     Read-Host "Press Enter to exit"
     exit 1

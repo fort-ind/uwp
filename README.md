@@ -4,7 +4,7 @@ fort.ind, but on windows! With all the features you want (and profiles!), made w
 <img width="1311" height="826" alt="image" src="https://github.com/user-attachments/assets/c698b6b0-2d43-4ccc-a70f-96fbaa25c35e" />
 
 # requirements
-Must be at least on Windows 10 version 1809; the dependencies for the app are in the artifacts folder 
+Must be at least on Windows 10 version 1803; the dependencies for the app are in the artifacts folder 
 # installing
 If you want a stable experience, get the latest [release](https://github.com/fort-ind/uwp/releases/latest), or if you like seeing what we are cooking and are okay with rough edges, go to the Actions tab and grab it from there (or use our [nightly.link](https://nightly.link/fort-ind/uwp/workflows/build-msix/master))
 > [!IMPORTANT]
