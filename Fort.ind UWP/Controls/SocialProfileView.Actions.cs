@@ -59,6 +59,7 @@ namespace Fort.ind_UWP
             if (_followHandlerAttached || _released) return;
 
             SocialFollowService.Changed += SocialFollowService_Changed;
+            LabsService.ChatChanged += LabsService_ChatChanged;
             _followHandlerAttached = true;
 
             UpdateFollowButtons();
@@ -69,7 +70,59 @@ namespace Fort.ind_UWP
             if (!_followHandlerAttached) return;
 
             SocialFollowService.Changed -= SocialFollowService_Changed;
+            LabsService.ChatChanged -= LabsService_ChatChanged;
             _followHandlerAttached = false;
+        }
+
+        private async void LabsService_ChatChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    try
+                    {
+                        if (!_released) UpdateMessageButtons();
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLog.Error("SocialProfileView: could not update the message button", ex);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialProfileView: chat lab handler failed", ex);
+            }
+        }
+
+        private void UpdateMessageButtons()
+        {
+            var shown = SocialChatService.CanStartWith(_detail);
+            MessageButton.Visibility = shown ? Visibility.Visible : Visibility.Collapsed;
+            CompactMessageButton.Visibility = shown ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private async void MessageButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_detail == null || _released) return;
+
+                var userId = _detail.User.Id;
+                if (WindowManagerService.IsSecondaryView)
+                {
+                    await WindowManagerService.ShowChatInMainWindowAsync(userId);
+                    return;
+                }
+
+                var shell = MainPage.Current;
+                if (shell != null) shell.ShowChat(userId);
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialProfileView: could not open the chat", ex);
+            }
         }
 
         private async void SocialFollowService_Changed(object sender, SocialFollowChangedEventArgs e)
@@ -110,6 +163,8 @@ namespace Fort.ind_UWP
 
         private void UpdateFollowButtons()
         {
+            UpdateMessageButtons();
+
             var state = SocialFollowService.StateOf(_detail);
             if (state == SocialFollowState.None)
             {

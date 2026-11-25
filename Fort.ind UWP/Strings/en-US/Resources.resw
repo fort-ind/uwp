@@ -4014,8 +4014,11 @@ Open your profile and try again.</value>
   <data name="SocialPrivacyChatNone.Content" xml:space="preserve">
     <value>Nobody</value>
   </data>
-  <data name="PrivacyChatScopeComboDescription.Text" xml:space="preserve">
-    <value>chat is not on fort.desktop yet if you want to use chat head to social.fort1nd.com/chat</value>
+  <data name="SocialPrivacyChatDescriptionLabOn" xml:space="preserve">
+    <value>Applies to Chat here and on fort.social.</value>
+  </data>
+  <data name="SocialPrivacyChatDescriptionLabOff" xml:space="preserve">
+    <value>Turn on fort.social chat in Labs &amp; Betas, or chat on social.fort1nd.com.</value>
   </data>
   <data name="SearchItemProfileFields" xml:space="preserve">
     <value>Profile fields</value>
@@ -4988,5 +4991,358 @@ Open your profile and try again.</value>
   <data name="UnixTimeLabelFormat" xml:space="preserve">
     <value>{0} ({1})</value>
     <comment>A time stamp inside a note, as its chip reads and as a screen reader says it. {0} is the date and time, {1} is how long ago or from now it is.</comment>
+  </data>
+  <data name="LabChatTitle.Text" xml:space="preserve">
+    <value>fort.social chat</value>
+  </data>
+  <data name="LabChatDescription.Text" xml:space="preserve">
+    <value>brings the chat feature from web to desktop :D not all features are fully ready yet.</value>
+  </data>
+  <data name="LabChatToggle.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>fort.social chat</value>
+  </data>
+  <data name="MainChat.Content" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="MainChat.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>message people on fort.social</value>
+  </data>
+  <data name="MainChat.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="MainChat.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="MainChatUnreadFormat" xml:space="preserve">
+    <value>Chat ({0})</value>
+    <comment>The Chat item in the menu while some conversations are unread.</comment>
+  </data>
+  <data name="MainChatUnreadAutomationFormat" xml:space="preserve">
+    <value>Chat, {0} unread</value>
+    <comment>What a screen reader says for the Chat menu item.</comment>
+  </data>
+  <data name="HeaderChat" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="SearchItemChat" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="SocialSignInPromptChatTitle" xml:space="preserve">
+    <value>Sign in again to use chat</value>
+  </data>
+  <data name="SocialChatSignedOutInfoBar.Title" xml:space="preserve">
+    <value>Sign in to chat</value>
+  </data>
+  <data name="SocialChatSignedOutInfoBar.Message" xml:space="preserve">
+    <value>Sign in with your fort.social account to chat with people on fort.social.</value>
+  </data>
+  <data name="SocialChatSignInButton.Content" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="SocialChatSignInAgainInfoBar.Title" xml:space="preserve">
+    <value>Sign in again to use chat</value>
+  </data>
+  <data name="SocialChatSignInAgainInfoBar.Message" xml:space="preserve">
+    <value>before you can chat... sign in again :p and then you can get to chattin </value>
+  </data>
+  <data name="SocialChatSignInAgainButton.Content" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="SocialChatUnavailableInfoBar.Title" xml:space="preserve">
+    <value>Chat is off for your account :(</value>
+  </data>
+  <data name="SocialChatUnavailableInfoBar.Message" xml:space="preserve">
+    <value>fort.social hasn't turned chat on for your account :(</value>
+  </data>
+  <data name="SocialChatNewChatButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>New chat</value>
+  </data>
+  <data name="SocialChatNewChatButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>New chat (Ctrl+N)</value>
+  </data>
+  <data name="SocialChatNewChatLabel.Text" xml:space="preserve">
+    <value>New chat</value>
+  </data>
+  <data name="SocialChatNewChatHeader.Text" xml:space="preserve">
+    <value>Who do you want to chat with?</value>
+  </data>
+  <data name="SocialChatPersonSearch.PlaceholderText" xml:space="preserve">
+    <value>Search people on fort.social</value>
+  </data>
+  <data name="SocialChatPersonSearch.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Search people on fort.social</value>
+  </data>
+  <data name="SocialChatSearchFailed" xml:space="preserve">
+    <value>Couldn't search right now. Try again in a moment. :(</value>
+  </data>
+  <data name="SocialChatSearchNoOne" xml:space="preserve">
+    <value>that person dosent seem to be on here..</value>
+  </data>
+  <data name="SocialChatConversationList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Conversations</value>
+  </data>
+  <data name="SocialChatListLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading your conversations</value>
+  </data>
+  <data name="SocialChatNoConversations" xml:space="preserve">
+    <value>its pretty empty here.. go start a chat and meet some really awesome people :p</value>
+  </data>
+  <data name="SocialChatPickConversation.Text" xml:space="preserve">
+    <value>Pick a convo, or start a new chat.</value>
+  </data>
+  <data name="SocialChatLoadFailed" xml:space="preserve">
+    <value>Couldn't load this. Try again in a moment.</value>
+  </data>
+  <data name="SocialChatRetryLoadButton.Content" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="SocialChatPreviewMineFormat" xml:space="preserve">
+    <value>You: {0}</value>
+    <comment>A conversation's last message when you sent it. {0} is the message.</comment>
+  </data>
+  <data name="SocialChatRowAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}, {2}</value>
+    <comment>A conversation in the list, for a screen reader. {0} is the person, {1} the last message, {2} how long ago.</comment>
+  </data>
+  <data name="SocialChatRowUnreadAutomationFormat" xml:space="preserve">
+    <value>{0}, unread, {1}, {2}</value>
+    <comment>An unread conversation in the list, for a screen reader. {0} is the person, {1} the last message, {2} how long ago.</comment>
+  </data>
+  <data name="SocialChatMoreButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialChatMoreButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="SocialChatMessageList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Messages</value>
+  </data>
+  <data name="SocialChatOlderLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading older messages</value>
+  </data>
+  <data name="SocialChatLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading the conversation</value>
+  </data>
+  <data name="SocialChatMessageBox.PlaceholderText" xml:space="preserve">
+    <value>text away..</value>
+  </data>
+  <data name="SocialChatMessageBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="SocialChatMessageBox.[using:Windows.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>Enter sends, Shift+Enter starts a new line</value>
+  </data>
+  <data name="SocialChatEmojiButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
+  <data name="SocialChatEmojiButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
+  <data name="SocialChatSendButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="SocialChatSendButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Send (Enter)</value>
+  </data>
+  <data name="SocialChatRetryButton.Content" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="SocialChatSending" xml:space="preserve">
+    <value>Sending…</value>
+  </data>
+  <data name="SocialChatNotSentFormat" xml:space="preserve">
+    <value>Not sent. {0}</value>
+    <comment>Under a message that failed to send. {0} is the reason.</comment>
+  </data>
+  <data name="SocialChatSentAnnouncement" xml:space="preserve">
+    <value>Message sent!</value>
+  </data>
+  <data name="SocialChatNewMessageAnnouncementFormat" xml:space="preserve">
+    <value>New message from {0}</value>
+  </data>
+  <data name="SocialChatEmptyFormat" xml:space="preserve">
+    <value>No messages with {0} yet. Say hi!</value>
+  </data>
+  <data name="SocialChatSignInAgainBody" xml:space="preserve">
+    <value>Sign in again to see your messages</value>
+  </data>
+  <data name="SocialChatReadOnlyNotice" xml:space="preserve">
+    <value>Your fort.social account can read chats but not send them. </value>
+  </data>
+  <data name="SocialChatRemoteNotice" xml:space="preserve">
+    <value>Chat only works with people on fort.social.</value>
+  </data>
+  <data name="SocialChatRefusedPolicyFormat" xml:space="preserve">
+    <value>{0} can't use chat.</value>
+  </data>
+  <data name="SocialChatRefusedNoneFormat" xml:space="preserve">
+    <value>{0} isn't accepting chats.</value>
+  </data>
+  <data name="SocialChatRefusedFollowersFormat" xml:space="preserve">
+    <value>{0} only accepts chats from people who follow them.</value>
+  </data>
+  <data name="SocialChatRefusedFollowingFormat" xml:space="preserve">
+    <value>{0} only accepts chats from people they follow.</value>
+  </data>
+  <data name="SocialChatRefusedMutualFormat" xml:space="preserve">
+    <value>{0} only accepts chats from mutual followers.</value>
+  </data>
+  <data name="SocialChatErrorNoSuchUser" xml:space="preserve">
+    <value>This account doesn't exist anymore.</value>
+  </data>
+  <data name="SocialChatErrorBlocked" xml:space="preserve">
+    <value>You can't message this person.</value>
+  </data>
+  <data name="SocialChatErrorEmpty" xml:space="preserve">
+    <value>The message was empty.</value>
+  </data>
+  <data name="SocialChatErrorPermission" xml:space="preserve">
+    <value>Sign in again to send messages.</value>
+  </data>
+  <data name="SocialChatErrorRefused" xml:space="preserve">
+    <value>hmm this user isn't accepting chats.</value>
+  </data>
+  <data name="SocialChatErrorTooLong" xml:space="preserve">
+    <value>The message is longer than 2,000 characters.</value>
+  </data>
+  <data name="SocialChatMenuDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialChatDeleteConfirmTitle" xml:space="preserve">
+    <value>Delete this message?</value>
+  </data>
+  <data name="SocialChatDeleteConfirmBody" xml:space="preserve">
+    <value>It will be gone for both of you....</value>
+  </data>
+  <data name="SocialChatDeleteConfirmButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialChatDeletedAnnouncement" xml:space="preserve">
+    <value>Message deleted!</value>
+  </data>
+  <data name="SocialChatDeleteFailedTitle" xml:space="preserve">
+    <value>Couldn't delete the message</value>
+  </data>
+  <data name="SocialChatDayToday" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="SocialChatDayYesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="SocialChatYou" xml:space="preserve">
+    <value>You</value>
+  </data>
+  <data name="SocialChatBubbleAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}: {2}</value>
+    <comment>A message, for a screen reader. {0} is who sent it, {1} the time, {2} the message.</comment>
+  </data>
+  <data name="SocialChatBubbleSendingAutomationFormat" xml:space="preserve">
+    <value>You, sending: {0}</value>
+  </data>
+  <data name="SocialChatBubbleFailedAutomationFormat" xml:space="preserve">
+    <value>You, not sent: {0}. {1}</value>
+    <comment>{0} is the message, {1} the reason it was not sent.</comment>
+  </data>
+  <data name="SocialChatAttachmentPreview" xml:space="preserve">
+    <value>Sent an attachment</value>
+  </data>
+  <data name="SocialChatImageLabel" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="SocialChatVideoLabel" xml:space="preserve">
+    <value>Video</value>
+  </data>
+  <data name="SocialChatSensitiveLabel" xml:space="preserve">
+    <value>Sensitive content. Select to show.</value>
+  </data>
+  <data name="SocialChatSensitiveAutomationFormat" xml:space="preserve">
+    <value>Sensitive {0}, hidden. Select to show</value>
+  </data>
+  <data name="SocialChatMediaAltAutomationFormat" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>An attachment, for a screen reader. {0} is Image or Video, {1} its description.</comment>
+  </data>
+  <data name="SocialChatFileAutomationFormat" xml:space="preserve">
+    <value>Open {0}</value>
+  </data>
+  <data name="SocialChatToastSomeone" xml:space="preserve">
+    <value>New message</value>
+  </data>
+  <data name="SocialChatToastAttribution" xml:space="preserve">
+    <value>fort.social chat</value>
+  </data>
+  <data name="SocialChatToastReplyPlaceholderFormat" xml:space="preserve">
+    <value>Reply to {0}</value>
+  </data>
+  <data name="SocialChatToastSendButton" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="SocialChatToastReplyFailedTitle" xml:space="preserve">
+    <value>Your message wasn't sent :(</value>
+  </data>
+  <data name="SocialChatToastFailedLab" xml:space="preserve">
+    <value>Chat is turned off in Labs &amp; Betas.</value>
+  </data>
+  <data name="SocialProfileMessageButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="SocialProfileMessageButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Chat with this person!</value>
+  </data>
+  <data name="SocialProfileMessageLabel.Text" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="SocialChatReactButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Add a reaction</value>
+  </data>
+  <data name="SocialChatReactButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add a reaction</value>
+  </data>
+  <data name="SocialChatMenuReact" xml:space="preserve">
+    <value>React…</value>
+  </data>
+  <data name="SocialChatRemoveReactionFormat" xml:space="preserve">
+    <value>Remove {0}</value>
+    <comment>Removes your reaction from a chat message. {0} is the emoji or :name:.</comment>
+  </data>
+  <data name="SocialChatReactedAnnouncementFormat" xml:space="preserve">
+    <value>Reacted with {0}</value>
+  </data>
+  <data name="SocialChatUnreactedAnnouncementFormat" xml:space="preserve">
+    <value>Removed {0}</value>
+  </data>
+  <data name="SocialChatReactFailedTitle" xml:space="preserve">
+    <value>Couldn't add the reaction</value>
+  </data>
+  <data name="SocialChatUnreactFailedTitle" xml:space="preserve">
+    <value>Couldn't remove the reaction</value>
+  </data>
+  <data name="SocialChatOpenInWindow" xml:space="preserve">
+    <value>Open in new window</value>
+  </data>
+  <data name="SocialChatAttachButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Attach a file</value>
+  </data>
+  <data name="SocialChatAttachButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Attach a file</value>
+  </data>
+  <data name="SocialChatAttachFromPcItem.Text" xml:space="preserve">
+    <value>From this PC…</value>
+  </data>
+  <data name="SocialChatAttachFromDriveItem.Text" xml:space="preserve">
+    <value>From your drive…</value>
+  </data>
+  <data name="SocialChatRemoveAttachmentButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SocialChatRemoveAttachmentFormat" xml:space="preserve">
+    <value>Remove {0}</value>
+    <comment>Removes the file attached to the message being written. {0} is the file name.</comment>
+  </data>
+  <data name="SocialChatOneFileNotice" xml:space="preserve">
+    <value>Chat sends one file per message, so only the first one was attached.</value>
+  </data>
+  <data name="SocialChatAttachmentReadyFormat" xml:space="preserve">
+    <value>{0} is ready to send</value>
   </data>
 </root>

@@ -57,9 +57,31 @@
                                TextWrapping="Wrap"
                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
 
-                    <TextBlock x:Uid="LabsEmpty"
-                               Style="{StaticResource BodyTextBlockStyle}"
-                               TextWrapping="Wrap"/>
+                    <Grid x:Name="ChatLabCard" Style="{StaticResource LabCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Style="{StaticResource LabIconPlateStyle}">
+                            <FontIcon Glyph="&#xE8F2;" FontSize="16"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="4">
+                            <TextBlock x:Uid="LabChatTitle"
+                                       Style="{StaticResource BaseTextBlockStyle}"
+                                       AutomationProperties.HeadingLevel="Level3"/>
+                            <TextBlock x:Uid="LabChatDescription"
+                                       Style="{StaticResource BodyTextBlockStyle}"
+                                       TextWrapping="Wrap"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            <ToggleSwitch x:Uid="LabChatToggle" x:Name="LabChatToggle"
+                                          Margin="0,4,0,0"
+                                          Toggled="LabChatToggle_Toggled"/>
+                        </StackPanel>
+                    </Grid>
 
                     <TextBlock x:Uid="BetasHeading"
                                Style="{StaticResource SubtitleTextBlockStyle}"

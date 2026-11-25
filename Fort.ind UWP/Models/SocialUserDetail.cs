@@ -107,6 +107,15 @@ namespace Fort.ind_UWP
 
         public IReadOnlyList<SocialRole> Roles { get; private set; }
 
+        public bool? CanChat { get; private set; }
+
+        public string ChatScope { get; private set; }
+
+        public bool ChatRefused
+        {
+            get { return CanChat.HasValue && !CanChat.GetValueOrDefault(); }
+        }
+
         public bool ShowsFollowingCount(string viewerId)
         {
             return FollowingCount.HasValue && IsVisibleTo(FollowingVisibility, viewerId);
@@ -155,7 +164,9 @@ namespace Fort.ind_UWP
                 IsCat = SocialJson.Bool(obj, "isCat").GetValueOrDefault(),
                 SpeaksAsCat = SocialJson.Bool(obj, "speakAsCat").GetValueOrDefault(),
                 PinnedNotes = SocialNote.ListFromJson(SocialJson.Array(obj, "pinnedNotes")),
-                Roles = RolesFromJson(SocialJson.Array(obj, "roles"))
+                Roles = RolesFromJson(SocialJson.Array(obj, "roles")),
+                CanChat = SocialJson.Bool(obj, "canChat"),
+                ChatScope = SocialJson.String(obj, "chatScope")
             };
         }
 

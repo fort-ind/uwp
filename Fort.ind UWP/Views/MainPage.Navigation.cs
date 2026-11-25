@@ -202,6 +202,8 @@ namespace Fort.ind_UWP
                     return LocalizedStrings.Get("HeaderProfile");
                 case AppConstants.NavigationSocial:
                     return LocalizedStrings.Get("HeaderSocial");
+                case AppConstants.NavigationChat:
+                    return LocalizedStrings.Get("HeaderChat");
                 case AppConstants.NavigationSettings:
                     return LocalizedStrings.Get("HeaderSettings");
                 default:
@@ -221,6 +223,8 @@ namespace Fort.ind_UWP
                     return typeof(ProfilePage);
                 case AppConstants.NavigationSocial:
                     return typeof(SocialPage);
+                case AppConstants.NavigationChat:
+                    return LabsService.ChatEnabled ? typeof(SocialChatPage) : typeof(HomePage);
                 case AppConstants.NavigationSettings:
                     return typeof(SettingsPage);
                 default:
@@ -469,6 +473,11 @@ namespace Fort.ind_UWP
         {
             try
             {
+                if (string.Equals(_launchNavTag, AppConstants.NavigationChat, StringComparison.Ordinal) && !LabsService.ChatEnabled)
+                {
+                    return AppConstants.NavigationLatestNews;
+                }
+
                 if (!string.IsNullOrEmpty(_launchNavTag)) return _launchNavTag;
 
                 if (!App.ResumingFromTermination) return AppConstants.NavigationLatestNews;
@@ -485,6 +494,8 @@ namespace Fort.ind_UWP
                     case AppConstants.NavigationSocial:
                     case AppConstants.NavigationSettings:
                         return saved;
+                    case AppConstants.NavigationChat:
+                        return LabsService.ChatEnabled ? saved : AppConstants.NavigationLatestNews;
                     default:
                         return AppConstants.NavigationLatestNews;
                 }
@@ -541,6 +552,10 @@ namespace Fort.ind_UWP
                 else if (e.Content is SocialNotePage)
                 {
                     TitleSubPage(LocalizedStrings.Get("HeaderNote"));
+                }
+                else if (e.Content is SocialChatConversationPage)
+                {
+                    TitleSubPage(SocialChatConversationPage.TitleFor(e.Parameter as SocialChatArgs));
                 }
                 else if (tagArgs != null)
                 {
@@ -605,6 +620,7 @@ namespace Fort.ind_UWP
             {
                 var stack = ContentFrame.BackStack;
                 var intoThread = SocialThreads.IsInPlacePage(currentPageType);
+                var intoConversation = currentPageType == typeof(SocialChatConversationPage);
 
                 for (int i = stack.Count - 1; i >= 0; i--)
                 {
@@ -612,6 +628,7 @@ namespace Fort.ind_UWP
                     if (type == typeof(LoginPage)
                         || type == typeof(SocialUserListPage)
                         || type == typeof(SocialScheduledPage)
+                        || (!intoConversation && type == typeof(SocialChatConversationPage))
                         || (!intoThread && SocialThreads.IsInPlacePage(type)))
                     {
                         stack.RemoveAt(i);

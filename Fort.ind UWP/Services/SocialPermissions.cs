@@ -24,7 +24,8 @@ namespace Fort.ind_UWP
         MutedBlocked,
         Drive,
         Lists,
-        Schedule
+        Schedule,
+        Chat
     }
 
     public static class SocialPermissions
@@ -67,12 +68,16 @@ namespace Fort.ind_UWP
 
         public const string WriteNotesSchedule = "write:notes-schedule";
 
+        public const string ReadChat = "read:chat";
+
+        public const string WriteChat = "write:chat";
+
         public const string Requested = ReadAccount + "," + ReadNotifications + "," + WriteFollowing + ","
                                         + WriteNotes + "," + WriteReactions + "," + WriteVotes + ","
                                         + ReadFavorites + "," + WriteFavorites + "," + WriteDrive + ","
                                         + WriteAccount + "," + WriteReportAbuse + "," + WriteMutes + "," + WriteBlocks + ","
                                         + ReadFollowing + "," + ReadMutes + "," + ReadBlocks + "," + ReadDrive + ","
-                                        + ReadNotesSchedule + "," + WriteNotesSchedule;
+                                        + ReadNotesSchedule + "," + WriteNotesSchedule + "," + ReadChat + "," + WriteChat;
 
         private static readonly string[] s_postingPermissions =
         {

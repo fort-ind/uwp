@@ -1,0 +1,167 @@
+<UserControl
+    x:Class="Fort.ind_UWP.SocialChatBubble"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Fort.ind_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:contract7Present="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)"
+    mc:Ignorable="d"
+    HorizontalAlignment="Stretch"
+    PointerEntered="Bubble_PointerEntered"
+    PointerExited="Bubble_PointerExited"
+    PointerCanceled="Bubble_PointerExited">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="SocialChatMineBubbleBrush" Color="{ThemeResource SystemAccentColorDark2}"/>
+                    <SolidColorBrush x:Key="SocialChatMineTextBrush" Color="#FFFFFFFF"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="SocialChatMineBubbleBrush" Color="{ThemeResource SystemAccentColorLight2}"/>
+                    <SolidColorBrush x:Key="SocialChatMineTextBrush" Color="#FF000000"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="SocialChatMineBubbleBrush" Color="{ThemeResource SystemColorHighlightColor}"/>
+                    <SolidColorBrush x:Key="SocialChatMineTextBrush" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid x:Name="RootGrid" Padding="12,0,12,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="SideStates">
+                <VisualState x:Name="TheirsState"/>
+                <VisualState x:Name="MineState">
+                    <VisualState.Setters>
+                        <Setter Target="AvatarHost.Visibility" Value="Collapsed"/>
+                        <Setter Target="ContentColumn.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="ContentColumn.Margin" Value="48,0,0,0"/>
+                        <Setter Target="BubbleLine.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="Bubble.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="ReactButton.Visibility" Value="Collapsed"/>
+                        <Setter Target="Bubble.Background" Value="{ThemeResource SocialChatMineBubbleBrush}"/>
+                        <Setter Target="MessageText.Foreground" Value="{ThemeResource SocialChatMineTextBrush}"/>
+                        <Setter Target="ReactionChips.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="MetaPanel.HorizontalAlignment" Value="Right"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <Grid x:Name="DayDivider"
+              Margin="0,16,0,8"
+              ColumnSpacing="12"
+              Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Rectangle Height="1"
+                       VerticalAlignment="Center"
+                       Fill="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                       AutomationProperties.AccessibilityView="Raw"/>
+            <TextBlock x:Name="DayText"
+                       Grid.Column="1"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                       AutomationProperties.HeadingLevel="Level3"/>
+            <Rectangle Grid.Column="2"
+                       Height="1"
+                       VerticalAlignment="Center"
+                       Fill="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                       AutomationProperties.AccessibilityView="Raw"/>
+        </Grid>
+
+        <Grid x:Name="BubbleRow"
+              Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="AvatarHost" Width="32" Margin="0,0,8,0" VerticalAlignment="Top">
+                <Button x:Name="AvatarButton"
+                        Style="{StaticResource SocialBareButtonStyle}"
+                        IsTabStop="False"
+                        Click="AvatarButton_Click">
+                    <PersonPicture x:Name="AvatarPicture"
+                                   Width="32" Height="32"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                </Button>
+            </Grid>
+
+            <StackPanel x:Name="ContentColumn"
+                        Grid.Column="1"
+                        MaxWidth="520"
+                        Margin="0,0,48,0"
+                        HorizontalAlignment="Left">
+                <Grid x:Name="BubbleLine" HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border x:Name="Bubble"
+                            HorizontalAlignment="Left"
+                            Padding="12,8,12,8"
+                            Background="{ThemeResource SystemControlBackgroundListLowBrush}">
+                        <StackPanel>
+                            <Grid x:Name="AttachmentHost" Visibility="Collapsed"/>
+                            <RichTextBlock x:Name="MessageText"
+                                           Style="{StaticResource BodyRichTextBlockStyle}"
+                                           IsTextSelectionEnabled="True"
+                                           TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Button x:Uid="SocialChatReactButton" x:Name="ReactButton"
+                            Grid.Column="1"
+                            Margin="4,0,0,0"
+                            Width="32" Height="32"
+                            MinWidth="32" MinHeight="32"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ButtonRevealStyle}"
+                            Background="Transparent"
+                            contract7Present:CornerRadius="0"
+                            IsTabStop="False"
+                            Opacity="0"
+                            IsHitTestVisible="False"
+                            Click="ReactButton_Click">
+                        <FontIcon Glyph="&#xE76E;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                    </Button>
+                </Grid>
+
+                <local:SocialReactionChipPanel x:Name="ReactionChips"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,4,0,0"
+                                               Visibility="Collapsed"/>
+
+                <StackPanel x:Name="MetaPanel"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left">
+                    <TextBlock x:Name="MetaText"
+                               Margin="0,2,0,0"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                               AutomationProperties.AccessibilityView="Raw"/>
+                    <HyperlinkButton x:Uid="SocialChatRetryButton" x:Name="RetryButton"
+                                     Margin="8,0,0,0"
+                                     Padding="0"
+                                     Visibility="Collapsed"
+                                     Click="RetryButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

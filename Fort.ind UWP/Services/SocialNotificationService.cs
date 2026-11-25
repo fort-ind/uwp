@@ -553,6 +553,9 @@ namespace Fort.ind_UWP
                 var count = me.Value.UnreadCount;
                 ApplyUnreadCount(count);
                 await ProfileService.OfferRefreshedProfileAsync(token, me.Value.Profile);
+                SocialChatService.OfferHasUnread(account, me.Value.HasUnreadChat);
+                await CheckChatAsync(token, account, me.Value.HasUnreadChat, cancellationToken);
+                if (!IsActiveAccount(account)) return;
 
                 if (!ReadWatermark().HasValue)
                 {
@@ -579,6 +582,22 @@ namespace Fort.ind_UWP
             finally
             {
                 s_checkGate.Release();
+            }
+        }
+
+        private static async Task CheckChatAsync(string token, string account, bool hasUnreadChat, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await SocialChatToasts.CheckAsync(token, account, hasUnreadChat, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialNotificationService: the chat check failed", ex);
             }
         }
 
@@ -654,6 +673,7 @@ namespace Fort.ind_UWP
                 if (me.Status == SocialApiStatus.Ok && s_active && IsActiveAccount(account))
                 {
                     ApplyUnreadCount(me.Value.UnreadCount);
+                    SocialChatService.OfferHasUnread(account, me.Value.HasUnreadChat);
                     await ProfileService.OfferRefreshedProfileAsync(token, me.Value.Profile);
                     await RefreshTileAsync(token, account, me.Value.UnreadCount, cancellationToken);
                 }
@@ -716,6 +736,7 @@ namespace Fort.ind_UWP
 
             LiveTileService.ClearBadge();
             LiveTileService.RemoveToastGroup(AppConstants.SocialToastGroup);
+            SocialChatToasts.ClearState();
         }
 
         private static bool TryClaimForToast(SocialNotification notification)
@@ -1078,6 +1099,9 @@ namespace Fort.ind_UWP
                 case "readAllNotifications":
                 case "notificationFlushed":
                     ApplyUnreadCount(0);
+                    break;
+                case "newChatMessage":
+                    SocialChatService.ApplyFromMainChannel(SocialChatMessage.FromJson(e.Body));
                     break;
             }
         }

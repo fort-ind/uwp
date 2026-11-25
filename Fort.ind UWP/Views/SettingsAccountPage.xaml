@@ -168,7 +168,7 @@
                             <ComboBoxItem x:Uid="SocialPrivacyChatMutual" Tag="mutual"/>
                             <ComboBoxItem x:Uid="SocialPrivacyChatNone" Tag="none"/>
                         </ComboBox>
-                        <TextBlock x:Uid="PrivacyChatScopeComboDescription" Margin="0,4,0,0"
+                        <TextBlock x:Name="PrivacyChatScopeDescription" Margin="0,4,0,0"
                                    Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap"
                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                     </StackPanel>

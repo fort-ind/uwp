@@ -37,6 +37,7 @@ namespace Fort.ind_UWP
                 case AppConstants.NavigationBetas:
                 case AppConstants.NavigationProfile:
                 case AppConstants.NavigationSocial:
+                case AppConstants.NavigationChat:
                     return true;
                 default:
                     return false;

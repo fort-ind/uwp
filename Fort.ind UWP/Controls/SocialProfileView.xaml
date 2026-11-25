@@ -95,9 +95,10 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.ColumnSpan="2"
+                    <Border Grid.ColumnSpan="3"
                             Margin="-64,-8,-12,-8"
                             Background="Transparent"
                             Tapped="CompactBar_Tapped"
@@ -120,8 +121,25 @@
                                    AutomationProperties.AccessibilityView="Raw"/>
                     </StackPanel>
 
-                    <Button x:Name="CompactFollowButton"
+                    <Button x:Name="CompactMessageButton"
                             Grid.Column="1"
+                            Width="40" Height="32"
+                            MinWidth="40"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ButtonRevealStyle}"
+                            IsTabStop="False"
+                            Visibility="Collapsed"
+                            AutomationProperties.AccessibilityView="Raw"
+                            Click="MessageButton_Click">
+                        <FontIcon Glyph="&#xE8BD;"
+                                  FontSize="16"
+                                  IsTextScaleFactorEnabled="False"
+                                  AutomationProperties.AccessibilityView="Raw"/>
+                    </Button>
+
+                    <Button x:Name="CompactFollowButton"
+                            Grid.Column="2"
                             MinWidth="96"
                             VerticalAlignment="Center"
                             Style="{StaticResource ButtonRevealStyle}"
@@ -142,6 +160,17 @@
                             VerticalAlignment="Top"
                             Orientation="Horizontal"
                             Spacing="8">
+                    <Button x:Uid="SocialProfileMessageButton" x:Name="MessageButton"
+                            Visibility="Collapsed"
+                            Click="MessageButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE8BD;"
+                                      FontSize="16"
+                                      IsTextScaleFactorEnabled="False"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock x:Uid="SocialProfileMessageLabel"/>
+                        </StackPanel>
+                    </Button>
                     <Button x:Name="FollowButton"
                             MinWidth="96"
                             Style="{StaticResource FollowAccentButtonStyle}"

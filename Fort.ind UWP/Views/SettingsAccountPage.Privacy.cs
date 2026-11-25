@@ -99,6 +99,9 @@ namespace Fort.ind_UWP
             var settings = SocialPrivacySettings.FromProfile(ProfileService.CurrentUser);
             LoadAccountExtras(SocialAccountSettings.FromProfile(ProfileService.CurrentUser));
             PrivacySection.Visibility = settings == null ? Visibility.Collapsed : Visibility.Visible;
+            PrivacyChatScopeDescription.Text = LocalizedStrings.Get(LabsService.ChatEnabled
+                                                                    ? "SocialPrivacyChatDescriptionLabOn"
+                                                                    : "SocialPrivacyChatDescriptionLabOff");
             if (settings == null) return;
 
             _loadingPrivacy = true;

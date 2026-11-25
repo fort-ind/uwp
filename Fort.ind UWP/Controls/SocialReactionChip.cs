@@ -79,9 +79,13 @@ namespace Fort.ind_UWP
 
         public void Show(SocialNoteItem item, SocialReactionCount reaction)
         {
+            Show(reaction, item.ReactionImageUri(reaction.Key), SocialReactions.AreSame(reaction.Key, item.MyReaction));
+        }
+
+        public void Show(SocialReactionCount reaction, Uri uri, bool mine)
+        {
             Key = reaction.Key;
 
-            var uri = item.ReactionImageUri(reaction.Key);
             if (uri != null)
             {
                 if (!Equals(uri, _imageUri))
@@ -113,7 +117,6 @@ namespace Fort.ind_UWP
             _countText.Text = CountText.Format(reaction.Count);
             _name = SocialReactions.SpokenName(reaction.Key);
 
-            var mine = SocialReactions.AreSame(reaction.Key, item.MyReaction);
             var spoken = LocalizedStrings.Format(mine ? "SocialReactionChipMineAutomationFormat" : "SocialReactionChipAutomationFormat",
                                                  _name, CountText.Format(reaction.Count));
             AutomationProperties.SetName(Button, spoken);

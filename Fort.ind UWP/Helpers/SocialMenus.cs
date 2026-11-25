@@ -40,6 +40,12 @@ namespace Fort.ind_UWP
         private const string FallbackBlockGlyph = "\uE25B";
         private const string ListGlyph = "\uE8FD";
 
+        private const string ReactGlyph = "\uE76E";
+
+        private const string RemoveReactionGlyph = "\uE711";
+
+        private const string NewWindowGlyph = "\uE8A7";
+
         private static readonly TimeSpan ShareRequestWindow = TimeSpan.FromSeconds(10);
 
         private static string BlockGlyph
@@ -311,6 +317,75 @@ namespace Fort.ind_UWP
             }
 
             return flyout.Items.Count > 0 ? flyout : null;
+        }
+
+        public static MenuFlyout BuildForChatMessage(SocialChatMessageItem item, UIElement announcer, Func<Task> delete, Func<Task> react,
+                                                     Func<string, Task> unreact)
+        {
+            if (item == null) return null;
+
+            var flyout = new MenuFlyout();
+            if (item.CanReact && react != null)
+            {
+                flyout.Items.Add(MenuItem("SocialChatMenuReact", ReactGlyph, react));
+
+                if (unreact != null)
+                {
+                    var removals = item.Reactions.Select(reaction => RemoveReactionItem(reaction.Key, unreact)).ToList();
+                    foreach (var removal in removals)
+                    {
+                        flyout.Items.Add(removal);
+                    }
+                }
+
+                flyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            var text = item.PlainText;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                flyout.Items.Add(MenuItem("SocialMenuCopyText", CopyGlyph, () =>
+                {
+                    CopyText(text, announcer);
+                    return Task.CompletedTask;
+                }));
+            }
+
+            if (!item.IsMine && item.Sender != null)
+            {
+                var sender = item.Sender;
+                var view = MenuItem("SocialMenuViewUserFormat", PersonGlyph, () => SocialWindows.ShowUserAsync(sender));
+                view.Text = LocalizedStrings.Format("SocialMenuViewUserFormat", sender.Handle);
+                flyout.Items.Add(view);
+            }
+
+            if (item.IsMine && item.State == SocialChatSendState.Sent && delete != null)
+            {
+                if (flyout.Items.Count > 0) flyout.Items.Add(new MenuFlyoutSeparator());
+                flyout.Items.Add(MenuItem("SocialChatMenuDelete", DeleteGlyph, delete));
+            }
+
+            while (flyout.Items.Count > 0 && flyout.Items[flyout.Items.Count - 1] is MenuFlyoutSeparator)
+            {
+                flyout.Items.RemoveAt(flyout.Items.Count - 1);
+            }
+
+            return flyout.Items.Count > 0 ? flyout : null;
+        }
+
+        private static MenuFlyoutItem RemoveReactionItem(string key, Func<string, Task> unreact)
+        {
+            var remove = MenuItem("SocialChatMenuReact", RemoveReactionGlyph, () => unreact(key));
+            remove.Text = LocalizedStrings.Format("SocialChatRemoveReactionFormat", SocialReactions.SpokenName(key));
+            return remove;
+        }
+
+        public static void AddChatWindowItem(MenuFlyout flyout, string userId, SocialUser user)
+        {
+            if (flyout == null || string.IsNullOrEmpty(userId)) return;
+
+            if (flyout.Items.Count > 0) flyout.Items.Insert(0, new MenuFlyoutSeparator());
+            flyout.Items.Insert(0, MenuItem("SocialChatOpenInWindow", NewWindowGlyph, () => SocialWindows.ShowChatAsync(userId, user)));
         }
 
         private static void AddModerationSubmenu(SocialMenuSink flyout, SocialUser user, UIElement owner)

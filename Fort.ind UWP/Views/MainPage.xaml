@@ -305,6 +305,13 @@
                         <SymbolIcon Symbol="People"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem x:Uid="MainChat" x:Name="ChatNavItem" Tag="Chat"
+                                     AccessKey="C"
+                                     Visibility="Collapsed">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8F2;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <Grid x:Name="ContentHost" Background="Transparent"

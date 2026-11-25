@@ -29,7 +29,10 @@ namespace Fort.ind_UWP
         public const string NavigationBetas = "Betas";
         public const string NavigationProfile = "Profile";
         public const string NavigationSocial = "Social";
+        public const string NavigationChat = "Chat";
         public const string NavigationSettings = "Settings";
+
+        public const string SettingLabChat = "LabChat";
 
         public const string ThemeDefault = "Default";
         public const string ThemeLight = "Light";
@@ -228,6 +231,24 @@ namespace Fort.ind_UWP
         public const string SettingSocialToastFailedReply = "SocialToastFailedReply";
         public const int SocialToastFailedReplyLimit = 3500;
         public const string SocialToastSendIcon = "ms-appx:///Assets/Toast/Send.png";
+
+        public const string ToastOpenChat = "chat";
+        public const string ToastActionChatReply = "chatReply";
+        public const string SocialChatToastGroupPrefix = "chat:";
+        public const string SettingSocialChatToastedThrough = "SocialChatToastedThrough";
+        public const string SettingSocialChatToastedIds = "SocialChatToastedIds";
+        public const string SettingSocialChatFailedReply = "SocialChatFailedReply";
+        public const int SocialChatPageSize = 30;
+        public const int SocialChatHistoryLimit = 50;
+        public const int SocialChatBackgroundHistoryLimit = 10;
+        public const int SocialChatMessageMaxLength = 2000;
+        public const int SocialChatGroupMinutes = 5;
+        public const int SocialChatSeenIdLimit = 128;
+        public const int SocialChatCaptureLingerSeconds = 30;
+        public const int SocialChatPreviewLength = 120;
+        public const string WindowKeyChatPrefix = "chat:";
+        public const double SocialChatWindowWidth = 440;
+        public const double SocialChatWindowHeight = 680;
 
         public const double KeepOnTopWindowWidth = 360;
         public const double KeepOnTopWindowHeight = 480;

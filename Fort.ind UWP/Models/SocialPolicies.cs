@@ -124,6 +124,31 @@ namespace Fort.ind_UWP
             get { return Limit("mentionLimit"); }
         }
 
+        public bool AllowsChatReading
+        {
+            get
+            {
+                var availability = ChatAvailability;
+                return availability == null
+                       || string.Equals(availability, "available", System.StringComparison.Ordinal)
+                       || string.Equals(availability, "readonly", System.StringComparison.Ordinal);
+            }
+        }
+
+        public bool AllowsChatWriting
+        {
+            get
+            {
+                var availability = ChatAvailability;
+                return availability == null || string.Equals(availability, "available", System.StringComparison.Ordinal);
+            }
+        }
+
+        private string ChatAvailability
+        {
+            get { return _values == null ? null : SocialJson.String(_values, "chatAvailability"); }
+        }
+
         private bool Flag(string key)
         {
             return _values == null || SocialJson.Bool(_values, key).GetValueOrDefault(true);

@@ -43,9 +43,9 @@ namespace Fort.ind_UWP
 
         private readonly Popup _popup;
 
-        private SocialNoteView _owner;
+        private object _owner;
 
-        private SocialNoteItem _item;
+        private Func<int, UIElement> _anchorFor;
 
         private Control _returnFocus;
 
@@ -80,7 +80,18 @@ namespace Fort.ind_UWP
             if (owner == null || item == null || ShownInWindow != null) return false;
 
             var lightbox = new SocialMediaLightbox();
-            return lightbox.Open(owner, item, fileIndex, focusState);
+            return lightbox.Open(owner, owner, item.Media, fileIndex, focusState,
+                                 index => owner.MediaAnchorFor(item, index),
+                                 index => owner.MediaPlaceholderFor(item, index));
+        }
+
+        public static bool Show(FrameworkElement owner, IReadOnlyList<SocialDriveFile> files, int fileIndex, FocusState focusState,
+                                Func<int, UIElement> anchorFor, Func<int, ImageSource> placeholderFor)
+        {
+            if (owner == null || files == null || ShownInWindow != null) return false;
+
+            var lightbox = new SocialMediaLightbox();
+            return lightbox.Open(owner, owner, files, fileIndex, focusState, anchorFor, placeholderFor);
         }
 
         public static bool CloseCurrent()
@@ -92,15 +103,15 @@ namespace Fort.ind_UWP
             return true;
         }
 
-        public static void CloseFor(SocialNoteView owner)
+        public static void CloseFor(object owner)
         {
             var current = ShownInWindow;
             if (current != null && ReferenceEquals(current._owner, owner)) current.Close(false);
         }
 
-        private bool Open(SocialNoteView owner, SocialNoteItem item, int fileIndex, FocusState focusState)
+        private bool Open(object owner, FrameworkElement themeSource, IReadOnlyList<SocialDriveFile> files, int fileIndex, FocusState focusState,
+                          Func<int, UIElement> anchorFor, Func<int, ImageSource> placeholderFor)
         {
-            var files = item.Media;
             var selected = -1;
             for (var i = 0; i < files.Count; i++)
             {
@@ -109,7 +120,7 @@ namespace Fort.ind_UWP
 
                 if (i == fileIndex) selected = _slots.Count;
 
-                var slot = new LightboxSlot(this, file, i, owner.MediaPlaceholderFor(item, i));
+                var slot = new LightboxSlot(this, file, i, placeholderFor == null ? null : placeholderFor(i));
                 _slots.Add(slot);
                 MediaFlipView.Items.Add(slot.Root);
             }
@@ -117,8 +128,8 @@ namespace Fort.ind_UWP
             if (selected < 0) return false;
 
             _owner = owner;
-            _item = item;
-            RequestedTheme = owner.ActualTheme;
+            _anchorFor = anchorFor;
+            RequestedTheme = themeSource.ActualTheme;
             _focusState = focusState == FocusState.Keyboard ? FocusState.Keyboard : FocusState.Programmatic;
             _returnFocus = FocusManager.GetFocusedElement() as Control;
 
@@ -129,7 +140,7 @@ namespace Fort.ind_UWP
             UpdateBounds();
             Window.Current.SizeChanged += Window_SizeChanged;
 
-            var anchor = owner.MediaAnchorFor(item, fileIndex);
+            var anchor = anchorFor == null ? null : anchorFor(fileIndex);
             if (anchor != null)
             {
                 _pendingOpen = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate(OpenAnimationKey, anchor);
@@ -191,7 +202,7 @@ namespace Fort.ind_UWP
             var slot = CurrentSlot();
             if (slot == null || slot.IsZoomed || slot.Picture.ActualWidth <= 0) return false;
 
-            var anchor = _owner == null ? null : _owner.MediaAnchorFor(_item, slot.FileIndex);
+            var anchor = _anchorFor == null ? null : _anchorFor(slot.FileIndex);
             if (anchor == null) return false;
 
             var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate(CloseAnimationKey, slot.Picture);
@@ -245,7 +256,7 @@ namespace Fort.ind_UWP
             }
 
             _owner = null;
-            _item = null;
+            _anchorFor = null;
         }
 
         private void CancelPendingOpen()

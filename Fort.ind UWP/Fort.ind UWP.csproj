@@ -245,6 +245,18 @@
     <Compile Include="Controls\SocialUserRow.xaml.cs">
       <DependentUpon>SocialUserRow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SocialChatBubble.xaml.cs">
+      <DependentUpon>SocialChatBubble.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialChatView.xaml.cs">
+      <DependentUpon>SocialChatView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialChatView.Composer.cs">
+      <DependentUpon>SocialChatView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SocialChatView.Attachments.cs">
+      <DependentUpon>SocialChatView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TagWrapPanel.cs" />
     <Compile Include="Helpers\ApiContracts.cs" />
     <Compile Include="Helpers\AppLog.cs" />
@@ -321,6 +333,10 @@
     <Compile Include="Models\SocialScheduledNote.cs" />
     <Compile Include="Models\SocialUserItem.cs" />
     <Compile Include="Models\SocialWindowArgs.cs" />
+    <Compile Include="Models\SocialChatArgs.cs" />
+    <Compile Include="Models\SocialChatConversation.cs" />
+    <Compile Include="Models\SocialChatMessage.cs" />
+    <Compile Include="Models\SocialChatMessageItem.cs" />
     <Compile Include="Models\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AccentColorService.cs" />
@@ -360,6 +376,10 @@
     <Compile Include="Services\SocialProfileEditService.cs" />
     <Compile Include="Services\SocialWordMuteService.cs" />
     <Compile Include="Services\SocialStream.cs" />
+    <Compile Include="Services\LabsService.cs" />
+    <Compile Include="Services\SocialChatCapture.cs" />
+    <Compile Include="Services\SocialChatService.cs" />
+    <Compile Include="Services\SocialChatToasts.cs" />
     <Compile Include="Services\SocialFeedTileService.cs" />
     <Compile Include="Services\SocialTileService.cs" />
     <Compile Include="Services\SocialToastActions.cs" />
@@ -389,6 +409,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Scheduled.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainPage.Chat.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainPage.Navigation.cs">
@@ -516,6 +539,12 @@
     </Compile>
     <Compile Include="Views\SocialScheduledPage.xaml.cs">
       <DependentUpon>SocialScheduledPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialChatPage.xaml.cs">
+      <DependentUpon>SocialChatPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SocialChatConversationPage.xaml.cs">
+      <DependentUpon>SocialChatConversationPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -751,6 +780,22 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SocialScheduledPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialChatPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SocialChatConversationPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialChatBubble.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SocialChatView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

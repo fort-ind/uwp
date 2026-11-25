@@ -26,7 +26,7 @@ namespace Fort.ind_UWP
     {
         private const uint ThumbnailRequestSize = 160;
 
-        private static readonly string[] s_pickerTypes =
+        internal static readonly string[] s_pickerTypes =
         {
             ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".heic", ".avif",
             ".mp4", ".mov", ".webm", ".m4v", ".mp3", ".m4a", ".wav", ".ogg", ".opus", ".flac", "*"
@@ -144,13 +144,19 @@ namespace Fort.ind_UWP
 
         private async Task PickFromDriveAsync()
         {
-            if (!await SocialPermissions.EnsureAsync(this, SocialPermissions.ReadDrive, SocialSignInPrompt.Drive)) return;
-
             var room = AppConstants.SocialAttachmentLimit - _attachments.Count;
             if (room <= 0) return;
 
             var attachedIds = _attachments.Where(item => item.File != null).Select(item => item.File.Id);
-            var picker = new SocialDrivePicker(attachedIds, room);
+            var files = await ShowDrivePickerAsync(this, attachedIds, room);
+            if (files != null) AddDriveFiles(files);
+        }
+
+        internal static async Task<IReadOnlyList<SocialDriveFile>> ShowDrivePickerAsync(UIElement owner, IEnumerable<string> attachedIds, int limit)
+        {
+            if (!await SocialPermissions.EnsureAsync(owner, SocialPermissions.ReadDrive, SocialSignInPrompt.Drive)) return null;
+
+            var picker = new SocialDrivePicker(attachedIds, limit);
             var dialog = new ContentDialog
             {
                 Title = LocalizedStrings.Get("SocialDriveDialogTitle"),
@@ -170,14 +176,20 @@ namespace Fort.ind_UWP
             };
             picker.PermissionDenied += (sender, args) => dialog.Hide();
 
-            var result = await DialogService.ShowAsync(this, dialog);
+            var result = await DialogService.ShowAsync(owner, dialog);
             if (picker.WasDenied)
             {
-                await SocialPermissions.HandleDeniedAsync(this, SocialPermissions.ReadDrive, SocialSignInPrompt.Drive);
-                return;
+                await SocialPermissions.HandleDeniedAsync(owner, SocialPermissions.ReadDrive, SocialSignInPrompt.Drive);
+                return null;
             }
 
-            if (result == ContentDialogResult.Primary) AddDriveFiles(picker.SelectedFiles);
+            return result == ContentDialogResult.Primary ? picker.SelectedFiles : null;
+        }
+
+        internal static string UploadErrorKeyFor(string errorCode)
+        {
+            string key;
+            return errorCode != null && s_uploadErrors.TryGetValue(errorCode, out key) ? key : "SocialAttachmentFailed";
         }
 
         private void AddDriveFiles(IReadOnlyList<SocialDriveFile> files)
@@ -307,9 +319,7 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                string key;
-                if (result.ErrorCode == null || !s_uploadErrors.TryGetValue(result.ErrorCode, out key)) key = "SocialAttachmentFailed";
-                Fail(item, key);
+                Fail(item, UploadErrorKeyFor(result.ErrorCode));
             }
             catch (OperationCanceledException)
             {
@@ -571,7 +581,14 @@ namespace Fort.ind_UWP
         {
             if (reference == null) return;
 
-            byte[] bytes;
+            var bytes = await PngBytesAsync(reference);
+            if (_attachments.Count >= AppConstants.SocialAttachmentLimit) return;
+
+            await AddBytesAsync(bytes, PastedImageName(), "image/png", -1, null, false);
+        }
+
+        internal static async Task<byte[]> PngBytesAsync(RandomAccessStreamReference reference)
+        {
             using (var source = await reference.OpenReadAsync())
             {
                 var decoder = await BitmapDecoder.CreateAsync(source);
@@ -582,16 +599,17 @@ namespace Fort.ind_UWP
                     encoder.SetSoftwareBitmap(pixels);
                     await encoder.FlushAsync();
 
-                    bytes = new byte[output.Size];
+                    var bytes = new byte[output.Size];
                     output.Seek(0);
                     await output.ReadAsync(bytes.AsBuffer(), (uint)output.Size, InputStreamOptions.None);
+                    return bytes;
                 }
             }
+        }
 
-            if (_attachments.Count >= AppConstants.SocialAttachmentLimit) return;
-
-            var name = DateTimeOffset.Now.ToString("yyyy-MM-dd HH.mm.ss", CultureInfo.InvariantCulture) + ".png";
-            await AddBytesAsync(bytes, name, "image/png", -1, null, false);
+        internal static string PastedImageName()
+        {
+            return DateTimeOffset.Now.ToString("yyyy-MM-dd HH.mm.ss", CultureInfo.InvariantCulture) + ".png";
         }
 
         private async Task<SocialAttachmentItem> AddBytesAsync(byte[] bytes, string name, string contentType, int index,
@@ -638,7 +656,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        private static async Task<IRandomAccessStream> OpenBytesAsync(byte[] bytes)
+        internal static async Task<IRandomAccessStream> OpenBytesAsync(byte[] bytes)
         {
             var stream = new InMemoryRandomAccessStream();
             await stream.WriteAsync(bytes.AsBuffer());

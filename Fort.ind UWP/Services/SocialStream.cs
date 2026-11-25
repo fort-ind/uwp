@@ -38,6 +38,22 @@ namespace Fort.ind_UWP
         public JObject Body { get; }
     }
 
+    public sealed class SocialChannelEventArgs : EventArgs
+    {
+        public SocialChannelEventArgs(string channelId, string type, JToken body)
+        {
+            ChannelId = channelId;
+            Type = type;
+            Body = body;
+        }
+
+        public string ChannelId { get; }
+
+        public string Type { get; }
+
+        public JToken Body { get; }
+    }
+
     public sealed class SocialStream : IDisposable
     {
         public const string MainChannel = "main";
@@ -69,6 +85,8 @@ namespace Fort.ind_UWP
         public event EventHandler<SocialStreamEventArgs> MessageReceived;
 
         public event EventHandler<SocialNoteStreamEventArgs> NoteUpdated;
+
+        public event EventHandler<SocialChannelEventArgs> ChannelMessageReceived;
 
         public event EventHandler Closed;
 
@@ -203,12 +221,21 @@ namespace Fort.ind_UWP
                 if (!string.Equals(messageType, "channel", StringComparison.Ordinal)) return;
 
                 var envelope = SocialJson.Object(message, "body");
-                if (!string.Equals(SocialJson.String(envelope, "id"), _channelId, StringComparison.Ordinal)) return;
-
+                var channelId = SocialJson.String(envelope, "id");
                 var type = SocialJson.String(envelope, "type");
-                if (string.IsNullOrEmpty(type)) return;
+                if (string.IsNullOrEmpty(channelId) || string.IsNullOrEmpty(type)) return;
 
-                MessageReceived?.Invoke(this, new SocialStreamEventArgs(type, SocialJson.Object(envelope, "body")));
+                if (_channel != null && string.Equals(channelId, _channelId, StringComparison.Ordinal))
+                {
+                    MessageReceived?.Invoke(this, new SocialStreamEventArgs(type, SocialJson.Object(envelope, "body")));
+                    return;
+                }
+
+                JToken body;
+                if (envelope.TryGetValue("body", out body))
+                {
+                    ChannelMessageReceived?.Invoke(this, new SocialChannelEventArgs(channelId, type, body));
+                }
             }
             catch (Exception ex)
             {

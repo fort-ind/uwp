@@ -33,6 +33,7 @@ namespace Fort.ind_UWP
                 new SearchItem(LocalizedStrings.Get("SearchItemBetaPrograms"), AppConstants.CategoryMenu, AppConstants.NavigationBetas),
                 new SearchItem(LocalizedStrings.Get("SearchItemYourProfile"), AppConstants.CategoryMenu, AppConstants.NavigationProfile),
                 new SearchItem(LocalizedStrings.Get("SearchItemSocial"), AppConstants.CategoryMenu, AppConstants.NavigationSocial),
+                new SearchItem(LocalizedStrings.Get("SearchItemChat"), AppConstants.CategoryMenu, AppConstants.NavigationChat),
                 new SearchItem(LocalizedStrings.Get("SearchItemSettings"), AppConstants.CategoryMenu, AppConstants.NavigationSettings),
                 SettingsItem("SearchItemDataStorage", AppConstants.SettingsSectionStorage),
                 SettingsItem("SearchItemLocalJsonStorage", AppConstants.SettingsSectionStorage),
@@ -157,7 +158,8 @@ namespace Fort.ind_UWP
         public static List<SearchItem> BuildSuggestions(string query, IReadOnlyList<SearchItem> items, SearchItem profileResult,
                                                         SearchItem notesResult = null, IReadOnlyList<SearchItem> tagResults = null)
         {
-            var filtered = items.Where(item => Matches(item, query))
+            var chatEnabled = LabsService.ChatEnabled;
+            var filtered = items.Where(item => Matches(item, query) && (chatEnabled || !IsChatItem(item)))
                                 .Take(AppConstants.SearchSuggestionLimit)
                                 .ToList();
 
@@ -173,6 +175,11 @@ namespace Fort.ind_UWP
             if (notesResult != null) filtered.Add(notesResult);
 
             return filtered;
+        }
+
+        private static bool IsChatItem(SearchItem item)
+        {
+            return string.Equals(item.NavigationTag, AppConstants.NavigationChat, StringComparison.Ordinal);
         }
 
         public static bool Matches(SearchItem item, string query)

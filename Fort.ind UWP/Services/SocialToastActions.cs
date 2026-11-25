@@ -120,6 +120,29 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static ToastChatReply ChatReplyFor(string userId, SocialUser user, string account)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(account)) return null;
+                if (FindRegistration() == null || !SocialPermissions.Has(SocialPermissions.WriteChat)) return null;
+
+                var name = user == null ? "" : MfmText.PlainName(SocialNoteItem.DisplayNameOf(user));
+                return new ToastChatReply
+                {
+                    UserId = userId,
+                    Account = account,
+                    Placeholder = LocalizedStrings.Format("SocialChatToastReplyPlaceholderFormat", name),
+                    SendText = LocalizedStrings.Get("SocialChatToastSendButton")
+                };
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialToastActions: no chat reply for this toast", ex);
+                return null;
+            }
+        }
+
         public static bool IsToastAction(IBackgroundTaskInstance instance)
         {
             return instance != null && instance.Task != null
@@ -189,6 +212,20 @@ namespace Fort.ind_UWP
                     && !string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(account))
                 {
                     await RespondToFollowRequestAsync(userId, account, followAccept, cancellationToken);
+                }
+
+                return;
+            }
+
+            if (string.Equals(action, AppConstants.ToastActionChatReply, StringComparison.Ordinal))
+            {
+                if (arguments.TryGetValue(AppConstants.ToastArgumentUser, out userId)
+                    && arguments.TryGetValue(AppConstants.ToastArgumentAccount, out account)
+                    && !string.IsNullOrEmpty(userId) && !string.IsNullOrEmpty(account))
+                {
+                    object typed = null;
+                    if (details.UserInput != null) details.UserInput.TryGetValue(AppConstants.ToastReplyInputId, out typed);
+                    await ChatReplyAsync(userId, account, typed as string, cancellationToken);
                 }
 
                 return;
@@ -317,6 +354,83 @@ namespace Fort.ind_UWP
             }
         }
 
+        private static async Task ChatReplyAsync(string userId, string account, string typed, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(typed)) return;
+
+            var text = typed.Trim();
+            string failure;
+            try
+            {
+                failure = await SendChatReplyAsync(userId, account, text, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                failure = LocalizedStrings.Get("SocialToastFailedTimeout");
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialToastActions: the chat reply failed", ex);
+                failure = LocalizedStrings.Get("SocialActionErrorGeneric");
+            }
+
+            if (failure != null) ShowChatReplyFailed(userId, account, text, failure);
+        }
+
+        private static async Task<string> SendChatReplyAsync(string userId, string account, string text, CancellationToken cancellationToken)
+        {
+            if (!SocialNotificationService.IsActiveAccount(account)) return LocalizedStrings.Get("SocialToastFailedAccount");
+            if (!LabsService.ChatEnabled) return LocalizedStrings.Get("SocialChatToastFailedLab");
+
+            var token = await MisskeyAuthService.TryGetTokenAsync();
+            if (string.IsNullOrEmpty(token)) return LocalizedStrings.Get("SocialToastFailedSignedOut");
+            if (!SocialPermissions.Has(SocialPermissions.WriteChat)) return LocalizedStrings.Get("SocialToastFailedPermission");
+
+            if (text.Length > AppConstants.SocialChatMessageMaxLength) return LocalizedStrings.Get("SocialChatErrorTooLong");
+
+            var result = await SocialApiService.SendChatMessageAsync(token, userId, text, null, cancellationToken);
+            if (result.Status == SocialApiStatus.Ok)
+            {
+                SocialChatService.ApplySent(userId, result.Value);
+                await SocialApiService.GetChatTimelineAsync(token, userId, null, null, 1, cancellationToken);
+                SocialChatService.MarkRead(userId);
+                return null;
+            }
+
+            if (result.Status == SocialApiStatus.PermissionDenied)
+            {
+                SocialPermissions.Forget(SocialPermissions.WriteChat);
+                return LocalizedStrings.Get("SocialToastFailedPermission");
+            }
+
+            return SocialChatService.SendFailureText(result.Status, result.ErrorCode);
+        }
+
+        private static void ShowChatReplyFailed(string userId, string account, string text, string reason)
+        {
+            RememberFailed(AppConstants.SettingSocialChatFailedReply, userId, account, text);
+
+            var toast = new GroupedToast
+            {
+                Title = LocalizedStrings.Get("SocialChatToastReplyFailedTitle"),
+                Body = LocalizedStrings.Format("SocialToastReplyFailedBodyFormat", reason),
+                Attribution = LocalizedStrings.Get("SocialChatToastAttribution"),
+                Group = AppConstants.SocialToastFailureGroup,
+                Tag = TagFor("chat:", userId)
+            };
+            toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenChat);
+            toast.AddArgument(AppConstants.ToastArgumentUser, userId);
+            toast.AddArgument(AppConstants.ToastArgumentAccount, account);
+            toast.AddArgument(AppConstants.ToastArgumentRestore, "1");
+
+            LiveTileService.ShowGroupedToast(toast);
+        }
+
+        public static string TakeFailedChatReply(string account, string userId)
+        {
+            return TakeFailed(AppConstants.SettingSocialChatFailedReply, account, userId);
+        }
+
         private static async Task LikeAsync(string noteId, string account, CancellationToken cancellationToken)
         {
             string failure;
@@ -420,6 +534,11 @@ namespace Fort.ind_UWP
 
         private static void RememberFailedReply(string noteId, string account, string text)
         {
+            RememberFailed(AppConstants.SettingSocialToastFailedReply, noteId, account, text);
+        }
+
+        private static void RememberFailed(string settingKey, string noteId, string account, string text)
+        {
             try
             {
                 var kept = text ?? "";
@@ -433,7 +552,7 @@ namespace Fort.ind_UWP
                 stored[FailedAccountKey] = account;
                 stored[FailedNoteKey] = noteId;
                 stored[FailedTextKey] = kept;
-                ApplicationData.Current.LocalSettings.Values[AppConstants.SettingSocialToastFailedReply] = stored;
+                ApplicationData.Current.LocalSettings.Values[settingKey] = stored;
             }
             catch (Exception ex)
             {
@@ -443,10 +562,15 @@ namespace Fort.ind_UWP
 
         public static string TakeFailedReply(string account, string noteId)
         {
+            return TakeFailed(AppConstants.SettingSocialToastFailedReply, account, noteId);
+        }
+
+        private static string TakeFailed(string settingKey, string account, string noteId)
+        {
             try
             {
                 var values = ApplicationData.Current.LocalSettings.Values;
-                var stored = values[AppConstants.SettingSocialToastFailedReply] as ApplicationDataCompositeValue;
+                var stored = values[settingKey] as ApplicationDataCompositeValue;
                 if (stored == null) return null;
 
                 if (!string.Equals(stored[FailedAccountKey] as string, account, StringComparison.Ordinal)
@@ -455,7 +579,7 @@ namespace Fort.ind_UWP
                     return null;
                 }
 
-                values.Remove(AppConstants.SettingSocialToastFailedReply);
+                values.Remove(settingKey);
                 return stored[FailedTextKey] as string;
             }
             catch (Exception ex)

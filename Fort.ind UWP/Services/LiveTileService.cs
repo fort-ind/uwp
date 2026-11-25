@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;
@@ -497,6 +498,7 @@ namespace Fort.ind_UWP
 
                 AddQuickReply(builder, toast.QuickReply);
                 AddFollowRequestButtons(builder, toast.FollowRequest);
+                AddChatReply(builder, toast.ChatReply);
 
                 ToastNotification notification = new ToastNotification(builder.GetToastContent().GetXml());
                 notification.Group = toast.Group;
@@ -555,6 +557,43 @@ namespace Fort.ind_UWP
                               .AddArgument(AppConstants.ToastArgumentUser, request.UserId)
                               .AddArgument(AppConstants.ToastArgumentAccount, request.Account)
                               .SetBackgroundActivation());
+        }
+
+        private static void AddChatReply(ToastContentBuilder builder, ToastChatReply reply)
+        {
+            if (reply == null || string.IsNullOrEmpty(reply.UserId) || string.IsNullOrEmpty(reply.Account)) return;
+
+            builder.AddInputTextBox(AppConstants.ToastReplyInputId, SanitizeText(reply.Placeholder), null);
+            builder.AddButton(new ToastButton()
+                              .SetContent(SanitizeText(reply.SendText))
+                              .AddArgument(AppConstants.ToastArgumentAction, AppConstants.ToastActionChatReply)
+                              .AddArgument(AppConstants.ToastArgumentUser, reply.UserId)
+                              .AddArgument(AppConstants.ToastArgumentAccount, reply.Account)
+                              .SetTextBoxId(AppConstants.ToastReplyInputId)
+                              .SetImageUri(new Uri(AppConstants.SocialToastSendIcon))
+                              .SetBackgroundActivation());
+        }
+
+        public static void RemoveToastGroups(Func<string, bool> matches)
+        {
+            if (matches == null) return;
+
+            try
+            {
+                var groups = ToastNotificationManager.History.GetHistory()
+                                                     .Select(toast => toast.Group)
+                                                     .Where(group => !string.IsNullOrEmpty(group) && matches(group))
+                                                     .Distinct(StringComparer.Ordinal)
+                                                     .ToList();
+                foreach (var group in groups)
+                {
+                    ToastNotificationManager.History.RemoveGroup(group);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("LiveTileService: RemoveToastGroups failed", ex);
+            }
         }
 
         public static void RemoveToastGroup(string group)
@@ -641,6 +680,7 @@ namespace Fort.ind_UWP
         public IList<KeyValuePair<string, string>> Arguments { get; } = new List<KeyValuePair<string, string>>();
         public ToastQuickReply QuickReply { get; set; }
         public ToastFollowRequest FollowRequest { get; set; }
+        public ToastChatReply ChatReply { get; set; }
 
         public void AddArgument(string key, string value)
         {
@@ -655,6 +695,14 @@ namespace Fort.ind_UWP
         public string Placeholder { get; set; }
         public string ReplyText { get; set; }
         public string LikeText { get; set; }
+    }
+
+    public sealed class ToastChatReply
+    {
+        public string UserId { get; set; }
+        public string Account { get; set; }
+        public string Placeholder { get; set; }
+        public string SendText { get; set; }
     }
 
     public sealed class ToastFollowRequest

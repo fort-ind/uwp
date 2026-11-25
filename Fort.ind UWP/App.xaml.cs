@@ -220,6 +220,8 @@ namespace Fort.ind_UWP
             SocialFollowService.Initialize();
             SocialNoteService.Initialize();
             SocialNoteCapture.Initialize();
+            SocialChatService.Initialize();
+            SocialChatCapture.Initialize();
             SocialNotificationService.Initialize();
             SocialNotificationService.ReconcileInBackground();
             SocialFeedTileService.ReconcileInBackground();
@@ -275,10 +277,11 @@ namespace Fort.ind_UWP
 
         private sealed class ToastTarget
         {
-            public ToastTarget(string open, string noteId, string account, bool restore)
+            public ToastTarget(string open, string noteId, string userId, string account, bool restore)
             {
                 Open = open;
                 NoteId = noteId;
+                UserId = userId;
                 Account = account;
                 Restore = restore;
             }
@@ -286,6 +289,18 @@ namespace Fort.ind_UWP
             public string Open { get; private set; }
 
             public string NoteId { get; private set; }
+
+            public string UserId { get; private set; }
+
+            public bool OpensChat
+            {
+                get { return string.Equals(Open, AppConstants.ToastOpenChat, StringComparison.Ordinal) && !string.IsNullOrEmpty(UserId); }
+            }
+
+            public string NavigationTag
+            {
+                get { return OpensChat && LabsService.ChatEnabled ? AppConstants.NavigationChat : AppConstants.NavigationSocial; }
+            }
 
             public string Account { get; private set; }
 
@@ -314,14 +329,16 @@ namespace Fort.ind_UWP
                 if (!parsed.TryGetValue(AppConstants.ToastArgumentOpen, out open)) return null;
 
                 string noteId;
+                string userId;
                 string account;
                 string restore;
                 parsed.TryGetValue(AppConstants.ToastArgumentNote, out noteId);
+                parsed.TryGetValue(AppConstants.ToastArgumentUser, out userId);
                 parsed.TryGetValue(AppConstants.ToastArgumentAccount, out account);
                 parsed.TryGetValue(AppConstants.ToastArgumentRestore, out restore);
 
-                var target = new ToastTarget(open, noteId, account, !string.IsNullOrEmpty(restore));
-                return target.OpensNotifications || target.OpensNote ? target : null;
+                var target = new ToastTarget(open, noteId, userId, account, !string.IsNullOrEmpty(restore));
+                return target.OpensNotifications || target.OpensNote || target.OpensChat ? target : null;
             }
             catch (Exception ex)
             {
@@ -336,6 +353,20 @@ namespace Fort.ind_UWP
 
             try
             {
+                if (target.OpensChat)
+                {
+                    if (!LabsService.ChatEnabled || !SocialContentService.IsCurrentAccount(target.Account)) return;
+
+                    if (target.Restore)
+                    {
+                        var typed = SocialToastActions.TakeFailedChatReply(target.Account, target.UserId);
+                        if (!string.IsNullOrEmpty(typed)) SocialChatService.SaveDraft(target.UserId, typed);
+                    }
+
+                    mainPage.ShowChat(target.UserId);
+                    return;
+                }
+
                 if (target.OpensNotifications || !SocialContentService.IsCurrentAccount(target.Account))
                 {
                     mainPage.ShowSocialNotifications();
@@ -430,7 +461,7 @@ namespace Fort.ind_UWP
                         Window.Current.Content = rootFrame;
                     }
 
-                    rootFrame.Navigate(typeof(MainPage), toastTarget != null ? AppConstants.NavigationSocial : null);
+                    rootFrame.Navigate(typeof(MainPage), toastTarget != null ? toastTarget.NavigationTag : null);
                 }
                 else if (toastTarget != null)
                 {
@@ -450,7 +481,7 @@ namespace Fort.ind_UWP
                     await ProfileService.TryRestoreSessionAsync();
                     StartSocialNotifications();
 
-                    if (toastTarget != null && toastTarget.OpensNote)
+                    if (toastTarget != null && (toastTarget.OpensNote || toastTarget.OpensChat))
                     {
                         ShowToastTarget(rootFrame.Content as MainPage, toastTarget);
                     }
@@ -531,6 +562,7 @@ namespace Fort.ind_UWP
             {
                 SocialNotificationService.OnSuspending();
                 SocialNoteCapture.OnSuspending();
+                SocialChatCapture.OnSuspending();
 
                 if (WindowShown && !SocialNotificationService.OwnsBadge && !LiveTileService.TileCleared)
                 {
@@ -558,6 +590,8 @@ namespace Fort.ind_UWP
 
                 SocialNotificationService.OnResuming();
                 SocialNoteCapture.OnResuming();
+                SocialChatCapture.OnResuming();
+                SocialChatService.OnResuming();
                 SocialFeedTileService.OnResuming();
             }
             catch (Exception ex)

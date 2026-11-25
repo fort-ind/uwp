@@ -159,6 +159,59 @@ namespace Fort.ind_UWP
             }
         }
 
+        public static Task CloseKeyedAsync(string key)
+        {
+            return string.IsNullOrEmpty(key) ? Task.CompletedTask : CloseWhereAsync(candidate => string.Equals(candidate, key, StringComparison.Ordinal));
+        }
+
+        public static async Task CloseWhereAsync(Func<string, bool> matches)
+        {
+            var mainDispatcher = s_mainDispatcher;
+            if (mainDispatcher == null || matches == null) return;
+
+            var views = await RunOnMainAsync(mainDispatcher, () =>
+            {
+                return Task.FromResult(s_secondaryViews.Where(view => view.Key != null && matches(view.Key)).ToList());
+            });
+
+            foreach (var view in views)
+            {
+                try
+                {
+                    await view.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => ConsolidateCurrentView(view));
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Error($"WindowManagerService: could not close view {view.Id}", ex);
+                }
+            }
+        }
+
+        public static async Task ShowChatInMainWindowAsync(string userId)
+        {
+            if (!IsSecondaryView) CaptureMainView();
+
+            var mainDispatcher = s_mainDispatcher;
+            if (mainDispatcher == null) return;
+
+            var callerViewId = ApplicationView.GetForCurrentView().Id;
+
+            await mainDispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                try
+                {
+                    var shell = MainPage.Current;
+                    if (shell != null) shell.ShowChat(userId);
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Error("WindowManagerService: could not open the chat in the main window", ex);
+                }
+            });
+
+            if (callerViewId != s_mainViewId) await ApplicationViewSwitcher.SwitchAsync(s_mainViewId);
+        }
+
         public static void CloseCurrentWindow()
         {
             if (!IsSecondaryView) return;
@@ -441,6 +494,7 @@ namespace Fort.ind_UWP
                 SocialEmojiPicker.ForgetCurrentView();
                 SearchItem.ForgetSubscribersOnView(view.Id);
                 SocialNoteHub.ForgetView(view.Id);
+                SocialChatService.ForgetView(view.Id);
                 DialogService.ForgetView(view.Id);
                 MisskeyAuthService.ForgetView(view.Id);
 

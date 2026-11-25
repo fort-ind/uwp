@@ -46,6 +46,7 @@ namespace Fort.ind_UWP
 
             SetupTitleBar();
             UpdateProfileNavItem();
+            UpdateChatNavItem();
             AttachOpenInNewWindowMenus();
             NavSearchInk.TextWritten += NavSearchInk_TextWritten;
 
@@ -117,6 +118,7 @@ namespace Fort.ind_UWP
             AttachSignInAgainHandler();
             AttachScheduledHandler();
             AttachMemoryHandler();
+            AttachChatHandlers();
 
             UpdateProfileNavItem();
         }
@@ -223,6 +225,7 @@ namespace Fort.ind_UWP
             DetachSignInAgainHandler();
             DetachScheduledHandler();
             DetachMemoryHandler();
+            DetachChatHandlers();
 
             _searchDebounce.Cancel();
         }

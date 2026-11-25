@@ -195,15 +195,18 @@ namespace Fort.ind_UWP
 
     public sealed class SocialMe
     {
-        public SocialMe(int unreadCount, UserProfile profile)
+        public SocialMe(int unreadCount, UserProfile profile, bool hasUnreadChat)
         {
             UnreadCount = unreadCount;
             Profile = profile;
+            HasUnreadChat = hasUnreadChat;
         }
 
         public int UnreadCount { get; }
 
         public UserProfile Profile { get; }
+
+        public bool HasUnreadChat { get; }
     }
 
     public static class SocialApiService
@@ -360,7 +363,8 @@ namespace Fort.ind_UWP
             var count = ReadUnreadCount(me);
             if (!count.HasValue) return SocialApiResult<SocialMe>.Failed(SocialApiStatus.Failed);
 
-            return SocialApiResult<SocialMe>.Succeeded(new SocialMe(count.Value, MisskeyAuthService.ParseCurrentUser(me)));
+            return SocialApiResult<SocialMe>.Succeeded(new SocialMe(count.Value, MisskeyAuthService.ParseCurrentUser(me),
+                                                                    SocialJson.Bool(me, "hasUnreadChatMessages").GetValueOrDefault()));
         }
 
         public static async Task<SocialApiResult<UserProfile>> UpdateProfileAsync(string token, JObject changes, CancellationToken cancellationToken)
@@ -973,6 +977,82 @@ namespace Fort.ind_UWP
             var array = (JArray)response.Value;
             var notes = await Task.Run(() => SocialScheduledNote.ListFromJson(array), cancellationToken);
             return SocialApiResult<IReadOnlyList<SocialScheduledNote>>.Succeeded(notes);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> GetChatHistoryAsync(string token, int limit,
+                                                                                                     CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("limit", new JValue(limit));
+            body.Add("room", new JValue(false));
+
+            return await ChatMessagesFromAsync(await PostAsync("chat/history", token, body, cancellationToken), cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> GetChatTimelineAsync(
+            string token, string userId, string sinceId, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("userId", new JValue(userId ?? ""));
+            body.Add("limit", new JValue(limit));
+            if (!string.IsNullOrEmpty(sinceId)) body.Add("sinceId", new JValue(sinceId));
+            if (!string.IsNullOrEmpty(untilId)) body.Add("untilId", new JValue(untilId));
+
+            return await ChatMessagesFromAsync(await PostAsync("chat/messages/user-timeline", token, body, cancellationToken), cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<SocialChatMessage>> SendChatMessageAsync(string token, string userId, string text, string fileId,
+                                                                                         CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("toUserId", new JValue(userId ?? ""));
+            if (!string.IsNullOrEmpty(text)) body.Add("text", new JValue(text));
+            if (!string.IsNullOrEmpty(fileId)) body.Add("fileId", new JValue(fileId));
+
+            var response = await PostAsync("chat/messages/create-to-user", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<SocialChatMessage>.Failed(response.Status, response.ErrorCode);
+            }
+
+            var message = response.Value.Type == JTokenType.Object ? SocialChatMessage.FromJson((JObject)response.Value) : null;
+            return message == null
+                   ? SocialApiResult<SocialChatMessage>.Failed(SocialApiStatus.Failed)
+                   : SocialApiResult<SocialChatMessage>.Succeeded(message);
+        }
+
+        public static Task<SocialApiResult<bool>> ReactChatMessageAsync(string token, string messageId, string reaction, bool add,
+                                                                        CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("messageId", new JValue(messageId ?? ""));
+            body.Add("reaction", new JValue(reaction ?? ""));
+            return ActionAsync(add ? "chat/messages/react" : "chat/messages/unreact", token, body, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> DeleteChatMessageAsync(string token, string messageId, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("messageId", new JValue(messageId ?? ""));
+            return ActionAsync("chat/messages/delete", token, body, cancellationToken);
+        }
+
+        private static async Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> ChatMessagesFromAsync(SocialApiResult<JToken> response,
+                                                                                                         CancellationToken cancellationToken)
+        {
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<IReadOnlyList<SocialChatMessage>>.Failed(response.Status, response.ErrorCode);
+            }
+
+            if (response.Value.Type != JTokenType.Array)
+            {
+                return SocialApiResult<IReadOnlyList<SocialChatMessage>>.Failed(SocialApiStatus.Failed);
+            }
+
+            var array = (JArray)response.Value;
+            var messages = await Task.Run(() => SocialChatMessage.ListFromJson(array), cancellationToken);
+            return SocialApiResult<IReadOnlyList<SocialChatMessage>>.Succeeded(messages);
         }
 
         private static async Task<SocialApiResult<SocialNote>> CreatedNoteAsync(string endpoint, string token, JObject body,
