@@ -21,7 +21,9 @@ namespace Fort.ind_UWP
 
         private static readonly TimeSpan TimeRefreshInterval = TimeSpan.FromMinutes(1);
 
-        private readonly ObservableCollection<SocialChatConversation> _conversations = new ObservableCollection<SocialChatConversation>();
+        private readonly ObservableCollection<SocialChatConversation> _people = new ObservableCollection<SocialChatConversation>();
+
+        private readonly ObservableCollection<SocialChatConversation> _rooms = new ObservableCollection<SocialChatConversation>();
 
         private readonly Debouncer _searchDebounce = new Debouncer();
 
@@ -35,9 +37,7 @@ namespace Fort.ind_UWP
 
         private string _account;
 
-        private string _selectedOtherId;
-
-        private SocialUser _selectedUser;
+        private SocialChatArgs _selected;
 
         private bool _loaded;
 
@@ -45,34 +45,48 @@ namespace Fort.ind_UWP
         {
             this.InitializeComponent();
 
-            ConversationList.ItemsSource = _conversations;
             ChatView.PersonResolved += ChatView_PersonResolved;
+            ChatView.Left += ChatView_Left;
             _timeTimer.Interval = TimeRefreshInterval;
             _timeTimer.Tick += TimeTimer_Tick;
 
             Loaded += SocialChatPage_Loaded;
             Unloaded += SocialChatPage_Unloaded;
+
+            InitializeTabs();
         }
 
-        public void OpenConversation(string userId, SocialUser user)
+        public void OpenConversation(string key)
+        {
+            if (string.IsNullOrEmpty(key)) return;
+
+            EnsureAccount();
+            var row = Find(key);
+            OpenConversation(row != null ? row.Args : SocialChatArgs.ForKey(_account, key));
+        }
+
+        private void EnsureAccount()
+        {
+            if (_loaded) return;
+
+            _twoPanes = IsTwoPane();
+            if (_account == null) _account = SocialContentService.CurrentAccountId();
+        }
+
+        private void OpenConversation(SocialChatArgs args)
         {
             try
             {
-                if (!_loaded)
-                {
-                    _twoPanes = IsTwoPane();
-                    if (_account == null) _account = SocialContentService.CurrentAccountId();
-                }
+                EnsureAccount();
+                if (args == null || string.IsNullOrEmpty(args.Key) || _account == null) return;
 
-                if (string.IsNullOrEmpty(userId) || _account == null) return;
+                _selected = args;
+                SelectTab(args.IsRoom);
 
-                var row = Find(userId);
-                _selectedOtherId = userId;
-                _selectedUser = user ?? (row == null ? null : row.Other);
-
+                var row = Find(args.Key);
                 if (_twoPanes)
                 {
-                    ChatView.Open(new SocialChatArgs(_account, userId, _selectedUser));
+                    ChatView.Open(args);
                     ShowPicker(false);
                     ConversationList.SelectedItem = row;
                     ChatView.FocusComposer();
@@ -80,7 +94,7 @@ namespace Fort.ind_UWP
                 }
 
                 ConversationList.SelectedItem = null;
-                if (Frame != null) Frame.Navigate(typeof(SocialChatConversationPage), new SocialChatArgs(_account, userId, _selectedUser));
+                if (Frame != null) Frame.Navigate(typeof(SocialChatConversationPage), args);
             }
             catch (Exception ex)
             {
@@ -106,7 +120,7 @@ namespace Fort.ind_UWP
             base.OnNavigatedTo(e);
 
             var args = e.Parameter as SocialChatArgs;
-            if (args != null && e.NavigationMode == NavigationMode.New) _selectedOtherId = args.UserId;
+            if (args != null && e.NavigationMode == NavigationMode.New) _selected = args;
         }
 
         private void SocialChatPage_Loaded(object sender, RoutedEventArgs e)
@@ -117,6 +131,8 @@ namespace Fort.ind_UWP
             {
                 Attach();
                 _twoPanes = IsTwoPane();
+                PaintTabs();
+                UpdateInvitations();
                 Refresh(true);
                 _timeTimer.Start();
             }
@@ -179,11 +195,11 @@ namespace Fort.ind_UWP
                 _twoPanes = twoPanes;
                 ChatView.SetPresented(_twoPanes);
 
-                if (_twoPanes && _selectedOtherId != null && _account != null)
+                if (_twoPanes && _selected != null && _account != null)
                 {
-                    ChatView.Open(new SocialChatArgs(_account, _selectedOtherId, _selectedUser));
+                    ChatView.Open(_selected);
                     ShowPicker(false);
-                    ConversationList.SelectedItem = Find(_selectedOtherId);
+                    ConversationList.SelectedItem = Find(_selected.Key);
                 }
                 else if (!_twoPanes)
                 {
@@ -208,14 +224,15 @@ namespace Fort.ind_UWP
             Show(UnavailableInfoBar, permitted && !available);
 
             ContentGrid.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
+            NewRoomLink.Visibility = SocialPolicies.Current.AllowsChatWriting ? Visibility.Visible : Visibility.Collapsed;
             ChatView.SetPresented(_twoPanes);
 
             if (!string.Equals(account, _account, StringComparison.Ordinal))
             {
                 _account = account;
-                _conversations.Clear();
-                _selectedOtherId = null;
-                _selectedUser = null;
+                _people.Clear();
+                _rooms.Clear();
+                _selected = null;
                 ChatView.Close();
                 reload = true;
             }
@@ -226,17 +243,17 @@ namespace Fort.ind_UWP
                 return;
             }
 
-            if (_selectedOtherId == null)
+            if (_selected == null)
             {
                 ShowPicker(true);
             }
-            else if (_twoPanes && !string.Equals(ChatView.OtherUserId, _selectedOtherId, StringComparison.Ordinal))
+            else if (_twoPanes && !string.Equals(ChatView.ConversationKey, _selected.Key, StringComparison.Ordinal))
             {
-                ChatView.Open(new SocialChatArgs(_account, _selectedOtherId, _selectedUser));
+                ChatView.Open(_selected);
                 ShowPicker(false);
             }
 
-            if (reload || _conversations.Count == 0) LoadInBackground();
+            if (reload || (_people.Count == 0 && _rooms.Count == 0)) LoadInBackground();
         }
 
         private static void Show(Microsoft.UI.Xaml.Controls.InfoBar bar, bool shown)
@@ -271,29 +288,42 @@ namespace Fort.ind_UWP
                 _loadCts = cts;
                 var account = _account;
 
-                ListLoading.IsActive = _conversations.Count == 0;
-                ListLoading.Visibility = _conversations.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+                var empty = CurrentList.Count == 0;
+                ListLoading.IsActive = empty;
+                ListLoading.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
                 ShowListState(null, false);
 
-                var result = await SocialChatService.FetchHistoryAsync(cts.Token);
+                var people = await SocialChatService.FetchHistoryAsync(false, cts.Token);
                 if (cts.IsCancellationRequested || !string.Equals(account, _account, StringComparison.Ordinal)) return;
 
-                if (result.Status != SocialApiStatus.Ok)
+                if (people.Status == SocialApiStatus.PermissionDenied)
                 {
-                    if (result.Status == SocialApiStatus.PermissionDenied)
-                    {
-                        Refresh(false);
-                        return;
-                    }
-
-                    if (_conversations.Count == 0)
-                    {
-                        ShowListState(LocalizedStrings.Get(SocialApiService.ConnectionMessageKey(result.Status) ?? "SocialChatLoadFailed"), true);
-                    }
+                    Refresh(false);
                     return;
                 }
 
-                ApplyHistory(result.Value);
+                if (people.Status == SocialApiStatus.Ok) ApplyHistory(people.Value);
+
+                var rooms = await SocialChatService.FetchRoomsAsync(cts.Token);
+                var roomHistory = await SocialChatService.FetchHistoryAsync(true, cts.Token);
+                if (cts.IsCancellationRequested || !string.Equals(account, _account, StringComparison.Ordinal)) return;
+
+                if (rooms.Status == SocialApiStatus.Ok)
+                {
+                    ApplyRooms(rooms.Value, roomHistory.Status == SocialApiStatus.Ok ? roomHistory.Value : new SocialChatMessage[0]);
+                }
+
+                await SocialChatService.FetchInvitationsAsync(cts.Token);
+                if (cts.IsCancellationRequested) return;
+
+                UpdateInvitations();
+                OpenPendingInvitations();
+
+                var failed = ShowingRooms ? rooms.Status : people.Status;
+                if (failed != SocialApiStatus.Ok && CurrentList.Count == 0)
+                {
+                    ShowListState(LocalizedStrings.Get(SocialApiService.ConnectionMessageKey(failed) ?? "SocialChatLoadFailed"), true);
+                }
             }
             catch (OperationCanceledException)
             {
@@ -302,7 +332,7 @@ namespace Fort.ind_UWP
             catch (Exception ex)
             {
                 AppLog.Error("SocialChatPage: could not load the conversations", ex);
-                if (_conversations.Count == 0) ShowListState(LocalizedStrings.Get("SocialChatLoadFailed"), true);
+                if (CurrentList.Count == 0) ShowListState(LocalizedStrings.Get("SocialChatLoadFailed"), true);
             }
             finally
             {
@@ -310,6 +340,7 @@ namespace Fort.ind_UWP
                 {
                     ListLoading.IsActive = false;
                     ListLoading.Visibility = Visibility.Collapsed;
+                    UpdateListState();
                 }
             }
         }
@@ -326,29 +357,42 @@ namespace Fort.ind_UWP
                               .Where(entry => !string.IsNullOrEmpty(entry.Other))
                               .GroupBy(entry => entry.Other, StringComparer.Ordinal)
                               .Select(group => group.First())
+                              .Select(entry => new SocialChatConversation(_account, entry.Other, entry.Message.OtherUser(_account),
+                                                                          entry.Message, SocialChatService.IsUnread(entry.Other)))
                               .ToList();
 
-            var selected = _selectedOtherId;
-            var conversations = rows.Select(entry => new SocialChatConversation(_account, entry.Other, entry.Message.OtherUser(_account),
-                                                                                entry.Message, SocialChatService.IsUnread(entry.Other)))
-                                    .ToList();
-            _conversations.Clear();
-            foreach (var conversation in conversations)
+            Replace(_people, rows);
+        }
+
+        private void Replace(ObservableCollection<SocialChatConversation> list, IEnumerable<SocialChatConversation> rows)
+        {
+            list.Clear();
+            foreach (var row in rows)
             {
-                _conversations.Add(conversation);
+                list.Add(row);
             }
 
-            if (selected != null && _twoPanes) ConversationList.SelectedItem = Find(selected);
+            if (_selected != null && _twoPanes) ConversationList.SelectedItem = Find(_selected.Key);
             UpdateListState();
+        }
+
+        private ObservableCollection<SocialChatConversation> ListFor(string key)
+        {
+            return SocialChatKeys.IsRoom(key) ? _rooms : _people;
+        }
+
+        private ObservableCollection<SocialChatConversation> CurrentList
+        {
+            get { return ShowingRooms ? _rooms : _people; }
         }
 
         private void UpdateListState()
         {
-            if (_conversations.Count == 0 && !ListLoading.IsActive)
+            if (CurrentList.Count == 0 && !ListLoading.IsActive)
             {
-                ShowListState(LocalizedStrings.Get("SocialChatNoConversations"), false);
+                ShowListState(LocalizedStrings.Get(ShowingRooms ? "SocialChatNoRooms" : "SocialChatNoConversations"), false);
             }
-            else if (!ListRetryButton.IsShown())
+            else if (CurrentList.Count > 0 || !ListRetryButton.IsShown())
             {
                 ShowListState(null, false);
             }
@@ -361,9 +405,11 @@ namespace Fort.ind_UWP
             ListRetryButton.Visibility = retry ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private SocialChatConversation Find(string otherUserId)
+        private SocialChatConversation Find(string key)
         {
-            return _conversations.FirstOrDefault(row => string.Equals(row.OtherUserId, otherUserId, StringComparison.Ordinal));
+            if (string.IsNullOrEmpty(key)) return null;
+
+            return ListFor(key).FirstOrDefault(row => string.Equals(row.Key, key, StringComparison.Ordinal));
         }
 
         private async void OnAuthStateChanged(object sender, bool isSignedIn)
@@ -404,10 +450,12 @@ namespace Fort.ind_UWP
 
         private void SyncUnread()
         {
-            foreach (var row in _conversations)
+            foreach (var row in _people.Concat(_rooms))
             {
-                row.IsUnread = SocialChatService.IsUnread(row.OtherUserId);
+                row.IsUnread = SocialChatService.IsUnread(row.Key);
             }
+
+            PaintTabs();
         }
 
         private async void OnChatChanged(object sender, SocialChatChange change)
@@ -454,53 +502,74 @@ namespace Fort.ind_UWP
                     Refresh(true);
                     break;
                 case SocialChatChangeKind.Message:
-                    ApplyMessage(change.OtherUserId, change.Message);
+                    ApplyMessage(change.Key, change.Message);
                     break;
                 case SocialChatChangeKind.Read:
-                    var read = Find(change.OtherUserId);
+                    var read = Find(change.Key);
                     if (read != null) read.IsUnread = false;
                     break;
                 case SocialChatChangeKind.Deleted:
-                    var row = Find(change.OtherUserId);
+                    var row = Find(change.Key);
                     if (row != null && row.LastMessage != null && string.Equals(row.LastMessage.Id, change.MessageId, StringComparison.Ordinal))
                     {
                         LoadInBackground();
                     }
                     break;
+                case SocialChatChangeKind.Rooms:
+                    ApplyRoom(change.Key, change.Room);
+                    break;
+                case SocialChatChangeKind.Invitations:
+                    UpdateInvitations();
+                    PaintTabs();
+                    break;
             }
         }
 
-        private void ApplyMessage(string otherUserId, SocialChatMessage message)
+        private void ApplyMessage(string key, SocialChatMessage message)
         {
-            if (message == null || string.IsNullOrEmpty(otherUserId)) return;
+            if (message == null || string.IsNullOrEmpty(key)) return;
 
-            var unread = !message.IsFrom(_account) && !SocialChatService.IsActive(otherUserId);
-            var row = Find(otherUserId);
+            var unread = SocialChatService.IsUnread(key);
+            var list = ListFor(key);
+            var row = Find(key);
             if (row == null)
             {
-                row = new SocialChatConversation(_account, otherUserId, message.OtherUser(_account), message, unread);
-                _conversations.Insert(0, row);
-                if (row.Other == null) ResolvePersonInBackground(row);
+                if (SocialChatKeys.IsRoom(key))
+                {
+                    row = SocialChatConversation.ForRoom(_account, message.ToRoom ?? SocialChatService.RoomFor(message.ToRoomId), message, unread);
+                    if (row == null) return;
+                }
+                else
+                {
+                    row = new SocialChatConversation(_account, key, message.OtherUser(_account), message, unread);
+                    if (row.Other == null) ResolvePersonInBackground(row);
+                }
+
+                list.Insert(0, row);
                 UpdateListState();
                 return;
             }
 
-            if (!row.Apply(message, unread || row.IsUnread && !SocialChatService.IsActive(otherUserId))) return;
+            if (!row.Apply(message, unread)) return;
 
-            var index = _conversations.IndexOf(row);
-            if (index > 0)
-            {
-                var wasSelected = ReferenceEquals(ConversationList.SelectedItem, row);
-                _conversations.Move(index, 0);
-                if (wasSelected) ConversationList.SelectedItem = row;
-            }
+            MoveToTop(list, row);
+        }
+
+        private void MoveToTop(ObservableCollection<SocialChatConversation> list, SocialChatConversation row)
+        {
+            var index = list.IndexOf(row);
+            if (index <= 0) return;
+
+            var wasSelected = ReferenceEquals(ConversationList.SelectedItem, row);
+            list.Move(index, 0);
+            if (wasSelected) ConversationList.SelectedItem = row;
         }
 
         private async void ResolvePersonInBackground(SocialChatConversation row)
         {
             try
             {
-                var result = await SocialContentService.FetchUserAsync(row.OtherUserId, CancellationToken.None);
+                var result = await SocialContentService.FetchUserAsync(row.Key, CancellationToken.None);
                 if (result.Status == SocialApiStatus.Ok) row.SetOther(result.Value.User);
             }
             catch (Exception ex)
@@ -513,15 +582,35 @@ namespace Fort.ind_UWP
         {
             if (user == null) return;
 
-            if (string.Equals(user.Id, _selectedOtherId, StringComparison.Ordinal)) _selectedUser = _selectedUser ?? user;
+            if (_selected != null && !_selected.IsRoom && _selected.User == null
+                && string.Equals(user.Id, _selected.UserId, StringComparison.Ordinal))
+            {
+                _selected = new SocialChatArgs(_selected.Account, user.Id, user);
+            }
 
             var row = Find(user.Id);
             if (row != null) row.SetOther(user);
         }
 
+        private void ChatView_Left(object sender, string key)
+        {
+            try
+            {
+                if (_selected == null || !string.Equals(_selected.Key, key, StringComparison.Ordinal)) return;
+
+                _selected = null;
+                ConversationList.SelectedItem = null;
+                ShowPicker(true);
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialChatPage: could not leave the conversation", ex);
+            }
+        }
+
         private void TimeTimer_Tick(object sender, object e)
         {
-            foreach (var row in _conversations)
+            foreach (var row in _people.Concat(_rooms))
             {
                 row.RefreshTime();
             }
@@ -530,7 +619,7 @@ namespace Fort.ind_UWP
         private void ConversationList_ItemClick(object sender, ItemClickEventArgs e)
         {
             var row = e.ClickedItem as SocialChatConversation;
-            if (row != null) OpenConversation(row.OtherUserId, row.Other);
+            if (row != null) OpenConversation(row.Args);
         }
 
         private void ConversationList_ContextRequested(UIElement sender, ContextRequestedEventArgs args)
@@ -541,10 +630,20 @@ namespace Fort.ind_UWP
 
                 var target = args.OriginalSource as FrameworkElement;
                 var row = target == null ? null : RowFor(target);
-                if (row == null || row.Other == null) return;
+                if (row == null) return;
 
-                var flyout = SocialMenus.BuildForUser(row.Other, null, this) ?? new MenuFlyout();
-                SocialMenus.AddChatWindowItem(flyout, row.OtherUserId, row.Other);
+                MenuFlyout flyout;
+                if (row.IsRoom)
+                {
+                    flyout = new MenuFlyout();
+                }
+                else
+                {
+                    if (row.Other == null) return;
+                    flyout = SocialMenus.BuildForUser(row.Other, null, this) ?? new MenuFlyout();
+                }
+
+                SocialMenus.AddChatWindowItem(flyout, row.Args);
 
                 Point point;
                 SocialMenus.ShowContextAt(flyout, target, args.TryGetPosition(target, out point) ? point : (Point?)null);
@@ -604,22 +703,17 @@ namespace Fort.ind_UWP
             {
                 if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
 
-                var query = (sender.Text ?? "").Trim().TrimStart('@');
-                var at = query.IndexOf('@');
-                if (at >= 0) query = query.Substring(0, at);
-
                 var token = _searchDebounce.Restart();
-                if (query.Length == 0)
+                if (string.IsNullOrWhiteSpace(sender.Text))
                 {
                     sender.ItemsSource = null;
                     PersonSearchStatus.Visibility = Visibility.Collapsed;
                     return;
                 }
 
-                await Task.Delay(AppConstants.SocialSuggestDelayMilliseconds, token);
+                if (!await Debouncer.WaitAsync(AppConstants.SocialSuggestDelayMilliseconds, token)) return;
 
-                var accessToken = await MisskeyAuthService.TryGetTokenAsync();
-                var result = await SocialApiService.SearchUsersAsync(accessToken, query, null, SuggestionLimit * 2, token);
+                var result = await SocialChatService.SearchPeopleAsync(sender.Text, SuggestionLimit, CancellationToken.None);
                 if (token.IsCancellationRequested) return;
 
                 if (result.Status != SocialApiStatus.Ok)
@@ -630,10 +724,7 @@ namespace Fort.ind_UWP
                     return;
                 }
 
-                var people = result.Value.Where(user => string.IsNullOrWhiteSpace(user.Host)
-                                                        && !string.Equals(user.Id, _account, StringComparison.Ordinal))
-                                         .Take(SuggestionLimit)
-                                         .ToList();
+                var people = result.Value;
                 sender.ItemsSource = people;
                 PersonSearchStatus.Text = people.Count == 0 ? LocalizedStrings.Get("SocialChatSearchNoOne") : "";
                 PersonSearchStatus.Visibility = people.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -662,7 +753,7 @@ namespace Fort.ind_UWP
                 if (user == null) return;
 
                 NewChatFlyout.Hide();
-                OpenConversation(user.Id, user);
+                OpenConversation(new SocialChatArgs(_account, user.Id, user));
             }
             catch (Exception ex)
             {

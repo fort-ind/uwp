@@ -331,7 +331,9 @@ namespace Fort.ind_UWP
 
                 if (unreact != null)
                 {
-                    var removals = item.Reactions.Select(reaction => RemoveReactionItem(reaction.Key, unreact)).ToList();
+                    var removals = item.Reactions.Where(reaction => item.IsMyReaction(reaction.Key))
+                                                 .Select(reaction => RemoveReactionItem(reaction.Key, unreact))
+                                                 .ToList();
                     foreach (var removal in removals)
                     {
                         flyout.Items.Add(removal);
@@ -380,12 +382,12 @@ namespace Fort.ind_UWP
             return remove;
         }
 
-        public static void AddChatWindowItem(MenuFlyout flyout, string userId, SocialUser user)
+        public static void AddChatWindowItem(MenuFlyout flyout, SocialChatArgs args)
         {
-            if (flyout == null || string.IsNullOrEmpty(userId)) return;
+            if (flyout == null || args == null || string.IsNullOrEmpty(args.Key)) return;
 
             if (flyout.Items.Count > 0) flyout.Items.Insert(0, new MenuFlyoutSeparator());
-            flyout.Items.Insert(0, MenuItem("SocialChatOpenInWindow", NewWindowGlyph, () => SocialWindows.ShowChatAsync(userId, user)));
+            flyout.Items.Insert(0, MenuItem("SocialChatOpenInWindow", NewWindowGlyph, () => SocialWindows.ShowChatAsync(args)));
         }
 
         private static void AddModerationSubmenu(SocialMenuSink flyout, SocialUser user, UIElement owner)

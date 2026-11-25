@@ -110,24 +110,42 @@ namespace Fort.ind_UWP
             TitleBarBackButton.IsEnabled = ContentFrame.CanGoBack;
         }
 
-        internal void ShowChat(string userId)
+        internal void ShowChat(string key)
         {
             try
             {
                 if (!LabsService.ChatEnabled) return;
-                if (HoldForUnsavedChanges(() => ShowChat(userId))) return;
+                if (HoldForUnsavedChanges(() => ShowChat(key))) return;
 
                 var conversation = ContentFrame.Content as SocialChatConversationPage;
-                if (conversation != null && conversation.Shows(userId)) return;
+                if (conversation != null && conversation.Shows(key)) return;
 
                 if (!(ContentFrame.Content is SocialChatPage)) NavigateToTag(AppConstants.NavigationChat);
 
                 var page = ContentFrame.Content as SocialChatPage;
-                if (page != null && !string.IsNullOrEmpty(userId)) page.OpenConversation(userId, null);
+                if (page != null && !string.IsNullOrEmpty(key)) page.OpenConversation(key);
             }
             catch (Exception ex)
             {
                 AppLog.Error("MainPage: could not open the chat", ex);
+            }
+        }
+
+        internal void ShowChatInvitations()
+        {
+            try
+            {
+                if (!LabsService.ChatEnabled) return;
+                if (HoldForUnsavedChanges(ShowChatInvitations)) return;
+
+                if (!(ContentFrame.Content is SocialChatPage)) NavigateToTag(AppConstants.NavigationChat);
+
+                var page = ContentFrame.Content as SocialChatPage;
+                if (page != null) page.ShowInvitations();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("MainPage: could not open the chat invitations", ex);
             }
         }
 

@@ -794,6 +794,19 @@ namespace Fort.ind_UWP
                     return;
                 }
 
+                if (item.OpensChatInvitations && LabsService.ChatEnabled)
+                {
+                    if (WindowManagerService.IsSecondaryView)
+                    {
+                        await WindowManagerService.ShowChatInMainWindowAsync(null);
+                    }
+                    else if (MainPage.Current != null)
+                    {
+                        MainPage.Current.ShowChatInvitations();
+                    }
+                    return;
+                }
+
                 if (!string.IsNullOrEmpty(item.TargetUrl)) await WebLauncher.LaunchAsync(item.TargetUrl);
             }
             catch (Exception ex)

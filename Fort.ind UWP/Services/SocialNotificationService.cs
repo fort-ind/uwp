@@ -914,6 +914,12 @@ namespace Fort.ind_UWP
                 toast.AddArgument(AppConstants.ToastArgumentAccount, account);
                 toast.QuickReply = SocialToastActions.QuickReplyFor(note, account);
             }
+            else if (string.Equals(notification.Type, "chatRoomInvitationReceived", StringComparison.Ordinal) && LabsService.ChatEnabled && account != null)
+            {
+                toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenChat);
+                toast.AddArgument(AppConstants.ToastArgumentInvitations, "1");
+                toast.AddArgument(AppConstants.ToastArgumentAccount, account);
+            }
             else
             {
                 toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenNotifications);

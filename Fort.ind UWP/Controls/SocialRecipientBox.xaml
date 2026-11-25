@@ -10,6 +10,7 @@
 
     <StackPanel Spacing="6">
         <TextBlock x:Uid="SocialRecipientHeader"
+                   x:Name="HeaderLabel"
                    Style="{StaticResource CaptionTextBlockStyle}"
                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
 

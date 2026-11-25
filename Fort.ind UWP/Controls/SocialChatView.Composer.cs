@@ -20,7 +20,7 @@ namespace Fort.ind_UWP
         {
             get
             {
-                return _otherId != null
+                return _key != null
                        && SocialPolicies.Current.AllowsChatWriting
                        && !IsRemote
                        && !(ScopeRefuses && _reachedOldest && !_theyMessaged);
@@ -31,6 +31,8 @@ namespace Fort.ind_UWP
         {
             get
             {
+                if (IsRoom) return false;
+
                 var user = _detail != null ? _detail.User : _other;
                 return user != null && !string.IsNullOrWhiteSpace(user.Host);
             }
@@ -38,13 +40,13 @@ namespace Fort.ind_UWP
 
         private bool ScopeRefuses
         {
-            get { return _detail != null && !SocialChatService.ScopeAllows(_detail, _theyMessaged); }
+            get { return !IsRoom && _detail != null && !SocialChatService.ScopeAllows(_detail, _theyMessaged); }
         }
 
         private void UpdateComposer()
         {
             string notice = null;
-            if (_otherId != null)
+            if (_key != null)
             {
                 if (!SocialPolicies.Current.AllowsChatWriting)
                 {
@@ -102,9 +104,9 @@ namespace Fort.ind_UWP
 
         private void SaveDraft()
         {
-            if (_otherId == null) return;
+            if (_key == null) return;
 
-            SocialChatService.SaveDraft(_otherId, ChatInput.Text);
+            SocialChatService.SaveDraft(_key, ChatInput.Text);
         }
 
         private void ChatInput_TextChanged(object sender, TextChangedEventArgs e)
@@ -185,7 +187,8 @@ namespace Fort.ind_UWP
             if (!await SocialPermissions.EnsureAsync(this, SocialPermissions.WriteChat, SocialSignInPrompt.Chat)) return;
 
             var file = HasReadyAttachment ? _attachment.File : null;
-            var pending = SocialChatMessageItem.CreatePending(text, file, _emojis ?? SocialContentService.CachedEmojiMap);
+            var pending = SocialChatMessageItem.CreatePending(text, file, _emojis ?? SocialContentService.CachedEmojiMap,
+                                                                 _account, IsRoom);
             Track(pending);
             pending.RetryRequested += Pending_RetryRequested;
             _items.Add(pending);
@@ -219,12 +222,12 @@ namespace Fort.ind_UWP
 
         private async Task SendPendingAsync(SocialChatMessageItem pending)
         {
-            var other = _otherId;
+            var key = _key;
             var firstFromMe = !_items.Any(item => item.IsMine && item.State == SocialChatSendState.Sent);
 
             var fileId = pending.PendingFile == null ? null : pending.PendingFile.Id;
-            var result = await SocialChatService.SendAsync(other, pending.PendingText, fileId, CancellationToken.None);
-            if (!string.Equals(other, _otherId, StringComparison.Ordinal) || !_items.Contains(pending)) return;
+            var result = await SocialChatService.SendAsync(key, pending.PendingText, fileId, CancellationToken.None);
+            if (!string.Equals(key, _key, StringComparison.Ordinal) || !_items.Contains(pending)) return;
 
             if (result.Status == SocialApiStatus.Ok)
             {
@@ -242,7 +245,7 @@ namespace Fort.ind_UWP
                 }
 
                 Relayout();
-                if (firstFromMe && _watch != null) _watch.Rejoin();
+                if (firstFromMe && !SocialChatKeys.IsRoom(key) && _watch != null) _watch.Rejoin();
                 AutomationHelper.AnnounceStatus(this, LocalizedStrings.Get("SocialChatSentAnnouncement"), "SocialChatSent");
                 return;
             }

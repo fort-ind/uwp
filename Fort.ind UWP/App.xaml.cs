@@ -277,11 +277,13 @@ namespace Fort.ind_UWP
 
         private sealed class ToastTarget
         {
-            public ToastTarget(string open, string noteId, string userId, string account, bool restore)
+            public ToastTarget(string open, string noteId, string userId, string roomId, bool invitations, string account, bool restore)
             {
                 Open = open;
                 NoteId = noteId;
                 UserId = userId;
+                RoomId = roomId;
+                Invitations = invitations;
                 Account = account;
                 Restore = restore;
             }
@@ -292,9 +294,22 @@ namespace Fort.ind_UWP
 
             public string UserId { get; private set; }
 
+            public string RoomId { get; private set; }
+
+            public bool Invitations { get; private set; }
+
+            public string ChatKey
+            {
+                get { return !string.IsNullOrEmpty(RoomId) ? SocialChatKeys.ForRoom(RoomId) : UserId; }
+            }
+
             public bool OpensChat
             {
-                get { return string.Equals(Open, AppConstants.ToastOpenChat, StringComparison.Ordinal) && !string.IsNullOrEmpty(UserId); }
+                get
+                {
+                    return string.Equals(Open, AppConstants.ToastOpenChat, StringComparison.Ordinal)
+                           && (!string.IsNullOrEmpty(ChatKey) || Invitations);
+                }
             }
 
             public string NavigationTag
@@ -330,14 +345,18 @@ namespace Fort.ind_UWP
 
                 string noteId;
                 string userId;
+                string roomId;
+                string invitations;
                 string account;
                 string restore;
                 parsed.TryGetValue(AppConstants.ToastArgumentNote, out noteId);
                 parsed.TryGetValue(AppConstants.ToastArgumentUser, out userId);
+                parsed.TryGetValue(AppConstants.ToastArgumentRoom, out roomId);
+                parsed.TryGetValue(AppConstants.ToastArgumentInvitations, out invitations);
                 parsed.TryGetValue(AppConstants.ToastArgumentAccount, out account);
                 parsed.TryGetValue(AppConstants.ToastArgumentRestore, out restore);
 
-                var target = new ToastTarget(open, noteId, userId, account, !string.IsNullOrEmpty(restore));
+                var target = new ToastTarget(open, noteId, userId, roomId, !string.IsNullOrEmpty(invitations), account, !string.IsNullOrEmpty(restore));
                 return target.OpensNotifications || target.OpensNote || target.OpensChat ? target : null;
             }
             catch (Exception ex)
@@ -357,13 +376,19 @@ namespace Fort.ind_UWP
                 {
                     if (!LabsService.ChatEnabled || !SocialContentService.IsCurrentAccount(target.Account)) return;
 
-                    if (target.Restore)
+                    if (target.Invitations)
                     {
-                        var typed = SocialToastActions.TakeFailedChatReply(target.Account, target.UserId);
-                        if (!string.IsNullOrEmpty(typed)) SocialChatService.SaveDraft(target.UserId, typed);
+                        mainPage.ShowChatInvitations();
+                        return;
                     }
 
-                    mainPage.ShowChat(target.UserId);
+                    if (target.Restore)
+                    {
+                        var typed = SocialToastActions.TakeFailedChatReply(target.Account, target.ChatKey);
+                        if (!string.IsNullOrEmpty(typed)) SocialChatService.SaveDraft(target.ChatKey, typed);
+                    }
+
+                    mainPage.ShowChat(target.ChatKey);
                     return;
                 }
 

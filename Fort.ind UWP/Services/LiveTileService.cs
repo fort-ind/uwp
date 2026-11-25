@@ -561,13 +561,15 @@ namespace Fort.ind_UWP
 
         private static void AddChatReply(ToastContentBuilder builder, ToastChatReply reply)
         {
-            if (reply == null || string.IsNullOrEmpty(reply.UserId) || string.IsNullOrEmpty(reply.Account)) return;
+            if (reply == null || string.IsNullOrEmpty(reply.Account)) return;
+            if (string.IsNullOrEmpty(reply.UserId) && string.IsNullOrEmpty(reply.RoomId)) return;
 
             builder.AddInputTextBox(AppConstants.ToastReplyInputId, SanitizeText(reply.Placeholder), null);
             builder.AddButton(new ToastButton()
                               .SetContent(SanitizeText(reply.SendText))
                               .AddArgument(AppConstants.ToastArgumentAction, AppConstants.ToastActionChatReply)
-                              .AddArgument(AppConstants.ToastArgumentUser, reply.UserId)
+                              .AddArgument(string.IsNullOrEmpty(reply.RoomId) ? AppConstants.ToastArgumentUser : AppConstants.ToastArgumentRoom,
+                                           string.IsNullOrEmpty(reply.RoomId) ? reply.UserId : reply.RoomId)
                               .AddArgument(AppConstants.ToastArgumentAccount, reply.Account)
                               .SetTextBoxId(AppConstants.ToastReplyInputId)
                               .SetImageUri(new Uri(AppConstants.SocialToastSendIcon))
@@ -700,6 +702,7 @@ namespace Fort.ind_UWP
     public sealed class ToastChatReply
     {
         public string UserId { get; set; }
+        public string RoomId { get; set; }
         public string Account { get; set; }
         public string Placeholder { get; set; }
         public string SendText { get; set; }

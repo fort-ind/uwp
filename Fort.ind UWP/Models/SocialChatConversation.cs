@@ -15,6 +15,8 @@ namespace Fort.ind_UWP
 
         private SocialUser _other;
 
+        private SocialChatRoom _room;
+
         private SocialChatMessage _last;
 
         private bool _isUnread;
@@ -28,7 +30,7 @@ namespace Fort.ind_UWP
         public SocialChatConversation(string account, string otherUserId, SocialUser other, SocialChatMessage last, bool isUnread)
         {
             _account = account;
-            OtherUserId = otherUserId;
+            Key = otherUserId;
             _other = other;
             _last = last;
             _isUnread = isUnread;
@@ -36,11 +38,37 @@ namespace Fort.ind_UWP
             RefreshTime();
         }
 
-        public string OtherUserId { get; private set; }
+        private SocialChatConversation(string account, SocialChatRoom room, SocialChatMessage last, bool isUnread)
+        {
+            _account = account;
+            Key = SocialChatKeys.ForRoom(room.Id);
+            _room = room;
+            _last = last;
+            _isUnread = isUnread;
+            NameSegments = MfmText.ParseName(DisplayName, null);
+            RefreshTime();
+        }
+
+        public static SocialChatConversation ForRoom(string account, SocialChatRoom room, SocialChatMessage last, bool isUnread)
+        {
+            return room == null ? null : new SocialChatConversation(account, room, last, isUnread);
+        }
+
+        public string Key { get; private set; }
+
+        public bool IsRoom
+        {
+            get { return SocialChatKeys.IsRoom(Key); }
+        }
 
         public SocialUser Other
         {
             get { return _other; }
+        }
+
+        public SocialChatRoom Room
+        {
+            get { return _room; }
         }
 
         public SocialChatMessage LastMessage
@@ -48,11 +76,25 @@ namespace Fort.ind_UWP
             get { return _last; }
         }
 
+        public DateTimeOffset SortTime
+        {
+            get { return _last != null ? _last.CreatedAt : _room != null ? _room.CreatedAt : DateTimeOffset.MinValue; }
+        }
+
+        public SocialChatArgs Args
+        {
+            get { return IsRoom ? SocialChatArgs.ForRoom(_account, _room.Id, _room) : new SocialChatArgs(_account, Key, _other); }
+        }
+
         public IReadOnlyList<MfmSegment> NameSegments { get; private set; }
 
         public string DisplayName
         {
-            get { return _other == null ? "" : SocialNoteItem.DisplayNameOf(_other); }
+            get
+            {
+                if (IsRoom) return _room == null ? "" : _room.DisplayName;
+                return _other == null ? "" : SocialNoteItem.DisplayNameOf(_other);
+            }
         }
 
         public string PlainName
@@ -60,18 +102,19 @@ namespace Fort.ind_UWP
             get { return MfmText.PlainName(DisplayName); }
         }
 
-        public string Handle
-        {
-            get { return _other == null ? "" : SocialLinks.FormatHandle(_other.Username, MisskeyAuthService.InstanceHost); }
-        }
-
         public string Preview
         {
             get
             {
+                if (_last == null) return IsRoom ? LocalizedStrings.Get("SocialChatRoomNoMessages") : "";
+
                 var body = SocialChatToasts.BodyFor(_last);
                 if (body.Length > AppConstants.SocialChatPreviewLength) body = body.Substring(0, AppConstants.SocialChatPreviewLength);
-                return _last != null && _last.IsFrom(_account) ? LocalizedStrings.Format("SocialChatPreviewMineFormat", body) : body;
+                if (_last.IsFrom(_account)) return LocalizedStrings.Format("SocialChatPreviewMineFormat", body);
+                if (!IsRoom) return body;
+
+                var sender = _last.FromUser == null ? null : MfmText.PlainName(SocialNoteItem.DisplayNameOf(_last.FromUser));
+                return string.IsNullOrWhiteSpace(sender) ? body : LocalizedStrings.Format("SocialChatRoomPreviewFormat", sender, body);
             }
         }
 
@@ -100,6 +143,21 @@ namespace Fort.ind_UWP
             get { return _isUnread ? Visibility.Visible : Visibility.Collapsed; }
         }
 
+        public Visibility AvatarVisibility
+        {
+            get { return IsRoom ? Visibility.Collapsed : Visibility.Visible; }
+        }
+
+        public Visibility RoomPlateVisibility
+        {
+            get { return IsRoom ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        public Visibility MutedVisibility
+        {
+            get { return _room != null && _room.IsMuted ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
         public FontWeight NameWeight
         {
             get { return _isUnread ? FontWeights.SemiBold : FontWeights.Normal; }
@@ -109,8 +167,9 @@ namespace Fort.ind_UWP
         {
             get
             {
-                return LocalizedStrings.Format(_isUnread ? "SocialChatRowUnreadAutomationFormat" : "SocialChatRowAutomationFormat",
-                                               MfmText.PlainName(DisplayName), Preview, TimeText ?? "");
+                var key = _isUnread ? "SocialChatRowUnreadAutomationFormat" : "SocialChatRowAutomationFormat";
+                var name = IsRoom ? LocalizedStrings.Format("SocialChatRoomAutomationNameFormat", PlainName) : PlainName;
+                return LocalizedStrings.Format(key, name, Preview, TimeText ?? "");
             }
         }
 
@@ -143,7 +202,7 @@ namespace Fort.ind_UWP
             if (_last != null && message.CreatedAt < _last.CreatedAt) return false;
 
             _last = message;
-            var user = message.OtherUser(_account);
+            var user = IsRoom ? null : message.OtherUser(_account);
             if (user != null && _other == null)
             {
                 _other = user;
@@ -163,21 +222,34 @@ namespace Fort.ind_UWP
 
         public void SetOther(SocialUser user)
         {
-            if (user == null || _other != null) return;
+            if (user == null || _other != null || IsRoom) return;
 
             _other = user;
             NameSegments = MfmText.ParseName(DisplayName, user.Emojis);
             OnPropertyChanged("NameSegments");
             OnPropertyChanged("DisplayName");
             OnPropertyChanged("PlainName");
-            OnPropertyChanged("Handle");
             OnPropertyChanged("Avatar");
+            OnPropertyChanged("AutomationName");
+        }
+
+        public void SetRoom(SocialChatRoom room)
+        {
+            if (room == null || !IsRoom) return;
+
+            _room = room;
+            NameSegments = MfmText.ParseName(DisplayName, null);
+            OnPropertyChanged("NameSegments");
+            OnPropertyChanged("DisplayName");
+            OnPropertyChanged("PlainName");
+            OnPropertyChanged("MutedVisibility");
             OnPropertyChanged("AutomationName");
         }
 
         public void RefreshTime()
         {
-            TimeText = _last == null ? "" : RelativeTime.Short(_last.CreatedAt, DateTimeOffset.Now);
+            var time = SortTime;
+            TimeText = time == DateTimeOffset.MinValue ? "" : RelativeTime.Short(time, DateTimeOffset.Now);
         }
     }
 }

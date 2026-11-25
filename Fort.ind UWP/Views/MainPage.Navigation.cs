@@ -758,6 +758,8 @@ namespace Fort.ind_UWP
 
                 if (SocialMediaLightbox.CloseCurrent()) return true;
 
+                if (SocialChatView.CloseOverlayInCurrentWindow()) return true;
+
                 if (ClosePaneUnlessExpanded()) return true;
 
                 if (!ContentFrame.CanGoBack) return false;

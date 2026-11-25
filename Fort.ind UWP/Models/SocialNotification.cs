@@ -269,6 +269,8 @@ namespace Fort.ind_UWP
 
         public string AppBody { get; private set; }
 
+        public string RoomName { get; private set; }
+
         public static SocialNotification FromJson(JObject obj)
         {
             if (obj == null) return null;
@@ -278,9 +280,11 @@ namespace Fort.ind_UWP
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(type)) return null;
 
             var role = SocialJson.Object(obj, "role");
+            var invitedRoom = SocialJson.Object(SocialJson.Object(obj, "invitation"), "room");
 
             return new SocialNotification
             {
+                RoomName = invitedRoom == null ? null : SocialJson.String(invitedRoom, "name"),
                 Id = id,
                 Type = type,
                 CreatedAt = SocialJson.Date(obj, "createdAt"),

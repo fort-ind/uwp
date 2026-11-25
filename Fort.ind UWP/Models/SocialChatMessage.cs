@@ -5,9 +5,28 @@ using Newtonsoft.Json.Linq;
 
 namespace Fort.ind_UWP
 {
+    public sealed class SocialChatReaction
+    {
+        public SocialChatReaction(string key, string userId)
+        {
+            Key = key;
+            UserId = userId;
+        }
+
+        public string Key { get; private set; }
+
+        public string UserId { get; private set; }
+
+        public bool Matches(string key, string userId)
+        {
+            if (!SocialReactions.AreSame(Key, key)) return false;
+            return userId == null || string.Equals(UserId, userId, StringComparison.Ordinal);
+        }
+    }
+
     public sealed class SocialChatMessage
     {
-        private static readonly IReadOnlyList<string> s_noReactions = new string[0];
+        private static readonly IReadOnlyList<SocialChatReaction> s_noReactions = new SocialChatReaction[0];
 
         private SocialChatMessage()
         {
@@ -27,13 +46,15 @@ namespace Fort.ind_UWP
 
         public SocialUser ToUser { get; private set; }
 
+        public SocialChatRoom ToRoom { get; private set; }
+
         public string Text { get; private set; }
 
         public SocialDriveFile File { get; private set; }
 
         public bool? IsRead { get; private set; }
 
-        public IReadOnlyList<string> ReactionKeys { get; private set; }
+        public IReadOnlyList<SocialChatReaction> ReactionEntries { get; private set; }
 
         public bool IsKnownUnread
         {
@@ -49,11 +70,11 @@ namespace Fort.ind_UWP
         {
             get
             {
-                if (ReactionKeys.Count == 0) return new SocialReactionCount[0];
+                if (ReactionEntries.Count == 0) return new SocialReactionCount[0];
 
-                return ReactionKeys.GroupBy(key => key, StringComparer.Ordinal)
-                                   .Select(group => new SocialReactionCount(group.Key, group.Count()))
-                                   .ToList();
+                return ReactionEntries.GroupBy(entry => SocialReactions.Normalize(entry.Key) ?? entry.Key, StringComparer.Ordinal)
+                                      .Select(group => new SocialReactionCount(group.First().Key, group.Count()))
+                                      .ToList();
             }
         }
 
@@ -72,27 +93,27 @@ namespace Fort.ind_UWP
             return !string.IsNullOrEmpty(userId) && string.Equals(FromUserId, userId, StringComparison.Ordinal);
         }
 
-        public bool HasReaction(string key)
+        public bool HasReaction(string key, string userId)
         {
-            return ReactionKeys.Any(existing => SocialReactions.AreSame(existing, key));
+            return ReactionEntries.Any(entry => entry.Matches(key, userId));
         }
 
-        public SocialChatMessage WithReaction(string key, bool added)
+        public SocialChatMessage WithReaction(string key, bool added, string userId)
         {
-            if (string.IsNullOrEmpty(key) || HasReaction(key) == added) return this;
+            if (string.IsNullOrEmpty(key) || HasReaction(key, userId) == added) return this;
 
-            var keys = new List<string>(ReactionKeys);
+            var entries = new List<SocialChatReaction>(ReactionEntries);
             if (added)
             {
-                keys.Add(key);
+                entries.Add(new SocialChatReaction(key, userId));
             }
             else
             {
-                keys.RemoveAll(existing => SocialReactions.AreSame(existing, key));
+                entries.RemoveAll(entry => entry.Matches(key, userId));
             }
 
             var copy = (SocialChatMessage)MemberwiseClone();
-            copy.ReactionKeys = keys;
+            copy.ReactionEntries = entries;
             return copy;
         }
 
@@ -121,10 +142,11 @@ namespace Fort.ind_UWP
                 ToRoomId = SocialJson.String(obj, "toRoomId"),
                 FromUser = SocialUser.FromJson(SocialJson.Object(obj, "fromUser")),
                 ToUser = SocialUser.FromJson(SocialJson.Object(obj, "toUser")),
+                ToRoom = SocialChatRoom.FromJson(SocialJson.Object(obj, "toRoom")),
                 Text = SocialJson.String(obj, "text"),
                 File = SocialDriveFile.FromJson(SocialJson.Object(obj, "file")),
                 IsRead = SocialJson.Bool(obj, "isRead"),
-                ReactionKeys = ReactionKeysFrom(SocialJson.Array(obj, "reactions"))
+                ReactionEntries = ReactionsFrom(SocialJson.Array(obj, "reactions"))
             };
         }
 
@@ -137,15 +159,20 @@ namespace Fort.ind_UWP
             return messages;
         }
 
-        private static IReadOnlyList<string> ReactionKeysFrom(JArray array)
+        private static IReadOnlyList<SocialChatReaction> ReactionsFrom(JArray array)
         {
             if (array == null || array.Count == 0) return s_noReactions;
 
-            var keys = array.OfType<JObject>()
-                            .Select(entry => SocialJson.String(entry, "reaction"))
-                            .Where(key => !string.IsNullOrEmpty(key))
-                            .ToList();
-            return keys.Count == 0 ? s_noReactions : keys;
+            var entries = array.OfType<JObject>()
+                               .Select(entry => new
+                               {
+                                   Key = SocialJson.String(entry, "reaction"),
+                                   User = SocialUser.FromJson(SocialJson.Object(entry, "user"))
+                               })
+                               .Where(entry => !string.IsNullOrEmpty(entry.Key))
+                               .Select(entry => new SocialChatReaction(entry.Key, entry.User == null ? null : entry.User.Id))
+                               .ToList();
+            return entries.Count == 0 ? s_noReactions : entries;
         }
     }
 }

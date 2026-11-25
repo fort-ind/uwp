@@ -10,7 +10,7 @@
     HorizontalAlignment="Stretch"
     PointerEntered="Bubble_PointerEntered"
     PointerExited="Bubble_PointerExited"
-    PointerCanceled="Bubble_PointerExited">
+    PointerCanceled="Bubble_PointerCanceled">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -31,7 +31,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="RootGrid" Padding="12,0,12,0">
+    <Grid x:Name="RootGrid" Padding="12,0,12,0" Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -105,6 +105,14 @@
                         MaxWidth="520"
                         Margin="0,0,48,0"
                         HorizontalAlignment="Left">
+                <TextBlock x:Name="SenderName"
+                           Margin="0,0,0,2"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           TextTrimming="CharacterEllipsis"
+                           MaxLines="1"
+                           Visibility="Collapsed"
+                           AutomationProperties.AccessibilityView="Raw"/>
                 <Grid x:Name="BubbleLine" HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

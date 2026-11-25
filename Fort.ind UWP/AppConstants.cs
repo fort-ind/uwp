@@ -247,6 +247,11 @@ namespace Fort.ind_UWP
         public const int SocialChatCaptureLingerSeconds = 30;
         public const int SocialChatPreviewLength = 120;
         public const string WindowKeyChatPrefix = "chat:";
+        public const int SocialChatRoomMemberLimit = 30;
+        public const int SocialChatRoomNameMaxLength = 256;
+        public const int SocialChatRoomDescriptionMaxLength = 1024;
+        public const string ToastArgumentRoom = "room";
+        public const string ToastArgumentInvitations = "invitations";
         public const double SocialChatWindowWidth = 440;
         public const double SocialChatWindowHeight = 680;
 

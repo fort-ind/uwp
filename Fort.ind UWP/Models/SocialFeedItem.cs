@@ -74,6 +74,8 @@ namespace Fort.ind_UWP
 
         public bool OpensActor { get; private set; }
 
+        public bool OpensChatInvitations { get; private set; }
+
         public bool IsFollowRequest { get; private set; }
 
         public SocialFollowRequestState RequestState
@@ -222,6 +224,7 @@ namespace Fort.ind_UWP
                 ThreadNote = ThreadNoteFor(notification),
                 OpensActor = notification.Type == "follow" || notification.Type == "followRequestAccepted"
                              || notification.Type == "receiveFollowRequest",
+                OpensChatInvitations = notification.Type == "chatRoomInvitationReceived",
                 IsFollowRequest = notification.Type == "receiveFollowRequest" && user != null && !string.IsNullOrEmpty(user.Id),
                 _isUnread = isUnread
             };
@@ -330,6 +333,9 @@ namespace Fort.ind_UWP
                 case "scheduledNotePosted": return LocalizedStrings.Get("SocialNotificationScheduledNotePosted");
                 case "scheduledNoteFailed": return LocalizedStrings.Get("SocialNotificationScheduledNoteFailed");
                 case "chatRoomInvitationReceived":
+                    return string.IsNullOrWhiteSpace(notification.RoomName)
+                           ? LocalizedStrings.Format("SocialNotificationChatRoomInviteFormat", name)
+                           : LocalizedStrings.Format("SocialNotificationChatRoomInviteNamedFormat", name, Collapse(notification.RoomName));
                 case "groupInvited": return LocalizedStrings.Get("SocialNotificationChatInvite");
                 case "test": return LocalizedStrings.Get("SocialNotificationTest");
                 case "app":

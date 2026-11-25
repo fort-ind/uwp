@@ -5345,4 +5345,262 @@ Open your profile and try again.</value>
   <data name="SocialChatAttachmentReadyFormat" xml:space="preserve">
     <value>{0} is ready to send</value>
   </data>
+  <data name="SocialChatErrorNoSuchRoom" xml:space="preserve">
+    <value>This room no longer exists.</value>
+  </data>
+  <data name="SocialChatDeleteRoomMessageConfirmBody" xml:space="preserve">
+    <value>It will be removed for everyone in the room. This can’t be undone.</value>
+  </data>
+  <data name="SocialChatRoomUnnamed" xml:space="preserve">
+    <value>Unnamed room</value>
+  </data>
+  <data name="SocialChatRoomPreviewFormat" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="SocialChatRoomNoMessages" xml:space="preserve">
+    <value>No messages yet</value>
+  </data>
+  <data name="SocialChatRoomAutomationNameFormat" xml:space="preserve">
+    <value>Room {0}</value>
+  </data>
+  <data name="SocialChatAddReactionFormat" xml:space="preserve">
+    <value>Add {0}</value>
+  </data>
+  <data name="SocialNotificationChatRoomInviteFormat" xml:space="preserve">
+    <value>{0} invited you to a chat room</value>
+  </data>
+  <data name="SocialNotificationChatRoomInviteNamedFormat" xml:space="preserve">
+    <value>{0} invited you to {1}</value>
+  </data>
+  <data name="SocialChatRoomCreateFailedTitle" xml:space="preserve">
+    <value>Couldn’t create the room</value>
+  </data>
+  <data name="SocialChatRoomCreatedFormat" xml:space="preserve">
+    <value>Created {0}</value>
+  </data>
+  <data name="SocialChatRoomUpdateFailedTitle" xml:space="preserve">
+    <value>Couldn’t save the room</value>
+  </data>
+  <data name="SocialChatRoomSavedAnnouncement" xml:space="preserve">
+    <value>Room saved</value>
+  </data>
+  <data name="SocialChatInviteFailedTitle" xml:space="preserve">
+    <value>Couldn’t send the invitation</value>
+  </data>
+  <data name="SocialChatInviteSomeFailedFormat" xml:space="preserve">
+    <value>The room was created, but these people couldn’t be invited: {0}. You can invite them from Room info.</value>
+  </data>
+  <data name="SocialChatInvitedFormat" xml:space="preserve">
+    <value>Invited {0}</value>
+  </data>
+  <data name="SocialChatInviteRefusedFormat" xml:space="preserve">
+    <value>{0} couldn’t be invited. They may already be invited, may not accept chats, or the room may already have {1} members.</value>
+  </data>
+  <data name="SocialChatRoomMuteFailedTitle" xml:space="preserve">
+    <value>Couldn’t change the room’s notifications</value>
+  </data>
+  <data name="SocialChatRoomMutedAnnouncement" xml:space="preserve">
+    <value>Room muted</value>
+  </data>
+  <data name="SocialChatRoomUnmutedAnnouncement" xml:space="preserve">
+    <value>Room unmuted</value>
+  </data>
+  <data name="SocialChatRoomLeaveConfirmTitleFormat" xml:space="preserve">
+    <value>Leave {0}?</value>
+  </data>
+  <data name="SocialChatRoomLeaveConfirmBody" xml:space="preserve">
+    <value>You’ll stop getting its messages. To come back, the owner has to invite you again.</value>
+  </data>
+  <data name="SocialChatRoomLeaveConfirmButton" xml:space="preserve">
+    <value>Leave</value>
+  </data>
+  <data name="SocialChatRoomLeaveFailedTitle" xml:space="preserve">
+    <value>Couldn’t leave the room</value>
+  </data>
+  <data name="SocialChatRoomLeftAnnouncement" xml:space="preserve">
+    <value>You left the room</value>
+  </data>
+  <data name="SocialChatRoomDeleteConfirmTitleFormat" xml:space="preserve">
+    <value>Delete {0}?</value>
+  </data>
+  <data name="SocialChatRoomDeleteConfirmBody" xml:space="preserve">
+    <value>The room and all of its messages will be deleted for everyone. This can’t be undone.</value>
+  </data>
+  <data name="SocialChatRoomDeleteConfirmButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SocialChatRoomDeleteFailedTitle" xml:space="preserve">
+    <value>Couldn’t delete the room</value>
+  </data>
+  <data name="SocialChatRoomDeletedAnnouncement" xml:space="preserve">
+    <value>Room deleted</value>
+  </data>
+  <data name="SocialChatJoinFailedTitle" xml:space="preserve">
+    <value>Couldn’t join the room</value>
+  </data>
+  <data name="SocialChatJoinedFormat" xml:space="preserve">
+    <value>Joined {0}</value>
+  </data>
+  <data name="SocialChatIgnoreFailedTitle" xml:space="preserve">
+    <value>Couldn’t ignore the invitation</value>
+  </data>
+  <data name="SocialChatIgnoredAnnouncement" xml:space="preserve">
+    <value>Invitation ignored</value>
+  </data>
+  <data name="SocialChatRoomOwnerAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}, owner</value>
+  </data>
+  <data name="SocialChatRoomMemberAutomationFormat" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
+  <data name="SocialChatRoomOwnerTag.Text" xml:space="preserve">
+    <value>Owner</value>
+  </data>
+  <data name="SocialChatRoomInfoHeader.Text" xml:space="preserve">
+    <value>Room info</value>
+  </data>
+  <data name="SocialChatRoomInfoCloseButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Close room info</value>
+  </data>
+  <data name="SocialChatRoomInfoCloseButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Close room info</value>
+  </data>
+  <data name="SocialChatRoomEditButton.Content" xml:space="preserve">
+    <value>Edit name and description</value>
+  </data>
+  <data name="SocialChatRoomNameBox.Header" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="SocialChatRoomDescriptionBox.Header" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="SocialChatRoomSaveButton.Content" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SocialChatRoomCancelEditButton.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="SocialChatRoomMuteToggle.Header" xml:space="preserve">
+    <value>Mute this room</value>
+  </data>
+  <data name="SocialChatRoomInviteSearch.PlaceholderText" xml:space="preserve">
+    <value>Invite someone</value>
+  </data>
+  <data name="SocialChatRoomInviteSearch.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Invite someone to the room</value>
+  </data>
+  <data name="SocialChatRoomMemberList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>People in this room</value>
+  </data>
+  <data name="SocialChatRoomMembersLoading.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading the people in this room</value>
+  </data>
+  <data name="SocialChatRoomLeaveButton.Content" xml:space="preserve">
+    <value>Leave room</value>
+  </data>
+  <data name="SocialChatRoomDeleteButton.Content" xml:space="preserve">
+    <value>Delete room</value>
+  </data>
+  <data name="SocialChatRoomOwnedByYou" xml:space="preserve">
+    <value>You created this room</value>
+  </data>
+  <data name="SocialChatRoomOwnedByFormat" xml:space="preserve">
+    <value>Created by {0}</value>
+  </data>
+  <data name="SocialChatRoomMembersHeading" xml:space="preserve">
+    <value>People</value>
+  </data>
+  <data name="SocialChatRoomMembersHeadingFormat" xml:space="preserve">
+    <value>People ({0})</value>
+  </data>
+  <data name="SocialChatRoomFullFormat" xml:space="preserve">
+    <value>This room is full :(</value>
+  </data>
+  <data name="SocialChatRoomMembersFailed" xml:space="preserve">
+    <value>Couldn’t load the people in this room.</value>
+  </data>
+  <data name="SocialChatRoomInfoButton.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Room info</value>
+  </data>
+  <data name="SocialChatRoomInfoButton.[using:Windows.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Room info</value>
+  </data>
+  <data name="SocialChatRoomPeopleOne" xml:space="preserve">
+    <value>1 person</value>
+  </data>
+  <data name="SocialChatRoomPeopleFormat" xml:space="preserve">
+    <value>{0} people</value>
+  </data>
+  <data name="SocialChatRoomInfoForFormat" xml:space="preserve">
+    <value>Room info for {0}</value>
+  </data>
+  <data name="SocialChatRoomGone" xml:space="preserve">
+    <value>This room no longer exists, or you’re no longer in it.</value>
+  </data>
+  <data name="SocialChatRoomEmpty" xml:space="preserve">
+    <value>No messages in this room yet. Say hello.</value>
+  </data>
+  <data name="SocialChatOlderUnavailable.Text" xml:space="preserve">
+    <value>Older messages couldn't be loaded because of an error on fort.social.</value>
+  </data>
+  <data name="SocialChatMessagesUnavailable" xml:space="preserve">
+    <value>The messages here couldn't be loaded because of an error on fort.social. New messages will still show up.</value>
+  </data>
+  <data name="SocialChatNewRoomLink.Content" xml:space="preserve">
+    <value>New room…</value>
+  </data>
+  <data name="SocialChatTabs.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Conversations</value>
+  </data>
+  <data name="SocialChatPeopleTab" xml:space="preserve">
+    <value>People</value>
+  </data>
+  <data name="SocialChatRoomsTab" xml:space="preserve">
+    <value>Rooms</value>
+  </data>
+  <data name="SocialChatTabCountFormat" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="SocialChatTabUnreadAutomationFormat" xml:space="preserve">
+    <value>{0}, {1} unread</value>
+  </data>
+  <data name="SocialChatInvitationsFormat" xml:space="preserve">
+    <value>Invitations ({0})</value>
+  </data>
+  <data name="SocialChatInvitationsAutomationFormat" xml:space="preserve">
+    <value>Room invitations, {0} waiting</value>
+  </data>
+  <data name="SocialChatInvitationsHeader.Text" xml:space="preserve">
+    <value>Room invitations</value>
+  </data>
+  <data name="SocialChatInvitationList.[using:Windows.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Room invitations</value>
+  </data>
+  <data name="SocialChatInvitationJoinButton.Content" xml:space="preserve">
+    <value>Join</value>
+  </data>
+  <data name="SocialChatInvitationIgnoreButton.Content" xml:space="preserve">
+    <value>Ignore</value>
+  </data>
+  <data name="SocialChatInvitationFromFormat" xml:space="preserve">
+    <value>From {0}</value>
+  </data>
+  <data name="SocialChatNoRooms" xml:space="preserve">
+    <value>No rooms yet. Start one with New chat ▸ New room, or join one you’re invited to.</value>
+  </data>
+  <data name="SocialChatNewRoomTitle" xml:space="preserve">
+    <value>New room</value>
+  </data>
+  <data name="SocialChatNewRoomNameHeader" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="SocialChatNewRoomDescriptionHeader" xml:space="preserve">
+    <value>Description (optional)</value>
+  </data>
+  <data name="SocialChatNewRoomInviteHeader" xml:space="preserve">
+    <value>Invite people (optional)</value>
+  </data>
+  <data name="SocialChatNewRoomCreate" xml:space="preserve">
+    <value>Create</value>
+  </data>
 </root>

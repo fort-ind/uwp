@@ -223,6 +223,8 @@ namespace Fort.ind_UWP
 
         private const string RateLimitClearHeader = "X-RateLimit-Clear";
 
+        private const int ServerDetailMaxLength = 300;
+
         private static readonly TimeSpan DefaultHoldOff = TimeSpan.FromSeconds(5);
 
         private static readonly TimeSpan MinimumHoldOff = TimeSpan.FromSeconds(1);
@@ -979,14 +981,160 @@ namespace Fort.ind_UWP
             return SocialApiResult<IReadOnlyList<SocialScheduledNote>>.Succeeded(notes);
         }
 
-        public static async Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> GetChatHistoryAsync(string token, int limit,
+        public static Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> GetChatHistoryAsync(string token, int limit,
+                                                                                               CancellationToken cancellationToken)
+        {
+            return GetChatHistoryAsync(token, limit, false, cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> GetChatHistoryAsync(string token, int limit, bool rooms,
                                                                                                      CancellationToken cancellationToken)
         {
             JObject body = new JObject();
             body.Add("limit", new JValue(limit));
-            body.Add("room", new JValue(false));
+            body.Add("room", new JValue(rooms));
 
             return await ChatMessagesFromAsync(await PostAsync("chat/history", token, body, cancellationToken), cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> GetChatRoomTimelineAsync(
+            string token, string roomId, string sinceId, string untilId, int limit, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("roomId", new JValue(roomId ?? ""));
+            body.Add("limit", new JValue(limit));
+            if (!string.IsNullOrEmpty(sinceId)) body.Add("sinceId", new JValue(sinceId));
+            if (!string.IsNullOrEmpty(untilId)) body.Add("untilId", new JValue(untilId));
+
+            return await ChatMessagesFromAsync(await PostAsync("chat/messages/room-timeline", token, body, cancellationToken), cancellationToken);
+        }
+
+        public static async Task<SocialApiResult<SocialChatMessage>> SendChatRoomMessageAsync(string token, string roomId, string text, string fileId,
+                                                                                             CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("toRoomId", new JValue(roomId ?? ""));
+            if (!string.IsNullOrEmpty(text)) body.Add("text", new JValue(text));
+            if (!string.IsNullOrEmpty(fileId)) body.Add("fileId", new JValue(fileId));
+
+            var response = await PostAsync("chat/messages/create-to-room", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok)
+            {
+                return SocialApiResult<SocialChatMessage>.Failed(response.Status, response.ErrorCode);
+            }
+
+            var message = response.Value.Type == JTokenType.Object ? SocialChatMessage.FromJson((JObject)response.Value) : null;
+            return message == null
+                   ? SocialApiResult<SocialChatMessage>.Failed(SocialApiStatus.Failed)
+                   : SocialApiResult<SocialChatMessage>.Succeeded(message);
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialChatRoom>>> GetOwnedChatRoomsAsync(string token, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("limit", new JValue(100));
+
+            var response = await PostAsync("chat/rooms/owned", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok) return SocialApiResult<IReadOnlyList<SocialChatRoom>>.Failed(response.Status, response.ErrorCode);
+            if (response.Value.Type != JTokenType.Array) return SocialApiResult<IReadOnlyList<SocialChatRoom>>.Failed(SocialApiStatus.Failed);
+
+            return SocialApiResult<IReadOnlyList<SocialChatRoom>>.Succeeded(SocialChatRoom.ListFromJson((JArray)response.Value));
+        }
+
+        public static Task<SocialApiResult<IReadOnlyList<SocialChatMembership>>> GetJoinedChatRoomsAsync(string token, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("limit", new JValue(100));
+            return MembershipsFromAsync("chat/rooms/joining", token, body, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<IReadOnlyList<SocialChatMembership>>> GetChatRoomMembersAsync(string token, string roomId, string untilId,
+                                                                                                      CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("roomId", new JValue(roomId ?? ""));
+            body.Add("limit", new JValue(100));
+            if (!string.IsNullOrEmpty(untilId)) body.Add("untilId", new JValue(untilId));
+            return MembershipsFromAsync("chat/rooms/members", token, body, cancellationToken);
+        }
+
+        private static async Task<SocialApiResult<IReadOnlyList<SocialChatMembership>>> MembershipsFromAsync(string endpoint, string token, JObject body,
+                                                                                                           CancellationToken cancellationToken)
+        {
+            var response = await PostAsync(endpoint, token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok) return SocialApiResult<IReadOnlyList<SocialChatMembership>>.Failed(response.Status, response.ErrorCode);
+            if (response.Value.Type != JTokenType.Array) return SocialApiResult<IReadOnlyList<SocialChatMembership>>.Failed(SocialApiStatus.Failed);
+
+            return SocialApiResult<IReadOnlyList<SocialChatMembership>>.Succeeded(SocialChatMembership.ListFromJson((JArray)response.Value));
+        }
+
+        public static async Task<SocialApiResult<IReadOnlyList<SocialChatInvitation>>> GetChatInvitationsAsync(string token, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("limit", new JValue(100));
+
+            var response = await PostAsync("chat/rooms/invitations/inbox", token, body, cancellationToken);
+            if (response.Status != SocialApiStatus.Ok) return SocialApiResult<IReadOnlyList<SocialChatInvitation>>.Failed(response.Status, response.ErrorCode);
+            if (response.Value.Type != JTokenType.Array) return SocialApiResult<IReadOnlyList<SocialChatInvitation>>.Failed(SocialApiStatus.Failed);
+
+            return SocialApiResult<IReadOnlyList<SocialChatInvitation>>.Succeeded(SocialChatInvitation.ListFromJson((JArray)response.Value));
+        }
+
+        public static async Task<SocialApiResult<SocialChatRoom>> GetChatRoomAsync(string token, string roomId, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("roomId", new JValue(roomId ?? ""));
+            return RoomFrom(await PostAsync("chat/rooms/show", token, body, cancellationToken));
+        }
+
+        public static async Task<SocialApiResult<SocialChatRoom>> CreateChatRoomAsync(string token, string name, string description,
+                                                                                     CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("name", new JValue(name ?? ""));
+            if (!string.IsNullOrWhiteSpace(description)) body.Add("description", new JValue(description));
+            return RoomFrom(await PostAsync("chat/rooms/create", token, body, cancellationToken));
+        }
+
+        public static async Task<SocialApiResult<SocialChatRoom>> UpdateChatRoomAsync(string token, string roomId, string name, string description,
+                                                                                     CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("roomId", new JValue(roomId ?? ""));
+            body.Add("name", new JValue(name ?? ""));
+            body.Add("description", new JValue(description ?? ""));
+            return RoomFrom(await PostAsync("chat/rooms/update", token, body, cancellationToken));
+        }
+
+        private static SocialApiResult<SocialChatRoom> RoomFrom(SocialApiResult<JToken> response)
+        {
+            if (response.Status != SocialApiStatus.Ok) return SocialApiResult<SocialChatRoom>.Failed(response.Status, response.ErrorCode);
+
+            var room = response.Value.Type == JTokenType.Object ? SocialChatRoom.FromJson((JObject)response.Value) : null;
+            return room == null ? SocialApiResult<SocialChatRoom>.Failed(SocialApiStatus.Failed) : SocialApiResult<SocialChatRoom>.Succeeded(room);
+        }
+
+        public static Task<SocialApiResult<bool>> ChatRoomActionAsync(string endpoint, string token, string roomId, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("roomId", new JValue(roomId ?? ""));
+            return ActionAsync(endpoint, token, body, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> MuteChatRoomAsync(string token, string roomId, bool mute, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("roomId", new JValue(roomId ?? ""));
+            body.Add("mute", new JValue(mute));
+            return ActionAsync("chat/rooms/mute", token, body, cancellationToken);
+        }
+
+        public static Task<SocialApiResult<bool>> InviteToChatRoomAsync(string token, string roomId, string userId, CancellationToken cancellationToken)
+        {
+            JObject body = new JObject();
+            body.Add("roomId", new JValue(roomId ?? ""));
+            body.Add("userId", new JValue(userId ?? ""));
+            return ActionAsync("chat/rooms/invitations/create", token, body, cancellationToken);
         }
 
         public static async Task<SocialApiResult<IReadOnlyList<SocialChatMessage>>> GetChatTimelineAsync(
@@ -1524,11 +1672,14 @@ namespace Fort.ind_UWP
 
                         if (!response.IsSuccessStatusCode)
                         {
-                            var errorCode = ReadErrorCode(text);
+                            string serverDetail;
+                            var errorCode = ReadErrorCode(text, out serverDetail);
                             var status = ClassifyFailure((int)response.StatusCode, errorCode);
                             if (status == SocialApiStatus.RateLimited) HoldOff(endpoint, RetryDelay(response));
 
-                            AppLog.Warning($"SocialApiService: {endpoint} answered {(int)response.StatusCode} {errorCode} ({status})");
+                            AppLog.Warning(serverDetail == null
+                                           ? $"SocialApiService: {endpoint} answered {(int)response.StatusCode} {errorCode} ({status})"
+                                           : $"SocialApiService: {endpoint} answered {(int)response.StatusCode} {errorCode} ({status}): {serverDetail}");
                             return SocialApiResult<JToken>.Failed(status, errorCode);
                         }
 
@@ -1621,12 +1772,22 @@ namespace Fort.ind_UWP
             return delay.Value > MaximumHoldOff ? MaximumHoldOff : delay.Value;
         }
 
-        private static string ReadErrorCode(string body)
+        private static string ReadErrorCode(string body, out string serverDetail)
         {
+            serverDetail = null;
             JObject parsed;
             if (string.IsNullOrEmpty(body) || !JsonText.TryParseObject(body, out parsed)) return null;
 
-            return SocialJson.String(SocialJson.Object(parsed, "error"), "code");
+            var error = SocialJson.Object(parsed, "error");
+            var inner = SocialJson.Object(SocialJson.Object(error, "info"), "e");
+            var message = SocialJson.String(inner, "message");
+            if (!string.IsNullOrEmpty(message))
+            {
+                if (message.Length > ServerDetailMaxLength) message = message.Substring(0, ServerDetailMaxLength);
+                serverDetail = $"{SocialJson.String(inner, "code")} \"{message}\" (error id {SocialJson.String(inner, "id")})";
+            }
+
+            return SocialJson.String(error, "code");
         }
 
         private static SocialApiStatus ClassifyFailure(int statusCode, string errorCode)

@@ -31,7 +31,18 @@
                                    VerticalAlignment="Center"
                                    DisplayName="{x:Bind PlainName, Mode=OneWay}"
                                    ProfilePicture="{x:Bind Avatar, Mode=OneWay}"
+                                   Visibility="{x:Bind AvatarVisibility}"
                                    AutomationProperties.AccessibilityView="Raw"/>
+                    <Grid Width="40" Height="40"
+                          VerticalAlignment="Center"
+                          Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                          Visibility="{x:Bind RoomPlateVisibility}"
+                          AutomationProperties.AccessibilityView="Raw">
+                        <FontIcon Glyph="&#xE716;"
+                                  FontSize="20"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  IsTextScaleFactorEnabled="False"/>
+                    </Grid>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="{x:Bind PlainName, Mode=OneWay}"
@@ -50,11 +61,19 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                        <TextBlock Text="{x:Bind TimeText, Mode=OneWay}"
-                                   Style="{StaticResource CaptionTextBlockStyle}"
-                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                                   HorizontalAlignment="Right"
-                                   AutomationProperties.AccessibilityView="Raw"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <FontIcon Glyph="&#xE7ED;"
+                                      Margin="0,0,6,0"
+                                      FontSize="12"
+                                      Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                      Visibility="{x:Bind MutedVisibility, Mode=OneWay}"
+                                      IsTextScaleFactorEnabled="False"
+                                      AutomationProperties.AccessibilityView="Raw"/>
+                            <TextBlock Text="{x:Bind TimeText, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                                       AutomationProperties.AccessibilityView="Raw"/>
+                        </StackPanel>
                         <Ellipse Width="8" Height="8"
                                  Margin="0,6,0,0"
                                  HorizontalAlignment="Right"
@@ -76,6 +95,38 @@
                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                            TextTrimming="CharacterEllipsis"/>
             </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SocialChatInvitationTemplate" x:DataType="local:SocialChatInvitation">
+            <Grid Padding="0,8,0,8" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind Title}"
+                               Style="{StaticResource BaseTextBlockStyle}"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{x:Bind FromText}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+                <Button x:Uid="SocialChatInvitationJoinButton"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Tag="{x:Bind}"
+                        Click="JoinButton_Click"/>
+                <Button x:Uid="SocialChatInvitationIgnoreButton"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Tag="{x:Bind}"
+                        Click="IgnoreButton_Click"/>
+            </Grid>
         </DataTemplate>
 
         <Style x:Key="SocialChatRowContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
@@ -181,6 +232,8 @@
             <Grid x:Name="ListPane">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -215,14 +268,67 @@
                                                TextWrapping="Wrap"
                                                Visibility="Collapsed"
                                                AutomationProperties.LiveSetting="Polite"/>
+                                    <Rectangle Height="1"
+                                               Margin="0,4,0,0"
+                                               Fill="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                                               AutomationProperties.AccessibilityView="Raw"/>
+                                    <HyperlinkButton x:Uid="SocialChatNewRoomLink" x:Name="NewRoomLink"
+                                                     Click="NewRoomLink_Click"/>
                                 </StackPanel>
                             </Flyout>
                         </Button.Flyout>
                     </Button>
                 </Grid>
 
+                <local:SocialTabStrip x:Uid="SocialChatTabs"
+                                      x:Name="ChatTabs"
+                                      Grid.Row="1"
+                                      Margin="0,0,0,4"
+                                      BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+                                      BorderThickness="0,0,0,1">
+                    <local:SocialTabButton x:Name="PeopleTab"
+                                           GroupName="SocialChatTabs"
+                                           Style="{StaticResource SocialTabButtonStyle}"
+                                           Checked="ChatTab_Checked">
+                        <TextBlock x:Name="PeopleTabText" Style="{StaticResource BaseTextBlockStyle}"/>
+                    </local:SocialTabButton>
+                    <local:SocialTabButton x:Name="RoomsTab"
+                                           GroupName="SocialChatTabs"
+                                           Style="{StaticResource SocialTabButtonStyle}"
+                                           Checked="ChatTab_Checked">
+                        <TextBlock x:Name="RoomsTabText" Style="{StaticResource BaseTextBlockStyle}"/>
+                    </local:SocialTabButton>
+                </local:SocialTabStrip>
+
+                <Button x:Name="InvitationsButton"
+                        Grid.Row="2"
+                        Margin="12,4,12,4"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE8F2;" FontSize="16" IsTextScaleFactorEnabled="False"/>
+                        <TextBlock x:Name="InvitationsText" Style="{StaticResource BodyTextBlockStyle}"/>
+                    </StackPanel>
+                    <Button.Flyout>
+                        <Flyout x:Name="InvitationsFlyout" Placement="Bottom">
+                            <StackPanel Width="320">
+                                <TextBlock x:Uid="SocialChatInvitationsHeader"
+                                           Margin="0,0,0,4"
+                                           Style="{StaticResource BaseTextBlockStyle}"/>
+                                <ListView x:Uid="SocialChatInvitationList" x:Name="InvitationList"
+                                          SelectionMode="None"
+                                          IsItemClickEnabled="False"
+                                          MaxHeight="360"
+                                          ItemTemplate="{StaticResource SocialChatInvitationTemplate}"
+                                          ItemContainerStyle="{StaticResource SocialChatRowContainerStyle}"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+
                 <ListView x:Uid="SocialChatConversationList" x:Name="ConversationList"
-                          Grid.Row="1"
+                          Grid.Row="3"
                           SelectionMode="Single"
                           IsItemClickEnabled="True"
                           ItemTemplate="{StaticResource SocialChatConversationTemplate}"
@@ -231,13 +337,13 @@
                           ContextRequested="ConversationList_ContextRequested"/>
 
                 <local:SocialLoadingIndicator x:Uid="SocialChatListLoading" x:Name="ListLoading"
-                                              Grid.Row="1"
+                                              Grid.Row="3"
                                               HorizontalAlignment="Center" VerticalAlignment="Center"
                                               IsActive="False"
                                               Visibility="Collapsed"/>
 
                 <StackPanel x:Name="ListStatePanel"
-                            Grid.Row="1"
+                            Grid.Row="3"
                             Margin="12"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"

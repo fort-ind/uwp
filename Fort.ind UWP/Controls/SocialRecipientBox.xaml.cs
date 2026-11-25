@@ -52,6 +52,16 @@ namespace Fort.ind_UWP
 
         public event EventHandler Changed;
 
+        public bool LocalOnly { get; set; }
+
+        public int Limit { get; set; } = int.MaxValue;
+
+        public string HeaderText
+        {
+            get { return HeaderLabel.Text; }
+            set { HeaderLabel.Text = value ?? ""; }
+        }
+
         public IReadOnlyList<SocialUser> Recipients
         {
             get { return _recipients.ToArray(); }
@@ -74,6 +84,8 @@ namespace Fort.ind_UWP
         {
             if (user == null || string.IsNullOrEmpty(user.Id) || Contains(user)) return false;
             if (string.Equals(user.Id, SocialContentService.CurrentAccountId(), StringComparison.Ordinal)) return false;
+            if (LocalOnly && !string.IsNullOrWhiteSpace(user.Host)) return false;
+            if (_recipients.Count >= Limit) return false;
 
             _recipients.Add(user);
             RenderChips();
@@ -159,15 +171,16 @@ namespace Fort.ind_UWP
                 if (at > 0)
                 {
                     username = query.Substring(0, at);
-                    host = query.Substring(at + 1);
+                    host = LocalOnly ? null : query.Substring(at + 1);
                 }
 
                 var token = await MisskeyAuthService.TryGetTokenAsync();
-                var result = await SocialApiService.SearchUsersAsync(token, username, host, SuggestionLimit, cancellationToken);
+                var result = await SocialApiService.SearchUsersAsync(token, username, host, SuggestionLimit, CancellationToken.None);
                 if (cancellationToken.IsCancellationRequested || result.Status != SocialApiStatus.Ok) return;
 
                 var me = SocialContentService.CurrentAccountId();
-                SearchBox.ItemsSource = result.Value.Where(user => user.Id != me && !Contains(user))
+                SearchBox.ItemsSource = result.Value.Where(user => user.Id != me && !Contains(user)
+                                                                   && (!LocalOnly || string.IsNullOrWhiteSpace(user.Host)))
                                                     .Select(user => new SocialRecipientSuggestion(user))
                                                     .ToList();
             }

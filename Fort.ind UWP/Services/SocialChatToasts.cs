@@ -14,9 +14,9 @@ namespace Fort.ind_UWP
 
         private static readonly object s_lock = new object();
 
-        public static string GroupFor(string otherUserId)
+        public static string GroupFor(string key)
         {
-            return Truncate(AppConstants.SocialChatToastGroupPrefix + (otherUserId ?? ""));
+            return Truncate(AppConstants.SocialChatToastGroupPrefix + (key ?? ""));
         }
 
         private static bool Wants(string account)
@@ -56,24 +56,26 @@ namespace Fort.ind_UWP
 
             if (!hasUnread) return;
 
-            var history = await SocialApiService.GetChatHistoryAsync(token, AppConstants.SocialChatBackgroundHistoryLimit, cancellationToken);
-            if (!SocialNotificationService.IsActiveAccount(account)) return;
-
-            if (history.Status == SocialApiStatus.PermissionDenied)
+            var waiting = new List<SocialChatMessage>();
+            foreach (var rooms in new[] { false, true })
             {
-                SocialPermissions.Forget(SocialPermissions.ReadChat);
-                return;
+                var history = await SocialApiService.GetChatHistoryAsync(token, AppConstants.SocialChatBackgroundHistoryLimit, rooms, cancellationToken);
+                if (!SocialNotificationService.IsActiveAccount(account)) return;
+
+                if (history.Status == SocialApiStatus.PermissionDenied)
+                {
+                    SocialPermissions.Forget(SocialPermissions.ReadChat);
+                    return;
+                }
+
+                if (history.Status != SocialApiStatus.Ok) continue;
+
+                waiting.AddRange(history.Value.Where(message => message.IsRoomMessage == rooms
+                                                                && message.IsKnownUnread
+                                                                && !message.IsFrom(account)));
             }
 
-            if (history.Status != SocialApiStatus.Ok) return;
-
-            var waiting = history.Value.Where(message => !message.IsRoomMessage
-                                                         && message.IsKnownUnread
-                                                         && !message.IsFrom(account))
-                                       .OrderBy(message => message.CreatedAt)
-                                       .ToList();
-
-            foreach (var message in waiting)
+            foreach (var message in waiting.OrderBy(message => message.CreatedAt).ToList())
             {
                 if (!SocialNotificationService.IsActiveAccount(account)) return;
 
@@ -86,21 +88,27 @@ namespace Fort.ind_UWP
 
         private static async Task EstablishBaselineAsync(string token, string account, CancellationToken cancellationToken)
         {
-            var newest = await SocialApiService.GetChatHistoryAsync(token, AppConstants.SocialChatBackgroundHistoryLimit, cancellationToken);
-            if (!SocialNotificationService.IsActiveAccount(account) || newest.Status != SocialApiStatus.Ok) return;
+            var newest = DateTimeOffset.MinValue;
+            foreach (var rooms in new[] { false, true })
+            {
+                var history = await SocialApiService.GetChatHistoryAsync(token, AppConstants.SocialChatBackgroundHistoryLimit, rooms, cancellationToken);
+                if (!SocialNotificationService.IsActiveAccount(account) || history.Status != SocialApiStatus.Ok) return;
+
+                if (history.Value.Count > 0) newest = new[] { newest, history.Value.Max(message => message.CreatedAt) }.Max();
+            }
 
             lock (s_lock)
             {
                 if (ReadFloor().HasValue) return;
-
-                var floor = newest.Value.Count == 0 ? DateTimeOffset.MinValue : newest.Value.Max(message => message.CreatedAt);
-                WriteFloor(floor);
+                WriteFloor(newest);
             }
         }
 
         private static async Task ShowAsync(SocialChatMessage message, string account, CancellationToken cancellationToken)
         {
             var sender = message.FromUser;
+            var key = SocialChatKeys.Of(message, account);
+            var senderName = sender == null ? null : MfmText.PlainName(SocialNoteItem.DisplayNameOf(sender));
 
             Uri logo = null;
             if (sender != null)
@@ -108,20 +116,35 @@ namespace Fort.ind_UWP
                 logo = await AvatarIconService.GetToastAvatarUriAsync(sender.AvatarUrl, cancellationToken);
             }
 
+            string title;
+            string body;
+            if (message.IsRoomMessage)
+            {
+                var room = message.ToRoom ?? SocialChatService.RoomFor(message.ToRoomId);
+                title = room == null ? LocalizedStrings.Get("SocialChatRoomUnnamed") : room.DisplayName;
+                body = LocalizedStrings.Format("SocialChatRoomPreviewFormat", senderName ?? LocalizedStrings.Get("SocialChatToastSomeone"), BodyFor(message));
+            }
+            else
+            {
+                title = senderName ?? LocalizedStrings.Get("SocialChatToastSomeone");
+                body = BodyFor(message);
+            }
+
             var toast = new GroupedToast
             {
-                Title = sender == null ? LocalizedStrings.Get("SocialChatToastSomeone") : MfmText.PlainName(SocialNoteItem.DisplayNameOf(sender)),
-                Body = BodyFor(message),
+                Title = title,
+                Body = body,
                 Attribution = LocalizedStrings.Get("SocialChatToastAttribution"),
                 AppLogo = logo,
                 Timestamp = message.CreatedAt,
-                Group = GroupFor(message.FromUserId),
+                Group = GroupFor(key),
                 Tag = Truncate(message.Id)
             };
             toast.AddArgument(AppConstants.ToastArgumentOpen, AppConstants.ToastOpenChat);
-            toast.AddArgument(AppConstants.ToastArgumentUser, message.FromUserId);
+            if (message.IsRoomMessage) toast.AddArgument(AppConstants.ToastArgumentRoom, message.ToRoomId);
+            else toast.AddArgument(AppConstants.ToastArgumentUser, message.FromUserId);
             toast.AddArgument(AppConstants.ToastArgumentAccount, account);
-            toast.ChatReply = SocialToastActions.ChatReplyFor(message.FromUserId, sender, account);
+            toast.ChatReply = SocialToastActions.ChatReplyFor(key, message.IsRoomMessage ? title : senderName, account);
 
             LiveTileService.ShowGroupedToast(toast);
         }
@@ -136,11 +159,11 @@ namespace Fort.ind_UWP
             return message.File != null ? LocalizedStrings.Get("SocialChatAttachmentPreview") : "";
         }
 
-        public static void Remove(string otherUserId)
+        public static void Remove(string key)
         {
-            if (string.IsNullOrEmpty(otherUserId)) return;
+            if (string.IsNullOrEmpty(key)) return;
 
-            LiveTileService.RemoveToastGroup(GroupFor(otherUserId));
+            LiveTileService.RemoveToastGroup(GroupFor(key));
         }
 
         public static void RemoveAll()

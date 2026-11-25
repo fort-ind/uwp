@@ -47,12 +47,14 @@ namespace Fort.ind_UWP
         private readonly DateTimeOffset _queuedAt = DateTimeOffset.Now;
 
         private SocialChatMessageItem(SocialChatMessage message, bool isMine, SocialUser sender, string pendingText,
-                                      SocialDriveFile pendingFile, IReadOnlyDictionary<string, Uri> localEmojis)
+                                      SocialDriveFile pendingFile, IReadOnlyDictionary<string, Uri> localEmojis, string account, bool isRoom)
         {
             _message = message;
             IsMine = isMine;
             Sender = sender;
             LocalEmojis = localEmojis;
+            Account = account;
+            IsRoom = isRoom;
             LocalId = Guid.NewGuid().ToString("N");
             _state = message == null ? SocialChatSendState.Sending : SocialChatSendState.Sent;
             PendingText = pendingText;
@@ -64,12 +66,14 @@ namespace Fort.ind_UWP
                                                    IReadOnlyDictionary<string, Uri> localEmojis)
         {
             var mine = message.IsFrom(account);
-            return new SocialChatMessageItem(message, mine, mine ? null : (message.FromUser ?? other), null, null, localEmojis);
+            var sender = mine ? null : (message.FromUser ?? (message.IsRoomMessage ? null : other));
+            return new SocialChatMessageItem(message, mine, sender, null, null, localEmojis, account, message.IsRoomMessage);
         }
 
-        public static SocialChatMessageItem CreatePending(string text, SocialDriveFile file, IReadOnlyDictionary<string, Uri> localEmojis)
+        public static SocialChatMessageItem CreatePending(string text, SocialDriveFile file, IReadOnlyDictionary<string, Uri> localEmojis,
+                                                          string account, bool isRoom)
         {
-            return new SocialChatMessageItem(null, true, null, text, file, localEmojis);
+            return new SocialChatMessageItem(null, true, null, text, file, localEmojis, account, isRoom);
         }
 
         public event EventHandler RetryRequested;
@@ -78,11 +82,30 @@ namespace Fort.ind_UWP
 
         public event EventHandler<string> UnreactRequested;
 
+        public event EventHandler<string> ReactWithRequested;
+
         public SocialDriveFile PendingFile { get; private set; }
+
+        public string Account { get; private set; }
+
+        public bool IsRoom { get; private set; }
 
         public bool CanReact
         {
             get { return !IsMine && _state == SocialChatSendState.Sent && _message != null; }
+        }
+
+        public bool ShowsSenderName
+        {
+            get { return IsRoom && !IsMine && _startsGroup && Sender != null; }
+        }
+
+        public bool IsMyReaction(string key)
+        {
+            if (_message == null) return false;
+            if (!IsRoom) return CanReact;
+
+            return _message.HasReaction(key, Account);
         }
 
         public void RequestReact(FrameworkElement anchor)
@@ -93,6 +116,11 @@ namespace Fort.ind_UWP
         public void RequestUnreact(string key)
         {
             if (CanReact && !string.IsNullOrEmpty(key)) UnreactRequested?.Invoke(this, key);
+        }
+
+        public void RequestReactWith(string key)
+        {
+            if (CanReact && !string.IsNullOrEmpty(key)) ReactWithRequested?.Invoke(this, key);
         }
 
         public string LocalId { get; private set; }

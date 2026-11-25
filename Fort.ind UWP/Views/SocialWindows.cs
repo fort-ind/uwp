@@ -73,17 +73,17 @@ namespace Fort.ind_UWP
             return WindowManagerService.ShowKeyedAsync(request);
         }
 
-        public static Task<bool> ShowChatAsync(string userId, SocialUser user)
+        public static Task<bool> ShowChatAsync(SocialChatArgs args)
         {
             var account = SocialContentService.CurrentAccountId();
-            if (string.IsNullOrEmpty(userId) || account == null || !LabsService.ChatEnabled) return Task.FromResult(false);
+            if (args == null || string.IsNullOrEmpty(args.Key) || account == null || !LabsService.ChatEnabled) return Task.FromResult(false);
 
-            var name = user == null ? null : MfmText.PlainName(SocialNoteItem.DisplayNameOf(user));
-            var request = new WindowRequest(AppConstants.WindowKeyChatPrefix + userId,
-                                            string.IsNullOrWhiteSpace(name) ? LocalizedStrings.Get("HeaderChat") : name,
+            var chat = args.IsRoom ? SocialChatArgs.ForRoom(account, args.RoomId, args.Room) : new SocialChatArgs(account, args.UserId, args.User);
+            var request = new WindowRequest(AppConstants.WindowKeyChatPrefix + chat.Key,
+                                            SocialChatConversationPage.TitleFor(chat),
                                             null,
                                             typeof(SocialChatConversationPage),
-                                            new SocialChatArgs(account, userId, user),
+                                            chat,
                                             new Size(AppConstants.SocialChatWindowWidth, AppConstants.SocialChatWindowHeight),
                                             true);
 

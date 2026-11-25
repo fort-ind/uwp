@@ -188,6 +188,9 @@ namespace Fort.ind_UWP
                 AutomationProperties.SetName(AvatarButton, LocalizedStrings.Format("SocialMenuViewUserFormat", item.Sender.Handle));
                 ToolTipService.SetToolTip(AvatarButton, MfmText.PlainName(name));
             }
+
+            SenderName.Visibility = item.ShowsSenderName ? Visibility.Visible : Visibility.Collapsed;
+            SenderName.Text = item.ShowsSenderName ? MfmText.PlainName(SocialNoteItem.DisplayNameOf(item.Sender)) : "";
         }
 
         private void PaintMeta(SocialChatMessageItem item)
@@ -227,7 +230,6 @@ namespace Fort.ind_UWP
             }
 
             var emojis = SocialContentService.CachedEmojiMap;
-            var mine = item.CanReact;
             for (var i = 0; i < reactions.Count; i++)
             {
                 if (i >= _chips.Count)
@@ -240,13 +242,17 @@ namespace Fort.ind_UWP
                 }
 
                 var key = reactions[i].Key;
+                var mine = item.IsMyReaction(key);
+                var clickable = item.CanReact && (mine || item.IsRoom);
                 var shown = _chips[i];
                 shown.Show(reactions[i], SocialReactions.ImageUri(key, null, emojis), mine);
                 shown.Button.IsChecked = mine;
-                shown.Button.IsHitTestVisible = mine;
+                shown.Button.IsHitTestVisible = clickable;
                 ToolTipService.SetToolTip(shown.Button, mine
                                                         ? LocalizedStrings.Format("SocialChatRemoveReactionFormat", SocialReactions.SpokenName(key))
-                                                        : SocialReactions.SpokenName(key));
+                                                        : clickable
+                                                          ? LocalizedStrings.Format("SocialChatAddReactionFormat", SocialReactions.SpokenName(key))
+                                                          : SocialReactions.SpokenName(key));
             }
 
             for (var i = reactions.Count; i < _chips.Count; i++)
@@ -534,10 +540,22 @@ namespace Fort.ind_UWP
 
         private void Bubble_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
+            var device = e.Pointer.PointerDeviceType;
+            if (device == Windows.Devices.Input.PointerDeviceType.Touch) return;
+
             ShowReactButton(true);
         }
 
         private void Bubble_PointerExited(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            var position = e.GetCurrentPoint(this).Position;
+            var stillInside = position.X >= 0 && position.Y >= 0 && position.X < ActualWidth && position.Y < ActualHeight;
+            if (stillInside) return;
+
+            ShowReactButton(false);
+        }
+
+        private void Bubble_PointerCanceled(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             ShowReactButton(false);
         }
@@ -563,8 +581,10 @@ namespace Fort.ind_UWP
                 var chip = _chips.FirstOrDefault(entry => ReferenceEquals(entry.Button, sender));
                 if (item == null || chip == null) return;
 
-                chip.Button.IsChecked = true;
-                item.RequestUnreact(chip.Key);
+                var mine = item.IsMyReaction(chip.Key);
+                chip.Button.IsChecked = mine;
+                if (mine) item.RequestUnreact(chip.Key);
+                else item.RequestReactWith(chip.Key);
             }
             catch (Exception ex)
             {

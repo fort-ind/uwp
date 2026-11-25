@@ -8,7 +8,7 @@ namespace Fort.ind_UWP
 {
     public sealed class SocialChatWatch : IDisposable
     {
-        private string _otherUserId;
+        private string _key;
 
         private bool _disposed;
 
@@ -16,25 +16,25 @@ namespace Fort.ind_UWP
         {
         }
 
-        public void Set(string otherUserId)
+        public void Set(string key)
         {
             if (_disposed) return;
-            if (string.IsNullOrEmpty(otherUserId)) otherUserId = null;
-            if (string.Equals(_otherUserId, otherUserId, StringComparison.Ordinal)) return;
+            if (string.IsNullOrEmpty(key)) key = null;
+            if (string.Equals(_key, key, StringComparison.Ordinal)) return;
 
-            var previous = _otherUserId;
-            _otherUserId = otherUserId;
-            SocialChatCapture.Change(otherUserId, previous);
+            var previous = _key;
+            _key = key;
+            SocialChatCapture.Change(key, previous);
         }
 
         public void MarkRead()
         {
-            if (!_disposed && _otherUserId != null) SocialChatCapture.MarkRead(_otherUserId);
+            if (!_disposed && _key != null) SocialChatCapture.MarkRead(_key);
         }
 
         public void Rejoin()
         {
-            if (!_disposed && _otherUserId != null) SocialChatCapture.Rejoin(_otherUserId);
+            if (!_disposed && _key != null) SocialChatCapture.Rejoin(_key);
         }
 
         public void Dispose()
@@ -52,6 +52,8 @@ namespace Fort.ind_UWP
         private const string MainChannel = "main";
 
         private const string ChatUserChannel = "chatUser";
+
+        private const string ChatRoomChannel = "chatRoom";
 
         private static readonly TimeSpan MinimumReconnectDelay = TimeSpan.FromSeconds(10);
 
@@ -195,26 +197,26 @@ namespace Fort.ind_UWP
             if (leaveChannel != null) Disconnect(stream, leaveChannel);
         }
 
-        internal static void Rejoin(string otherUserId)
+        internal static void Rejoin(string key)
         {
             SocialStream stream;
             lock (s_lock)
             {
                 stream = s_connected ? s_stream : null;
-                if (stream == null || !s_counts.ContainsKey(otherUserId)) return;
+                if (stream == null || !s_counts.ContainsKey(key)) return;
             }
 
-            JoinConversation(stream, otherUserId);
+            JoinConversation(stream, key);
         }
 
-        internal static void MarkRead(string otherUserId)
+        internal static void MarkRead(string key)
         {
             SocialStream stream;
             string channelId;
             lock (s_lock)
             {
                 stream = s_connected ? s_stream : null;
-                if (stream == null || !s_channelIds.TryGetValue(otherUserId, out channelId)) return;
+                if (stream == null || !s_channelIds.TryGetValue(key, out channelId)) return;
             }
 
             JObject body = new JObject();
@@ -224,24 +226,26 @@ namespace Fort.ind_UWP
             Send(stream, "ch", body);
         }
 
-        private static void JoinConversation(SocialStream stream, string otherUserId)
+        private static void JoinConversation(SocialStream stream, string key)
         {
             string channelId;
             lock (s_lock)
             {
-                if (!s_channelIds.TryGetValue(otherUserId, out channelId))
+                if (!s_channelIds.TryGetValue(key, out channelId))
                 {
                     channelId = Guid.NewGuid().ToString("N");
-                    s_channelIds[otherUserId] = channelId;
-                    s_channelOwners[channelId] = otherUserId;
+                    s_channelIds[key] = channelId;
+                    s_channelOwners[channelId] = key;
                 }
             }
 
+            var isRoom = SocialChatKeys.IsRoom(key);
             JObject parameters = new JObject();
-            parameters.Add("otherId", new JValue(otherUserId));
+            if (isRoom) parameters.Add("roomId", new JValue(SocialChatKeys.RoomIdOf(key)));
+            else parameters.Add("otherId", new JValue(key));
 
             JObject body = new JObject();
-            body.Add("channel", new JValue(ChatUserChannel));
+            body.Add("channel", new JValue(isRoom ? ChatRoomChannel : ChatUserChannel));
             body.Add("id", new JValue(channelId));
             body.Add("params", parameters);
             Send(stream, "connect", body);
@@ -461,6 +465,10 @@ namespace Fort.ind_UWP
                     {
                         SocialChatService.ApplyFromMainChannel(SocialChatMessage.FromJson(e.Body as JObject));
                     }
+                    else if (string.Equals(e.Type, "notification", StringComparison.Ordinal))
+                    {
+                        SocialChatService.OfferNotification(SocialJson.String(e.Body as JObject, "type"));
+                    }
                     return;
                 }
 
@@ -477,10 +485,12 @@ namespace Fort.ind_UWP
                     case "react":
                     case "unreact":
                         var reaction = e.Body as JObject;
+                        var reactor = SocialUser.FromJson(SocialJson.Object(reaction, "user"));
                         SocialChatService.ApplyReaction(other,
                                                         SocialJson.String(reaction, "messageId"),
                                                         SocialJson.String(reaction, "reaction"),
-                                                        string.Equals(e.Type, "react", StringComparison.Ordinal));
+                                                        string.Equals(e.Type, "react", StringComparison.Ordinal),
+                                                        reactor == null ? null : reactor.Id);
                         break;
                 }
             }

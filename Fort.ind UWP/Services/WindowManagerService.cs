@@ -187,7 +187,7 @@ namespace Fort.ind_UWP
             }
         }
 
-        public static async Task ShowChatInMainWindowAsync(string userId)
+        public static async Task ShowChatInMainWindowAsync(string key)
         {
             if (!IsSecondaryView) CaptureMainView();
 
@@ -201,7 +201,10 @@ namespace Fort.ind_UWP
                 try
                 {
                     var shell = MainPage.Current;
-                    if (shell != null) shell.ShowChat(userId);
+                    if (shell == null) return;
+
+                    if (string.IsNullOrEmpty(key)) shell.ShowChatInvitations();
+                    else shell.ShowChat(key);
                 }
                 catch (Exception ex)
                 {

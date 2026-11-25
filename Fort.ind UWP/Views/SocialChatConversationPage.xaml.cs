@@ -14,19 +14,26 @@ namespace Fort.ind_UWP
             this.InitializeComponent();
 
             Loaded += SocialChatConversationPage_Loaded;
-            ChatView.PersonResolved += ChatView_PersonResolved;
+            ChatView.TitleChanged += ChatView_TitleChanged;
+            ChatView.Left += ChatView_Left;
         }
 
         public static string TitleFor(SocialChatArgs args)
         {
+            if (args != null && args.IsRoom)
+            {
+                var room = args.Room ?? SocialChatService.RoomFor(args.RoomId);
+                return room == null ? LocalizedStrings.Get("HeaderChat") : room.DisplayName;
+            }
+
             var user = args == null ? null : args.User;
             var name = user == null ? null : MfmText.PlainName(SocialNoteItem.DisplayNameOf(user));
             return string.IsNullOrWhiteSpace(name) ? LocalizedStrings.Get("HeaderChat") : name;
         }
 
-        public bool Shows(string userId)
+        public bool Shows(string key)
         {
-            return _args != null && string.Equals(_args.UserId, userId, StringComparison.Ordinal);
+            return _args != null && string.Equals(_args.Key, key, StringComparison.Ordinal);
         }
 
         private bool IsOwnWindow
@@ -70,14 +77,30 @@ namespace Fort.ind_UWP
             ChatView.FocusComposer();
         }
 
-        private void ChatView_PersonResolved(object sender, SocialUser user)
+        private void ChatView_Left(object sender, string key)
         {
             try
             {
-                if (user == null || !IsOwnWindow) return;
+                if (IsOwnWindow)
+                {
+                    WindowManagerService.CloseCurrentWindow();
+                }
+                else if (Frame != null && Frame.CanGoBack && ReferenceEquals(Frame.Content, this))
+                {
+                    Frame.GoBack();
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("SocialChatConversationPage: could not leave the room", ex);
+            }
+        }
 
-                var name = MfmText.PlainName(SocialNoteItem.DisplayNameOf(user));
-                if (!string.IsNullOrWhiteSpace(name)) WindowManagerService.SetCurrentWindowTitle(name);
+        private void ChatView_TitleChanged(object sender, string title)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(title) && IsOwnWindow) WindowManagerService.SetCurrentWindowTitle(title);
             }
             catch (Exception ex)
             {
